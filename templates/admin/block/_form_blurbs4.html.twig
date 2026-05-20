@@ -12,34 +12,146 @@
         <label>Texto de apoio</label>
         <textarea name="text" class="ate" rows="3">{{ block.text }}</textarea>
     </div>
-    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">4 Blocos</div>
+
+    <div style="margin:2rem 0 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:.9rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:.06em">Itens do Bloco</span>
+        <button type="button" class="btn btn-g btn-sm" onclick="addBlurb()" style="display:inline-flex; align-items:center; gap:0.4rem;">
+            <i class="fa-solid fa-plus"></i> Adicionar Item
+        </button>
+    </div>
+
     {% set cfg = block.config ?? {} %}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-    {% for i in 0..3 %}
-    {% set b = {icon: '', title: '', text: ''}|merge(cfg.items[i] ?? {}) %}
-    <div class="card" style="margin:0;padding:1rem">
-        <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Bloco {{ i+1 }}</div>
-        <div class="af-field">
-            <label>Ícone (Font Awesome)</label>
-            <div class="icon-picker-wrap">
-                <div class="icon-preview" id="blurb-prev-{{ i }}">{% if b.icon %}<i class="{{ b.icon }}"></i>{% endif %}</div>
-                <input type="text" id="blurb-icon-{{ i }}" name="config[items][{{ i }}][icon]" class="ai" value="{{ b.icon }}" placeholder="fa-solid fa-star" style="flex:1">
-                <button type="button" class="btn btn-g btn-sm" onclick="openIconPicker('blurb-icon-{{ i }}','blurb-prev-{{ i }}')">Escolher</button>
-            </div>
-        </div>
-        <div class="af-field">
-            <label>Título</label>
-            <input type="text" name="config[items][{{ i }}][title]" class="ai" value="{{ b.title }}">
-        </div>
-        <div class="af-field">
-            <label>Texto</label>
-            <textarea name="config[items][{{ i }}][text]" class="ate" rows="2">{{ b.text }}</textarea>
-        </div>
-    </div>
-    {% endfor %}
-    </div>
-    <div class="af-actions">
+    {% set items = cfg.items ?? [] %}
+
+    {# Fallback to old format item1_title etc. if items is empty #}
+    {% if items|length == 0 %}
+        {% for i in 1..4 %}
+            {% set title = cfg['item' ~ i ~ '_title'] ?? null %}
+            {% if title or cfg['item' ~ i ~ '_text'] ?? null or cfg['item' ~ i ~ '_icon'] ?? null %}
+                {% set items = items|merge([{
+                    'icon': cfg['item' ~ i ~ '_icon'] ?? '',
+                    'title': title ?? '',
+                    'text': cfg['item' ~ i ~ '_text'] ?? ''
+                }]) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div id="blurbs-container"></div>
+
+    <div class="af-actions" style="margin-top:2.5rem;">
         <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
         <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
     </div>
 </form>
+
+<script>
+function addBlurb(icon = '', title = '', text = '') {
+    const container = document.getElementById('blurbs-container');
+    const uniqueId = 'blurb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
+    
+    const card = document.createElement('div');
+    card.className = 'card blurb-item';
+    card.style.margin = '0 0 1rem';
+    card.style.padding = '1.25rem';
+    card.style.borderLeft = '4px solid var(--color-primary, #3b82f6)';
+    card.style.position = 'relative';
+    card.style.background = 'var(--bg-card)';
+    
+    card.innerHTML = `
+        <div style="position: absolute; top: 1rem; right: 1rem; display: flex; gap: 0.25rem;">
+            <button type="button" class="btn btn-g btn-sm btn-up" title="Mover para cima" onclick="moveBlurbUp(this)" style="padding: 4px 8px; min-width: 32px;"><i class="fa-solid fa-arrow-up"></i></button>
+            <button type="button" class="btn btn-g btn-sm btn-down" title="Mover para baixo" onclick="moveBlurbDown(this)" style="padding: 4px 8px; min-width: 32px;"><i class="fa-solid fa-arrow-down"></i></button>
+            <button type="button" class="btn btn-sm btn-del" title="Excluir" onclick="removeBlurb(this)" style="background:#ef4444; color:#fff; border:none; padding: 4px 8px; border-radius:4px; cursor:pointer; min-width: 32px;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        
+        <div style="font-weight:700; font-size:.85rem; margin-bottom:1rem; color:var(--text); text-transform:uppercase; letter-spacing:0.05em;">
+            Item <span class="blurb-index">1</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <div class="af-field">
+                    <label>Ícone (Font Awesome)</label>
+                    <div class="icon-picker-wrap">
+                        <div class="icon-preview" id="prev-${uniqueId}">${icon ? `<i class="${icon}"></i>` : ''}</div>
+                        <input type="text" id="input-${uniqueId}" class="ai blurb-icon-input" value="${escapeHtml(icon)}" placeholder="fa-solid fa-star" style="flex:1">
+                        <button type="button" class="btn btn-g btn-sm" onclick="openIconPicker('input-${uniqueId}','prev-${uniqueId}')">Escolher</button>
+                    </div>
+                </div>
+                <div class="af-field" style="margin-top:0.75rem;">
+                    <label>Título <span class="req">*</span></label>
+                    <input type="text" class="ai blurb-title-input" value="${escapeHtml(title)}" required>
+                </div>
+            </div>
+            
+            <div class="af-field" style="margin-bottom:0;">
+                <label>Texto</label>
+                <textarea class="ate blurb-text-input" rows="4" style="height: 104px;">${escapeHtml(text)}</textarea>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(card);
+    reindexBlurbs();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function removeBlurb(button) {
+    if (confirm('Deseja realmente remover este item?')) {
+        const item = button.closest('.blurb-item');
+        item.remove();
+        reindexBlurbs();
+    }
+}
+
+function moveBlurbUp(button) {
+    const item = button.closest('.blurb-item');
+    const prev = item.previousElementSibling;
+    if (prev && prev.classList.contains('blurb-item')) {
+        item.parentNode.insertBefore(item, prev);
+        reindexBlurbs();
+    }
+}
+
+function moveBlurbDown(button) {
+    const item = button.closest('.blurb-item');
+    const next = item.nextElementSibling;
+    if (next && next.classList.contains('blurb-item')) {
+        item.parentNode.insertBefore(next, item);
+        reindexBlurbs();
+    }
+}
+
+function reindexBlurbs() {
+    const items = document.querySelectorAll('.blurb-item');
+    items.forEach((item, index) => {
+        // Update index number display
+        item.querySelector('.blurb-index').textContent = index + 1;
+        
+        // Update input names
+        const iconInput = item.querySelector('.blurb-icon-input');
+        const titleInput = item.querySelector('.blurb-title-input');
+        const textInput = item.querySelector('.blurb-text-input');
+        
+        if (iconInput) iconInput.name = `config[items][${index}][icon]`;
+        if (titleInput) titleInput.name = `config[items][${index}][title]`;
+        if (textInput) textInput.name = `config[items][${index}][text]`;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    {% for it in items %}
+        addBlurb('{{ it.icon|escape('js') }}', '{{ it.title|escape('js') }}', '{{ it.text|escape('js') }}');
+    {% endfor %}
+    
+    // Add one empty blurb if list is empty
+    if (document.querySelectorAll('.blurb-item').length === 0) {
+        addBlurb();
+    }
+});
+</script>

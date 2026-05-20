@@ -3,7 +3,12 @@
     <div class="container mh-inner">
         <a href="{{ path('pub_home') }}" class="mh-logo" aria-label="Início">
             {% if currentTenant and currentTenant.logo %}
-                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" height="40">
+                <img class="logo-light" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" height="40" style="max-height:40px;width:auto;object-fit:contain;">
+                {% if currentTenant.darkLogo %}
+                    <img class="logo-dark" src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ currentTenant.name }}" height="40" style="max-height:40px;width:auto;object-fit:contain;">
+                {% else %}
+                    <img class="logo-dark" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" height="40" style="max-height:40px;width:auto;object-fit:contain;">
+                {% endif %}
             {% else %}
                 <span class="mh-logo-text">{{ currentTenant ? currentTenant.name : 'WAB' }}</span>
             {% endif %}
@@ -12,43 +17,74 @@
         {% set showMenuIcons = currentTenant.navigationSettings.showMenuIcons ?? true %}
 
         <nav class="mh-nav" aria-label="Navegação">
-            {% if headerCategories is defined %}
-                {% for cat in headerCategories %}
-                    {% set active_children = [] %}
-                    {% for sub in cat.children %}
-                        {% if sub.pages|length > 0 %}
-                            {% set active_children = active_children|merge([sub]) %}
+            {% if currentTenant.landingPageMode and currentTenant.homePage %}
+                {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
+                {% set anchorPrefix = isHome ? '' : path('pub_home') %}
+                {% for section in currentTenant.homePage.sections %}
+                    {% if section.active %}
+                        {% set sectionTitle = '' %}
+                        {% if section.titlePart1 or section.titlePart2 %}
+                            {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
                         {% endif %}
-                    {% endfor %}
-                    
-                    {% set has_pages = cat.pages|length > 0 %}
-                    {% set has_active_children = active_children|length > 0 %}
-                    
-                    {% if has_active_children or has_pages %}
-                        {% if has_active_children %}
-                            <div class="mh-dropdown">
-                                <span class="mh-link mh-dropdown-toggle">
-                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                    {{ cat.name }} <i class="fa-solid fa-chevron-down" style="font-size:.65rem;margin-left:.3rem"></i>
-                                </span>
-                                <div class="mh-dropdown-menu">
-                                    {% for sub in active_children %}
-                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="mh-dd-item">
-                                        {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}"></i>{% endif %} {{ sub.name }}
-                                    </a>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% else %}
-                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="mh-link">
-                                 {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                {{ cat.name }}
-                            </a>
+                        {% if sectionTitle == '' %}
+                            {% set firstBlock = section.blocks|first %}
+                            {% if firstBlock %}
+                                {% if firstBlock.type == 'banner' %}{% set sectionTitle = 'Início' %}
+                                {% elseif firstBlock.type in ['features', 'blurbs', 'blurbs4'] %}{% set sectionTitle = 'Recursos' %}
+                                {% elseif firstBlock.type == 'team' %}{% set sectionTitle = 'Equipe' %}
+                                {% elseif firstBlock.type in ['about', 'content'] %}{% set sectionTitle = 'Sobre' %}
+                                {% elseif firstBlock.type == 'pricing' %}{% set sectionTitle = 'Preços' %}
+                                {% elseif firstBlock.type == 'contact' %}{% set sectionTitle = 'Contato' %}
+                                {% elseif firstBlock.type == 'faq' %}{% set sectionTitle = 'FAQ' %}
+                                {% elseif firstBlock.type in ['gallery', 'portfolio'] %}{% set sectionTitle = 'Portfólio' %}
+                                {% endif %}
+                            {% endif %}
                         {% endif %}
+                        {% if sectionTitle == '' %}
+                            {% set sectionTitle = 'Seção ' ~ loop.index %}
+                        {% endif %}
+                        <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="mh-link">{{ sectionTitle }}</a>
                     {% endif %}
                 {% endfor %}
+            {% else %}
+                {% if headerCategories is defined %}
+                    {% for cat in headerCategories %}
+                        {% set active_children = [] %}
+                        {% for sub in cat.children %}
+                            {% if sub.pages|length > 0 %}
+                                {% set active_children = active_children|merge([sub]) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% set has_pages = cat.pages|length > 0 %}
+                        {% set has_active_children = active_children|length > 0 %}
+                        
+                        {% if has_active_children or has_pages %}
+                            {% if has_active_children %}
+                                <div class="mh-dropdown">
+                                    <span class="mh-link mh-dropdown-toggle">
+                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                        {{ cat.name }} <i class="fa-solid fa-chevron-down" style="font-size:.65rem;margin-left:.3rem"></i>
+                                    </span>
+                                    <div class="mh-dropdown-menu">
+                                        {% for sub in active_children %}
+                                        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="mh-dd-item">
+                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}"></i>{% endif %} {{ sub.name }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="mh-link">
+                                     {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                    {{ cat.name }}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <a href="{{ path('pub_home') }}#contato" class="mh-cta btn btn-primary" style="padding:.6rem 1.5rem;font-size:.85rem">Contato</a>
             {% endif %}
-            <a href="{{ path('pub_home') }}#contato" class="mh-cta btn btn-primary" style="padding:.6rem 1.5rem;font-size:.85rem">Contato</a>
             <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" style="margin-left:.5rem">
                 <i class="fa-solid fa-circle-half-stroke"></i> Auto
             </button>
@@ -61,6 +97,11 @@
 </header>
 
 <style>
+html.dark .logo-light { display: none !important; }
+html.dark .logo-dark { display: block !important; }
+html:not(.dark) .logo-light { display: block !important; }
+html:not(.dark) .logo-dark { display: none !important; }
+
 .moderno-header {
     position: fixed; top: var(--topbar-height, 0px); left: 0; right: 0; z-index: 200;
     background: var(--header-bg); backdrop-filter: blur(20px) saturate(180%);

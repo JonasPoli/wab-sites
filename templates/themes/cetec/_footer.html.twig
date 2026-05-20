@@ -21,8 +21,12 @@
         <!-- Col 1: Brand Info -->
         <div data-aos="fade-up">
             <div class="mb-6">
-                {% if currentTenant and currentTenant.logo %}
-                    <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain brightness-0 invert">
+                {% if currentTenant and (currentTenant.darkLogo or currentTenant.logo) %}
+                    {% if currentTenant.darkLogo %}
+                        <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain">
+                    {% else %}
+                        <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain brightness-0 invert">
+                    {% endif %}
                 {% else %}
                     <span class="text-2xl font-black tracking-wider uppercase text-white">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
                 {% endif %}

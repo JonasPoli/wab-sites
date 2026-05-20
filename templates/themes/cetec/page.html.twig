@@ -56,7 +56,7 @@
         {% set sectionStyle = 'position:relative;overflow:hidden' %}
     {% endif %}
 
-    <section class="{{ sectionClass }}" style="{{ sectionStyle }}">
+    <section id="section-{{ section.id }}" class="{{ sectionClass }}" style="{{ sectionStyle }}">
         {# Background Image layer #}
         {% if section.bgType == 'image' and section.bgImage %}
             <div class="absolute inset-0 bg-cover bg-center pointer-events-none" 

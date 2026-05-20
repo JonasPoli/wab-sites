@@ -4,7 +4,12 @@
         <!-- Logo -->
         <a href="{{ path('pub_home') }}" class="flex items-center">
             {% if currentTenant and currentTenant.logo %}
-                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" class="h-12 md:h-14 transition-all duration-300 w-auto object-contain">
+                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}">
+                {% if currentTenant.darkLogo %}
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ currentTenant.name }}">
+                {% else %}
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}">
+                {% endif %}
             {% else %}
                 <span class="text-2xl font-black tracking-wider uppercase" style="color: var(--color-primary);">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
             {% endif %}
@@ -14,7 +19,125 @@
 
         <!-- Desktop Menu -->
         <div class="hidden lg:flex items-center gap-6 font-semibold">
-            <a href="{{ path('pub_home') }}" class="nav-link">Início</a>
+            {% if currentTenant.landingPageMode and currentTenant.homePage %}
+                {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
+                {% set anchorPrefix = isHome ? '' : path('pub_home') %}
+                {% for section in currentTenant.homePage.sections %}
+                    {% if section.active %}
+                        {% set sectionTitle = '' %}
+                        {% if section.titlePart1 or section.titlePart2 %}
+                            {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
+                        {% endif %}
+                        {% if sectionTitle == '' %}
+                            {% set firstBlock = section.blocks|first %}
+                            {% if firstBlock %}
+                                {% if firstBlock.type == 'banner' %}{% set sectionTitle = 'Início' %}
+                                {% elseif firstBlock.type in ['features', 'blurbs', 'blurbs4'] %}{% set sectionTitle = 'Recursos' %}
+                                {% elseif firstBlock.type == 'team' %}{% set sectionTitle = 'Equipe' %}
+                                {% elseif firstBlock.type in ['about', 'content'] %}{% set sectionTitle = 'Sobre' %}
+                                {% elseif firstBlock.type == 'pricing' %}{% set sectionTitle = 'Preços' %}
+                                {% elseif firstBlock.type == 'contact' %}{% set sectionTitle = 'Contato' %}
+                                {% elseif firstBlock.type == 'faq' %}{% set sectionTitle = 'FAQ' %}
+                                {% elseif firstBlock.type in ['gallery', 'portfolio'] %}{% set sectionTitle = 'Portfólio' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                        {% if sectionTitle == '' %}
+                            {% set sectionTitle = 'Seção ' ~ loop.index %}
+                        {% endif %}
+                        <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="nav-link">{{ sectionTitle }}</a>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <a href="{{ path('pub_home') }}" class="nav-link">Início</a>
+                
+                {% if headerCategories is defined %}
+                    {% for cat in headerCategories %}
+                        {% set active_children = [] %}
+                        {% for sub in cat.children %}
+                            {% if sub.pages|length > 0 %}
+                                {% set active_children = active_children|merge([sub]) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% set has_pages = cat.pages|length > 0 %}
+                        {% set has_active_children = active_children|length > 0 %}
+                        
+                        {% if has_active_children or has_pages %}
+                            {% if has_active_children %}
+                                <div class="nav-dropdown">
+                                    <span class="nav-link dropdown-toggle">
+                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                                        {{ cat.name }} <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                                    </span>
+                                    <div class="dropdown-menu">
+                                        {% for sub in active_children %}
+                                        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="dd-item">
+                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }} w-4 text-center"></i>{% endif %} {{ sub.name }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
+                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                                    {{ cat.name }}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
+                <a href="{{ path('pub_home') }}#contato" class="btn-inscricao">
+                    <i class="bi bi-pencil-square"></i>
+                    Inscreva-se
+                </a>
+            {% endif %}
+            
+            <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" class="ml-2">
+                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+            </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="lg:hidden text-3xl focus:outline-none text-current" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="mobile-menu" onclick="toggleMobileMenu()">
+            <i class="bi bi-list" aria-hidden="true" id="menu-icon-state"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-gray-100 flex-col py-4 px-6 shadow-xl gap-2 transition-all duration-300" style="background: var(--bg-card); color: var(--text);">
+        {% if currentTenant.landingPageMode and currentTenant.homePage %}
+            {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
+            {% set anchorPrefix = isHome ? '' : path('pub_home') %}
+            {% for section in currentTenant.homePage.sections %}
+                {% if section.active %}
+                    {% set sectionTitle = '' %}
+                    {% if section.titlePart1 or section.titlePart2 %}
+                        {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
+                    {% endif %}
+                    {% if sectionTitle == '' %}
+                        {% set firstBlock = section.blocks|first %}
+                        {% if firstBlock %}
+                            {% if firstBlock.type == 'banner' %}{% set sectionTitle = 'Início' %}
+                            {% elseif firstBlock.type in ['features', 'blurbs', 'blurbs4'] %}{% set sectionTitle = 'Recursos' %}
+                            {% elseif firstBlock.type == 'team' %}{% set sectionTitle = 'Equipe' %}
+                            {% elseif firstBlock.type in ['about', 'content'] %}{% set sectionTitle = 'Sobre' %}
+                            {% elseif firstBlock.type == 'pricing' %}{% set sectionTitle = 'Preços' %}
+                            {% elseif firstBlock.type == 'contact' %}{% set sectionTitle = 'Contato' %}
+                            {% elseif firstBlock.type == 'faq' %}{% set sectionTitle = 'FAQ' %}
+                            {% elseif firstBlock.type in ['gallery', 'portfolio'] %}{% set sectionTitle = 'Portfólio' %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    {% if sectionTitle == '' %}
+                        {% set sectionTitle = 'Seção ' ~ loop.index %}
+                    {% endif %}
+                    <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors" onclick="toggleMobileMenu()">{{ sectionTitle }}</a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <a href="{{ path('pub_home') }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">Início</a>
             
             {% if headerCategories is defined %}
                 {% for cat in headerCategories %}
@@ -30,22 +153,20 @@
                     
                     {% if has_active_children or has_pages %}
                         {% if has_active_children %}
-                            <div class="nav-dropdown">
-                                <span class="nav-link dropdown-toggle">
-                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
-                                    {{ cat.name }} <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                            <div class="py-2.5 border-b border-gray-50/5">
+                                <span class="font-bold flex justify-between items-center" style="color: var(--color-secondary);">
+                                    {{ cat.name }}
                                 </span>
-                                <div class="dropdown-menu">
+                                <div class="pl-4 mt-2 flex flex-col gap-2 border-l-2 border-gray-200">
                                     {% for sub in active_children %}
-                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="dd-item">
-                                        {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }} w-4 text-center"></i>{% endif %} {{ sub.name }}
+                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="py-1 hover:text-cetec-orange transition-colors">
+                                        {{ sub.name }}
                                     </a>
                                     {% endfor %}
                                 </div>
                             </div>
                         {% else %}
-                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
-                                {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">
                                 {{ cat.name }}
                             </a>
                         {% endif %}
@@ -53,64 +174,10 @@
                 {% endfor %}
             {% endif %}
             
-            <a href="{{ path('pub_home') }}#contato" class="btn-inscricao">
-                <i class="bi bi-pencil-square"></i>
+            <a href="{{ path('pub_home') }}#contato" class="mt-4 bg-cetec-orange text-white text-center font-bold py-3 rounded-md shadow-md hover:bg-[#e55902] transition-colors" onclick="toggleMobileMenu()">
                 Inscreva-se
             </a>
-            
-            <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" class="ml-2">
-                <i class="fa-solid fa-circle-half-stroke"></i> Auto
-            </button>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="lg:hidden text-3xl focus:outline-none text-current" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="mobile-menu" onclick="toggleMobileMenu()">
-            <i class="bi bi-list" aria-hidden="true" id="menu-icon-state"></i>
-        </button>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden lg:hidden border-t border-gray-100 flex-col py-4 px-6 shadow-xl gap-2 transition-all duration-300" style="background: var(--bg-card); color: var(--text);">
-        <a href="{{ path('pub_home') }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">Início</a>
-        
-        {% if headerCategories is defined %}
-            {% for cat in headerCategories %}
-                {% set active_children = [] %}
-                {% for sub in cat.children %}
-                    {% if sub.pages|length > 0 %}
-                        {% set active_children = active_children|merge([sub]) %}
-                    {% endif %}
-                {% endfor %}
-                
-                {% set has_pages = cat.pages|length > 0 %}
-                {% set has_active_children = active_children|length > 0 %}
-                
-                {% if has_active_children or has_pages %}
-                    {% if has_active_children %}
-                        <div class="py-2.5 border-b border-gray-50/5">
-                            <span class="font-bold flex justify-between items-center" style="color: var(--color-secondary);">
-                                {{ cat.name }}
-                            </span>
-                            <div class="pl-4 mt-2 flex flex-col gap-2 border-l-2 border-gray-200">
-                                {% for sub in active_children %}
-                                <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="py-1 hover:text-cetec-orange transition-colors">
-                                    {{ sub.name }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">
-                            {{ cat.name }}
-                        </a>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
         {% endif %}
-        
-        <a href="{{ path('pub_home') }}#contato" class="mt-4 bg-cetec-orange text-white text-center font-bold py-3 rounded-md shadow-md hover:bg-[#e55902] transition-colors" onclick="toggleMobileMenu()">
-            Inscreva-se
-        </a>
         <div class="mt-4 flex justify-between items-center">
             <span class="text-sm font-medium">Modo de Cor</span>
             <button id="wab-theme-btn-mobile" onclick="cycleTheme()" class="px-4 py-2 border rounded-full text-xs font-bold" style="background: var(--bg); color: var(--text); border-color: var(--border);">
@@ -121,6 +188,11 @@
 </header>
 
 <style>
+html.dark .logo-light { display: none !important; }
+html.dark .logo-dark { display: block !important; }
+html:not(.dark) .logo-light { display: block !important; }
+html:not(.dark) .logo-dark { display: none !important; }
+
 .cetec-header {
     position: sticky;
     top: 0;

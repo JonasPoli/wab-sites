@@ -73,7 +73,7 @@
     {% set sectionStyle = 'position:relative;overflow:hidden' %}
 {% endif %}
 
-<section class="{{ sectionClass }}" style="{{ sectionStyle }}">
+<section id="section-{{ section.id }}" class="{{ sectionClass }}" style="{{ sectionStyle }}">
     {# Background image layer #}
     {% if section.bgType == 'image' and section.bgImage %}
     <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}');background-size:cover;background-position:{{ section.bgImagePosition }};opacity:{{ section.bgImageOpacity / 100 }};z-index:0;pointer-events:none"></div>

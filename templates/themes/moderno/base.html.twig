@@ -25,6 +25,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=optional" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
+    {# ── FontAwesome 6 — assíncrono ── #}
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+
     {# Apply theme BEFORE paint to prevent flash #}
     <script>
     (function(){
@@ -33,12 +37,18 @@
             ? window.matchMedia('(prefers-color-scheme: dark)').matches
             : saved === 'dark';
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        if (dark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     })();
     </script>
 
     {{ tenant_css_vars()|raw }}
 
     <style>
+    html { scroll-behavior: smooth; }
     /* ── Design Tokens ── */
     :root {
         --font: 'Outfit', system-ui, sans-serif;
@@ -213,6 +223,11 @@ function applyTheme(mode) {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : mode === 'dark';
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    if (dark) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('wab-theme', mode);
     const btn = document.getElementById('wab-theme-btn');
     if (btn) btn.innerHTML = MODE_LABELS[mode];

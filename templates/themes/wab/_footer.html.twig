@@ -3,10 +3,16 @@
 
     {# Col 1 — Logo + Quem Somos + Redes Sociais #}
     <div class="footer-col footer-brand">
-        {% if currentTenant and currentTenant.logo %}
-            <img src="{{ asset('uploads/tenant/logo/' ~ currentTenant.logo) }}"
-                 alt="{{ currentTenant.name }}"
-                 style="height:48px;width:auto;object-fit:contain;margin-bottom:1rem;filter:brightness(0) invert(1)">
+        {% if currentTenant and (currentTenant.darkLogo or currentTenant.logo) %}
+            {% if currentTenant.darkLogo %}
+                <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}"
+                     alt="{{ currentTenant.name }}"
+                     style="height:48px;width:auto;object-fit:contain;margin-bottom:1rem;">
+            {% else %}
+                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}"
+                     alt="{{ currentTenant.name }}"
+                     style="height:48px;width:auto;object-fit:contain;margin-bottom:1rem;filter:brightness(0) invert(1)">
+            {% endif %}
         {% else %}
             <div class="footer-logo-text">{{ currentTenant ? currentTenant.name : 'WAB' }}</div>
         {% endif %}

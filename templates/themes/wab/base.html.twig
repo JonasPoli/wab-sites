@@ -50,6 +50,10 @@
     <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"></noscript>
 
+    {# ── FontAwesome 6 — assíncrono ── #}
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+
     <script>
     (function(){
         var saved = localStorage.getItem('wab-theme') || 'auto';
@@ -69,6 +73,7 @@
     {{ tenant_css_vars()|raw }}
 
     <style>
+        html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; }
         :root {
             --font-sans: 'Inter', system-ui, sans-serif;

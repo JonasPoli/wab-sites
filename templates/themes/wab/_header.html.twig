@@ -4,9 +4,18 @@
         {# Logo #}
         <a href="{{ path('pub_home') }}" class="header-logo" aria-label="Página inicial">
             {% if currentTenant and currentTenant.logo %}
-                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}"
+                <img class="logo-light" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}"
                      alt="{{ currentTenant.name }}"
-                     style="max-height:52px;width:auto;max-width:200px;object-fit:contain;display:block">
+                     style="max-height:52px;width:auto;max-width:200px;object-fit:contain;">
+                {% if currentTenant.darkLogo %}
+                    <img class="logo-dark" src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}"
+                         alt="{{ currentTenant.name }}"
+                         style="max-height:52px;width:auto;max-width:200px;object-fit:contain;">
+                {% else %}
+                    <img class="logo-dark" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}"
+                         alt="{{ currentTenant.name }}"
+                         style="max-height:52px;width:auto;max-width:200px;object-fit:contain;">
+                {% endif %}
             {% else %}
                 <span class="logo-text">{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}</span>
             {% endif %}
@@ -16,50 +25,81 @@
 
         {# Nav #}
         <nav class="header-nav" aria-label="Navegação principal">
-            {% if headerPages is defined %}
-                {% for page in headerPages %}
-                    <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="nav-link">{{ page.title }}</a>
-                {% endfor %}
-            {% endif %}
-            {% if headerCategories is defined %}
-                {% for cat in headerCategories %}
-                    {% set active_children = [] %}
-                    {% for sub in cat.children %}
-                        {% if sub.pages|length > 0 %}
-                            {% set active_children = active_children|merge([sub]) %}
+            {% if currentTenant.landingPageMode and currentTenant.homePage %}
+                {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
+                {% set anchorPrefix = isHome ? '' : path('pub_home') %}
+                {% for section in currentTenant.homePage.sections %}
+                    {% if section.active %}
+                        {% set sectionTitle = '' %}
+                        {% if section.titlePart1 or section.titlePart2 %}
+                            {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
                         {% endif %}
-                    {% endfor %}
-                    
-                    {% set has_pages = cat.pages|length > 0 %}
-                    {% set has_active_children = active_children|length > 0 %}
-                    
-                    {% if has_active_children or has_pages %}
-                        {% if has_active_children %}
-                        <div class="nav-dropdown">
-                            <a href="#" class="nav-link nav-link--has-children" aria-haspopup="true">
-                                {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                {{ cat.name }} <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                            </a>
-                            <div class="nav-dropdown__panel">
-                                {% for sub in active_children %}
-                                <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="nav-dropdown__item">
-                                    {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                    {{ sub.name }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% else %}
-                        <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
-                            {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                            {{ cat.name }}
-                        </a>
+                        {% if sectionTitle == '' %}
+                            {% set firstBlock = section.blocks|first %}
+                            {% if firstBlock %}
+                                {% if firstBlock.type == 'banner' %}{% set sectionTitle = 'Início' %}
+                                {% elseif firstBlock.type in ['features', 'blurbs', 'blurbs4'] %}{% set sectionTitle = 'Recursos' %}
+                                {% elseif firstBlock.type == 'team' %}{% set sectionTitle = 'Equipe' %}
+                                {% elseif firstBlock.type in ['about', 'content'] %}{% set sectionTitle = 'Sobre' %}
+                                {% elseif firstBlock.type == 'pricing' %}{% set sectionTitle = 'Preços' %}
+                                {% elseif firstBlock.type == 'contact' %}{% set sectionTitle = 'Contato' %}
+                                {% elseif firstBlock.type == 'faq' %}{% set sectionTitle = 'FAQ' %}
+                                {% elseif firstBlock.type in ['gallery', 'portfolio'] %}{% set sectionTitle = 'Portfólio' %}
+                                {% endif %}
+                            {% endif %}
                         {% endif %}
+                        {% if sectionTitle == '' %}
+                            {% set sectionTitle = 'Seção ' ~ loop.index %}
+                        {% endif %}
+                        <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="nav-link">{{ sectionTitle }}</a>
                     {% endif %}
                 {% endfor %}
+            {% else %}
+                {% if headerPages is defined %}
+                    {% for page in headerPages %}
+                        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="nav-link">{{ page.title }}</a>
+                    {% endfor %}
+                {% endif %}
+                {% if headerCategories is defined %}
+                    {% for cat in headerCategories %}
+                        {% set active_children = [] %}
+                        {% for sub in cat.children %}
+                            {% if sub.pages|length > 0 %}
+                                {% set active_children = active_children|merge([sub]) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% set has_pages = cat.pages|length > 0 %}
+                        {% set has_active_children = active_children|length > 0 %}
+                        
+                        {% if has_active_children or has_pages %}
+                            {% if has_active_children %}
+                            <div class="nav-dropdown">
+                                <a href="#" class="nav-link nav-link--has-children" aria-haspopup="true">
+                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                    {{ cat.name }} <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                                </a>
+                                <div class="nav-dropdown__panel">
+                                    {% for sub in active_children %}
+                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="nav-dropdown__item">
+                                        {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                        {{ sub.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
+                                {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                {{ cat.name }}
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <a href="{{ path('pub_articles') }}" class="nav-link">Notícias</a>
+                <a href="{{ path('pub_home') }}#contato" class="nav-link">Contato</a>
             {% endif %}
-            <a href="{{ path('pub_articles') }}" class="nav-link">Notícias</a>
-            <a href="{{ path('pub_home') }}#contato" class="nav-link">Contato</a>
             <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema">
                 <i class="fa-solid fa-circle-half-stroke"></i> Auto
             </button>
@@ -73,6 +113,11 @@
 </header>
 
 <style>
+html.dark .logo-light { display: none !important; }
+html.dark .logo-dark { display: block !important; }
+html:not(.dark) .logo-light { display: block !important; }
+html:not(.dark) .logo-dark { display: none !important; }
+
 .wab-header {
     position: sticky; top: 0; z-index: 100;
     background: var(--header-bg);

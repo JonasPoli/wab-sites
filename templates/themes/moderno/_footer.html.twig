@@ -4,10 +4,16 @@
 
     {# Col 1 — Brand + Redes Sociais #}
     <div class="mf-col mf-brand">
-        {% if currentTenant and currentTenant.logo %}
-            <img src="{{ asset('uploads/tenant/logo/' ~ currentTenant.logo) }}"
-                 alt="{{ currentTenant.name }}"
-                 style="height:44px;width:auto;object-fit:contain;margin-bottom:1rem">
+        {% if currentTenant and (currentTenant.darkLogo or currentTenant.logo) %}
+            {% if currentTenant.darkLogo %}
+                <img class="logo-dark" src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}"
+                     alt="{{ currentTenant.name }}"
+                     style="height:44px;width:auto;object-fit:contain;margin-bottom:1rem">
+            {% else %}
+                <img class="logo-light" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}"
+                     alt="{{ currentTenant.name }}"
+                     style="height:44px;width:auto;object-fit:contain;margin-bottom:1rem">
+            {% endif %}
         {% else %}
             <span class="mf-logo-text">{{ currentTenant ? currentTenant.name : 'WAB Sites' }}</span>
         {% endif %}
@@ -76,7 +82,7 @@
 .mf-nav a { color:var(--text-muted); font-size:.875rem; transition:color .2s; text-decoration:none; }
 .mf-nav a:hover { color:var(--color-secondary); }
 .mf-bottom { border-top:1px solid var(--border); text-align:center; padding:1.25rem; font-size:.8rem; color:var(--text-muted); }
-[data-theme="dark"] .mf-brand img { filter: brightness(0) invert(1); }
+[data-theme="dark"] .mf-brand img.logo-light { filter: brightness(0) invert(1); }
 @media(max-width:900px){ .mf-grid{ grid-template-columns:1fr 1fr; gap:2rem; } }
 @media(max-width:560px){ .mf-grid{ grid-template-columns:1fr; } }
 </style>

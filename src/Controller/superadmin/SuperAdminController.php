@@ -57,6 +57,12 @@ class SuperAdminController extends AbstractController
                 $tenant->setLogoFile($logoFile);
             }
 
+            /** @var UploadedFile|null $darkLogoFile */
+            $darkLogoFile = $request->files->get('darkLogoFile');
+            if ($darkLogoFile instanceof UploadedFile && $darkLogoFile->isValid()) {
+                $tenant->setDarkLogoFile($darkLogoFile);
+            }
+
             /** @var UploadedFile|null $faviconFile */
             $faviconFile = $request->files->get('faviconFile');
             if ($faviconFile instanceof UploadedFile && $faviconFile->isValid()) {
@@ -163,6 +169,7 @@ class SuperAdminController extends AbstractController
         $tenant->setSecondaryColor((string) $r->request->get('secondaryColor', '#ffaa00'));
         $tenant->setTheme((string) $r->request->get('theme', 'wab'));
         $tenant->setShowSectionTitles($r->request->get('showSectionTitles') === '1');
+        $tenant->setLandingPageMode($r->request->get('landingPageMode') === '1');
 
         // HomePage
         $homePageId = $r->request->get('homePageId');

@@ -28,6 +28,12 @@ class Tenant
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[Vich\UploadableField(mapping: 'tenant_dark_logo', fileNameProperty: 'darkLogo')]
+    private ?File $darkLogoFile = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $darkLogo = null;
+
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $primaryColor = '#0044cc';
 
@@ -114,6 +120,9 @@ class Tenant
 
     #[ORM\Column(options: ['default' => true])]
     private bool $showSectionTitles = true;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $landingPageMode = false;
 
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
@@ -265,6 +274,30 @@ class Tenant
         return $this;
     }
 
+    public function getDarkLogoFile(): ?File { return $this->darkLogoFile; }
+    public function setDarkLogoFile(?File $darkLogoFile): static
+    {
+        $this->darkLogoFile = $darkLogoFile;
+        if ($darkLogoFile !== null) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+        return $this;
+    }
+
+    public function getDarkLogo(): ?string { return $this->darkLogo; }
+    public function setDarkLogo(?string $darkLogo): static { $this->darkLogo = $darkLogo; return $this; }
+
+    public function isLandingPageMode(): bool
+    {
+        return $this->landingPageMode;
+    }
+
+    public function setLandingPageMode(bool $landingPageMode): static
+    {
+        $this->landingPageMode = $landingPageMode;
+        return $this;
+    }
+
 
     /**
      * Exclude $logoFile (Symfony\Component\HttpFoundation\File\File) from serialization.
@@ -302,6 +335,8 @@ class Tenant
             'fontSettings'     => $this->fontSettings,
             'navigationSettings'=> $this->navigationSettings,
             'showSectionTitles' => $this->showSectionTitles,
+            'landingPageMode'  => $this->landingPageMode,
+            'darkLogo'         => $this->darkLogo,
             'homePageId'       => $this->homePage?->getId(),
             'updatedAt'        => $this->updatedAt,
             // File objects intentionally excluded — not serializable
@@ -338,8 +373,11 @@ class Tenant
         $this->fontSettings      = $data['fontSettings'] ?? [];
         $this->navigationSettings = $data['navigationSettings'] ?? [];
         $this->showSectionTitles = $data['showSectionTitles'] ?? true;
+        $this->landingPageMode   = $data['landingPageMode'] ?? false;
+        $this->darkLogo          = $data['darkLogo'] ?? null;
         $this->updatedAt         = $data['updatedAt'];
         $this->logoFile          = null;
+        $this->darkLogoFile      = null;
         $this->aboutImageFile    = null;
         $this->faviconFile       = null;
         $this->homePage          = null; // lazy-loaded separately if needed
