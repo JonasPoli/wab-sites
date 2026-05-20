@@ -1,0 +1,252 @@
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="team">
+    
+    <div class="af-field">
+        <label>Pré-título</label>
+        <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}">
+    </div>
+    
+    <div class="af-field">
+        <label>Título <span class="req">*</span></label>
+        <input type="text" name="title" class="ai" value="{{ block.title }}" required>
+    </div>
+    
+    <div class="af-field">
+        <label>Texto de apoio</label>
+        <textarea name="text" class="ate" rows="2">{{ block.text }}</textarea>
+    </div>
+
+    <div style="margin:1.25rem 0 .75rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">
+        Membros da Equipe (<span id="members-count">{{ block.teamMembers|length }}</span>)
+    </div>
+
+    <div id="team-members-wrap">
+    {% for m in block.teamMembers %}
+    <div class="card team-member-card" style="margin:0 0 1.5rem;padding:1.5rem;border:1px solid var(--border);position:relative;" data-index="{{ loop.index0 }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div style="font-weight:700;font-size:.9rem;color:var(--primary)">Membro #{{ loop.index }}</div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button type="button" class="btn btn-g btn-sm move-up" onclick="moveMemberUp(this)" title="Mover para Cima"><sl-icon name="arrow-up"></sl-icon></button>
+                <button type="button" class="btn btn-g btn-sm move-down" onclick="moveMemberDown(this)" title="Mover para Baixo"><sl-icon name="arrow-down"></sl-icon></button>
+            </div>
+        </div>
+        
+        <input type="hidden" name="team[{{ loop.index0 }}][id]" value="{{ m.id }}">
+        
+        <div class="af-row">
+            <div class="af-field">
+                <label>Nome <span class="req">*</span></label>
+                <input type="text" name="team[{{ loop.index0 }}][name]" class="ai" value="{{ m.name }}" required>
+            </div>
+            <div class="af-field">
+                <label>Cargo / Função</label>
+                <input type="text" name="team[{{ loop.index0 }}][role]" class="ai" value="{{ m.role }}">
+            </div>
+        </div>
+
+        <div class="af-field">
+            <label>Minicurrículo / Bio</label>
+            <textarea name="team[{{ loop.index0 }}][bio]" class="ate" rows="3">{{ m.bio }}</textarea>
+        </div>
+
+        <div class="af-row">
+            <div class="af-field">
+                <label>E-mail</label>
+                <input type="email" name="team[{{ loop.index0 }}][email]" class="ai" value="{{ m.email }}">
+            </div>
+            <div class="af-field">
+                <label>Telefone</label>
+                <input type="text" name="team[{{ loop.index0 }}][phone]" class="ai" value="{{ m.phone }}">
+            </div>
+        </div>
+
+        <div class="af-row">
+            <div class="af-field">
+                <label>LinkedIn (URL)</label>
+                <input type="url" name="team[{{ loop.index0 }}][linkedinUrl]" class="ai" value="{{ m.linkedinUrl }}">
+            </div>
+            <div class="af-field">
+                <label>Facebook (URL)</label>
+                <input type="url" name="team[{{ loop.index0 }}][facebookUrl]" class="ai" value="{{ m.facebookUrl }}">
+            </div>
+        </div>
+
+        <div class="af-row">
+            <div class="af-field">
+                <label>Instagram (URL)</label>
+                <input type="url" name="team[{{ loop.index0 }}][instagramUrl]" class="ai" value="{{ m.instagramUrl }}">
+            </div>
+            <div class="af-field">
+                <label>WhatsApp (URL)</label>
+                <input type="url" name="team[{{ loop.index0 }}][whatsappUrl]" class="ai" value="{{ m.whatsappUrl }}" placeholder="https://wa.me/...">
+            </div>
+        </div>
+
+        <div class="af-row">
+            <div class="af-field">
+                <label>Foto (avatar)</label>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                    {% if m.image %}
+                        <img src="{{ vich_uploader_asset(m, 'imageFile') }}" style="height:50px;width:50px;border-radius:50%;object-fit:cover;">
+                    {% endif %}
+                    <input type="file" name="team[{{ loop.index0 }}][imageFile]" accept="image/*" class="ai">
+                </div>
+            </div>
+            <div class="af-field" style="display:flex;align-items:flex-end;justify-content:flex-end;">
+                <label style="font-size:.85rem;color:var(--danger);cursor:pointer;margin-bottom:0.75rem;">
+                    <input type="checkbox" name="delete_member[]" value="{{ m.id }}" onclick="toggleDeleteMember(this)"> Remover este membro
+                </label>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+
+    <button type="button" onclick="addTeamMember()" class="btn btn-g" style="margin-bottom:2rem">
+        <sl-icon name="plus-lg"></sl-icon> Adicionar Membro
+    </button>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>
+
+<template id="team-member-tpl">
+<div class="card team-member-card" style="margin:0 0 1.5rem;padding:1.5rem;border:1px solid var(--border);position:relative;" data-index="__i__">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div style="font-weight:700;font-size:.9rem;color:var(--primary)">Novo Membro</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+            <button type="button" class="btn btn-g btn-sm move-up" onclick="moveMemberUp(this)" title="Mover para Cima"><sl-icon name="arrow-up"></sl-icon></button>
+            <button type="button" class="btn btn-g btn-sm move-down" onclick="moveMemberDown(this)" title="Mover para Baixo"><sl-icon name="arrow-down"></sl-icon></button>
+            <button type="button" class="btn btn-danger-outline btn-sm" onclick="removeNewMember(this)" title="Remover"><sl-icon name="trash"></sl-icon></button>
+        </div>
+    </div>
+    
+    <div class="af-row">
+        <div class="af-field">
+            <label>Nome <span class="req">*</span></label>
+            <input type="text" name="team[__i__][name]" class="ai" placeholder="Nome do profissional" required>
+        </div>
+        <div class="af-field">
+            <label>Cargo / Função</label>
+            <input type="text" name="team[__i__][role]" class="ai" placeholder="Ex: Diretor, Desenvolvedor">
+        </div>
+    </div>
+
+    <div class="af-field">
+        <label>Minicurrículo / Bio</label>
+        <textarea name="team[__i__][bio]" class="ate" rows="3" placeholder="Pequena biografia..."></textarea>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label>E-mail</label>
+            <input type="email" name="team[__i__][email]" class="ai" placeholder="email@exemplo.com">
+        </div>
+        <div class="af-field">
+            <label>Telefone</label>
+            <input type="text" name="team[__i__][phone]" class="ai" placeholder="(00) 00000-0000">
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label>LinkedIn (URL)</label>
+            <input type="url" name="team[__i__][linkedinUrl]" class="ai" placeholder="https://linkedin.com/in/...">
+        </div>
+        <div class="af-field">
+            <label>Facebook (URL)</label>
+            <input type="url" name="team[__i__][facebookUrl]" class="ai" placeholder="https://facebook.com/...">
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label>Instagram (URL)</label>
+            <input type="url" name="team[__i__][instagramUrl]" class="ai" placeholder="https://instagram.com/...">
+        </div>
+        <div class="af-field">
+            <label>WhatsApp (URL)</label>
+            <input type="url" name="team[__i__][whatsappUrl]" class="ai" placeholder="https://wa.me/...">
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label>Foto (avatar)</label>
+            <input type="file" name="team[__i__][imageFile]" accept="image/*" class="ai">
+        </div>
+    </div>
+</div>
+</template>
+
+<script>
+let mIdx = {{ block.teamMembers|length }};
+
+function updateIndexes() {
+    const cards = document.querySelectorAll('#team-members-wrap .team-member-card');
+    cards.forEach((card, index) => {
+        card.setAttribute('data-index', index);
+        
+        // Update Title
+        const titleEl = card.querySelector('div > div:first-child');
+        if (titleEl && !titleEl.textContent.includes('Novo')) {
+            titleEl.textContent = 'Membro #' + (index + 1);
+        }
+        
+        // Update form fields names
+        const inputs = card.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                input.setAttribute('name', name.replace(/team\[\d+\]/, 'team[' + index + ']'));
+            }
+        });
+    });
+    document.getElementById('members-count').textContent = cards.length;
+}
+
+function addTeamMember() {
+    const tpl = document.getElementById('team-member-tpl').innerHTML.replaceAll('__i__', mIdx++);
+    const div = document.createElement('div'); 
+    div.innerHTML = tpl;
+    document.getElementById('team-members-wrap').appendChild(div.firstElementChild);
+    updateIndexes();
+}
+
+function removeNewMember(btn) {
+    const card = btn.closest('.team-member-card');
+    card.remove();
+    updateIndexes();
+}
+
+function toggleDeleteMember(checkbox) {
+    const card = checkbox.closest('.team-member-card');
+    if (checkbox.checked) {
+        card.style.opacity = '0.5';
+        card.style.background = '#ffe5e5';
+    } else {
+        card.style.opacity = '1';
+        card.style.background = 'none';
+    }
+}
+
+function moveMemberUp(btn) {
+    const card = btn.closest('.team-member-card');
+    const prev = card.previousElementSibling;
+    if (prev) {
+        card.parentNode.insertBefore(card, prev);
+        updateIndexes();
+    }
+}
+
+function moveMemberDown(btn) {
+    const card = btn.closest('.team-member-card');
+    const next = card.nextElementSibling;
+    if (next) {
+        card.parentNode.insertBefore(next, card);
+        updateIndexes();
+    }
+}
+</script>

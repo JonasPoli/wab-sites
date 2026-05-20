@@ -76,6 +76,11 @@ class PageBlock
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $partnerLogos;
 
+    /** Team member items */
+    #[ORM\OneToMany(mappedBy: 'block', targetEntity: PageBlockTeamMember::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $teamMembers;
+
     #[ORM\Column(options: ['default' => 0])]
     private int $position = 0;
 
@@ -88,6 +93,7 @@ class PageBlock
         $this->galleryImages = new ArrayCollection();
         $this->testimonials  = new ArrayCollection();
         $this->partnerLogos  = new ArrayCollection();
+        $this->teamMembers   = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -140,6 +146,9 @@ class PageBlock
 
     /** @return Collection<int, PageBlockPartnerLogo> */
     public function getPartnerLogos(): Collection { return $this->partnerLogos; }
+
+    /** @return Collection<int, PageBlockTeamMember> */
+    public function getTeamMembers(): Collection { return $this->teamMembers; }
 
     public function getPosition(): int { return $this->position; }
     public function setPosition(int $position): static { $this->position = $position; return $this; }

@@ -1,0 +1,343 @@
+{% set tenant = currentTenant %}
+<div class="wab-block" id="contato" style="padding: 4rem 0;">
+    {% if block.preTitle %}
+        <div style="text-align:center">
+            <span class="section-label" style="color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9rem;">
+                {{ block.preTitle }}
+            </span>
+        </div>
+    {% endif %}
+    {% if block.title %}
+        <h2 class="section-heading" style="text-align:center; margin-bottom:1.25rem; font-size:clamp(2rem, 4vw, 2.75rem); font-weight:800; letter-spacing:-0.02em; color:var(--text); line-height: 1.1;">
+            {{ block.title }}
+        </h2>
+    {% endif %}
+    {% if block.text %}
+        <div class="section-desc-rich" style="color:var(--text-muted); text-align:center; max-width:720px; margin:0 auto 3.5rem; font-size:1.05rem; line-height:1.6;">
+            {{ block.text|raw }}
+        </div>
+    {% endif %}
+
+    <div class="wab-contact-container">
+        <div class="wab-contact-grid">
+            {# Column 1: Contact Form #}
+            <div class="wab-contact-card form-column" data-aos="fade-right">
+                <h3 class="column-title">Envie uma Mensagem</h3>
+                <p class="column-desc">Preencha o formulário abaixo e responderemos o mais breve possível.</p>
+
+                <form name="contato_publico" action="{{ path('pub_contact_post') }}" method="post" class="wab-contact-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="contato_publico_nome">Nome Completo <span class="required-asterisk">*</span></label>
+                        <input type="text" id="contato_publico_nome" name="name" required class="form-control" placeholder="Seu nome completo">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="contato_publico_email">E-mail <span class="required-asterisk">*</span></label>
+                            <input type="email" id="contato_publico_email" name="email" required class="form-control" placeholder="seu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="contato_publico_telefone">Telefone / WhatsApp</label>
+                            <input type="tel" id="contato_publico_telefone" name="phone" class="form-control" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contato_publico_mensagem">Mensagem <span class="required-asterisk">*</span></label>
+                        <textarea id="contato_publico_mensagem" name="message" required class="form-control" rows="5" placeholder="Como podemos ajudar?"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-wab-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+
+            {# Column 2: Contact Info #}
+            <div class="wab-contact-card info-column" data-aos="fade-left">
+                <h3 class="column-title">Informações de Contato</h3>
+                <p class="column-desc">Entre em contato direto conosco ou venha nos fazer uma visita.</p>
+
+                <div class="contact-details-list">
+                    {% if tenant.address %}
+                    <div class="contact-item">
+                        <div class="contact-item-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">Endereço</span>
+                            <span class="contact-item-value">{{ tenant.address|nl2br }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.phone %}
+                    <div class="contact-item">
+                        <div class="contact-item-icon">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">Telefone</span>
+                            <a href="tel:{{ tenant.phone }}" class="contact-item-link">{{ tenant.phone }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.contactEmail %}
+                    <div class="contact-item">
+                        <div class="contact-item-icon">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">E-mail</span>
+                            <a href="mailto:{{ tenant.contactEmail }}" class="contact-item-link">{{ tenant.contactEmail }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.whatsappLink %}
+                    <div class="contact-item">
+                        <div class="contact-item-icon whatsapp-icon">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">WhatsApp</span>
+                            <a href="{{ tenant.whatsappLink }}" target="_blank" class="contact-item-link whatsapp-link">Clique para conversar</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="working-hours-card">
+                    <h4 class="working-hours-title"><i class="fa-solid fa-clock"></i> Horário de Funcionamento</h4>
+                    <div class="working-hours-row">
+                        <span class="working-hours-days">Segunda a Sexta:</span>
+                        <span class="working-hours-time">08h00 às 22h00</span>
+                    </div>
+                    <div class="working-hours-row">
+                        <span class="working-hours-days">Sábado:</span>
+                        <span class="working-hours-time">08h00 às 13h00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if tenant.mapsEmbedUrl %}
+        <div class="wab-contact-map" data-aos="zoom-in">
+            <iframe 
+                src="{{ tenant.mapsEmbedUrl }}" 
+                width="100%" 
+                height="380" 
+                style="border:0; border-radius: var(--radius, 12px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.wab-contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+.wab-contact-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+}
+.wab-contact-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+}
+.column-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.01em;
+}
+.column-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0 0 2rem 0;
+}
+.wab-contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text);
+}
+.required-asterisk {
+    color: var(--color-primary);
+}
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.2s var(--transition);
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 79, 110, 247), 0.15);
+}
+textarea.form-control {
+    resize: vertical;
+}
+.btn-wab-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s var(--transition);
+}
+.btn-wab-submit:hover {
+    background: var(--color-secondary, var(--color-primary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb, 79, 110, 247), 0.25);
+}
+
+.contact-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.contact-item-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(var(--color-primary-rgb, 79, 110, 247), 0.08);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.contact-item-icon.whatsapp-icon {
+    background: rgba(37, 211, 102, 0.08);
+    color: #25d366;
+}
+.contact-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.contact-item-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+.contact-item-value, .contact-item-link {
+    font-size: 0.95rem;
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.2s var(--transition);
+}
+a.contact-item-link:hover {
+    color: var(--color-primary);
+}
+a.contact-item-link.whatsapp-link:hover {
+    color: #25d366;
+}
+
+.working-hours-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.working-hours-title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+.working-hours-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+.working-hours-days {
+    color: var(--text-muted);
+}
+.working-hours-time {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.wab-contact-map {
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    .wab-contact-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    .wab-contact-card {
+        padding: 1.5rem;
+    }
+}
+</style>

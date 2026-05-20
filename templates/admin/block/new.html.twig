@@ -40,6 +40,8 @@
             {key: 'page_list',      label: 'Lista de Páginas',          icon: 'fa-solid fa-list',                 desc: 'Cards com páginas filtradas'},
             {key: 'testimonials',   label: 'Depoimentos',               icon: 'fa-solid fa-quote-left',           desc: 'Avaliações e depoimentos'},
             {key: 'partner_logos',  label: 'Logos de Parceiros',        icon: 'fa-solid fa-handshake',            desc: 'Linha/grid de logos'},
+            {key: 'team',           label: 'Membros da Equipe',         icon: 'fa-solid fa-users',                desc: 'Cards com membros da sua equipe'},
+            {key: 'contact',        label: 'Formulário de Contato',     icon: 'fa-solid fa-envelope',             desc: 'Exibe dados de contato e um formulário'},
         ] %}
         {% for t in types %}
         <a href="{{ path('admin_block_new', {sectionId: section.id}) }}?type={{ t.key }}"

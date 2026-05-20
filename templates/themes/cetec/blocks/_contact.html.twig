@@ -1,0 +1,145 @@
+{% set tenant = currentTenant %}
+<section class="py-16 bg-slate-50 dark:bg-cetec-dark/30 rounded-3xl my-12" id="contato" data-aos="fade-up">
+    <div class="container mx-auto px-4">
+        {# Block Header #}
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
+            {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
+            <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+            {% if block.text %}<div class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text|raw }}</div>{% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {# Column 1: Form #}
+            <div data-aos="fade-right" class="aos-init aos-animate bg-white dark:bg-cetec-dark p-8 rounded-2xl border border-gray-100 dark:border-white/5 shadow-lg">
+                <h3 class="font-headline text-2xl font-bold text-gray-900 dark:text-white mb-2">Envie uma Mensagem</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">Respondemos em até 24 horas úteis.</p>
+
+                <form name="contato_publico" action="{{ path('pub_contact_post') }}" method="post" class="space-y-5">
+                    <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_nome">
+                            Nome Completo *
+                        </label>
+                        <input type="text" id="contato_publico_nome" name="name" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="Seu nome">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_email">
+                                E-mail *
+                            </label>
+                            <input type="email" id="contato_publico_email" name="email" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="seu@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1" for="contato_publico_telefone">
+                                Telefone / WhatsApp
+                            </label>
+                            <input type="tel" id="contato_publico_telefone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="(16) 99999-9999">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_mensagem">
+                            Mensagem *
+                        </label>
+                        <textarea id="contato_publico_mensagem" name="message" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" rows="5" placeholder="Como podemos ajudar?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-cetec-primary w-full justify-center py-4 text-base bg-cetec-orange hover:bg-cetec-orange-dark text-white font-bold rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
+                        <i class="bi bi-send"></i> Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+
+            {# Column 2: Details #}
+            <div data-aos="fade-left" class="aos-init aos-animate">
+                <h2 class="font-headline text-2xl font-bold text-gray-900 dark:text-white mb-2">Nosso Endereço</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">Venha nos visitar presencialmente ou entre em contato pelos canais abaixo.</p>
+
+                <div class="space-y-5 mb-8">
+                    {% if tenant.address %}
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
+                            <i class="bi bi-geo-alt-fill text-xl" style="color:#ff7f00"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 dark:text-white">Endereço</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">{{ tenant.address|nl2br }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.phone %}
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
+                            <i class="bi bi-telephone-fill text-xl" style="color:#ff7f00"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 dark:text-white">Telefone</p>
+                            <a href="tel:{{ tenant.phone }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-orange transition-colors text-decoration-none">{{ tenant.phone }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.contactEmail %}
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
+                            <i class="bi bi-envelope-fill text-xl" style="color:#ff7f00"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 dark:text-white">E-mail</p>
+                            <a href="mailto:{{ tenant.contactEmail }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-orange transition-colors text-decoration-none">
+                                {{ tenant.contactEmail }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.whatsappLink %}
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(37,211,102,0.1)">
+                            <i class="bi bi-whatsapp text-xl" style="color:#25d366"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 dark:text-white">WhatsApp</p>
+                            <a href="{{ tenant.whatsappLink }}" target="_blank" class="text-sm font-semibold text-decoration-none hover:underline" style="color:#25d366">
+                                Clique para conversar
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-6 p-4 bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/5 rounded-xl shadow-md">
+                    <h4 class="font-bold text-gray-900 dark:text-white text-sm uppercase tracking-wider mb-3">Horário de Funcionamento</h4>
+                    <div class="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                        <div class="flex justify-between">
+                            <span>Segunda a Sexta:</span>
+                            <span class="font-semibold">08h00 às 22h00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Sábado:</span>
+                            <span class="font-semibold">08h00 às 13h00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if tenant.mapsEmbedUrl %}
+        <div class="mt-12 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-white/5" data-aos="zoom-in">
+            <iframe 
+                src="{{ tenant.mapsEmbedUrl }}" 
+                width="100%" 
+                height="380" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+        {% endif %}
+    </div>
+</section>

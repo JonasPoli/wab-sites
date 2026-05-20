@@ -611,6 +611,57 @@ class AdminContentController extends AbstractController
             }
         }
 
+        // Team members
+        if ($type === 'team') {
+            $delIds = array_filter(array_map('intval', (array)$r->request->all('delete_member')));
+            foreach ($block->getTeamMembers() as $m) {
+                if (in_array($m->getId(), $delIds, true)) {
+                    $em->remove($m);
+                }
+            }
+            $items = $r->request->all('team') ?: [];
+            $files = $r->files->all('team') ?: [];
+            foreach ($items as $idx => $data) {
+                if (!empty($data['id'])) {
+                    // Find existing and update
+                    foreach ($block->getTeamMembers() as $m) {
+                        if ($m->getId() === (int)$data['id'] && !in_array($m->getId(), $delIds, true)) {
+                            $m->setName($data['name'] ?? '');
+                            $m->setRole($data['role'] ?? null);
+                            $m->setBio($data['bio'] ?? null);
+                            $m->setLinkedinUrl($data['linkedinUrl'] ?? null);
+                            $m->setFacebookUrl($data['facebookUrl'] ?? null);
+                            $m->setInstagramUrl($data['instagramUrl'] ?? null);
+                            $m->setWhatsappUrl($data['whatsappUrl'] ?? null);
+                            $m->setPhone($data['phone'] ?? null);
+                            $m->setEmail($data['email'] ?? null);
+                            $m->setPosition($idx);
+                            if (isset($files[$idx]['imageFile']) && $files[$idx]['imageFile'] instanceof UploadedFile && $files[$idx]['imageFile']->isValid()) {
+                                $m->setImageFile($files[$idx]['imageFile']);
+                            }
+                        }
+                    }
+                } else {
+                    $m = new \App\Entity\PageBlockTeamMember();
+                    $m->setBlock($block);
+                    $m->setName($data['name'] ?? '');
+                    $m->setRole($data['role'] ?? null);
+                    $m->setBio($data['bio'] ?? null);
+                    $m->setLinkedinUrl($data['linkedinUrl'] ?? null);
+                    $m->setFacebookUrl($data['facebookUrl'] ?? null);
+                    $m->setInstagramUrl($data['instagramUrl'] ?? null);
+                    $m->setWhatsappUrl($data['whatsappUrl'] ?? null);
+                    $m->setPhone($data['phone'] ?? null);
+                    $m->setEmail($data['email'] ?? null);
+                    $m->setPosition($idx);
+                    if (isset($files[$idx]['imageFile']) && $files[$idx]['imageFile'] instanceof UploadedFile && $files[$idx]['imageFile']->isValid()) {
+                        $m->setImageFile($files[$idx]['imageFile']);
+                    }
+                    $em->persist($m);
+                }
+            }
+        }
+
         // Banners (multi-slide support)
         if ($type === 'banner') {
             $banners = $r->request->all('banners') ?: [];

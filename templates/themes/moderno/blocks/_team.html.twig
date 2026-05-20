@@ -1,0 +1,192 @@
+{% set members = block.teamMembers %}
+{% if members|length > 0 %}
+<div class="wab-block" style="padding: 4rem 0;">
+    {% if block.preTitle %}
+        <div style="text-align:center">
+            <span class="section-label" style="color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9rem;">
+                {{ block.preTitle }}
+            </span>
+        </div>
+    {% endif %}
+    {% if block.title %}
+        <h2 class="section-heading" style="text-align:center; margin-bottom:1.25rem; font-size:clamp(2rem, 4vw, 2.75rem); font-weight:800; letter-spacing:-0.02em; color:var(--text); line-height: 1.1;">
+            {{ block.title }}
+        </h2>
+    {% endif %}
+    {% if block.text %}
+        <p style="color:var(--text-muted); text-align:center; max-width:720px; margin:0 auto 3.5rem; font-size:1.05rem; line-height:1.6;">
+            {{ block.text }}
+        </p>
+    {% endif %}
+
+    <div class="moderno-team-grid">
+        {% for m in members %}
+        <div class="moderno-team-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            <div class="team-img-wrap">
+                {% if m.image %}
+                    <img src="{{ vich_uploader_asset(m, 'imageFile') }}" alt="{{ m.name }}" class="team-img" loading="lazy">
+                {% else %}
+                    <div class="team-img-placeholder">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="team-info">
+                <h3 class="team-name">{{ m.name }}</h3>
+                {% if m.role %}<div class="team-role">{{ m.role }}</div>{% endif %}
+                {% if m.bio %}<p class="team-bio">{{ m.bio|nl2br }}</p>{% endif %}
+                
+                {% set has_socials = m.linkedinUrl or m.facebookUrl or m.instagramUrl or m.whatsappUrl or m.phone or m.email %}
+                {% if has_socials %}
+                <div class="team-socials">
+                    {% if m.linkedinUrl %}
+                        <a href="{{ m.linkedinUrl }}" target="_blank" class="social-link linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    {% endif %}
+                    {% if m.instagramUrl %}
+                        <a href="{{ m.instagramUrl }}" target="_blank" class="social-link instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    {% endif %}
+                    {% if m.facebookUrl %}
+                        <a href="{{ m.facebookUrl }}" target="_blank" class="social-link facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    {% endif %}
+                    {% if m.whatsappUrl %}
+                        <a href="{{ m.whatsappUrl }}" target="_blank" class="social-link whatsapp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    {% endif %}
+                    {% if m.phone %}
+                        <a href="tel:{{ m.phone }}" class="social-link phone" title="Telefone"><i class="fa-solid fa-phone"></i></a>
+                    {% endif %}
+                    {% if m.email %}
+                        <a href="mailto:{{ m.email }}" class="social-link email" title="E-mail"><i class="fa-solid fa-envelope"></i></a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.moderno-team-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+}
+.moderno-team-card {
+    flex: 0 0 calc((100% - 4rem) / 3);
+    max-width: calc((100% - 4rem) / 3);
+    min-width: 290px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+    overflow: hidden;
+    transition: transform 0.3s var(--transition), box-shadow 0.3s var(--transition), border-color 0.3s var(--transition);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+}
+.moderno-team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    border-color: var(--color-primary);
+}
+.team-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: rgba(var(--color-primary-rgb, 79, 110, 247), 0.05);
+    border-bottom: 1px solid var(--border);
+}
+.team-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--transition);
+}
+.moderno-team-card:hover .team-img {
+    transform: scale(1.05);
+}
+.team-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    font-size: 4rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+.team-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.team-name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+.team-role {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+.team-bio {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+    flex-grow: 1;
+}
+.team-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+}
+.social-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(var(--color-primary-rgb, 79, 110, 247), 0.05);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: all 0.2s var(--transition);
+    text-decoration: none;
+}
+.social-link:hover {
+    color: #fff;
+    transform: scale(1.1);
+}
+.social-link.linkedin:hover { background: #0077b5; }
+.social-link.instagram:hover { background: #e1306c; }
+.social-link.facebook:hover { background: #1877f2; }
+.social-link.whatsapp:hover { background: #25d366; }
+.social-link.phone:hover { background: var(--color-primary); }
+.social-link.email:hover { background: var(--color-secondary, #333); }
+
+@media(max-width: 1024px) {
+    .moderno-team-card {
+        flex: 0 0 calc((100% - 2rem) / 2);
+        max-width: calc((100% - 2rem) / 2);
+    }
+}
+@media(max-width: 640px) {
+    .moderno-team-card {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+</style>
+{% endif %}

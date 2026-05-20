@@ -16,6 +16,8 @@ enum BlockType: string
     case Testimonials  = 'testimonials';
     case PartnerLogos  = 'partner_logos';
     case Banner        = 'banner';
+    case Team          = 'team';
+    case Contact       = 'contact';
 
     public function label(): string
     {
@@ -32,6 +34,8 @@ enum BlockType: string
             self::Testimonials  => 'Depoimentos',
             self::PartnerLogos  => 'Logos de Parceiros',
             self::Banner        => 'Banner',
+            self::Team          => 'Membros da Equipe',
+            self::Contact       => 'Formulário de Contato',
         };
     }
 
@@ -50,6 +54,8 @@ enum BlockType: string
             self::Testimonials  => 'fa-solid fa-quote-left',
             self::PartnerLogos  => 'fa-solid fa-handshake',
             self::Banner        => 'fa-solid fa-image',
+            self::Team          => 'fa-solid fa-users',
+            self::Contact       => 'fa-solid fa-envelope',
         };
     }
 }
