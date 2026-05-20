@@ -104,7 +104,7 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
 
         $importString = '';
         if (!empty($familiesParts)) {
-            $queryString = implode('&', $familiesParts) . '&display=swap';
+            $queryString = implode('&', $familiesParts) . '&display=optional';
             $importString = "@import url('https://fonts.googleapis.com/css2?{$queryString}');";
         }
 

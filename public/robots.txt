@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Substitua pelo domínio real do tenant em produção:
+# Sitemap: https://seudominio.com.br/sitemap.xml

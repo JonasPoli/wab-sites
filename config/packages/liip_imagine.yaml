@@ -2,18 +2,22 @@
 liip_imagine:
     # valid drivers options include "gd" or "gmagick" or "imagick"
     driver: "gd"
+    # FormatExtensionResolver: evita redirect 302 — injeta URL estática com extensão .webp direto no HTML
+    cache: format_extension
     twig:
-        mode: lazy
+        mode: legacy
     webp:
         generate: true
     filter_sets:
         cache: ~
         news_thumb:
-            quality: 75
+            quality: 80
+            format: webp
             filters:
                 thumbnail: { size: [400, 220], mode: outbound }
         product_list:
-            quality: 100
+            quality: 80
+            format: webp
             filters:
                 thumbnail: { size: [400, 500], mode: inset }
         admin_thumb:
@@ -22,3 +26,13 @@ liip_imagine:
                 thumbnail:
                     size: [200, 200]
                     mode: inset
+        hero_banner:
+            quality: 75
+            format: webp
+            filters:
+                thumbnail: { size: [1280, 720], mode: outbound }
+        hero_banner_mobile:
+            quality: 65
+            format: webp
+            filters:
+                thumbnail: { size: [640, 400], mode: outbound }

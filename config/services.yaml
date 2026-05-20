@@ -25,4 +25,12 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # LiipImagine: FormatExtensionResolver — evita redirect 302 ao servir imagens WebP.
+    # O bundle passa a gerar URLs estáticas com extensão .webp diretamente no HTML.
+    Liip\ImagineBundle\Imagine\Cache\Resolver\FormatExtensionResolver:
+        arguments:
+            - '@liip_imagine.cache.resolver.default'
+            - '@liip_imagine.filter.configuration'
+        tags:
+            - { name: "liip_imagine.cache.resolver", resolver: "format_extension" }
 

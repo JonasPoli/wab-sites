@@ -14,6 +14,8 @@
 <meta property="og:title" content="{{ page.seoTitle ?? page.title }}">
 {% endblock %}
 
+{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
+
 {% block body %}
 <script type="application/ld+json">
 {

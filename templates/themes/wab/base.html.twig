@@ -23,7 +23,7 @@
     {% block canonical %}{% endblock %}
 
     {# ── Robots ── #}
-    {% block robots %}{% endblock %}
+    {% block robots %}<meta name="robots" content="index, follow">{% endblock %}
 
     {# ── Favicon ── #}
     {% if currentTenant and currentTenant.logo %}
@@ -31,11 +31,24 @@
     {% endif %}
 
     {# Apply theme BEFORE paint to prevent flash #}
-    <!-- CDNs: Bootstrap Icons, FontAwesome, Swiper and AOS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    {# ── Preconnect para CDNs ── #}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+
+    {# ── Swiper CSS (bloqueante — crítico para layout) ── #}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+    {# ── Bootstrap Icons — assíncrono (não-crítico) ── #}
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+
+    {# ── AOS CSS — assíncrono ── #}
+    <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"></noscript>
 
     <script>
     (function(){
@@ -195,17 +208,17 @@
 {% include 'themes/wab/_footer.html.twig' %}
 
 <!-- Global Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
 
 {% block javascripts %}{% endblock %}
 <script>
 // ── Theme Toggle Script ───────────────────────────────────────────────────────
 const MODES = ['dark', 'light', 'auto'];
 const MODE_LABELS = {
-    dark: '<i class="fa-solid fa-moon"></i> Escuro',
-    light: '<i class="fa-solid fa-sun"></i> Claro',
-    auto: '<i class="fa-solid fa-circle-half-stroke"></i> Auto'
+    dark:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010 9.79z"/></svg> Escuro',
+    light: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Claro',
+    auto:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 2v16a8 8 0 0 1 0-16z"/></svg> Auto'
 };
 
 function applyTheme(mode) {

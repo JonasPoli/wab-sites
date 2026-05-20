@@ -12,15 +12,19 @@
 <meta property="og:description" content="Núcleo de Estudos e Pesquisas — conhecimento, pesquisa e transformação">
 {% endblock %}
 
+{% block canonical %}<link rel="canonical" href="{{ app.request.schemeAndHttpHost }}/">{% endblock %}
+
 {# JSON-LD WebPage #}
 {% block body %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}",
-  "description": "Núcleo de Estudos e Pesquisas",
-  "url": "{{ app.request.uri }}"
+  "@type": "Organization",
+  "name": {{ (currentTenant ? currentTenant.name : 'WAB Brasil')|json_encode|raw }},
+  "url": "{{ app.request.schemeAndHttpHost }}/"
+  {% if currentTenant and currentTenant.phone %}, "telephone": {{ currentTenant.phone|json_encode|raw }}{% endif %}
+  {% if currentTenant and currentTenant.contactEmail %}, "email": {{ currentTenant.contactEmail|json_encode|raw }}{% endif %}
+  {% if currentTenant and currentTenant.address %}, "address": {{ currentTenant.address|json_encode|raw }}{% endif %}
 }
 </script>
 
@@ -29,7 +33,20 @@
 <div class="hero-slider-wrap" id="heroSlider">
     {% for b in banners %}
     <div class="hero-slide {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
-        <div class="hero-slide-bg" {% if b.backgroundImage %}style="background-image: url('{{ asset('uploads/hero/' ~ b.backgroundImage) }}')"{% endif %}></div>
+        {% if loop.first and b.backgroundImage %}
+        {# ── Primeira imagem = LCP: usar <img> com fetchpriority="high" ── #}
+        <img src="{{ asset('uploads/hero/' ~ b.backgroundImage) }}"
+             alt="{{ b.title }}"
+             class="hero-slide-bg hero-slide-bg-img"
+             fetchpriority="high"
+             loading="eager"
+             decoding="async"
+             width="1920" height="1080">
+        {% elseif b.backgroundImage %}
+        <div class="hero-slide-bg" style="background-image: url('{{ asset('uploads/hero/' ~ b.backgroundImage) }}')"></div>
+        {% else %}
+        <div class="hero-slide-bg"></div>
+        {% endif %}
         <div class="hero-slide-overlay"></div>
         <div class="container hero-content">
             <h1 class="hero-title">{{ b.title }}</h1>
@@ -107,7 +124,14 @@
             {% for article in latestNews %}
             <article class="news-card reveal-up delay-{{ loop.index0 * 100 }}">
                 {% if article.image %}
-                    <div class="news-card-img" style="background-image: url('{{ ('uploads/article/' ~ article.image) | imagine_filter('news_thumb') }}')"></div>
+                    <div class="news-card-img">
+                        <img src="{{ ('uploads/article/' ~ article.image) | imagine_filter('news_thumb') }}"
+                             alt="{{ article.title }}"
+                             loading="lazy"
+                             decoding="async"
+                             width="400" height="220"
+                             style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </div>
                 {% endif %}
                 <div class="news-card-body">
                     {% if article.category %}
@@ -363,6 +387,17 @@
     background-size: cover;
     background-position: center;
     background-color: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 50%, var(--color-secondary)));
+}
+
+/* LCP img tag — replica o comportamento do background-image para o primeiro slide */
+.hero-slide-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .hero-slide-overlay {

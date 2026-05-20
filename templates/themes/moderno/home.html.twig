@@ -6,7 +6,20 @@
 <meta name="description" content="{{ currentTenant.seoDescription ?? (currentTenant ? currentTenant.name : 'WAB Sites') }}">
 {% endblock %}
 
+{% block canonical %}<link rel="canonical" href="{{ app.request.schemeAndHttpHost }}/">{% endblock %}
+
 {% block body %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": {{ (currentTenant ? currentTenant.name : 'WAB Sites')|json_encode|raw }},
+  "url": "{{ app.request.schemeAndHttpHost }}/"
+  {% if currentTenant and currentTenant.phone %}, "telephone": {{ currentTenant.phone|json_encode|raw }}{% endif %}
+  {% if currentTenant and currentTenant.contactEmail %}, "email": {{ currentTenant.contactEmail|json_encode|raw }}{% endif %}
+}
+</script>
 
 {# ── HERO ── #}
 <section class="m-hero">
