@@ -155,4 +155,13 @@ class PageBlock
 
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
+    public function __clone()
+    {
+        $this->id = null;
+        $this->galleryImages = new ArrayCollection();
+        $this->testimonials = new ArrayCollection();
+        $this->partnerLogos = new ArrayCollection();
+        $this->teamMembers = new ArrayCollection();
+    }
 }

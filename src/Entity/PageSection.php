@@ -160,6 +160,12 @@ class PageSection
     /** @return Collection<int, PageBlock> */
     public function getBlocks(): Collection { return $this->blocks; }
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->blocks = new ArrayCollection();
+    }
+
     public function __toString(): string
     {
         return trim(($this->titlePart1 ?? '') . ' ' . ($this->titlePart2 ?? '')) ?: 'Seção #' . $this->id;

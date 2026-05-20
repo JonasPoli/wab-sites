@@ -124,5 +124,11 @@ class Page implements TenantAwareInterface
     /** @return Collection<int, PageSection> */
     public function getSections(): Collection { return $this->sections; }
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->sections = new ArrayCollection();
+    }
+
     public function __toString(): string { return $this->title; }
 }

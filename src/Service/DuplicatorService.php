@@ -8,6 +8,7 @@ use App\Entity\PageBlock;
 use App\Entity\PageBlockImage;
 use App\Entity\PageBlockTestimonial;
 use App\Entity\PageBlockPartnerLogo;
+use App\Entity\PageBlockTeamMember;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DuplicatorService
@@ -37,6 +38,7 @@ class DuplicatorService
         $copy = clone $source;
         if ($newPage) {
             $copy->setPage($newPage);
+            $newPage->getSections()->add($copy);
         }
         // Clear blocks collection
         $copy->getBlocks()->clear();
@@ -57,10 +59,12 @@ class DuplicatorService
         $copy = clone $source;
         if ($newSection) {
             $copy->setSection($newSection);
+            $newSection->getBlocks()->add($copy);
         }
         $copy->getGalleryImages()->clear();
         $copy->getTestimonials()->clear();
         $copy->getPartnerLogos()->clear();
+        $copy->getTeamMembers()->clear();
         $this->em->persist($copy);
 
         // Clone gallery images (filenames only — shared files)
@@ -71,6 +75,7 @@ class DuplicatorService
             $c->setCaption($img->getCaption() ?? null);
             $c->setPosition($img->getPosition());
             $this->em->persist($c);
+            $copy->getGalleryImages()->add($c);
         }
 
         // Clone testimonials
@@ -84,6 +89,7 @@ class DuplicatorService
             $c->setAvatar($t->getAvatar());
             $c->setPosition($t->getPosition());
             $this->em->persist($c);
+            $copy->getTestimonials()->add($c);
         }
 
         // Clone partner logos
@@ -95,6 +101,26 @@ class DuplicatorService
             $c->setUrl($l->getUrl());
             $c->setPosition($l->getPosition());
             $this->em->persist($c);
+            $copy->getPartnerLogos()->add($c);
+        }
+
+        // Clone team members
+        foreach ($source->getTeamMembers() as $m) {
+            $c = new PageBlockTeamMember();
+            $c->setBlock($copy);
+            $c->setName($m->getName());
+            $c->setRole($m->getRole());
+            $c->setBio($m->getBio());
+            $c->setImage($m->getImage());
+            $c->setLinkedinUrl($m->getLinkedinUrl());
+            $c->setFacebookUrl($m->getFacebookUrl());
+            $c->setInstagramUrl($m->getInstagramUrl());
+            $c->setWhatsappUrl($m->getWhatsappUrl());
+            $c->setPhone($m->getPhone());
+            $c->setEmail($m->getEmail());
+            $c->setPosition($m->getPosition());
+            $this->em->persist($c);
+            $copy->getTeamMembers()->add($c);
         }
 
         if (!$newSection) {
