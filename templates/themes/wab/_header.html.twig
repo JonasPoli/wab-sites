@@ -62,37 +62,39 @@
                 {% endif %}
                 {% if headerCategories is defined %}
                     {% for cat in headerCategories %}
-                        {% set active_children = [] %}
-                        {% for sub in cat.children %}
-                            {% if sub.pages|length > 0 %}
-                                {% set active_children = active_children|merge([sub]) %}
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% set has_pages = cat.pages|length > 0 %}
-                        {% set has_active_children = active_children|length > 0 %}
-                        
-                        {% if has_active_children or has_pages %}
-                            {% if has_active_children %}
-                            <div class="nav-dropdown">
-                                <a href="#" class="nav-link nav-link--has-children" aria-haspopup="true">
-                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                    {{ cat.name }} <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                                </a>
-                                <div class="nav-dropdown__panel">
-                                    {% for sub in active_children %}
-                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="nav-dropdown__item">
-                                        {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                        {{ sub.name }}
+                        {% if cat.slug != 'videos' and cat.slug != 'estudos' %}
+                            {% set active_children = [] %}
+                            {% for sub in cat.children %}
+                                {% if sub.pages|length > 0 %}
+                                    {% set active_children = active_children|merge([sub]) %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% set has_pages = cat.pages|length > 0 %}
+                            {% set has_active_children = active_children|length > 0 %}
+                            
+                            {% if has_active_children or has_pages %}
+                                {% if has_active_children %}
+                                <div class="nav-dropdown">
+                                    <a href="#" class="nav-link nav-link--has-children" aria-haspopup="true">
+                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                        {{ cat.name }} <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
                                     </a>
-                                    {% endfor %}
+                                    <div class="nav-dropdown__panel">
+                                        {% for sub in active_children %}
+                                        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="nav-dropdown__item">
+                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                            {{ sub.name }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                            </div>
-                            {% else %}
-                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
-                                {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                {{ cat.name }}
-                            </a>
+                                {% else %}
+                                <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
+                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                    {{ cat.name }}
+                                </a>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endfor %}

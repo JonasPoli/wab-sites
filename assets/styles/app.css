@@ -7,46 +7,46 @@
 }
 
 @layer utilities {
-    .tw-block {
+    .wab-block {
         @apply transition-colors duration-200;
     }
 
-    .dark .tw-block {
+    .dark .wab-block {
         @apply text-slate-100;
     }
 
-    .dark .tw-block .bg-white,
-    .dark .tw-block .bg-gray-50 {
+    .dark .wab-block .bg-white,
+    .dark .wab-block .bg-gray-50 {
         @apply bg-slate-900;
     }
 
-    .dark .tw-block .text-gray-900,
-    .dark .tw-block .text-gray-800,
-    .dark .tw-block .text-gray-700 {
+    .dark .wab-block .text-gray-900,
+    .dark .wab-block .text-gray-800,
+    .dark .wab-block .text-gray-700 {
         @apply text-white;
     }
 
-    .dark .tw-block .text-gray-600,
-    .dark .tw-block .text-gray-500,
-    .dark .tw-block .text-gray-400 {
+    .dark .wab-block .text-gray-600,
+    .dark .wab-block .text-gray-500,
+    .dark .wab-block .text-gray-400 {
         @apply text-slate-300;
     }
 
-    .dark .tw-block .border-gray-200,
-    .dark .tw-block .border-gray-100 {
+    .dark .wab-block .border-gray-200,
+    .dark .wab-block .border-gray-100 {
         @apply border-white/10;
     }
 
-    .dark .tw-block .ring-gray-900\/10 {
+    .dark .wab-block .ring-gray-900\/10 {
         --tw-ring-color: rgb(255 255 255 / 0.1);
     }
 
-    .dark .tw-block .hover\:bg-gray-50:hover,
-    .dark .tw-block .hover\:bg-gray-100:hover {
+    .dark .wab-block .hover\:bg-gray-50:hover,
+    .dark .wab-block .hover\:bg-gray-100:hover {
         @apply bg-slate-800;
     }
 
-    .dark .tw-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]) {
+    .dark .wab-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]) {
         border-color: rgb(255 255 255 / 0.1);
     }
 }

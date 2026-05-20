@@ -48,85 +48,105 @@
     {% endif %}
 
     {% if banners|length == 1 %}
-        {# Single Banner Template (Backward compatible, static layout) #}
+        {# Single Banner Template (Redesigned, Premium Left-Aligned) #}
         {% set b = banners[0] %}
         <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
             {# Background image #}
             {% if b.image %}
                 <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg opacity-40"></div>
                 <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
-                <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.75) 100%);z-index:1"></div>
             {% else %}
                 <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
             {% endif %}
+            
+            <div class="hero-overlay"></div>
 
             {# Content Area #}
-            <div style="position:relative;z-index:2;max-width:850px;width:100%;margin:0 auto;text-align:center;color:#fff;{{ slideStyles }}" class="banner-glass-card">
-                {% if block.preTitle %}
-                    <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
-                        {{ block.preTitle }}
-                    </span>
-                {% endif %}
+            <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
+                <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
+                    {% if block.preTitle %}
+                        <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                            {{ block.preTitle }}
+                        </span>
+                    {% endif %}
 
-                <h2 class="banner-title text-3xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight text-white drop-shadow-md">
-                    {{ b.title }}
-                </h2>
+                    <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md">
+                        {{ b.title|raw }}
+                    </h2>
 
-                {% if b.text %}
-                    <p class="banner-text text-sm sm:text-base md:text-lg text-gray-200 mb-6 max-w-xl mx-auto leading-relaxed">
-                        {{ b.text }}
-                    </p>
-                {% endif %}
+                    {% if b.text %}
+                        <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                            {{ b.text }}
+                        </p>
+                    {% endif %}
 
-                {% if b.ctaText %}
-                    <div class="mt-8">
-                        <a href="{{ b.ctaLink ?: '#' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base shadow-xl transition-all transform hover:-translate-y-0.5 inline-block">
-                            {{ b.ctaText }}
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
+                        {% if b.ctaText %}
+                            <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                {{ b.ctaText }}
+                            </a>
+                        {% else %}
+                            <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                Ver Nossos Cursos
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                            Fale Conosco
                         </a>
                     </div>
-                {% endif %}
+                </div>
             </div>
         </div>
     {% else %}
-        {# Multiple Banner Carousel (Swiper layout) #}
+        {# Multiple Banner Carousel (Swiper layout - Redesigned, Premium Left-Aligned) #}
         <div class="{{ bannerClasses }} swiper banner-swiper-{{ block.id }}" style="{{ containerStyles }}">
             <div class="swiper-wrapper">
                 {% for b in banners %}
-                    <div class="swiper-slide" style="position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+                    <div class="swiper-slide" style="position:relative;display:flex;align-items:center;box-sizing:border-box;">
                         {# Background image #}
                         {% if b.image %}
                             <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg opacity-40"></div>
                             <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
-                            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.75) 100%);z-index:1"></div>
                         {% else %}
                             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
                         {% endif %}
 
+                        <div class="hero-overlay"></div>
+
                         {# Content Area #}
-                        <div style="position:relative;z-index:2;max-width:850px;width:100%;margin:0 auto;text-align:center;color:#fff;{{ slideStyles }}" class="banner-glass-card">
-                            {% if block.preTitle %}
-                                <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
-                                    {{ block.preTitle }}
-                                </span>
-                            {% endif %}
+                        <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
+                            <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
+                                {% if block.preTitle %}
+                                    <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                                        {{ block.preTitle }}
+                                    </span>
+                                {% endif %}
 
-                            <h2 class="banner-title text-3xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight text-white drop-shadow-md">
-                                {{ b.title }}
-                            </h2>
+                                <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md">
+                                    {{ b.title|raw }}
+                                </h2>
 
-                            {% if b.text %}
-                                <p class="banner-text text-sm sm:text-base md:text-lg text-gray-200 mb-6 max-w-xl mx-auto leading-relaxed">
-                                    {{ b.text }}
-                                </p>
-                            {% endif %}
+                                {% if b.text %}
+                                    <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                                        {{ b.text }}
+                                    </p>
+                                {% endif %}
 
-                            {% if b.ctaText %}
-                                <div class="mt-8">
-                                    <a href="{{ b.ctaLink ?: '#' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base shadow-xl transition-all transform hover:-translate-y-0.5 inline-block">
-                                        {{ b.ctaText }}
+                                <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
+                                    {% if b.ctaText %}
+                                        <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                            {{ b.ctaText }}
+                                        </a>
+                                    {% else %}
+                                        <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                            Ver Nossos Cursos
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                        Fale Conosco
                                     </a>
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -169,12 +189,11 @@
     .banner-block:hover .banner-bg {
         transform: scale(1.03);
     }
-    .banner-glass-card {
-        background: rgba(26, 26, 26, 0.45);
-        padding: 3rem;
-        border-radius: 20px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,.08);
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, rgba(26, 26, 26, 0.85) 0%, rgba(26, 26, 26, 0.7) 40%, rgba(26, 26, 26, 0.25) 100%);
+        z-index: 1;
     }
     .banner-swiper-{{ block.id }} .swiper-pagination-bullet {
         background: rgba(255,255,255,.4);
@@ -198,6 +217,7 @@
         backdrop-filter: blur(4px);
         border: 1px solid rgba(255, 255, 255, 0.15);
         transition: all 0.2s ease;
+        z-index: 10;
     }
     .banner-swiper-{{ block.id }} .swiper-button-next:hover,
     .banner-swiper-{{ block.id }} .swiper-button-prev:hover {
@@ -210,9 +230,9 @@
         font-size: 1.1rem;
         font-weight: bold;
     }
-    @media (max-width:576px) {
-        .banner-glass-card {
-            padding: 2rem 1.25rem;
+    @media (max-width:768px) {
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(26, 26, 26, 0.8) 0%, rgba(26, 26, 26, 0.9) 100%);
         }
         .banner-swiper-{{ block.id }} .swiper-button-next,
         .banner-swiper-{{ block.id }} .swiper-button-prev {
