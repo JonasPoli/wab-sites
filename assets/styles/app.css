@@ -11,42 +11,81 @@
         @apply transition-colors duration-200;
     }
 
-    .dark .wab-block {
+    .dark .wab-block,
+    .wab-section-dark .wab-block,
+    .mp-section-dark .wab-block {
         @apply text-slate-100;
     }
 
     .dark .wab-block .bg-white,
-    .dark .wab-block .bg-gray-50 {
+    .dark .wab-block .bg-gray-50,
+    .wab-section-dark .wab-block .bg-white,
+    .wab-section-dark .wab-block .bg-gray-50,
+    .mp-section-dark .wab-block .bg-white,
+    .mp-section-dark .wab-block .bg-gray-50 {
         @apply bg-slate-900;
+    }
+
+    .dark .wab-block .bg-slate-50,
+    .wab-section-dark .wab-block .bg-slate-50,
+    .mp-section-dark .wab-block .bg-slate-50 {
+        @apply bg-slate-900/50;
     }
 
     .dark .wab-block .text-gray-900,
     .dark .wab-block .text-gray-800,
-    .dark .wab-block .text-gray-700 {
+    .dark .wab-block .text-gray-700,
+    .dark .wab-block .text-cetec-dark,
+    .wab-section-dark .wab-block .text-gray-900,
+    .wab-section-dark .wab-block .text-gray-800,
+    .wab-section-dark .wab-block .text-gray-700,
+    .wab-section-dark .wab-block .text-cetec-dark,
+    .mp-section-dark .wab-block .text-gray-900,
+    .mp-section-dark .wab-block .text-gray-800,
+    .mp-section-dark .wab-block .text-gray-700,
+    .mp-section-dark .wab-block .text-cetec-dark {
         @apply text-white;
     }
 
     .dark .wab-block .text-gray-600,
     .dark .wab-block .text-gray-500,
-    .dark .wab-block .text-gray-400 {
+    .dark .wab-block .text-gray-400,
+    .wab-section-dark .wab-block .text-gray-600,
+    .wab-section-dark .wab-block .text-gray-500,
+    .wab-section-dark .wab-block .text-gray-400,
+    .mp-section-dark .wab-block .text-gray-600,
+    .mp-section-dark .wab-block .text-gray-500,
+    .mp-section-dark .wab-block .text-gray-400 {
         @apply text-slate-300;
     }
 
     .dark .wab-block .border-gray-200,
-    .dark .wab-block .border-gray-100 {
+    .dark .wab-block .border-gray-100,
+    .wab-section-dark .wab-block .border-gray-200,
+    .wab-section-dark .wab-block .border-gray-100,
+    .mp-section-dark .wab-block .border-gray-200,
+    .mp-section-dark .wab-block .border-gray-100 {
         @apply border-white/10;
     }
 
-    .dark .wab-block .ring-gray-900\/10 {
+    .dark .wab-block .ring-gray-900\/10,
+    .wab-section-dark .wab-block .ring-gray-900\/10,
+    .mp-section-dark .wab-block .ring-gray-900\/10 {
         --tw-ring-color: rgb(255 255 255 / 0.1);
     }
 
     .dark .wab-block .hover\:bg-gray-50:hover,
-    .dark .wab-block .hover\:bg-gray-100:hover {
+    .dark .wab-block .hover\:bg-gray-100:hover,
+    .wab-section-dark .wab-block .hover\:bg-gray-50:hover,
+    .wab-section-dark .wab-block .hover\:bg-gray-100:hover,
+    .mp-section-dark .wab-block .hover\:bg-gray-50:hover,
+    .mp-section-dark .wab-block .hover\:bg-gray-100:hover {
         @apply bg-slate-800;
     }
 
-    .dark .wab-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]) {
+    .dark .wab-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]),
+    .wab-section-dark .wab-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]),
+    .mp-section-dark .wab-block .divide-gray-500\/10 > :not([hidden]) ~ :not([hidden]) {
         border-color: rgb(255 255 255 / 0.1);
     }
 }

@@ -67,7 +67,7 @@
     flex: 0 0 calc((100% - 4rem) / 3);
     max-width: calc((100% - 4rem) / 3);
     min-width: 290px;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 20px;
     overflow: hidden;
@@ -75,9 +75,6 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-}
-[data-theme="dark"] .cetec-team-card {
-    background: var(--bg-card);
 }
 .cetec-team-card:hover {
     transform: translateY(-5px);
@@ -152,7 +149,7 @@
     height: 36px;
     border-radius: 50%;
     background: rgba(255, 127, 0, 0.05);
-    color: var(--text-muted);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;

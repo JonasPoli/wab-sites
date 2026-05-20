@@ -122,12 +122,19 @@
 .page-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin: 0; }
 .wab-section { padding: 5rem 0; position: relative; }
 .wab-section.section-has-banner { padding: 0 !important; }
-.wab-section:nth-child(even) { background: #f8fafc; }
+.wab-section:nth-child(even) { background: var(--bg-alt); }
 
 /* Dark mode overrides for section */
 .wab-section-dark {
-    background-color: #0f172a; /* Solid dark background fallback */
-    color: #f1f5f9 !important;
+    --bg: #0f172a;
+    --bg-alt: #131625;
+    --bg-card: #1e293b;
+    --bg-glass: rgba(30,41,59,0.95);
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: rgba(255,255,255,.08);
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
 }
 .wab-section-dark h1, 
 .wab-section-dark h2, 
