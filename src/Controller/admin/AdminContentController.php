@@ -845,10 +845,11 @@ class AdminContentController extends AbstractController
     ): Response {
         $tenant = $tc->requireTenant();
         if ($r->isMethod('POST')) {
-            // Theme and Colors
             $tenant->setTheme((string) $r->request->get('theme', 'wab'));
             $tenant->setPrimaryColor($r->request->get('primaryColor') ?: '#0044cc');
             $tenant->setSecondaryColor($r->request->get('secondaryColor') ?: '#ffaa00');
+            $tenant->setPrimaryColorDark($r->request->get('primaryColorDark') ?: '#3b82f6');
+            $tenant->setSecondaryColorDark($r->request->get('secondaryColorDark') ?: '#fbbf24');
 
             // Home page
             $homePageId = (int) $r->request->get('homePageId');

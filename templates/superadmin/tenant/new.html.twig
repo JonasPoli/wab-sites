@@ -20,8 +20,12 @@
             </label>
         </div>
         <div class="af-row">
-            <div class="af-field"><label>Cor Primária</label><input type="color" name="primaryColor" value="#0044cc" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
-            <div class="af-field"><label>Cor Secundária</label><input type="color" name="secondaryColor" value="#ffaa00" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
+            <div class="af-field"><label>Cor Primária (Modo Claro)</label><input type="color" name="primaryColor" value="#0044cc" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
+            <div class="af-field"><label>Cor Secundária (Modo Claro)</label><input type="color" name="secondaryColor" value="#ffaa00" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
+        </div>
+        <div class="af-row" style="margin-top: 1rem;">
+            <div class="af-field"><label>Cor Primária (Modo Escuro)</label><input type="color" name="primaryColorDark" value="#3b82f6" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
+            <div class="af-field"><label>Cor Secundária (Modo Escuro)</label><input type="color" name="secondaryColorDark" value="#fbbf24" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
         </div>
         <div class="af-actions"><button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Criar Tenant</button><a href="{{ path('superadmin_dash') }}" class="btn btn-g">Cancelar</a></div>
     </form>

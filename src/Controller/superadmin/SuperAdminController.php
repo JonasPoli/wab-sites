@@ -167,6 +167,8 @@ class SuperAdminController extends AbstractController
         $tenant->setName((string) $r->request->get('name'));
         $tenant->setPrimaryColor((string) $r->request->get('primaryColor', '#0044cc'));
         $tenant->setSecondaryColor((string) $r->request->get('secondaryColor', '#ffaa00'));
+        $tenant->setPrimaryColorDark((string) $r->request->get('primaryColorDark', '#3b82f6'));
+        $tenant->setSecondaryColorDark((string) $r->request->get('secondaryColorDark', '#fbbf24'));
         $tenant->setTheme((string) $r->request->get('theme', 'wab'));
         $tenant->setShowSectionTitles($r->request->get('showSectionTitles') === '1');
         $tenant->setLandingPageMode($r->request->get('landingPageMode') === '1');

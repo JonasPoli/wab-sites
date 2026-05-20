@@ -66,6 +66,17 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
 
         $primary = htmlspecialchars($tenant->getPrimaryColor() ?? '#0044cc');
         $secondary = htmlspecialchars($tenant->getSecondaryColor() ?? '#ffaa00');
+        $primaryDark = htmlspecialchars($tenant->getPrimaryColorDark() ?? '#3b82f6');
+        $secondaryDark = htmlspecialchars($tenant->getSecondaryColorDark() ?? '#fbbf24');
+
+        $isPrimaryDark = $this->isDarkColor($primary);
+        $isPrimaryDarkDark = $this->isDarkColor($primaryDark);
+
+        $topbarText = $isPrimaryDark ? '#ffffff' : '#1f2937';
+        $topbarBorder = $isPrimaryDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+
+        $topbarTextDark = $isPrimaryDarkDark ? '#ffffff' : '#1f2937';
+        $topbarBorderDark = $isPrimaryDarkDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
 
         $fontSettings = $tenant->getFontSettings() ?? [];
         $fontGroups = [];
@@ -147,6 +158,17 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
   --color-primary-rgb: {$this->hexToRgb($primary)};
   --color-secondary-rgb: {$this->hexToRgb($secondary)};
   --topbar-height: {$topBarHeight};
+  --topbar-text: {$topbarText};
+  --topbar-border: {$topbarBorder};
+}
+
+[data-theme="dark"], .dark, .wab-section-dark, .mp-section-dark {
+  --color-primary: {$primaryDark};
+  --color-secondary: {$secondaryDark};
+  --color-primary-rgb: {$this->hexToRgb($primaryDark)};
+  --color-secondary-rgb: {$this->hexToRgb($secondaryDark)};
+  --topbar-text: {$topbarTextDark};
+  --topbar-border: {$topbarBorderDark};
 }
 {$cssRules}
 </style>

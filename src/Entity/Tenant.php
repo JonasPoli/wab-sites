@@ -40,6 +40,12 @@ class Tenant
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $secondaryColor = '#ffaa00';
 
+    #[ORM\Column(length: 7, nullable: true)]
+    private ?string $primaryColorDark = '#3b82f6';
+
+    #[ORM\Column(length: 7, nullable: true)]
+    private ?string $secondaryColorDark = '#fbbf24';
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactEmail = null;
 
@@ -158,6 +164,12 @@ class Tenant
 
     public function getSecondaryColor(): ?string { return $this->secondaryColor; }
     public function setSecondaryColor(?string $secondaryColor): static { $this->secondaryColor = $secondaryColor; return $this; }
+
+    public function getPrimaryColorDark(): ?string { return $this->primaryColorDark; }
+    public function setPrimaryColorDark(?string $primaryColorDark): static { $this->primaryColorDark = $primaryColorDark; return $this; }
+
+    public function getSecondaryColorDark(): ?string { return $this->secondaryColorDark; }
+    public function setSecondaryColorDark(?string $secondaryColorDark): static { $this->secondaryColorDark = $secondaryColorDark; return $this; }
 
     public function getContactEmail(): ?string { return $this->contactEmail; }
     public function setContactEmail(?string $contactEmail): static { $this->contactEmail = $contactEmail; return $this; }
@@ -313,6 +325,8 @@ class Tenant
             'logo'             => $this->logo,
             'primaryColor'     => $this->primaryColor,
             'secondaryColor'   => $this->secondaryColor,
+            'primaryColorDark'   => $this->primaryColorDark,
+            'secondaryColorDark' => $this->secondaryColorDark,
             'contactEmail'     => $this->contactEmail,
             'youtubeLink'      => $this->youtubeLink,
             'instagramLink'    => $this->instagramLink,
@@ -351,6 +365,8 @@ class Tenant
         $this->logo              = $data['logo'];
         $this->primaryColor      = $data['primaryColor'];
         $this->secondaryColor    = $data['secondaryColor'];
+        $this->primaryColorDark   = $data['primaryColorDark'] ?? '#3b82f6';
+        $this->secondaryColorDark = $data['secondaryColorDark'] ?? '#fbbf24';
         $this->contactEmail      = $data['contactEmail'];
         $this->youtubeLink       = $data['youtubeLink'];
         $this->instagramLink     = $data['instagramLink'];
