@@ -4,8 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    emailFrom: '%env(resolve:MAIL_SENDER)%'
-    emailContactTo: '%env(resolve:CONTACT_TO)%'
+    emailFrom: '%env(resolve:EMAIL_FROM)%'
+    emailContactTo: '%env(resolve:EMAIL_CONTACT_TO)%'
 
 services:
     # default configuration for services in *this* file

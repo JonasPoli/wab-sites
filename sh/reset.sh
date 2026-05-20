@@ -31,3 +31,11 @@ echo -e "${GREEN}--> Limpando logs...${NC}"
 rm -rf var/log/*
 
 echo -e "${BLUE}==> Limpeza concluída com sucesso!${NC}"
+
+
+/RunCloud/Packages/php83rc/bin/php bin/console tailwind:build
+/RunCloud/Packages/php83rc/bin/php bin/console asset-map:compile
+/RunCloud/Packages/php83rc/bin/php bin/console  liip:imagine:cache:remove
+
+
+
