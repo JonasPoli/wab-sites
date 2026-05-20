@@ -33,8 +33,7 @@ class AppFixtures extends Fixture
         $tenantA->setPrimaryColor('#0044cc');
         $tenantA->setSecondaryColor('#ffaa00');
         $tenantA->setContactEmail('contato@nepebrasil.org');
-        $tenantA->setTheme('nepe');
-        $tenantA->setRequiredApprovals(2);
+        $tenantA->setTheme('wab');
         $manager->persist($tenantA);
 
         $tenantB = new Tenant();
@@ -44,7 +43,6 @@ class AppFixtures extends Fixture
         $tenantB->setSecondaryColor('#333333');
         $tenantB->setContactEmail('dev@localhost');
         $tenantB->setTheme('moderno');
-        $tenantB->setRequiredApprovals(1);
         $manager->persist($tenantB);
 
         $manager->flush(); // flush tenants first so they get IDs

@@ -1,0 +1,51 @@
+{% set testimonials = block.testimonials %}
+{% if testimonials|length > 0 %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for t in testimonials %}
+        <div class="bg-white dark:bg-cetec-dark p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-white/5 hover:border-cetec-orange/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between transform hover:-translate-y-1">
+            <div>
+                <!-- Stars -->
+                <div class="flex gap-1 text-[#f59e0b] text-sm mb-4">
+                    {% for s in 1..t.rating %}
+                        <i class="fa-solid fa-star"></i>
+                    {% endfor %}
+                    {% if t.rating < 5 %}
+                        {% for s in (t.rating+1)..5 %}
+                            <i class="fa-regular fa-star"></i>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <!-- Testimonial Text -->
+                <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed italic mb-6">
+                    "{{ t.text }}"
+                </p>
+            </div>
+            
+            <!-- Author info -->
+            <div class="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-white/5">
+                {% if t.avatar %}
+                    <img src="{{ asset('uploads/testimonial_avatar/' ~ t.avatar) }}" alt="{{ t.name }}" class="w-12 h-12 rounded-full object-cover border-2 border-cetec-orange/30 shadow-sm" loading="lazy">
+                {% else %}
+                    <div class="w-12 h-12 rounded-full bg-cetec-orange/10 flex items-center justify-center text-cetec-orange text-lg shadow-inner flex-shrink-0">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="font-bold text-cetec-dark dark:text-white text-sm md:text-base">{{ t.name }}</div>
+                    {% if t.role %}<div class="text-gray-400 dark:text-gray-500 text-xs md:text-sm">{{ t.role }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

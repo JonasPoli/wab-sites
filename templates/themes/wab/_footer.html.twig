@@ -1,4 +1,4 @@
-<footer class="nepe-footer">
+<footer class="wab-footer">
 <div class="container footer-grid">
 
     {# Col 1 — Logo + Quem Somos + Redes Sociais #}
@@ -8,7 +8,7 @@
                  alt="{{ currentTenant.name }}"
                  style="height:48px;width:auto;object-fit:contain;margin-bottom:1rem;filter:brightness(0) invert(1)">
         {% else %}
-            <div class="footer-logo-text">{{ currentTenant ? currentTenant.name : 'NEPE' }}</div>
+            <div class="footer-logo-text">{{ currentTenant ? currentTenant.name : 'WAB' }}</div>
         {% endif %}
         {% if currentTenant and currentTenant.aboutText %}
             {% set firstSentence = currentTenant.aboutText|split('.')[0] ~ '.' %}
@@ -38,7 +38,15 @@
         <h4 class="footer-col-title">Notícias</h4>
         <nav class="footer-nav">
             <a href="{{ path('pub_articles') }}">Todas as notícias</a>
-            {% for cat in footerCategories %}<a href="{{ path('pub_articles') }}">{{ cat.name }}</a>{% endfor %}
+            {% for cat in footerCategories %}
+                {% set active_children_count = 0 %}
+                {% for sub in cat.children %}
+                    {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
+                {% endfor %}
+                {% if cat.pages|length > 0 or active_children_count > 0 %}
+                    <a href="{{ path('pub_articles') }}">{{ cat.name }}</a>
+                {% endif %}
+            {% endfor %}
         </nav>
     </div>
 
@@ -62,11 +70,11 @@
 
 </div>
 <div class="footer-bottom">
-    <p>&copy; {{ "now"|date("Y") }} {{ currentTenant ? currentTenant.name : 'NEPE Brasil' }}. Todos os direitos reservados.</p>
+    <p>&copy; {{ "now"|date("Y") }} {{ currentTenant ? currentTenant.name : 'WAB Brasil' }}. Todos os direitos reservados.</p>
 </div>
 </footer>
 <style>
-.nepe-footer { background: linear-gradient(135deg,#0f172a,#1e293b); color:#94a3b8; margin-top:5rem; }
+.wab-footer { background: linear-gradient(135deg,#0f172a,#1e293b); color:#94a3b8; margin-top:5rem; }
 .footer-grid { display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1fr; gap:2.5rem; padding:3.5rem 0 2.5rem; align-items:start; }
 .footer-col-title { font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#e2e8f0; margin:0 0 1rem; }
 .footer-logo-text { font-size:1.3rem; font-weight:800; margin-bottom:.75rem; background:linear-gradient(135deg,var(--color-primary),var(--color-secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }

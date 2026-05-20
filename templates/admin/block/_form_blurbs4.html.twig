@@ -16,7 +16,7 @@
     {% set cfg = block.config ?? {} %}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
     {% for i in 0..3 %}
-    {% set b = cfg.items[i] ?? {} %}
+    {% set b = {icon: '', title: '', text: ''}|merge(cfg.items[i] ?? {}) %}
     <div class="card" style="margin:0;padding:1rem">
         <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Bloco {{ i+1 }}</div>
         <div class="af-field">

@@ -1,12 +1,24 @@
-{% extends 'themes/nepe/base.html.twig' %}
+{% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}Estudos — {{ currentTenant ? currentTenant.name : 'NEPE' }}{% endblock %}
+{% block title %}Estudos — {{ currentTenant ? currentTenant.name : 'WAB' }}{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="Materiais de estudo, referências e conteúdos aprofundados do {{ currentTenant ? currentTenant.name : 'NEPE' }}.">
+<meta name="description" content="Materiais de estudo, referências e conteúdos aprofundados do {{ currentTenant ? currentTenant.name : 'WAB' }}.">
 {% endblock %}
 
 {% block body %}
+{% set active_categories = [] %}
+{% if footerCategories is defined %}
+    {% for cat in footerCategories %}
+        {% set active_children_count = 0 %}
+        {% for sub in cat.children %}
+            {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
+        {% endfor %}
+        {% if cat.pages|length > 0 or active_children_count > 0 %}
+            {% set active_categories = active_categories|merge([cat]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 {# ── HERO ── #}
 <section class="sl-hero">
@@ -21,7 +33,7 @@
                 Materiais de Estudo
             </span>
             <h1>Aprofunde seu<br><span class="sl-gradient-text">conhecimento</span></h1>
-            <p>Conteúdos, referências e materiais para estudo do {{ currentTenant ? currentTenant.name : 'NEPE' }}. Acesse gratuitamente.</p>
+            <p>Conteúdos, referências e materiais para estudo do {{ currentTenant ? currentTenant.name : 'WAB' }}. Acesse gratuitamente.</p>
         </div>
     </div>
     {# Stats #}
@@ -32,7 +44,7 @@
         </div>
         <div class="sl-stat-div"></div>
         <div class="sl-stat">
-            <span class="sl-stat-num">{{ footerCategories|length }}</span>
+            <span class="sl-stat-num">{{ active_categories|length }}</span>
             <span class="sl-stat-label">Categorias</span>
         </div>
         <div class="sl-stat-div"></div>
@@ -49,7 +61,7 @@
         <button class="sl-filter-btn active" data-cat="all" onclick="filterStudies('all', this)">
             Todos
         </button>
-        {% for cat in footerCategories %}
+        {% for cat in active_categories %}
         <button class="sl-filter-btn" data-cat="{{ cat.id }}" onclick="filterStudies('{{ cat.id }}', this)">
             {{ cat.name }}
         </button>

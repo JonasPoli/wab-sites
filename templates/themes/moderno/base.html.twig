@@ -20,6 +20,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     {# Apply theme BEFORE paint to prevent flash #}
     <script>
@@ -134,6 +135,45 @@
         font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap;
     }
     #wab-theme-btn:hover { border-color: var(--color-primary); }
+
+    /* ── Dark Section Overrides for Light/Auto Themes ── */
+    .mp-section-dark {
+        --bg:         #060612;
+        --bg-alt:     #0d0f1e;
+        --bg-card:    #131625;
+        --bg-glass:   rgba(6,6,18,.7);
+        --text:       #e2e8f0;
+        --text-muted: rgba(255,255,255,.45);
+        --border:     rgba(255,255,255,.07);
+        --link:       #e2e8f0;
+        color: var(--text);
+    }
+    .mp-section-dark .section-heading {
+        background: linear-gradient(135deg, #fff 0%, color-mix(in srgb, var(--color-secondary) 60%, #fff) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+    }
+
+    /* Light Theme Overrides for .mp-section-dark */
+    [data-theme="light"] .mp-section-dark {
+        background: var(--bg-alt) !important;
+        --bg:         #ffffff;
+        --bg-alt:     #f8fafc;
+        --bg-card:    #ffffff;
+        --bg-glass:   rgba(255,255,255,.7);
+        --text:       #0f172a;
+        --text-muted: #64748b;
+        --border:     rgba(0,0,0,.08);
+        --link:       #0f172a;
+        color: var(--text);
+    }
+    [data-theme="light"] .mp-section-dark .section-heading {
+        background: linear-gradient(135deg, var(--text) 0%, color-mix(in srgb, var(--color-secondary) 80%, var(--text)) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+    }
     </style>
 
     {% block stylesheets %}{% endblock %}
@@ -154,6 +194,7 @@
 
 {% include 'themes/moderno/_footer.html.twig' %}
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 {% block javascripts %}
 <script>
 // ── Theme Toggle ──────────────────────────────────────────────────────────────

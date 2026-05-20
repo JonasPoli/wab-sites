@@ -73,9 +73,6 @@ class Tenant
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $mapsEmbedUrl = null;
 
-    /** Minimum approvals needed for an article to be published */
-    #[ORM\Column(options: ['default' => 1])]
-    private int $requiredApprovals = 1;
 
     /** Which visual theme this tenant uses */
     #[ORM\Column(length: 50, options: ['default' => 'wab'])]
@@ -108,6 +105,15 @@ class Tenant
     /** SEO: Open Graph image URL */
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $ogImage = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $fontSettings = [];
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $navigationSettings = [];
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $showSectionTitles = true;
 
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
@@ -188,8 +194,6 @@ class Tenant
     public function getMapsEmbedUrl(): ?string { return $this->mapsEmbedUrl; }
     public function setMapsEmbedUrl(?string $url): static { $this->mapsEmbedUrl = $url; return $this; }
 
-    public function getRequiredApprovals(): int { return $this->requiredApprovals; }
-    public function setRequiredApprovals(int $requiredApprovals): static { $this->requiredApprovals = $requiredApprovals; return $this; }
 
     public function getTheme(): string { return $this->theme; }
     public function setTheme(string $theme): static { $this->theme = $theme; return $this; }
@@ -223,6 +227,44 @@ class Tenant
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
 
+    public function getFontSettings(): ?array
+    {
+        return $this->fontSettings ?? [];
+    }
+
+    public function setFontSettings(?array $fontSettings): static
+    {
+        $this->fontSettings = $fontSettings;
+        return $this;
+    }
+
+    public function getNavigationSettings(): ?array
+    {
+        return $this->navigationSettings ?? [
+            'showMenuIcons' => true,
+            'topBarEnabled' => false,
+            'topBarLeft'    => [],
+            'topBarRight'   => [],
+        ];
+    }
+
+    public function setNavigationSettings(?array $navigationSettings): static
+    {
+        $this->navigationSettings = $navigationSettings;
+        return $this;
+    }
+
+    public function isShowSectionTitles(): bool
+    {
+        return $this->showSectionTitles;
+    }
+
+    public function setShowSectionTitles(bool $showSectionTitles): static
+    {
+        $this->showSectionTitles = $showSectionTitles;
+        return $this;
+    }
+
 
     /**
      * Exclude $logoFile (Symfony\Component\HttpFoundation\File\File) from serialization.
@@ -250,13 +292,16 @@ class Tenant
             'address'          => $this->address,
             'phone'            => $this->phone,
             'mapsEmbedUrl'     => $this->mapsEmbedUrl,
-            'requiredApprovals'=> $this->requiredApprovals,
+
             'theme'            => $this->theme,
             'favicon'          => $this->favicon,
             'seoTitle'         => $this->seoTitle,
             'seoDescription'   => $this->seoDescription,
             'seoKeywords'      => $this->seoKeywords,
             'ogImage'          => $this->ogImage,
+            'fontSettings'     => $this->fontSettings,
+            'navigationSettings'=> $this->navigationSettings,
+            'showSectionTitles' => $this->showSectionTitles,
             'homePageId'       => $this->homePage?->getId(),
             'updatedAt'        => $this->updatedAt,
             // File objects intentionally excluded — not serializable
@@ -283,13 +328,16 @@ class Tenant
         $this->address           = $data['address'] ?? null;
         $this->phone             = $data['phone'] ?? null;
         $this->mapsEmbedUrl      = $data['mapsEmbedUrl'] ?? null;
-        $this->requiredApprovals = $data['requiredApprovals'];
+
         $this->theme             = $data['theme'];
         $this->favicon           = $data['favicon'] ?? null;
         $this->seoTitle          = $data['seoTitle'] ?? null;
         $this->seoDescription    = $data['seoDescription'] ?? null;
         $this->seoKeywords       = $data['seoKeywords'] ?? null;
         $this->ogImage           = $data['ogImage'] ?? null;
+        $this->fontSettings      = $data['fontSettings'] ?? [];
+        $this->navigationSettings = $data['navigationSettings'] ?? [];
+        $this->showSectionTitles = $data['showSectionTitles'] ?? true;
         $this->updatedAt         = $data['updatedAt'];
         $this->logoFile          = null;
         $this->aboutImageFile    = null;

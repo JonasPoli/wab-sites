@@ -16,7 +16,7 @@
     {% set cfg = block.config ?? {} %}
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem">
     {% for i in 0..3 %}
-    {% set s = cfg.stats[i] ?? {} %}
+    {% set s = {number: '', label: '', description: ''}|merge(cfg.stats[i] ?? {}) %}
     <div class="card" style="margin:0;padding:1rem">
         <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Stat {{ i+1 }}</div>
         <div class="af-field">

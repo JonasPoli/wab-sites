@@ -1,4 +1,4 @@
-{% extends 'themes/nepe/base.html.twig' %}
+{% extends 'themes/wab/base.html.twig' %}
 
 {% block title %}{{ article.seoTitle ?? article.title }}{% endblock %}
 
@@ -31,8 +31,8 @@
   "@type": "NewsArticle",
   "headline": {{ article.title|json_encode|raw }},
   "datePublished": "{{ article.publishedAt|date('c') }}",
-  "author": {"@type": "Organization", "name": {{ (currentTenant ? currentTenant.name : 'NEPE Brasil')|json_encode|raw }}},
-  "publisher": {"@type": "Organization", "name": {{ (currentTenant ? currentTenant.name : 'NEPE Brasil')|json_encode|raw }}}
+  "author": {"@type": "Organization", "name": {{ (currentTenant ? currentTenant.name : 'WAB Brasil')|json_encode|raw }}},
+  "publisher": {"@type": "Organization", "name": {{ (currentTenant ? currentTenant.name : 'WAB Brasil')|json_encode|raw }}}
   {% if article.image %}, "image": "{{ app.request.schemeAndHttpHost }}/uploads/article/{{ article.image }}"{% endif %}
 }
 </script>

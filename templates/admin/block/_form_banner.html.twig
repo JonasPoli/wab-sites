@@ -1,61 +1,124 @@
+{% set banners = block.config.banners ?? [] %}
+{% if banners is empty %}
+    {# Fallback to single banner properties as Slide 1 #}
+    {% set banners = [{
+        'title': block.title ?? '',
+        'text': block.text ?? '',
+        'ctaText': block.config.ctaText ?? '',
+        'ctaLink': block.config.ctaLink ?? '',
+        'active': '1',
+        'image': block.image ?? ''
+    }] %}
+{% endif %}
+
 <form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
     <input type="hidden" name="type" value="banner">
 
-    {# ── Imagem de fundo ── #}
-    <div class="af-field">
-        <label>Imagem de fundo</label>
-        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
-            {% if block.image %}
-                <div>
-                    <img id="banner-preview"
-                         src="{{ asset('uploads/page_block/' ~ block.image) }}"
-                         alt="Preview atual"
-                         style="height:80px;width:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-                    <div style="font-size:.7rem;color:var(--muted);margin-top:.3rem;text-align:center">Atual</div>
-                </div>
-            {% else %}
-                <div id="banner-preview"
-                     style="width:160px;height:80px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)">
-                    <sl-icon name="image" style="font-size:1.8rem"></sl-icon>
-                </div>
-            {% endif %}
-            <div style="flex:1">
-                <label for="banner-upload" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s ease">
-                    <sl-icon name="upload"></sl-icon> Selecionar imagem
-                </label>
-                <input type="file" id="banner-upload" name="imageFile"
-                       accept="image/webp,image/jpeg,image/png"
-                       style="display:none"
-                       onchange="previewBanner(this)">
-                <p class="af-hint" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB<br>
-                Será exibida com overlay da cor primária do tenant (15% opacidade)</p>
-            </div>
-        </div>
+    <div style="margin: 0 0 1.25rem 0; font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em;">
+        Slides de Banner
     </div>
 
-    <div class="af-field">
-        <label>Título <span class="req">*</span></label>
-        <input type="text" name="title" class="ai" value="{{ block.title }}" required placeholder="Título principal do banner">
-    </div>
-    <div class="af-field">
-        <label>Subtítulo</label>
-        <input type="text" name="text" class="ai" value="{{ block.text }}" placeholder="Subtítulo ou descrição curta">
-    </div>
-    <div class="af-row">
-        <div class="af-field">
-            <label>Texto do botão (CTA)</label>
-            <input type="text" name="config[ctaText]" class="ai" value="{{ block.config.ctaText ?? '' }}" placeholder="Ex: Saiba mais">
+    <div id="banners-wrap">
+    {% for b in banners %}
+        {% set idx = loop.index0 %}
+        <div class="card slide-card" style="margin: 0 0 1.5rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card, #fff); position: relative; transition: all 0.2s ease;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border);padding-bottom:.75rem">
+                <div style="font-weight:700;font-size:.9rem;color:var(--primary);display:flex;align-items:center;gap:.5rem">
+                    <sl-icon name="image"></sl-icon> Slide #<span class="slide-index">{{ loop.index }}</span>
+                </div>
+                <button type="button" class="btn btn-g" style="padding:.25rem .5rem;font-size:.75rem;color:var(--danger);border-color:var(--danger);background:transparent" onclick="removeSlide(this)">
+                    <sl-icon name="trash"></sl-icon> Remover Slide
+                </button>
+            </div>
+
+            <input type="hidden" name="banners[{{ idx }}][image]" value="{{ b.image }}">
+            <div class="af-field" style="margin-bottom: 1.25rem;">
+                <label>Imagem de fundo do Slide</label>
+                <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+                    {% if b.image %}
+                        <div>
+                            <img class="banner-preview"
+                                 src="{{ asset('uploads/page_block/' ~ b.image) }}"
+                                 alt="Preview atual"
+                                 style="height:80px;width:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+                            <div style="font-size:.7rem;color:var(--muted);margin-top:.3rem;text-align:center">Atual</div>
+                        </div>
+                    {% else %}
+                        <div class="banner-preview"
+                             style="width:160px;height:80px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                            <sl-icon name="image" style="font-size:1.8rem"></sl-icon>
+                        </div>
+                    {% endif %}
+                    <div style="flex:1">
+                        <label class="upload-btn" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s ease">
+                            <sl-icon name="upload"></sl-icon> Selecionar imagem
+                            <input type="file" name="banners[{{ idx }}][imageFile]"
+                                   accept="image/webp,image/jpeg,image/png"
+                                   style="display:none"
+                                   onchange="previewBannerSlide(this)">
+                        </label>
+                        <p class="af-hint" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="af-field" style="margin-bottom: 1rem;">
+                <label>Título do Slide <span class="req">*</span></label>
+                <input type="text" name="banners[{{ idx }}][title]" class="ai" value="{{ b.title }}" required placeholder="Título principal do slide">
+            </div>
+
+            <div class="af-field" style="margin-bottom: 1rem;">
+                <label>Subtítulo do Slide</label>
+                <input type="text" name="banners[{{ idx }}][text]" class="ai" value="{{ b.text }}" placeholder="Subtítulo ou descrição curta">
+            </div>
+
+            <div class="af-row" style="margin-bottom: 1rem;">
+                <div class="af-field">
+                    <label>Texto do botão (CTA)</label>
+                    <input type="text" name="banners[{{ idx }}][ctaText]" class="ai" value="{{ b.ctaText }}" placeholder="Ex: Saiba mais">
+                </div>
+                <div class="af-field">
+                    <label>Link do botão</label>
+                    <input type="text" name="banners[{{ idx }}][ctaLink]" class="ai" value="{{ b.ctaLink }}" placeholder="Ex: /p/servicos ou #contato">
+                </div>
+            </div>
+
+            <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem;margin: 0 0 1rem 0">
+                <input type="hidden" name="banners[{{ idx }}][active]" value="0">
+                <sl-switch name="banners[{{ idx }}][active]" value="1" {{ (b.active ?? '1') == '1' ? 'checked' : '' }}></sl-switch>
+                <label style="color:var(--text)">Slide ativo</label>
+            </div>
         </div>
-        <div class="af-field">
-            <label>Link do botão</label>
-            <input type="text" name="config[ctaLink]" class="ai" value="{{ block.config.ctaLink ?? '' }}" placeholder="Ex: /p/servicos ou #contato">
-        </div>
+    {% endfor %}
     </div>
-    
-    <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem">
-        <input type="hidden" name="config[active]" value="0">
-        <sl-switch name="config[active]" value="1" {{ (block.config.active ?? '1') == '1' ? 'checked' : '' }}></sl-switch>
-        <label style="color:var(--text)">Banner ativo</label>
+
+    <button type="button" onclick="addSlide()" class="btn btn-g" style="margin: 0 0 2rem 0; width: 100%; justify-content: center; padding: .75rem;">
+        <sl-icon name="plus-lg"></sl-icon> Adicionar Novo Slide
+    </button>
+
+    <div style="margin: 2rem 0 1.5rem 0; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <div style="margin: 0 0 1rem 0; font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em;">
+            Opções Gerais do Banner
+        </div>
+        
+        <div class="af-row" style="margin-bottom:1.5rem;gap:1.5rem">
+            <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem;margin:0">
+                <input type="hidden" name="config[fullWidth]" value="0">
+                <sl-switch name="config[fullWidth]" value="1" {{ (block.config.fullWidth ?? '0') == '1' ? 'checked' : '' }}></sl-switch>
+                <label style="color:var(--text)">100% de largura</label>
+            </div>
+            <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem;margin:0">
+                <input type="hidden" name="config[fullHeight]" value="0">
+                <sl-switch name="config[fullHeight]" value="1" {{ (block.config.fullHeight ?? '0') == '1' ? 'checked' : '' }}></sl-switch>
+                <label style="color:var(--text)">100% de altura</label>
+            </div>
+        </div>
+        
+        <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem">
+            <input type="hidden" name="config[active]" value="0">
+            <sl-switch name="config[active]" value="1" {{ (block.config.active ?? '1') == '1' ? 'checked' : '' }}></sl-switch>
+            <label style="color:var(--text)">Banner ativo</label>
+        </div>
     </div>
 
     <div class="af-actions">
@@ -64,8 +127,71 @@
     </div>
 </form>
 
+<template id="banner-tpl">
+    <div class="card slide-card" style="margin: 0 0 1.5rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card, #fff); position: relative; transition: all 0.2s ease;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border);padding-bottom:.75rem">
+            <div style="font-weight:700;font-size:.9rem;color:var(--primary);display:flex;align-items:center;gap:.5rem">
+                <sl-icon name="image"></sl-icon> Slide #<span class="slide-index">__n__</span>
+            </div>
+            <button type="button" class="btn btn-g" style="padding:.25rem .5rem;font-size:.75rem;color:var(--danger);border-color:var(--danger);background:transparent" onclick="removeSlide(this)">
+                <sl-icon name="trash"></sl-icon> Remover Slide
+            </button>
+        </div>
+
+        <input type="hidden" name="banners[__i__][image]" value="">
+        <div class="af-field" style="margin-bottom: 1.25rem;">
+            <label>Imagem de fundo do Slide</label>
+            <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+                <div class="banner-preview"
+                     style="width:160px;height:80px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                    <sl-icon name="image" style="font-size:1.8rem"></sl-icon>
+                </div>
+                <div style="flex:1">
+                    <label class="upload-btn" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s ease">
+                        <sl-icon name="upload"></sl-icon> Selecionar imagem
+                        <input type="file" name="banners[__i__][imageFile]"
+                               accept="image/webp,image/jpeg,image/png"
+                               style="display:none"
+                               onchange="previewBannerSlide(this)">
+                    </label>
+                    <p class="af-hint" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="af-field" style="margin-bottom: 1rem;">
+            <label>Título do Slide <span class="req">*</span></label>
+            <input type="text" name="banners[__i__][title]" class="ai" required placeholder="Título principal do slide">
+        </div>
+
+        <div class="af-field" style="margin-bottom: 1rem;">
+            <label>Subtítulo do Slide</label>
+            <input type="text" name="banners[__i__][text]" class="ai" placeholder="Subtítulo ou descrição curta">
+        </div>
+
+        <div class="af-row" style="margin-bottom: 1rem;">
+            <div class="af-field">
+                <label>Texto do botão (CTA)</label>
+                <input type="text" name="banners[__i__][ctaText]" class="ai" placeholder="Ex: Saiba mais">
+            </div>
+            <div class="af-field">
+                <label>Link do botão</label>
+                <input type="text" name="banners[__i__][ctaLink]" class="ai" placeholder="Ex: /p/servicos ou #contato">
+            </div>
+        </div>
+
+        <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem;margin: 0 0 1rem 0">
+            <input type="hidden" name="banners[__i__][active]" value="0">
+            <sl-switch name="banners[__i__][active]" value="1" checked></sl-switch>
+            <label style="color:var(--text)">Slide ativo</label>
+        </div>
+    </div>
+</template>
+
 <script>
-function previewBanner(input) {
+let bannerIdx = {{ banners|length }};
+
+function previewBannerSlide(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     if (file.size > 5 * 1024 * 1024) {
@@ -75,10 +201,11 @@ function previewBanner(input) {
     }
     const reader = new FileReader();
     reader.onload = e => {
-        let preview = document.getElementById('banner-preview');
+        const card = input.closest('.slide-card');
+        let preview = card.querySelector('.banner-preview');
         if (preview.tagName === 'DIV') {
             const img = document.createElement('img');
-            img.id = 'banner-preview';
+            img.className = 'banner-preview';
             img.style.cssText = 'height:80px;width:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)';
             img.alt = 'Preview';
             preview.replaceWith(img);
@@ -87,5 +214,34 @@ function previewBanner(input) {
         preview.src = e.target.result;
     };
     reader.readAsDataURL(file);
+}
+
+function addSlide() {
+    const wrap = document.getElementById('banners-wrap');
+    const count = wrap.querySelectorAll('.slide-card').length + 1;
+    const html = document.getElementById('banner-tpl').innerHTML
+        .replaceAll('__i__', bannerIdx++)
+        .replaceAll('__n__', count);
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    wrap.appendChild(tempDiv.firstElementChild);
+}
+
+function removeSlide(btn) {
+    const wrap = document.getElementById('banners-wrap');
+    const cards = wrap.querySelectorAll('.slide-card');
+    if (cards.length <= 1) {
+        alert('O banner deve conter pelo menos 1 slide.');
+        return;
+    }
+    if (confirm('Tem certeza que deseja remover este slide?')) {
+        btn.closest('.slide-card').remove();
+        // Recalculate slide numbers sequentially
+        const remaining = wrap.querySelectorAll('.slide-card');
+        remaining.forEach((card, idx) => {
+            card.querySelector('.slide-index').textContent = idx + 1;
+        });
+    }
 }
 </script>

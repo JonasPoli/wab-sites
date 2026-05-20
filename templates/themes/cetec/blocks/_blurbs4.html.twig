@@ -1,0 +1,54 @@
+{% set config = block.config ?? {} %}
+{% set items_list = [] %}
+{% if config.items is defined and config.items is iterable %}
+    {% for it in config.items %}
+        {% if it.title is defined and it.title %}
+            {% set items_list = items_list|merge([{
+                'icon': it.icon ?? null,
+                'title': it.title,
+                'text': it.text ?? null
+            }]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if items_list|length == 0 %}
+    {% for i in 1..4 %}
+        {% set title = config['item' ~ i ~ '_title'] ?? null %}
+        {% if title %}
+            {% set items_list = items_list|merge([{
+                'icon': config['item' ~ i ~ '_icon'] ?? null,
+                'title': title,
+                'text': config['item' ~ i ~ '_text'] ?? null
+            }]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% set has_items = items_list|length > 0 %}
+{% if block.title or block.text or block.preTitle or has_items %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    {% if has_items %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+        {% for it in items_list %}
+        <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/50 transition-all duration-300 transform hover:-translate-y-1">
+            {% if it.icon %}
+            <div class="w-14 h-14 bg-cetec-orange/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-orange mb-4 group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+                <i class="{{ it.icon }}"></i>
+            </div>
+            {% endif %}
+            <h3 class="text-lg font-bold mb-2 text-cetec-dark dark:text-white group-hover:text-cetec-orange transition-colors">{{ it.title }}</h3>
+            {% if it.text %}<p class="text-gray-500 dark:text-gray-400 text-xs md:text-sm leading-relaxed">{{ it.text }}</p>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}

@@ -1,0 +1,68 @@
+{% extends 'themes/cetec/base.html.twig' %}
+
+{% block title %}Notícias - {{ currentTenant ? currentTenant.name : 'CETEC' }}{% endblock %}
+
+{% block body %}
+
+<div class="cetec-page-hero py-12 md:py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5 text-center relative overflow-hidden">
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    <div class="container mx-auto px-4 relative z-10">
+        <h1 class="text-3xl md:text-5xl font-black text-cetec-dark dark:text-white leading-tight">
+            Notícias e Acontecimentos
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 max-w-xl mx-auto mt-3 text-sm md:text-base">
+            Fique por dentro das últimas atualizações, eventos e notícias da nossa comunidade técnica.
+        </p>
+    </div>
+</div>
+
+<div class="py-16 bg-white dark:bg-cetec-dark">
+    <div class="container mx-auto px-4">
+        {% if articles is not defined or articles|length == 0 %}
+            <div class="text-center py-12">
+                <div class="text-cetec-orange text-5xl mb-4"><i class="bi bi-newspaper"></i></div>
+                <p class="text-gray-500 dark:text-gray-400 text-lg">Nenhuma notícia publicada no momento.</p>
+            </div>
+        {% else %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for article in articles %}
+                <article class="bg-gray-50 dark:bg-cetec-dark/50 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 border border-gray-100 dark:border-white/5 flex flex-col group">
+                    {% if article.image %}
+                        <div class="h-52 overflow-hidden relative">
+                            <img src="/uploads/article/{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                    {% else %}
+                        <div class="h-52 bg-cetec-orange/5 dark:bg-cetec-dark/80 flex items-center justify-center text-5xl text-cetec-orange/30">
+                            <i class="bi bi-newspaper"></i>
+                        </div>
+                    {% endif %}
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            {% if article.category %}
+                                <span class="inline-block bg-cetec-orange/10 text-cetec-orange px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider mb-3">
+                                    {{ article.category.name }}
+                                </span>
+                            {% endif %}
+                            <h3 class="text-xl font-bold mb-3 group-hover:text-cetec-orange transition-colors leading-snug">
+                                <a href="{{ path('pub_article_show', {slug: article.slug}) }}">{{ article.title }}</a>
+                            </h3>
+                            {% if article.shortDescription %}
+                                <p class="text-gray-500 dark:text-gray-400 text-xs mb-6 line-clamp-3 leading-relaxed">{{ article.shortDescription }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-4 mt-auto">
+                            <span class="text-xs text-gray-400 font-semibold"><i class="bi bi-calendar3"></i> {{ article.publishedAt|date('d/m/Y') }}</span>
+                            <a href="{{ path('pub_article_show', {slug: article.slug}) }}" class="text-cetec-orange font-bold text-xs flex items-center gap-1">
+                                Ler Mais <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

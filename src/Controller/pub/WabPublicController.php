@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class NepePublicController extends AbstractController
+class WabPublicController extends AbstractController
 {
     public function __construct(private readonly TenantContext $tenantContext) {}
 
@@ -132,5 +132,53 @@ class NepePublicController extends AbstractController
 
         $this->addFlash('success', 'Mensagem enviada com sucesso!');
         return $redirect;
+    }
+
+    // ── Notícias / Artigos ───────────────────────────────────────────────────
+
+    #[Route('/noticias', name: 'pub_articles')]
+    public function articles(): Response
+    {
+        return $this->render($this->theme('articles.html.twig'), [
+            'articles' => [],
+        ]);
+    }
+
+    #[Route('/noticias/{slug}', name: 'pub_article_show')]
+    public function articleShow(string $slug): Response
+    {
+        throw $this->createNotFoundException('Notícia não encontrada.');
+    }
+
+    // ── Vídeos ───────────────────────────────────────────────────────────────
+
+    #[Route('/videos', name: 'pub_videos')]
+    public function videos(): Response
+    {
+        return $this->render($this->theme('videos.html.twig'), [
+            'videos' => [],
+        ]);
+    }
+
+    #[Route('/videos/{slug}', name: 'pub_video_show')]
+    public function videoShow(string $slug): Response
+    {
+        throw $this->createNotFoundException('Vídeo não encontrado.');
+    }
+
+    // ── Estudos ──────────────────────────────────────────────────────────────
+
+    #[Route('/estudos', name: 'pub_studies')]
+    public function studies(): Response
+    {
+        return $this->render($this->theme('studies.html.twig'), [
+            'studies' => [],
+        ]);
+    }
+
+    #[Route('/estudos/{slug}', name: 'pub_study_show')]
+    public function studyShow(string $slug): Response
+    {
+        throw $this->createNotFoundException('Estudo não encontrado.');
     }
 }

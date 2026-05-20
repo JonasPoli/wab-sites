@@ -59,10 +59,16 @@ class Category implements TenantAwareInterface
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $sections;
 
+    /** @var Collection<int, Page> */
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Page::class)]
+    #[ORM\OrderBy(['position' => 'ASC', 'title' => 'ASC'])]
+    private Collection $pages;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
         $this->sections = new ArrayCollection();
+        $this->pages = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -101,6 +107,9 @@ class Category implements TenantAwareInterface
 
     /** @return Collection<int, PageSection> */
     public function getSections(): Collection { return $this->sections; }
+
+    /** @return Collection<int, Page> */
+    public function getPages(): Collection { return $this->pages; }
 
     public function __toString(): string { return $this->name; }
 }

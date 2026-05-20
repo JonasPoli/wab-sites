@@ -57,13 +57,25 @@
 {# ── Seções da categoria ── #}
 {% for section in category.sections %}{% if section.active %}
 {% set sectionStyle = '' %}
+{% set sectionClass = 'mp-section' %}
+{% set isDark = false %}
+{% if section.bgType in ['image', 'video', 'gradient'] %}
+    {% set isDark = true %}
+{% elseif section.bgType == 'color' and section.bgColor %}
+    {% set isDark = is_dark_color(section.bgColor) %}
+{% endif %}
+
+{% if isDark %}
+    {% set sectionClass = sectionClass ~ ' mp-section-dark' %}
+{% endif %}
+
 {% if section.bgType == 'color' and section.bgColor %}{% set sectionStyle = 'background:' ~ section.bgColor %}
 {% elseif section.bgType == 'gradient' and section.bgGradient %}{% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
 {% elseif section.bgType in ['image','video'] %}{% set sectionStyle = 'position:relative;overflow:hidden' %}{% endif %}
-<section class="mp-section" style="{{ sectionStyle }}">
+<section class="{{ sectionClass }}" style="{{ sectionStyle }}">
     {% if section.bgType == 'image' and section.bgImage %}<div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}');background-size:cover;background-position:{{ section.bgImagePosition }};opacity:{{ section.bgImageOpacity/100 }};z-index:0"></div>{% endif %}
     <div class="container" style="position:relative;z-index:2">
-        {% if section.titlePart1 or section.titlePart2 %}<div class="mp-two-tone">{% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}{% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}</div>{% endif %}
+        {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}<div class="mp-two-tone">{% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}{% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}</div>{% endif %}
         {% for block in section.blocks %}{% include 'themes/moderno/_block.html.twig' %}{% endfor %}
     </div>
 </section>

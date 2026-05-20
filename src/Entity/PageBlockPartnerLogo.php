@@ -26,8 +26,8 @@ class PageBlockPartnerLogo
     #[Vich\UploadableField(mapping: 'partner_logo', fileNameProperty: 'logoFilename')]
     private ?File $logoFile = null;
 
-    #[ORM\Column(length: 255)]
-    private string $logoFilename = '';
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logoFilename = null;
 
     /** External link (optional) */
     #[ORM\Column(length: 500, nullable: true)]
@@ -60,8 +60,8 @@ class PageBlockPartnerLogo
         return $this;
     }
 
-    public function getLogoFilename(): string { return $this->logoFilename; }
-    public function setLogoFilename(string $logoFilename): static { $this->logoFilename = $logoFilename; return $this; }
+    public function getLogoFilename(): ?string { return $this->logoFilename; }
+    public function setLogoFilename(?string $logoFilename): static { $this->logoFilename = $logoFilename; return $this; }
 
     public function getUrl(): ?string { return $this->url; }
     public function setUrl(?string $url): static { $this->url = $url; return $this; }

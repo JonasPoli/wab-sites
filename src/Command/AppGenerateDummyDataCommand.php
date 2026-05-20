@@ -61,7 +61,6 @@ class AppGenerateDummyDataCommand extends Command
         $tenant->setSecondaryColor('#3b82f6'); // Azul Royal Vivo
         $tenant->setContactEmail('contato@wabdigital.com');
         $tenant->setTheme('moderno');
-        $tenant->setRequiredApprovals(1);
         $tenant->setSeoTitle('WAB Digital — Hub de Tecnologia e Soluções Web');
         $tenant->setSeoDescription('Criamos ecossistemas digitais de alta performance, portais multi-tenant, design arrojado e soluções de ponta para sua empresa.');
         $tenant->setSeoKeywords('tecnologia, design, symfony, portais, web dev, agência, premium');

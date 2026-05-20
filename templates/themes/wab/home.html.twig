@@ -1,14 +1,14 @@
-{% extends 'themes/nepe/base.html.twig' %}
+{% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}{{ currentTenant ? currentTenant.name : 'NEPE Brasil' }}{% endblock %}
+{% block title %}{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="{{ currentTenant ? currentTenant.name ~ ' — Núcleo de Estudos e Pesquisas' : 'NEPE Brasil' }}">
+<meta name="description" content="{{ currentTenant ? currentTenant.name ~ ' — Núcleo de Estudos e Pesquisas' : 'WAB Brasil' }}">
 {% endblock %}
 
 {% block og_tags %}
 {{ parent() }}
-<meta property="og:title" content="{{ currentTenant ? currentTenant.name : 'NEPE Brasil' }}">
+<meta property="og:title" content="{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}">
 <meta property="og:description" content="Núcleo de Estudos e Pesquisas — conhecimento, pesquisa e transformação">
 {% endblock %}
 
@@ -18,7 +18,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "{{ currentTenant ? currentTenant.name : 'NEPE Brasil' }}",
+  "name": "{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}",
   "description": "Núcleo de Estudos e Pesquisas",
   "url": "{{ app.request.uri }}"
 }
@@ -57,7 +57,7 @@
 {% else %}
 <section class="hero hero-default">
     <div class="container hero-content">
-        <h1 class="hero-title">{{ currentTenant ? currentTenant.name : 'NEPE Brasil' }}</h1>
+        <h1 class="hero-title">{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}</h1>
         <p class="hero-subtitle">Núcleo de Estudos e Pesquisas — conhecimento que transforma</p>
         <a href="#noticias" class="btn btn-hero">Saiba mais →</a>
     </div>

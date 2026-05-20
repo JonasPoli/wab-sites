@@ -1,0 +1,231 @@
+{% include 'themes/_topbar.html.twig' %}
+<header class="cetec-header" id="navbar">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center h-[70px]">
+        <!-- Logo -->
+        <a href="{{ path('pub_home') }}" class="flex items-center">
+            {% if currentTenant and currentTenant.logo %}
+                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" class="h-12 md:h-14 transition-all duration-300 w-auto object-contain">
+            {% else %}
+                <span class="text-2xl font-black tracking-wider uppercase" style="color: var(--color-primary);">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
+            {% endif %}
+        </a>
+
+        {% set showMenuIcons = currentTenant.navigationSettings.showMenuIcons ?? true %}
+
+        <!-- Desktop Menu -->
+        <div class="hidden lg:flex items-center gap-6 font-semibold">
+            <a href="{{ path('pub_home') }}" class="nav-link">Início</a>
+            
+            {% if headerCategories is defined %}
+                {% for cat in headerCategories %}
+                    {% set active_children = [] %}
+                    {% for sub in cat.children %}
+                        {% if sub.pages|length > 0 %}
+                            {% set active_children = active_children|merge([sub]) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% set has_pages = cat.pages|length > 0 %}
+                    {% set has_active_children = active_children|length > 0 %}
+                    
+                    {% if has_active_children or has_pages %}
+                        {% if has_active_children %}
+                            <div class="nav-dropdown">
+                                <span class="nav-link dropdown-toggle">
+                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                                    {{ cat.name }} <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                                </span>
+                                <div class="dropdown-menu">
+                                    {% for sub in active_children %}
+                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="dd-item">
+                                        {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }} w-4 text-center"></i>{% endif %} {{ sub.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
+                                {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                                {{ cat.name }}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            
+            <a href="{{ path('pub_home') }}#contato" class="btn-inscricao">
+                <i class="bi bi-pencil-square"></i>
+                Inscreva-se
+            </a>
+            
+            <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" class="ml-2">
+                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+            </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="lg:hidden text-3xl focus:outline-none text-current" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="mobile-menu" onclick="toggleMobileMenu()">
+            <i class="bi bi-list" aria-hidden="true" id="menu-icon-state"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-gray-100 flex-col py-4 px-6 shadow-xl gap-2 transition-all duration-300" style="background: var(--bg-card); color: var(--text);">
+        <a href="{{ path('pub_home') }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">Início</a>
+        
+        {% if headerCategories is defined %}
+            {% for cat in headerCategories %}
+                {% set active_children = [] %}
+                {% for sub in cat.children %}
+                    {% if sub.pages|length > 0 %}
+                        {% set active_children = active_children|merge([sub]) %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% set has_pages = cat.pages|length > 0 %}
+                {% set has_active_children = active_children|length > 0 %}
+                
+                {% if has_active_children or has_pages %}
+                    {% if has_active_children %}
+                        <div class="py-2.5 border-b border-gray-50/5">
+                            <span class="font-bold flex justify-between items-center" style="color: var(--color-secondary);">
+                                {{ cat.name }}
+                            </span>
+                            <div class="pl-4 mt-2 flex flex-col gap-2 border-l-2 border-gray-200">
+                                {% for sub in active_children %}
+                                <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="py-1 hover:text-cetec-orange transition-colors">
+                                    {{ sub.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">
+                            {{ cat.name }}
+                        </a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        <a href="{{ path('pub_home') }}#contato" class="mt-4 bg-cetec-orange text-white text-center font-bold py-3 rounded-md shadow-md hover:bg-[#e55902] transition-colors" onclick="toggleMobileMenu()">
+            Inscreva-se
+        </a>
+        <div class="mt-4 flex justify-between items-center">
+            <span class="text-sm font-medium">Modo de Cor</span>
+            <button id="wab-theme-btn-mobile" onclick="cycleTheme()" class="px-4 py-2 border rounded-full text-xs font-bold" style="background: var(--bg); color: var(--text); border-color: var(--border);">
+                Tema
+            </button>
+        </div>
+    </div>
+</header>
+
+<style>
+.cetec-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--header-bg);
+    border-bottom: 3px solid var(--color-secondary);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.nav-link:hover, .nav-link:focus {
+    color: var(--color-secondary);
+    opacity: 1;
+}
+
+.btn-inscricao {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--color-secondary);
+    color: #ffffff !important;
+    font-weight: 700;
+    padding: 0.55rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s var(--ease);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(var(--color-secondary-rgb), 0.3);
+}
+
+.btn-inscricao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(var(--color-secondary-rgb), 0.45);
+    opacity: 1;
+}
+
+/* Nav Dropdown Desktop */
+.nav-dropdown {
+    position: relative;
+}
+.dropdown-toggle {
+    user-select: none;
+    display: flex;
+    align-items: center;
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+    z-index: 300;
+}
+.nav-dropdown:hover .dropdown-menu {
+    display: block;
+}
+.dd-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+}
+.dd-item:hover {
+    background: var(--bg-alt);
+    color: var(--color-secondary);
+    opacity: 1;
+}
+</style>
+
+<script>
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const icon = document.getElementById('menu-icon-state');
+    if (menu) {
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+            menu.classList.remove('hidden');
+            menu.classList.add('flex');
+            icon.className = 'bi bi-x-lg';
+        } else {
+            menu.classList.add('hidden');
+            menu.classList.remove('flex');
+            icon.className = 'bi bi-list';
+        }
+    }
+}
+</script>

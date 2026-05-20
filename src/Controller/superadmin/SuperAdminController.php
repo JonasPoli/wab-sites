@@ -5,6 +5,7 @@ namespace App\Controller\superadmin;
 use App\Entity\Tenant;
 use App\Entity\User;
 use App\Repository\TenantRepository;
+use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,11 +32,11 @@ class SuperAdminController extends AbstractController
     // ── Tenant CRUD ─────────────────────────────────────────────────────────
 
     #[Route('/tenant/new', name: 'tenant_new', methods: ['GET', 'POST'])]
-    public function tenantNew(Request $request, EntityManagerInterface $em): Response
+    public function tenantNew(Request $request, EntityManagerInterface $em, PageRepository $pageRepo): Response
     {
         $tenant = new Tenant();
         if ($request->isMethod('POST')) {
-            $this->populateTenantFromRequest($tenant, $request);
+            $this->populateTenantFromRequest($tenant, $request, $pageRepo);
             $em->persist($tenant);
             $em->flush();
             $this->addFlash('success', 'Tenant criado com sucesso.');
@@ -45,22 +46,34 @@ class SuperAdminController extends AbstractController
     }
 
     #[Route('/tenant/{id}/edit', name: 'tenant_edit', methods: ['GET', 'POST'])]
-    public function tenantEdit(Tenant $tenant, Request $request, EntityManagerInterface $em): Response
+    public function tenantEdit(Tenant $tenant, Request $request, EntityManagerInterface $em, PageRepository $pageRepo): Response
     {
         if ($request->isMethod('POST')) {
-            $this->populateTenantFromRequest($tenant, $request);
+            $this->populateTenantFromRequest($tenant, $request, $pageRepo);
 
             /** @var UploadedFile|null $logoFile */
             $logoFile = $request->files->get('logoFile');
-            if ($logoFile instanceof UploadedFile) {
+            if ($logoFile instanceof UploadedFile && $logoFile->isValid()) {
                 $tenant->setLogoFile($logoFile);
+            }
+
+            /** @var UploadedFile|null $faviconFile */
+            $faviconFile = $request->files->get('faviconFile');
+            if ($faviconFile instanceof UploadedFile && $faviconFile->isValid()) {
+                $tenant->setFaviconFile($faviconFile);
             }
 
             $em->flush();
             $this->addFlash('success', 'Tenant atualizado.');
             return $this->redirectToRoute('superadmin_dash');
         }
-        return $this->render('superadmin/tenant/edit.html.twig', ['tenant' => $tenant]);
+
+        $pages = $pageRepo->findBy(['tenant' => $tenant], ['position' => 'ASC', 'title' => 'ASC']);
+
+        return $this->render('superadmin/tenant/edit.html.twig', [
+            'tenant' => $tenant,
+            'pages'  => $pages,
+        ]);
     }
 
     #[Route('/tenant/{id}/delete', name: 'tenant_delete', methods: ['POST'])]
@@ -142,17 +155,61 @@ class SuperAdminController extends AbstractController
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    private function populateTenantFromRequest(Tenant $tenant, Request $r): void
+    private function populateTenantFromRequest(Tenant $tenant, Request $r, PageRepository $pageRepo): void
     {
         $tenant->setDomain((string) $r->request->get('domain'));
         $tenant->setName((string) $r->request->get('name'));
         $tenant->setPrimaryColor((string) $r->request->get('primaryColor', '#0044cc'));
         $tenant->setSecondaryColor((string) $r->request->get('secondaryColor', '#ffaa00'));
+        $tenant->setTheme((string) $r->request->get('theme', 'wab'));
+        $tenant->setShowSectionTitles($r->request->get('showSectionTitles') === '1');
+
+        // HomePage
+        $homePageId = $r->request->get('homePageId');
+        $homePage = $homePageId ? $pageRepo->find((int) $homePageId) : null;
+        $tenant->setHomePage($homePage);
+
+        // SEO
+        $tenant->setSeoTitle($r->request->get('seoTitle') ?: null);
+        $tenant->setSeoDescription($r->request->get('seoDescription') ?: null);
+        $tenant->setSeoKeywords($r->request->get('seoKeywords') ?: null);
+        $tenant->setOgImage($r->request->get('ogImage') ?: null);
+
+        // Contact
         $tenant->setContactEmail($r->request->get('contactEmail') ?: null);
+        $tenant->setPhone($r->request->get('phone') ?: null);
+        $tenant->setAddress($r->request->get('address') ?: null);
+        $tenant->setMapsEmbedUrl($r->request->get('mapsEmbedUrl') ?: null);
+
+        // Social Networks
         $tenant->setYoutubeLink($r->request->get('youtubeLink') ?: null);
         $tenant->setInstagramLink($r->request->get('instagramLink') ?: null);
-        $tenant->setRequiredApprovals((int) $r->request->get('requiredApprovals', 1));
-        $tenant->setTheme((string) $r->request->get('theme', 'nepe'));
+        $tenant->setFacebookLink($r->request->get('facebookLink') ?: null);
+        $tenant->setWhatsappLink($r->request->get('whatsappLink') ?: null);
+        $tenant->setLinkedinLink($r->request->get('linkedinLink') ?: null);
+
+        // Menu and TopBar settings
+        $showMenuIcons = (bool) $r->request->get('showMenuIcons');
+        $topBarEnabled = (bool) $r->request->get('topBarEnabled');
+        $topBarLeft = $r->request->all('topBarLeft');
+        $topBarRight = $r->request->all('topBarRight');
+
+        $tenant->setNavigationSettings([
+            'showMenuIcons' => $showMenuIcons,
+            'topBarEnabled' => $topBarEnabled,
+            'topBarLeft'    => $topBarLeft,
+            'topBarRight'   => $topBarRight,
+        ]);
+
+        $fontSettings = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $fontSettings['h' . $i] = [
+                'font'   => (string) $r->request->get('h' . $i . '_font', 'Outfit'),
+                'size'   => (string) $r->request->get('h' . $i . '_size', ''),
+                'weight' => (string) $r->request->get('h' . $i . '_weight', '400'),
+            ];
+        }
+        $tenant->setFontSettings($fontSettings);
     }
 
     private function populateUserFromRequest(

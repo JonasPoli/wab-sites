@@ -39,6 +39,10 @@
             <sl-switch name="showInFooter" value="1" {{ page.showInFooter ? 'checked' : '' }}></sl-switch>
             <label style="color:var(--text)">Exibir no rodapé</label>
         </div>
+        <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem;padding-top:1rem">
+            <sl-switch name="showTitle" value="1" {{ (page.showTitle ?? true) ? 'checked' : '' }}></sl-switch>
+            <label style="color:var(--text)">Exibir título da página (Hero banner)</label>
+        </div>
     </div>
 
     <details>

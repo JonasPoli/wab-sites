@@ -1,4 +1,4 @@
-{% extends 'themes/nepe/base.html.twig' %}
+{% extends 'themes/wab/base.html.twig' %}
 
 {% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
 
@@ -26,18 +26,70 @@
 </script>
 
 {# Page hero #}
+{% if page.showTitle ?? true %}
 <div class="page-hero">
     <div class="container">
         <h1>{{ page.title }}</h1>
     </div>
 </div>
+{% endif %}
 
-{# Sections in zig-zag layout #}
-{% for section in page.sections %}
-    {% if section.active %}
-    <section class="page-section">
+{# Sections #}
+{% for section in page.sections %}{% if section.active %}
+
+{# ── Build background style ── #}
+{% set sectionStyle = '' %}
+{% set sectionClass = 'wab-section' %}
+{% set isDark = false %}
+{% if section.bgType in ['image', 'video', 'gradient'] %}
+    {% set isDark = true %}
+{% elseif section.bgType == 'color' and section.bgColor %}
+    {% set isDark = is_dark_color(section.bgColor) %}
+{% endif %}
+
+{% if isDark %}
+    {% set sectionClass = sectionClass ~ ' wab-section-dark' %}
+{% endif %}
+
+{# Detect if the section contains a banner block #}
+{% set hasBanner = false %}
+{% for block in section.blocks %}
+    {% if block.type == 'banner' %}
+        {% set hasBanner = true %}
+    {% endif %}
+{% endfor %}
+
+{% if hasBanner %}
+    {% set sectionClass = sectionClass ~ ' section-has-banner' %}
+{% endif %}
+
+{% if section.bgType == 'color' and section.bgColor %}
+    {% set sectionStyle = 'background-color:' ~ section.bgColor %}
+{% elseif section.bgType == 'gradient' and section.bgGradient %}
+    {% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+{% elseif section.bgType in ['image', 'video'] %}
+    {% set sectionStyle = 'position:relative;overflow:hidden' %}
+{% endif %}
+
+<section class="{{ sectionClass }}" style="{{ sectionStyle }}">
+    {# Background image layer #}
+    {% if section.bgType == 'image' and section.bgImage %}
+    <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}');background-size:cover;background-position:{{ section.bgImagePosition }};opacity:{{ section.bgImageOpacity / 100 }};z-index:0;pointer-events:none"></div>
+    {% endif %}
+    
+    {# Background video layer #}
+    {% if section.bgType == 'video' and section.bgVideo %}
+    <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0">
+        <source src="{{ asset('uploads/section/video/' ~ section.bgVideo) }}" type="video/mp4">
+    </video>
+    {% if section.bgColor %}
+    <div style="position:absolute;inset:0;background:{{ section.bgColor }};opacity:.5;z-index:1;pointer-events:none"></div>
+    {% endif %}
+    {% endif %}
+
+    <div class="container" style="position:relative;z-index:2">
         {# Two-part colored title #}
-        {% if section.titlePart1 or section.titlePart2 %}
+        {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
         <div class="section-two-tone-title reveal-up">
             {% if section.titlePart1 %}
                 <span class="title-secondary">{{ section.titlePart1 }}</span>
@@ -48,32 +100,14 @@
         </div>
         {% endif %}
 
-        {# Blocks in zig-zag #}
+        {# Blocks #}
         {% for block in section.blocks %}
-        <div class="zigzag-block {% if loop.index is even %}zigzag-reverse{% endif %} reveal-up delay-{{ loop.index0 * 100 }}">
-            {% if block.image %}
-            <div class="zigzag-img">
-                <div class="zigzag-img-wrapper">
-                    <img src="/uploads/page_block/{{ block.image }}" alt="{{ block.title ?? '' }}" loading="lazy">
-                </div>
-            </div>
-            {% endif %}
-            <div class="zigzag-text">
-                {% if block.preTitle %}
-                    <span class="pre-label">{{ block.preTitle }}</span>
-                {% endif %}
-                {% if block.title %}
-                    <h2>{{ block.title }}</h2>
-                {% endif %}
-                {% if block.text %}
-                    <div class="prose">{{ block.text|raw }}</div>
-                {% endif %}
-            </div>
-        </div>
+            {% include 'themes/wab/_block.html.twig' %}
         {% endfor %}
-    </section>
-    {% endif %}
-{% endfor %}
+    </div>
+</section>
+
+{% endif %}{% endfor %}
 {% endblock %}
 
 {% block stylesheets %}
@@ -84,8 +118,35 @@
     color: white; padding: 5rem 0; text-align: center;
 }
 .page-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin: 0; }
-.page-section { padding: 5rem 0; }
-.page-section:nth-child(even) { background: #f8fafc; }
+.wab-section { padding: 5rem 0; position: relative; }
+.wab-section.section-has-banner { padding: 0 !important; }
+.wab-section:nth-child(even) { background: #f8fafc; }
+
+/* Dark mode overrides for section */
+.wab-section-dark {
+    background-color: #0f172a; /* Solid dark background fallback */
+    color: #f1f5f9 !important;
+}
+.wab-section-dark h1, 
+.wab-section-dark h2, 
+.wab-section-dark h3, 
+.wab-section-dark h4,
+.wab-section-dark .section-heading { 
+    color: #ffffff !important;
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+}
+.wab-section-dark p, 
+.wab-section-dark .prose,
+.wab-section-dark .wg-caption { 
+    color: #cbd5e1 !important; 
+}
+.wab-section-dark .section-label {
+    background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),.25), rgba(var(--color-primary-rgb),.2)) !important;
+    border-color: rgba(var(--color-secondary-rgb),.4) !important;
+    color: var(--color-secondary) !important;
+}
+.wab-section-dark .title-secondary { color: #1a1c2e !important; }
 
 .section-two-tone-title {
     display: flex; justify-content: center; margin-bottom: 3rem; overflow: hidden;
@@ -137,6 +198,9 @@
     background: var(--color-secondary);
     transform: scale(1.05);
 }
+
+.wab-block { margin-bottom: 3rem; }
+.wab-block:last-child { margin-bottom: 0; }
 
 @media (max-width: 768px) {
     .zigzag-block { grid-template-columns: 1fr; gap: 2rem; }

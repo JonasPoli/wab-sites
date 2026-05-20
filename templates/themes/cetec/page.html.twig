@@ -1,0 +1,100 @@
+{% extends 'themes/cetec/base.html.twig' %}
+
+{% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
+
+{% block meta_description %}
+{% if page.seoDescription %}
+<meta name="description" content="{{ page.seoDescription }}">
+{% endif %}
+{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
+
+{% block body %}
+
+{# ── Page Hero ── #}
+{% if page.showTitle ?? true %}
+<div class="cetec-page-hero py-12 md:py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5 text-center relative overflow-hidden">
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        {% if page.category %}
+            <span class="inline-block bg-cetec-orange/10 text-cetec-orange px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                {{ page.category.name }}
+            </span>
+        {% endif %}
+        <h1 class="text-3xl md:text-5xl font-black text-cetec-dark dark:text-white leading-tight">
+            {{ page.title }}
+        </h1>
+    </div>
+</div>
+{% endif %}
+
+{# ── Page Sections ── #}
+{% for section in page.sections %}{% if section.active %}
+
+    {# ── Background Style Construction ── #}
+    {% set sectionStyle = '' %}
+    {% set sectionClass = 'cetec-section py-16 border-b border-gray-100 dark:border-white/5 relative' %}
+    {% set isDark = false %}
+    {% if section.bgType in ['image', 'video', 'gradient'] %}
+        {% set isDark = true %}
+    {% elseif section.bgType == 'color' and section.bgColor %}
+        {% set isDark = is_dark_color(section.bgColor) %}
+    {% endif %}
+
+    {% if isDark %}
+        {% set sectionClass = sectionClass ~ ' mp-section-dark text-white' %}
+    {% endif %}
+
+    {% if section.bgType == 'color' and section.bgColor %}
+        {% set sectionStyle = 'background-color:' ~ section.bgColor %}
+    {% elseif section.bgType == 'gradient' and section.bgGradient %}
+        {% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+    {% elseif section.bgType in ['image', 'video'] %}
+        {% set sectionStyle = 'position:relative;overflow:hidden' %}
+    {% endif %}
+
+    <section class="{{ sectionClass }}" style="{{ sectionStyle }}">
+        {# Background Image layer #}
+        {% if section.bgType == 'image' and section.bgImage %}
+            <div class="absolute inset-0 bg-cover bg-center pointer-events-none" 
+                 style="background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}'); background-position:{{ section.bgImagePosition }}; opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;"></div>
+        {% endif %}
+        
+        {# Background Video layer #}
+        {% if section.bgType == 'video' and section.bgVideo %}
+            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none" style="z-index:0">
+                <source src="{{ asset('uploads/section/video/' ~ section.bgVideo) }}" type="video/mp4">
+            </video>
+            {% if section.bgColor %}
+                <div class="absolute inset-0 pointer-events-none" style="background:{{ section.bgColor }}; opacity:.5; z-index:1"></div>
+            {% endif %}
+        {% endif %}
+
+        <div class="container mx-auto px-4 relative z-10">
+            {# Two-tone Section Title #}
+            {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
+                <div class="flex flex-wrap justify-center mb-12 rounded-lg overflow-hidden text-center max-w-2xl mx-auto shadow-md">
+                    {% if section.titlePart1 %}
+                        <span class="bg-cetec-dark text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart1 }}</span>
+                    {% endif %}
+                    {% if section.titlePart2 %}
+                        <span class="bg-cetec-orange text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Blocks Renderer #}
+            <div class="space-y-12">
+                {% for block in section.blocks %}
+                    {% include 'themes/cetec/_block.html.twig' %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+{% endif %}{% endfor %}
+
+{% endblock %}

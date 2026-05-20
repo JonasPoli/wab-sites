@@ -1,0 +1,26 @@
+{% set t = block.type %}
+{% if t == 'text_image' %}
+    {% include 'themes/cetec/blocks/_text_image.html.twig' %}
+{% elseif t == 'gallery' %}
+    {% include 'themes/cetec/blocks/_gallery.html.twig' %}
+{% elseif t == 'newsletter' %}
+    {% include 'themes/cetec/blocks/_newsletter.html.twig' %}
+{% elseif t == 'blurbs4' %}
+    {% include 'themes/cetec/blocks/_blurbs4.html.twig' %}
+{% elseif t == 'stats' %}
+    {% include 'themes/cetec/blocks/_stats.html.twig' %}
+{% elseif t == 'news_call' %}
+    {% include 'themes/cetec/blocks/_news_call.html.twig' %}
+{% elseif t == 'map' %}
+    {% include 'themes/cetec/blocks/_map.html.twig' %}
+{% elseif t == 'sub_categories' %}
+    {% include 'themes/cetec/blocks/_sub_categories.html.twig' %}
+{% elseif t == 'page_list' %}
+    {% include 'themes/cetec/blocks/_page_list.html.twig' %}
+{% elseif t == 'testimonials' %}
+    {% include 'themes/cetec/blocks/_testimonials.html.twig' %}
+{% elseif t == 'partner_logos' %}
+    {% include 'themes/cetec/blocks/_partner_logos.html.twig' %}
+{% elseif t == 'banner' %}
+    {% include 'themes/cetec/blocks/_banner.html.twig' %}
+{% endif %}

@@ -1,0 +1,224 @@
+{% if (block.config.active ?? '1') == '1' %}
+{% set isFullWidth = (block.config.fullWidth ?? '0') == '1' %}
+{% set isFullHeight = (block.config.fullHeight ?? '0') == '1' %}
+
+{% set banners = [] %}
+{% if block.config.banners is defined and block.config.banners is not empty %}
+    {% for b in block.config.banners %}
+        {% if (b.active ?? '1') == '1' %}
+            {% set banners = banners|merge([b]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# Fallback to single banner properties if config banners are empty #}
+{% if banners is empty and block.title is not empty %}
+    {% set banners = [{
+        'title': block.title,
+        'text': block.text,
+        'ctaText': block.config.ctaText ?? '',
+        'ctaLink': block.config.ctaLink ?? '',
+        'image': block.image
+    }] %}
+{% endif %}
+
+{% if banners is not empty %}
+    {% set bannerStyles = 'position:relative;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;' %}
+    {% set bannerClasses = 'wab-block banner-block group' %}
+    
+    {% if isFullWidth %}
+        {% set containerStyles = bannerStyles ~ ' width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;max-width:100vw;border-radius:0;' %}
+    {% else %}
+        {% set containerStyles = bannerStyles ~ ' border-radius:24px;border:1px solid var(--border);' %}
+        {% set bannerClasses = bannerClasses ~ ' shadow-lg' %}
+    {% endif %}
+
+    {% if isFullHeight %}
+        {% set containerStyles = containerStyles ~ ' min-height:100vh;padding:0;' %}
+        {% set slideStyles = 'min-height:100vh;padding:8rem 2rem;' %}
+    {% else %}
+        {% set containerStyles = containerStyles ~ ' min-height:400px;padding:0;' %}
+        {% set slideStyles = 'min-height:400px;padding:4rem 2rem;' %}
+    {% endif %}
+
+    {% if isFullWidth or isFullHeight %}
+        {% set containerStyles = containerStyles ~ ' margin-bottom:0;' %}
+    {% else %}
+        {% set containerStyles = containerStyles ~ ' margin-bottom:2.5rem;' %}
+    {% endif %}
+
+    {% if banners|length == 1 %}
+        {# Single Banner Template (Backward compatible, static layout) #}
+        {% set b = banners[0] %}
+        <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
+            {# Background image #}
+            {% if b.image %}
+                <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg opacity-40"></div>
+                <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
+                <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.75) 100%);z-index:1"></div>
+            {% else %}
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
+            {% endif %}
+
+            {# Content Area #}
+            <div style="position:relative;z-index:2;max-width:850px;width:100%;margin:0 auto;text-align:center;color:#fff;{{ slideStyles }}" class="banner-glass-card">
+                {% if block.preTitle %}
+                    <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                        {{ block.preTitle }}
+                    </span>
+                {% endif %}
+
+                <h2 class="banner-title text-3xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight text-white drop-shadow-md">
+                    {{ b.title }}
+                </h2>
+
+                {% if b.text %}
+                    <p class="banner-text text-sm sm:text-base md:text-lg text-gray-200 mb-6 max-w-xl mx-auto leading-relaxed">
+                        {{ b.text }}
+                    </p>
+                {% endif %}
+
+                {% if b.ctaText %}
+                    <div class="mt-8">
+                        <a href="{{ b.ctaLink ?: '#' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base shadow-xl transition-all transform hover:-translate-y-0.5 inline-block">
+                            {{ b.ctaText }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {# Multiple Banner Carousel (Swiper layout) #}
+        <div class="{{ bannerClasses }} swiper banner-swiper-{{ block.id }}" style="{{ containerStyles }}">
+            <div class="swiper-wrapper">
+                {% for b in banners %}
+                    <div class="swiper-slide" style="position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+                        {# Background image #}
+                        {% if b.image %}
+                            <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg opacity-40"></div>
+                            <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
+                            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.75) 100%);z-index:1"></div>
+                        {% else %}
+                            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
+                        {% endif %}
+
+                        {# Content Area #}
+                        <div style="position:relative;z-index:2;max-width:850px;width:100%;margin:0 auto;text-align:center;color:#fff;{{ slideStyles }}" class="banner-glass-card">
+                            {% if block.preTitle %}
+                                <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                                    {{ block.preTitle }}
+                                </span>
+                            {% endif %}
+
+                            <h2 class="banner-title text-3xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight text-white drop-shadow-md">
+                                {{ b.title }}
+                            </h2>
+
+                            {% if b.text %}
+                                <p class="banner-text text-sm sm:text-base md:text-lg text-gray-200 mb-6 max-w-xl mx-auto leading-relaxed">
+                                    {{ b.text }}
+                                </p>
+                            {% endif %}
+
+                            {% if b.ctaText %}
+                                <div class="mt-8">
+                                    <a href="{{ b.ctaLink ?: '#' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base shadow-xl transition-all transform hover:-translate-y-0.5 inline-block">
+                                        {{ b.ctaText }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Swiper Pagination & Navigation #}
+            <div class="swiper-pagination swiper-pagination-{{ block.id }}"></div>
+            <div class="swiper-button-next swiper-button-next-{{ block.id }}"></div>
+            <div class="swiper-button-prev swiper-button-prev-{{ block.id }}"></div>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.banner-swiper-{{ block.id }}', {
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-{{ block.id }}',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next-{{ block.id }}',
+                        prevEl: '.swiper-button-prev-{{ block.id }}',
+                    },
+                });
+            }
+        });
+        </script>
+    {% endif %}
+
+    <style>
+    .banner-block:hover .banner-bg {
+        transform: scale(1.03);
+    }
+    .banner-glass-card {
+        background: rgba(26, 26, 26, 0.45);
+        padding: 3rem;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+    .banner-swiper-{{ block.id }} .swiper-pagination-bullet {
+        background: rgba(255,255,255,.4);
+        opacity: 1;
+        width: 10px;
+        height: 10px;
+        transition: all .3s ease;
+    }
+    .banner-swiper-{{ block.id }} .swiper-pagination-bullet-active {
+        background: #ff6600; /* Cetec Orange accent color for active bullet */
+        width: 24px;
+        border-radius: 5px;
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next,
+    .banner-swiper-{{ block.id }} .swiper-button-prev {
+        color: #ffffff !important;
+        background: rgba(26, 26, 26, 0.5);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: all 0.2s ease;
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next:hover,
+    .banner-swiper-{{ block.id }} .swiper-button-prev:hover {
+        background: rgba(255, 102, 0, 0.85); /* Accent highlight color on hover */
+        border-color: #ff6600;
+        transform: scale(1.05);
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next::after,
+    .banner-swiper-{{ block.id }} .swiper-button-prev::after {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+    @media (max-width:576px) {
+        .banner-glass-card {
+            padding: 2rem 1.25rem;
+        }
+        .banner-swiper-{{ block.id }} .swiper-button-next,
+        .banner-swiper-{{ block.id }} .swiper-button-prev {
+            display: none;
+        }
+    }
+    </style>
+{% endif %}
+{% endif %}

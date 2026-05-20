@@ -171,9 +171,11 @@
         <a href="{{ path('admin_editor_index') }}" class="nl {% if '/admin/editors' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="people-fill"></sl-icon> Editores
         </a>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <a href="{{ path('admin_settings') }}" class="nl {% if '/admin/settings' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="gear-fill"></sl-icon> Configurações
         </a>
+        {% endif %}
         {% endif %}
         {% if is_granted('ROLE_SUPER_ADMIN') %}
         <div class="nav-sec">Super Admin</div>

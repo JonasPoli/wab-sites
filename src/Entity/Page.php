@@ -54,9 +54,12 @@ class Page implements TenantAwareInterface
     private int $position = 0;
 
     /** Optional category / subcategory this page belongs to */
-    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'pages')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Category $category = null;
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $showTitle = true;
 
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
@@ -111,6 +114,9 @@ class Page implements TenantAwareInterface
 
     public function getCategory(): ?Category { return $this->category; }
     public function setCategory(?Category $category): static { $this->category = $category; return $this; }
+
+    public function isShowTitle(): bool { return $this->showTitle; }
+    public function setShowTitle(bool $showTitle): static { $this->showTitle = $showTitle; return $this; }
 
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }

@@ -1,4 +1,4 @@
-<footer class="moderno-footer">
+<footer class="moderno-footer" id="contato">
 <div class="mf-glow"></div>
 <div class="container mf-grid">
 
@@ -7,7 +7,7 @@
         {% if currentTenant and currentTenant.logo %}
             <img src="{{ asset('uploads/tenant/logo/' ~ currentTenant.logo) }}"
                  alt="{{ currentTenant.name }}"
-                 style="height:44px;width:auto;object-fit:contain;margin-bottom:1rem;filter:brightness(0) invert(1)">
+                 style="height:44px;width:auto;object-fit:contain;margin-bottom:1rem">
         {% else %}
             <span class="mf-logo-text">{{ currentTenant ? currentTenant.name : 'WAB Sites' }}</span>
         {% endif %}
@@ -30,7 +30,7 @@
     <div class="mf-col">
         <h4 class="mf-col-title">Institucional</h4>
         <nav class="mf-nav">
-            {% for page in footerPages %}<a href="{{ path('pub_page_show', {slug: page.slug}) }}">{{ page.title }}</a>{% else %}<span style="color:rgba(255,255,255,.2)">—</span>{% endfor %}
+            {% for page in footerPages %}<a href="{{ path('pub_page_show', {slug: page.slug}) }}">{{ page.title }}</a>{% else %}<span style="color:var(--text-muted);opacity:.4">—</span>{% endfor %}
         </nav>
     </div>
 
@@ -38,10 +38,21 @@
     <div class="mf-col">
         <h4 class="mf-col-title">Categorias</h4>
         <nav class="mf-nav">
+            {% set active_footer_categories = [] %}
             {% for cat in footerCategories %}
+                {% set active_children_count = 0 %}
+                {% for sub in cat.children %}
+                    {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
+                {% endfor %}
+                {% if cat.pages|length > 0 or active_children_count > 0 %}
+                    {% set active_footer_categories = active_footer_categories|merge([cat]) %}
+                {% endif %}
+            {% endfor %}
+            
+            {% for cat in active_footer_categories %}
             <a href="{{ path('pub_category', {slug: cat.slug}) }}">{{ cat.name }}</a>
             {% else %}
-            <span style="color:rgba(255,255,255,.2)">—</span>
+            <span style="color:var(--text-muted);opacity:.4">—</span>
             {% endfor %}
         </nav>
     </div>
@@ -59,12 +70,13 @@
 .mf-logo-text { font-size:1.5rem; font-weight:900; display:block; margin-bottom:.75rem; background:linear-gradient(135deg,var(--color-secondary),var(--color-primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .mf-tagline { color:var(--text-muted); font-size:.85rem; margin:.25rem 0 1.25rem; line-height:1.6; }
 .mf-social { display:flex; gap:.75rem; flex-wrap:wrap; }
-.mf-social-link { color:rgba(255,255,255,.4); transition:color .2s; }
+.mf-social-link { color:var(--text-muted); transition:color .2s; }
 .mf-social-link:hover { color:var(--color-secondary); }
 .mf-nav { display:flex; flex-direction:column; gap:.5rem; }
 .mf-nav a { color:var(--text-muted); font-size:.875rem; transition:color .2s; text-decoration:none; }
 .mf-nav a:hover { color:var(--color-secondary); }
 .mf-bottom { border-top:1px solid var(--border); text-align:center; padding:1.25rem; font-size:.8rem; color:var(--text-muted); }
+[data-theme="dark"] .mf-brand img { filter: brightness(0) invert(1); }
 @media(max-width:900px){ .mf-grid{ grid-template-columns:1fr 1fr; gap:2rem; } }
 @media(max-width:560px){ .mf-grid{ grid-template-columns:1fr; } }
 </style>

@@ -1,0 +1,55 @@
+{% extends 'themes/cetec/base.html.twig' %}
+
+{% block title %}{{ article is defined ? article.title : 'Notícia' }} - {{ currentTenant ? currentTenant.name : 'CETEC' }}{% endblock %}
+
+{% block body %}
+
+{% if article is defined %}
+<article class="py-16 bg-white dark:bg-cetec-dark">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Back to list -->
+        <a href="{{ path('pub_articles') }}" class="inline-flex items-center gap-2 text-cetec-orange font-bold text-sm mb-6 hover:gap-3 transition-all">
+            <i class="bi bi-arrow-left"></i> Voltar para notícias
+        </a>
+        
+        <!-- Header -->
+        <header class="mb-8">
+            {% if article.category %}
+                <span class="inline-block bg-cetec-orange/10 text-cetec-orange px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider mb-3">
+                    {{ article.category.name }}
+                </span>
+            {% endif %}
+            <h1 class="text-3xl md:text-5xl font-black text-cetec-dark dark:text-white leading-tight mb-4">
+                {{ article.title }}
+            </h1>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-gray-400 font-semibold border-b border-gray-100 dark:border-white/5 pb-6">
+                <span><i class="bi bi-calendar3"></i> Publicado em {{ article.publishedAt|date('d/m/Y') }}</span>
+                {% if article.author %}
+                    <span><i class="bi bi-person"></i> Por {{ article.author }}</span>
+                {% endif %}
+            </div>
+        </header>
+        
+        <!-- Featured Image -->
+        {% if article.image %}
+            <div class="rounded-3xl overflow-hidden shadow-xl mb-10 border border-gray-100 dark:border-white/5">
+                <img src="/uploads/article/{{ article.image }}" alt="{{ article.title }}" class="w-full h-auto object-cover max-h-[480px]">
+            </div>
+        {% endif %}
+        
+        <!-- Body Content -->
+        <div class="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-200 leading-relaxed space-y-6">
+            {{ article.content|raw }}
+        </div>
+    </div>
+</article>
+{% else %}
+<div class="py-24 text-center">
+    <div class="text-cetec-orange text-5xl mb-4"><i class="bi bi-newspaper"></i></div>
+    <h2 class="text-2xl font-bold mb-2">Notícia não encontrada</h2>
+    <p class="text-gray-500 mb-6">A publicação que você procura não está disponível.</p>
+    <a href="{{ path('pub_home') }}" class="bg-cetec-orange text-white px-6 py-2.5 rounded-md font-bold hover:bg-[#e55902] transition-colors">Voltar ao Início</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% set navSettings = currentTenant.navigationSettings ?? {} %}
+{% set topBarEnabled = navSettings.topBarEnabled ?? false %}
+
+{% if topBarEnabled %}
+    {% import _self as helper %}
+    {% set isDark = is_dark_color(currentTenant.primaryColor) %}
+    {% set textColor = isDark ? '#ffffff' : '#1f2937' %}
+    {% set borderColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' %}
+
+    <div class="topbar-wrapper" style="background-color: var(--color-primary); color: {{ textColor }}; height: var(--topbar-height); display: flex; align-items: center; border-bottom: 1px solid {{ borderColor }}; font-size: 0.85rem; overflow: hidden; position: relative; z-index: 1030; width: 100%;">
+        <div class="container mx-auto px-4 flex justify-between items-center w-full">
+            {# Left Side #}
+            <div class="flex items-center gap-4 sm:gap-6">
+                {% for item in navSettings.topBarLeft ?? [] %}
+                    {{ helper.render_item(item, currentTenant, textColor) }}
+                {% endfor %}
+            </div>
+            
+            {# Right Side #}
+            <div class="flex items-center gap-4 sm:gap-6">
+                {% for item in navSettings.topBarRight ?? [] %}
+                    {{ helper.render_item(item, currentTenant, textColor) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% macro render_item(item_key, tenant, text_color) %}
+  {% if item_key == 'social' %}
+    <div class="flex items-center gap-3">
+      {% if tenant.whatsappLink %}
+        <a href="{{ tenant.whatsappLink }}" target="_blank" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="WhatsApp">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+        </a>
+      {% endif %}
+      {% if tenant.instagramLink %}
+        <a href="{{ tenant.instagramLink }}" target="_blank" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="Instagram">
+          <i class="fa-brands fa-instagram text-base"></i>
+        </a>
+      {% endif %}
+      {% if tenant.facebookLink %}
+        <a href="{{ tenant.facebookLink }}" target="_blank" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="Facebook">
+          <i class="fa-brands fa-facebook text-base"></i>
+        </a>
+      {% endif %}
+      {% if tenant.youtubeLink %}
+        <a href="{{ tenant.youtubeLink }}" target="_blank" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="YouTube">
+          <i class="fa-brands fa-youtube text-base"></i>
+        </a>
+      {% endif %}
+      {% if tenant.linkedinLink %}
+        <a href="{{ tenant.linkedinLink }}" target="_blank" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="LinkedIn">
+          <i class="fa-brands fa-linkedin text-base"></i>
+        </a>
+      {% endif %}
+    </div>
+  {% elseif item_key == 'phone' and tenant.phone %}
+    <a href="tel:{{ tenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ tenant.phone }}">
+      <i class="fa-solid fa-phone text-xs"></i>
+      <span class="hidden sm:inline">{{ tenant.phone }}</span>
+    </a>
+  {% elseif item_key == 'email' and tenant.contactEmail %}
+    <a href="mailto:{{ tenant.contactEmail }}" style="color: {{ text_color }}; opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ tenant.contactEmail }}">
+      <i class="fa-solid fa-envelope text-xs"></i>
+      <span class="hidden md:inline">{{ tenant.contactEmail }}</span>
+    </a>
+  {% elseif item_key == 'address' and tenant.address %}
+    <span style="color: {{ text_color }}; opacity: 0.85;" class="flex items-center gap-1.5 text-sm cursor-default" title="{{ tenant.address }}">
+      <i class="fa-solid fa-location-dot text-xs"></i>
+      <span class="hidden lg:inline">{{ tenant.address }}</span>
+    </span>
+  {% endif %}
+{% endmacro %}

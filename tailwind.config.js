@@ -7,6 +7,7 @@ module.exports = {
   ],
   theme: {
     fontFamily:{
+        'headline':['Outfit','sans-serif'],
         'body':['Inter','sans-serif'],
         'sans':['Inter','sans-serif']
       },
@@ -15,6 +16,21 @@ module.exports = {
         'primary': {
             DEFAULT:'#0769a1',
             light: '#1679b1',
+        },
+        'cetec-orange': '#FE6102',
+        'cetec-orange-text': '#c2410c',
+        'cetec-dark': '#1a1a1a',
+        'cetec-light': '#f8f9fa',
+        'cetec': {
+            orange: '#FE6102',
+            'orange-text': '#c2410c',
+            dark: '#1a1a1a',
+            light: '#f8f9fa',
+        },
+        'cetec-footer': {
+            top: '#222222',
+            mid: '#1a1a1a',
+            bottom: '#111111',
         },
       },
         spacing:{

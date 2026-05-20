@@ -72,7 +72,7 @@ class AdminContentController extends AbstractController
             $banner->setCtaLink($r->request->get('ctaLink') ?: null);
             $banner->setActive((bool) $r->request->get('active'));
             $file = $r->files->get('backgroundImageFile');
-            if ($file instanceof UploadedFile) { $banner->setBackgroundImageFile($file); }
+            if ($file instanceof UploadedFile && $file->isValid()) { $banner->setBackgroundImageFile($file); }
             $em->persist($banner);
             $em->flush();
             $this->addFlash('success', 'Banner criado.');
@@ -91,7 +91,7 @@ class AdminContentController extends AbstractController
             $banner->setCtaLink($r->request->get('ctaLink') ?: null);
             $banner->setActive((bool) $r->request->get('active'));
             $file = $r->files->get('backgroundImageFile');
-            if ($file instanceof UploadedFile) { $banner->setBackgroundImageFile($file); }
+            if ($file instanceof UploadedFile && $file->isValid()) { $banner->setBackgroundImageFile($file); }
             $em->flush();
             $this->addFlash('success', 'Banner atualizado.');
             return $this->redirectToRoute('admin_banner_index');
@@ -426,9 +426,9 @@ class AdminContentController extends AbstractController
         $section->setBgImageOpacity((int) ($r->request->get('bgImageOpacity') ?? 100));
         $section->setBgImagePosition($r->request->get('bgImagePosition', 'center'));
         $bgImg = $r->files->get('bgImageFile');
-        if ($bgImg instanceof UploadedFile) { $section->setBgImageFile($bgImg); }
+        if ($bgImg instanceof UploadedFile && $bgImg->isValid()) { $section->setBgImageFile($bgImg); }
         $bgVid = $r->files->get('bgVideoFile');
-        if ($bgVid instanceof UploadedFile) { $section->setBgVideoFile($bgVid); }
+        if ($bgVid instanceof UploadedFile && $bgVid->isValid()) { $section->setBgVideoFile($bgVid); }
     }
 
 
@@ -523,7 +523,7 @@ class AdminContentController extends AbstractController
 
         // Main image (text_image)
         $file = $r->files->get('imageFile');
-        if ($file instanceof UploadedFile) { $block->setImageFile($file); }
+        if ($file instanceof UploadedFile && $file->isValid()) { $block->setImageFile($file); }
 
         // Gallery images
         if ($type === 'gallery') {
@@ -532,7 +532,7 @@ class AdminContentController extends AbstractController
                 if (in_array($img->getId(), $delIds, true)) { $em->remove($img); }
             }
             foreach ((array)$r->files->all('galleryFiles') as $gFile) {
-                if (!$gFile instanceof UploadedFile) { continue; }
+                if (!$gFile instanceof UploadedFile || !$gFile->isValid()) { continue; }
                 $img = new \App\Entity\PageBlockImage();
                 $img->setBlock($block);
                 $img->setFile($gFile);
@@ -558,7 +558,7 @@ class AdminContentController extends AbstractController
                             $t->setRole($data['role'] ?? null);
                             $t->setText($data['text'] ?? '');
                             $t->setRating((int)($data['rating'] ?? 5));
-                            if (isset($files[$idx]['avatarFile']) && $files[$idx]['avatarFile'] instanceof UploadedFile) {
+                            if (isset($files[$idx]['avatarFile']) && $files[$idx]['avatarFile'] instanceof UploadedFile && $files[$idx]['avatarFile']->isValid()) {
                                 $t->setAvatarFile($files[$idx]['avatarFile']);
                             }
                         }
@@ -571,7 +571,7 @@ class AdminContentController extends AbstractController
                     $t->setText($data['text'] ?? '');
                     $t->setRating((int)($data['rating'] ?? 5));
                     $t->setPosition($idx);
-                    if (isset($files[$idx]['avatarFile']) && $files[$idx]['avatarFile'] instanceof UploadedFile) {
+                    if (isset($files[$idx]['avatarFile']) && $files[$idx]['avatarFile'] instanceof UploadedFile && $files[$idx]['avatarFile']->isValid()) {
                         $t->setAvatarFile($files[$idx]['avatarFile']);
                     }
                     $em->persist($t);
@@ -593,7 +593,7 @@ class AdminContentController extends AbstractController
                         if ($l->getId() === (int)$data['id'] && !in_array($l->getId(), $delIds, true)) {
                             $l->setName($data['name'] ?? null);
                             $l->setUrl($data['url'] ?? null);
-                            if (isset($logoFiles[$idx]['logoFile']) && $logoFiles[$idx]['logoFile'] instanceof UploadedFile) {
+                            if (isset($logoFiles[$idx]['logoFile']) && $logoFiles[$idx]['logoFile'] instanceof UploadedFile && $logoFiles[$idx]['logoFile']->isValid()) {
                                 $l->setLogoFile($logoFiles[$idx]['logoFile']);
                             }
                         }
@@ -602,12 +602,81 @@ class AdminContentController extends AbstractController
             }
             // Bulk upload
             foreach ((array)$r->files->all('logoFiles') as $lf) {
-                if (!$lf instanceof UploadedFile) { continue; }
+                if (!$lf instanceof UploadedFile || !$lf->isValid()) { continue; }
                 $l = new \App\Entity\PageBlockPartnerLogo();
                 $l->setBlock($block);
                 $l->setLogoFile($lf);
                 $l->setPosition($block->getPartnerLogos()->count());
                 $em->persist($l);
+            }
+        }
+
+        // Banners (multi-slide support)
+        if ($type === 'banner') {
+            $banners = $r->request->all('banners') ?: [];
+            $files = $r->files->all('banners') ?: [];
+            $savedBanners = [];
+            $existingBanners = $block->getConfig()['banners'] ?? [];
+
+            foreach ($banners as $idx => $data) {
+                $slideImage = $data['image'] ?? null;
+
+                if (isset($files[$idx]['imageFile']) && $files[$idx]['imageFile'] instanceof UploadedFile && $files[$idx]['imageFile']->isValid()) {
+                    /** @var UploadedFile $uploadedFile */
+                    $uploadedFile = $files[$idx]['imageFile'];
+                    $extension = $uploadedFile->guessExtension() ?: 'bin';
+                    $newFilename = uniqid('banner_', true) . '.' . $extension;
+                    $targetDir = $this->getParameter('kernel.project_dir') . '/public/uploads/page_block';
+                    $uploadedFile->move($targetDir, $newFilename);
+                    $slideImage = $newFilename;
+                }
+
+                if (empty($slideImage) && isset($existingBanners[$idx]['image'])) {
+                    $slideImage = $existingBanners[$idx]['image'];
+                }
+
+                $savedBanners[] = [
+                    'title' => $data['title'] ?? '',
+                    'text' => $data['text'] ?? '',
+                    'ctaText' => $data['ctaText'] ?? '',
+                    'ctaLink' => $data['ctaLink'] ?? '',
+                    'active' => (isset($data['active']) && $data['active'] === '1') ? '1' : '0',
+                    'image' => $slideImage,
+                ];
+            }
+
+            $cfg = $block->getConfig() ?: [];
+            $cfg['banners'] = $savedBanners;
+            $reqCfg = $r->request->all('config') ?: [];
+            foreach ($reqCfg as $k => $v) {
+                if ($k !== 'banners') {
+                    $cfg[$k] = $v;
+                }
+            }
+            $block->setConfig($cfg);
+
+            $firstSlide = null;
+            foreach ($savedBanners as $b) {
+                if (($b['active'] ?? '0') === '1') {
+                    $firstSlide = $b;
+                    break;
+                }
+            }
+            if (!$firstSlide && !empty($savedBanners)) {
+                $firstSlide = $savedBanners[0];
+            }
+
+            if ($firstSlide) {
+                $block->setTitle($firstSlide['title'] ?? null);
+                $block->setText($firstSlide['text'] ?? null);
+                $block->setImage($firstSlide['image'] ?? null);
+                $cfg['ctaText'] = $firstSlide['ctaText'] ?? '';
+                $cfg['ctaLink'] = $firstSlide['ctaLink'] ?? '';
+                $block->setConfig($cfg);
+            } else {
+                $block->setTitle(null);
+                $block->setText(null);
+                $block->setImage(null);
             }
         }
     }
@@ -725,6 +794,11 @@ class AdminContentController extends AbstractController
     ): Response {
         $tenant = $tc->requireTenant();
         if ($r->isMethod('POST')) {
+            // Theme and Colors
+            $tenant->setTheme((string) $r->request->get('theme', 'wab'));
+            $tenant->setPrimaryColor($r->request->get('primaryColor') ?: '#0044cc');
+            $tenant->setSecondaryColor($r->request->get('secondaryColor') ?: '#ffaa00');
+
             // Home page
             $homePageId = (int) $r->request->get('homePageId');
             $tenant->setHomePage($homePageId ? $pageRepo->find($homePageId) : null);
@@ -735,7 +809,7 @@ class AdminContentController extends AbstractController
             $tenant->setOgImage($r->request->get('ogImage') ?: null);
             // Favicon
             $faviconFile = $r->files->get('faviconFile');
-            if ($faviconFile instanceof UploadedFile) { $tenant->setFaviconFile($faviconFile); }
+            if ($faviconFile instanceof UploadedFile && $faviconFile->isValid()) { $tenant->setFaviconFile($faviconFile); }
             // Contact
             $tenant->setContactEmail($r->request->get('contactEmail') ?: null);
             $tenant->setPhone($r->request->get('phone') ?: null);
@@ -747,6 +821,20 @@ class AdminContentController extends AbstractController
             $tenant->setFacebookLink($r->request->get('facebookLink') ?: null);
             $tenant->setWhatsappLink($r->request->get('whatsappLink') ?: null);
             $tenant->setLinkedinLink($r->request->get('linkedinLink') ?: null);
+
+            // Menu and TopBar settings
+            $showMenuIcons = (bool) $r->request->get('showMenuIcons');
+            $topBarEnabled = (bool) $r->request->get('topBarEnabled');
+            $topBarLeft = $r->request->all('topBarLeft');
+            $topBarRight = $r->request->all('topBarRight');
+
+            $tenant->setNavigationSettings([
+                'showMenuIcons' => $showMenuIcons,
+                'topBarEnabled' => $topBarEnabled,
+                'topBarLeft'    => $topBarLeft,
+                'topBarRight'   => $topBarRight,
+            ]);
+
             $em->flush();
             $this->addFlash('success', 'Configurações salvas.');
             return $this->redirectToRoute('admin_settings');
@@ -792,6 +880,7 @@ class AdminContentController extends AbstractController
         $page->setShowInFooter((bool) $r->request->get('showInFooter'));
         $page->setSeoTitle($r->request->get('seoTitle') ?: null);
         $page->setSeoDescription($r->request->get('seoDescription') ?: null);
+        $page->setShowTitle((bool) $r->request->get('showTitle'));
         // Category
         if ($cats) {
             $catId = (int) $r->request->get('categoryId');
@@ -799,7 +888,7 @@ class AdminContentController extends AbstractController
         }
         // Cover image
         $coverFile = $r->files->get('coverImageFile');
-        if ($coverFile instanceof UploadedFile) { $page->setCoverImageFile($coverFile); }
+        if ($coverFile instanceof UploadedFile && $coverFile->isValid()) { $page->setCoverImageFile($coverFile); }
     }
 
 }

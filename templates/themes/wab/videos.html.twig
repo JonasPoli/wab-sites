@@ -1,12 +1,24 @@
-{% extends 'themes/nepe/base.html.twig' %}
+{% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}Vídeos — {{ currentTenant ? currentTenant.name : 'NEPE' }}{% endblock %}
+{% block title %}Vídeos — {{ currentTenant ? currentTenant.name : 'WAB' }}{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="Assista todos os vídeos, materiais e referências do {{ currentTenant ? currentTenant.name : 'NEPE' }}.">
+<meta name="description" content="Assista todos os vídeos, materiais e referências do {{ currentTenant ? currentTenant.name : 'WAB' }}.">
 {% endblock %}
 
 {% block body %}
+{% set active_categories = [] %}
+{% if footerCategories is defined %}
+    {% for cat in footerCategories %}
+        {% set active_children_count = 0 %}
+        {% for sub in cat.children %}
+            {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
+        {% endfor %}
+        {% if cat.pages|length > 0 or active_children_count > 0 %}
+            {% set active_categories = active_categories|merge([cat]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 {# ── HERO ── #}
 <section class="vl-hero">
@@ -21,7 +33,7 @@
                 Canal de Vídeos
             </span>
             <h1>Acompanhe o<br><span class="vl-gradient-text">nosso canal</span></h1>
-            <p>Vídeos, materiais de apoio e referências do {{ currentTenant ? currentTenant.name : 'NEPE' }}. Acesse gratuitamente.</p>
+            <p>Vídeos, materiais de apoio e referências do {{ currentTenant ? currentTenant.name : 'WAB' }}. Acesse gratuitamente.</p>
         </div>
         {% if currentTenant and currentTenant.youtubeLink %}
         <a href="{{ currentTenant.youtubeLink }}" target="_blank" rel="noopener" class="vl-yt-btn">
@@ -40,7 +52,7 @@
         </div>
         <div class="vl-stat-div"></div>
         <div class="vl-stat">
-            <span class="vl-stat-num">{{ footerCategories|length }}</span>
+            <span class="vl-stat-num">{{ active_categories|length }}</span>
             <span class="vl-stat-label">Categorias</span>
         </div>
         <div class="vl-stat-div"></div>
@@ -57,7 +69,7 @@
         <button class="vl-filter-btn active" data-cat="all" onclick="filterVideos('all', this)">
             Todos
         </button>
-        {% for cat in footerCategories %}
+        {% for cat in active_categories %}
         <button class="vl-filter-btn" data-cat="{{ cat.id }}" onclick="filterVideos('{{ cat.id }}', this)">
             {{ cat.name }}
         </button>

@@ -23,8 +23,8 @@ class PageBlockImage
     #[Vich\UploadableField(mapping: 'page_block_gallery', fileNameProperty: 'filename')]
     private ?File $file = null;
 
-    #[ORM\Column(length: 255)]
-    private string $filename = '';
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $filename = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $caption = null;
@@ -53,8 +53,8 @@ class PageBlockImage
         return $this;
     }
 
-    public function getFilename(): string { return $this->filename; }
-    public function setFilename(string $filename): static { $this->filename = $filename; return $this; }
+    public function getFilename(): ?string { return $this->filename; }
+    public function setFilename(?string $filename): static { $this->filename = $filename; return $this; }
 
     public function getCaption(): ?string { return $this->caption; }
     public function setCaption(?string $caption): static { $this->caption = $caption; return $this; }

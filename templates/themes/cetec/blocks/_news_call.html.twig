@@ -1,0 +1,48 @@
+{% set count = block.itemCount ?? 3 %}
+{% set pages = footerPages is defined ? footerPages|slice(0, count) : [] %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    {% if pages|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for page in pages %}
+        <article class="bg-white dark:bg-cetec-dark border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col group">
+            {% if page.coverImage %}
+            <div class="h-48 overflow-hidden relative">
+                <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            </div>
+            {% endif %}
+            <div class="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        {% if page.category %}
+                        <span class="bg-cetec-orange/10 text-cetec-orange text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full">
+                            {{ page.category.name }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-lg font-bold text-cetec-dark dark:text-white mb-2 line-clamp-2 group-hover:text-cetec-orange transition-colors">
+                        <a href="{{ path('pub_page_show', {slug: page.slug}) }}">{{ page.title }}</a>
+                    </h3>
+                    {% if page.seoDescription %}
+                    <p class="text-gray-500 dark:text-gray-400 text-xs md:text-sm mb-4 line-clamp-3 leading-relaxed">
+                        {{ page.seoDescription }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="pt-4 border-t border-gray-100 dark:border-white/5">
+                    <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="flex items-center gap-1.5 text-cetec-orange hover:text-[#e55902] text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
+                        Ler mais <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

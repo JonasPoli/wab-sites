@@ -1,0 +1,34 @@
+{% set count = block.itemCount ?? 3 %}
+{% set pages = footerPages is defined ? footerPages|slice(0, count) : [] %}
+<div class="wab-block">
+    {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+    {% if block.title %}<h2 class="section-heading">{{ block.title }}</h2>{% endif %}
+    {% if pages|length > 0 %}
+    <div class="wab-news-grid" style="margin-top:2rem">
+        {% for page in pages %}
+        <article class="wnc-card">
+            {% if page.coverImage %}
+            <div class="wnc-img" style="background-image:url('{{ asset('uploads/page_cover/' ~ page.coverImage) }}')"></div>
+            {% endif %}
+            <div class="wnc-body">
+                {% if page.category %}<span class="wnc-tag">{{ page.category.name }}</span>{% endif %}
+                <h3><a href="{{ path('pub_page_show', {slug: page.slug}) }}">{{ page.title }}</a></h3>
+                {% if page.seoDescription %}<p>{{ page.seoDescription|slice(0,120) }}…</p>{% endif %}
+                <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="wnc-more">Ler mais →</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<style>
+.wab-news-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.5rem; }
+.wnc-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:transform .3s; }
+.wnc-card:hover { transform:translateY(-6px); }
+.wnc-img { height:180px; background-size:cover; background-position:center; }
+.wnc-body { padding:1.5rem; }
+.wnc-tag { display:inline-block; padding:.2rem .75rem; border-radius:50px; background:rgba(var(--color-secondary-rgb),.12); color:var(--color-secondary); font-size:.72rem; font-weight:700; margin-bottom:.75rem; }
+.wnc-body h3 { font-size:1rem; font-weight:700; margin-bottom:.5rem; } .wnc-body h3 a { color:var(--text); }
+.wnc-body p { color:var(--text-muted); font-size:.88rem; margin-bottom:1rem; }
+.wnc-more { color:var(--color-secondary); font-weight:600; font-size:.88rem; }
+</style>

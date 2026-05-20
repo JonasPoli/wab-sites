@@ -52,20 +52,23 @@
             </div>
         </div>
 
-        {# ── Visual ── #}
-        <div class="af-row">
-            <div class="af-field">
-                <label>Tema</label>
-                <select name="theme" class="as">
-                    <option value="nepe" {{ tenant.theme == 'nepe' ? 'selected' }}>Nepe (claro, acadêmico)</option>
-                    <option value="moderno" {{ tenant.theme == 'moderno' ? 'selected' }}>Moderno (dark, vibrante)</option>
-                </select>
-            </div>
-            <div class="af-field">
-                <label>Mínimo de aprovações</label>
-                <input type="number" name="requiredApprovals" class="ai"
-                       value="{{ tenant.requiredApprovals ?? 1 }}" min="1" max="10">
-            </div>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Tema</label>
+            <select name="theme" class="as">
+                <option value="wab" {{ tenant.theme == 'wab' ? 'selected' }}>Tema WAB (claro, acadêmico)</option>
+                <option value="moderno" {{ tenant.theme == 'moderno' ? 'selected' }}>Moderno (dark, vibrante)</option>
+                <option value="cetec" {{ tenant.theme == 'cetec' ? 'selected' }}>CETEC (Laranja, Profissional/Técnico)</option>
+            </select>
+        </div>
+
+        {# ── Exibir Título das Seções ── #}
+        <div class="af-field" style="margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+            <input type="checkbox" id="showSectionTitles" name="showSectionTitles" value="1"
+                   {% if tenant.showSectionTitles %}checked{% endif %}
+                   style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary);">
+            <label for="showSectionTitles" style="cursor:pointer; margin:0; font-weight:600; color:var(--text)">
+                Exibir título das seções do site (titlePart1 e titlePart2)
+            </label>
         </div>
         <div class="af-row">
             <div class="af-field">
@@ -79,6 +82,280 @@
                        style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none">
             </div>
         </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Página Home ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">Página Inicial</h3>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Página usada como Home do site</label>
+            <select name="homePageId" class="as">
+                <option value="">— Nenhuma (padrão do sistema) —</option>
+                {% for page in pages %}
+                    <option value="{{ page.id }}" {% if tenant.homePage and tenant.homePage.id == page.id %} selected {% endif %}>
+                        {{ page.title }}
+                        {% if page.slug %}
+                            ({{ page.slug }})
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+            <p class="af-hint">Selecione qual página será exibida ao acessar a raiz do site.</p>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── SEO ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">SEO e Meta Tags</h3>
+        <div class="af-field">
+            <label>Título padrão do site
+                <span class="af-hint" style="display:inline;margin-left:.5rem">(usado quando a página não tem título próprio)</span>
+            </label>
+            <input type="text" name="seoTitle" class="ai" value="{{ tenant.seoTitle }}" placeholder="Meu Site WAB">
+        </div>
+        <div class="af-field">
+            <label>Meta description padrão</label>
+            <textarea name="seoDescription" class="ate" rows="3" placeholder="Descrição do site para mecanismos de busca...">{{ tenant.seoDescription }}</textarea>
+        </div>
+        <div class="af-field">
+            <label>Palavras-chave (meta keywords)</label>
+            <input type="text" name="seoKeywords" class="ai" value="{{ tenant.seoKeywords }}" placeholder="palavra1, palavra2, palavra3">
+        </div>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Open Graph Image (URL)
+                <span class="af-hint" style="display:inline;margin-left:.5rem">(imagem usada ao compartilhar nas redes sociais)</span>
+            </label>
+            <input type="url" name="ogImage" class="ai" value="{{ tenant.ogImage }}" placeholder="https://exemplo.com/og-image.jpg">
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Favicon ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">Favicon</h3>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Favicon do site</label>
+            <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+                {% if tenant.favicon %}
+                    <img id="favicon-prev" src="{{ asset('uploads/tenant/favicon/' ~ tenant.favicon) }}" alt="Favicon atual" style="height:48px;width:48px;object-fit:contain;border-radius:6px;border:1px solid var(--border)">
+                {% else %}
+                    <div id="favicon-prev" style="width:48px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                        <sl-icon name="image" style="font-size:1.4rem"></sl-icon>
+                    </div>
+                {% endif %}
+                <div>
+                    <label for="favicon-upload" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer">
+                        <sl-icon name="upload"></sl-icon>
+                        Selecionar favicon
+                    </label>
+                    <input type="file" id="favicon-upload" name="faviconFile" accept="image/x-icon,image/png,image/svg+xml,image/webp" style="display:none" onchange="prevFavicon(this)">
+                    <p class="af-hint" style="margin-top:.4rem">Recomendado: 32×32 px · ICO, PNG ou SVG</p>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Contato ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">Informações de Contato</h3>
+        <div class="af-row">
+            <div class="af-field">
+                <label>E-mail de Contato</label>
+                <input type="email" name="contactEmail" class="ai" value="{{ tenant.contactEmail }}" placeholder="contato@exemplo.com.br">
+            </div>
+            <div class="af-field">
+                <label>Telefone</label>
+                <input type="text" name="phone" class="ai" value="{{ tenant.phone }}" placeholder="(00) 0000-0000">
+            </div>
+        </div>
+        <div class="af-field">
+            <label>Endereço</label>
+            <input type="text" name="address" class="ai" value="{{ tenant.address }}" placeholder="Rua Exemplo, 123 — Cidade/UF">
+        </div>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Google Maps — URL de incorporação
+                <span class="af-hint" style="display:inline;margin-left:.5rem">(src do iframe)</span>
+            </label>
+            <input type="url" name="mapsEmbedUrl" class="ai" value="{{ tenant.mapsEmbedUrl }}" placeholder="https://www.google.com/maps/embed?...">
+            <p class="af-hint">No Google Maps: Compartilhar → Incorporar um mapa → copie apenas o valor do atributo <code>src</code></p>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Redes Sociais ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">Redes Sociais</h3>
+        <div class="af-row">
+            <div class="af-field">
+                <label><twig:ux:icon name="fa6-brands:youtube" style="color:#ff0000;margin-right:.35rem;vertical-align:middle"/>YouTube</label>
+                <input type="url" name="youtubeLink" class="ai" value="{{ tenant.youtubeLink }}" placeholder="https://youtube.com/@canal">
+            </div>
+            <div class="af-field">
+                <label><twig:ux:icon name="fa6-brands:instagram" style="color:#e1306c;margin-right:.35rem;vertical-align:middle"/>Instagram</label>
+                <input type="url" name="instagramLink" class="ai" value="{{ tenant.instagramLink }}" placeholder="https://instagram.com/perfil">
+            </div>
+        </div>
+        <div class="af-row">
+            <div class="af-field">
+                <label><twig:ux:icon name="fa6-brands:facebook" style="color:#1877f2;margin-right:.35rem;vertical-align:middle"/>Facebook</label>
+                <input type="url" name="facebookLink" class="ai" value="{{ tenant.facebookLink }}" placeholder="https://facebook.com/pagina">
+            </div>
+            <div class="af-field">
+                <label><twig:ux:icon name="fa6-brands:linkedin" style="color:#0a66c2;margin-right:.35rem;vertical-align:middle"/>LinkedIn</label>
+                <input type="url" name="linkedinLink" class="ai" value="{{ tenant.linkedinLink }}" placeholder="https://linkedin.com/in/perfil">
+            </div>
+        </div>
+        <div class="af-row" style="margin-bottom:1.5rem">
+            <div class="af-field">
+                <label><twig:ux:icon name="fa6-brands:whatsapp" style="color:#25d366;margin-right:.35rem;vertical-align:middle"/>WhatsApp</label>
+                <input type="url" name="whatsappLink" class="ai" value="{{ tenant.whatsappLink }}" placeholder="https://wa.me/5511999999999">
+                <p class="af-hint">Use o formato <code>https://wa.me/55DD9XXXXXXXX</code></p>
+            </div>
+            <div class="af-field"></div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Menu e TopBar ── #}
+        {% set navSettings = tenant.navigationSettings ?? {} %}
+        {% set showMenuIcons = navSettings.showMenuIcons ?? true %}
+        {% set topBarEnabled = navSettings.topBarEnabled ?? false %}
+        {% set topBarLeft = navSettings.topBarLeft ?? [] %}
+        {% set topBarRight = navSettings.topBarRight ?? [] %}
+
+        <h3 style="margin-bottom: 1rem; color: var(--text)">Menu Principal e TopBar</h3>
+        <div class="af-row">
+            <div class="af-field" style="flex:1">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                    <input type="checkbox" name="showMenuIcons" value="1" {% if showMenuIcons %}checked{% endif %} style="width:18px;height:18px;cursor:pointer">
+                    <span>Exibir ícones no menu principal</span>
+                </label>
+                <p class="af-hint">Exibe ou oculta os ícones correspondentes às categorias no menu principal de navegação.</p>
+            </div>
+            <div class="af-field" style="flex:1">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                    <input type="checkbox" name="topBarEnabled" value="1" {% if topBarEnabled %}checked{% endif %} style="width:18px;height:18px;cursor:pointer" onchange="toggleTopBarSettings(this.checked)">
+                    <span>Ativar Barra Superior (TopBar)</span>
+                </label>
+                <p class="af-hint">Exibe uma barra superior acima do cabeçalho principal nas páginas públicas do site.</p>
+            </div>
+        </div>
+
+        <div id="topbar-config-panel" style="{% if not topBarEnabled %}display:none;{% endif %}margin-top:1rem;margin-bottom:2rem;padding:1.25rem;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.02)">
+            <h4 style="margin-top:0;margin-bottom:1rem;color:var(--primary)">Configuração da TopBar</h4>
+            <div class="af-row">
+                <div class="af-field">
+                    <label style="font-weight:600;margin-bottom:.5rem">Lado Esquerdo</label>
+                    <p class="af-hint" style="margin-bottom:.75rem">Selecione quais itens deseja exibir à esquerda:</p>
+                    <div style="display:flex;flex-direction:column;gap:.5rem">
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarLeft[]" value="social" {% if 'social' in topBarLeft %}checked{% endif %}>
+                            <span>Redes Sociais</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarLeft[]" value="phone" {% if 'phone' in topBarLeft %}checked{% endif %}>
+                            <span>Telefone e WhatsApp</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarLeft[]" value="email" {% if 'email' in topBarLeft %}checked{% endif %}>
+                            <span>E-mail</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarLeft[]" value="address" {% if 'address' in topBarLeft %}checked{% endif %}>
+                            <span>Endereço</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="af-field">
+                    <label style="font-weight:600;margin-bottom:.5rem">Lado Direito</label>
+                    <p class="af-hint" style="margin-bottom:.75rem">Selecione quais itens deseja exibir à direita:</p>
+                    <div style="display:flex;flex-direction:column;gap:.5rem">
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarRight[]" value="social" {% if 'social' in topBarRight %}checked{% endif %}>
+                            <span>Redes Sociais</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarRight[]" value="phone" {% if 'phone' in topBarRight %}checked{% endif %}>
+                            <span>Telefone e WhatsApp</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarRight[]" value="email" {% if 'email' in topBarRight %}checked{% endif %}>
+                            <span>E-mail</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                            <input type="checkbox" name="topBarRight[]" value="address" {% if 'address' in topBarRight %}checked{% endif %}>
+                            <span>Endereço</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        <h3 style="margin-bottom: 1.5rem; color: var(--text)">Configurações de Tipografia dos Títulos (H1 a H5)</h3>
+        
+        {% set fontSettings = tenant.fontSettings %}
+        {% set fontFamilies = {
+            'Inter': 'Inter (Moderna, Geométrica)',
+            'Roboto': 'Roboto (Neutra, Legível)',
+            'Playfair Display': 'Playfair Display (Elegante, Serifa)',
+            'Montserrat': 'Montserrat (Expressiva, Geométrica)',
+            'Outfit': 'Outfit (Contemporânea, Original do Tema)'
+        } %}
+        {% set fontWeights = {
+            '300': '300 (Light)',
+            '400': '400 (Regular)',
+            '500': '500 (Medium)',
+            '600': '600 (Semi-Bold)',
+            '700': '700 (Bold)',
+            '800': '800 (Extra-Bold)',
+            '900': '900 (Black)'
+        } %}
+        {% set fontSizes = [
+            '0.75rem', '0.875rem', '1rem', '1.125rem', '1.25rem', '1.5rem',
+            '1.75rem', '2rem', '2.25rem', '2.5rem', '2.75rem', '3rem',
+            '3.25rem', '3.5rem', '3.75rem', '4rem', '4.5rem', '5rem'
+        ] %}
+
+        {% for i in 1..5 %}
+            {% set h_key = 'h' ~ i %}
+            {% set current_settings = fontSettings[h_key] ?? {} %}
+            {% set selected_font = current_settings.font ?? 'Outfit' %}
+            {% set selected_size = current_settings.size ?? '' %}
+            {% set selected_weight = current_settings.weight ?? '400' %}
+
+            <div style="margin-bottom: 1.5rem; padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.02)">
+                <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                    <sl-icon name="type"></sl-icon> Título H{{ i }}
+                </h4>
+                <div class="af-row">
+                    <div class="af-field">
+                        <label>Fonte (Família)</label>
+                        <select name="h{{ i }}_font" class="as">
+                            {% for font_val, font_label in fontFamilies %}
+                                <option value="{{ font_val }}" {{ selected_font == font_val ? 'selected' }}>{{ font_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="af-field">
+                        <label>Tamanho (Size)</label>
+                        <select name="h{{ i }}_size" class="as">
+                            <option value="" {{ selected_size == '' ? 'selected' }}>Padrão do Tema</option>
+                            {% for size_val in fontSizes %}
+                                <option value="{{ size_val }}" {{ selected_size == size_val ? 'selected' }}>{{ size_val }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="af-field">
+                        <label>Peso (Weight)</label>
+                        <select name="h{{ i }}_weight" class="as">
+                            {% for weight_val, weight_label in fontWeights %}
+                                <option value="{{ weight_val }}" {{ selected_weight == weight_val ? 'selected' }}>{{ weight_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
 
         <div class="af-actions">
             <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
@@ -134,6 +411,28 @@ function previewLogo(input) {
         preview.src = e.target.result;
     };
     reader.readAsDataURL(file);
+}
+function prevFavicon(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        let el = document.getElementById('favicon-prev');
+        if (el.tagName === 'DIV') {
+            const img = document.createElement('img');
+            img.id = 'favicon-prev';
+            img.style.cssText = 'height:48px;width:48px;object-fit:contain;border-radius:6px;border:1px solid var(--border)';
+            el.replaceWith(img);
+            el = img;
+        }
+        el.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+function toggleTopBarSettings(enabled) {
+    const panel = document.getElementById('topbar-config-panel');
+    if (panel) {
+        panel.style.display = enabled ? 'block' : 'none';
+    }
 }
 </script>
 {% endblock %}

@@ -1,0 +1,175 @@
+<!-- ================================
+     FOOTER CETEC
+     ================================ -->
+<footer class="cetec-footer pt-32 pb-10 mt-24 relative" style="background-color: #1a1a1a;">
+    
+    <!-- Newsletter Bar (Floating) -->
+    <div class="container mx-auto px-4 absolute left-0 right-0 top-0 -translate-y-1/2 z-30">
+        <div class="bg-cetec-orange p-8 md:p-10 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8" data-aos="zoom-in" style="background-color: var(--color-secondary);">
+            <div class="text-white max-w-lg text-center lg:text-left">
+                <h3 class="text-2xl md:text-3xl font-extrabold mb-2" style="font-family: var(--font-headline);">Fique por dentro das novidades!</h3>
+                <p class="text-white/80 text-sm md:text-base">Assine nossa newsletter e receba informações sobre cursos e eventos.</p>
+            </div>
+            <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="flex flex-col sm:flex-row w-full lg:w-auto gap-3 sm:gap-2">
+                <input type="email" name="email" required placeholder="Seu melhor e-mail" class="w-full sm:flex-grow lg:w-80 px-6 py-4 rounded-xl text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-white/50 text-sm md:text-base">
+                <button type="submit" class="w-full sm:w-auto bg-[#1a1a1a] text-white px-8 py-4 rounded-xl font-bold hover:bg-black transition-all text-sm md:text-base uppercase tracking-wider">Assinar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 border-b border-white/10 pb-16 pt-10">
+        <!-- Col 1: Brand Info -->
+        <div data-aos="fade-up">
+            <div class="mb-6">
+                {% if currentTenant and currentTenant.logo %}
+                    <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain brightness-0 invert">
+                {% else %}
+                    <span class="text-2xl font-black tracking-wider uppercase text-white">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
+                {% endif %}
+            </div>
+            <p class="text-gray-400 mb-8 text-sm leading-relaxed">
+                {% if currentTenant and currentTenant.seoDescription %}
+                    {{ currentTenant.seoDescription }}
+                {% else %}
+                    {{ currentTenant ? currentTenant.name : 'CETEC' }} — Líder em Ensino Técnico, oferecendo formação profissional de excelência há mais de 20 anos.
+                {% endif %}
+            </p>
+            
+            <!-- Social Networks -->
+            <div class="flex gap-4">
+                {% if currentTenant and currentTenant.facebookLink %}
+                    <a href="{{ currentTenant.facebookLink }}" target="_blank" aria-label="Facebook" class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                {% endif %}
+                {% if currentTenant and currentTenant.instagramLink %}
+                    <a href="{{ currentTenant.instagramLink }}" target="_blank" aria-label="Instagram" class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
+                {% endif %}
+                {% if currentTenant and currentTenant.youtubeLink %}
+                    <a href="{{ currentTenant.youtubeLink }}" target="_blank" aria-label="YouTube" class="social-icon-btn"><i class="fa-brands fa-youtube"></i></a>
+                {% endif %}
+                {% if currentTenant and currentTenant.linkedinLink %}
+                    <a href="{{ currentTenant.linkedinLink }}" target="_blank" aria-label="LinkedIn" class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
+                {% endif %}
+                {% if currentTenant and currentTenant.whatsappLink %}
+                    <a href="{{ currentTenant.whatsappLink }}" target="_blank" aria-label="WhatsApp" class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Col 2: Quick Links (Footer Pages) -->
+        <div data-aos="fade-up" data-aos-delay="100">
+            <h4 class="footer-title">Links Rápidos</h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Início</a></li>
+                {% if footerPages is defined %}
+                    {% for page in footerPages %}
+                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ page.title }}</a></li>
+                    {% endfor %}
+                {% endif %}
+                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Contato</a></li>
+            </ul>
+        </div>
+
+        <!-- Col 3: Highlighted Categories -->
+        <div data-aos="fade-up" data-aos-delay="200">
+            <h4 class="footer-title">Áreas & Cursos</h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                {% if footerCategories is defined %}
+                    {% set active_footer_categories = [] %}
+                    {% for cat in footerCategories %}
+                        {% set active_children_count = 0 %}
+                        {% for sub in cat.children %}
+                            {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
+                        {% endfor %}
+                        {% if cat.pages|length > 0 or active_children_count > 0 %}
+                            {% set active_footer_categories = active_footer_categories|merge([cat]) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for cat in active_footer_categories|slice(0, 5) %}
+                        <li><a href="{{ path('pub_category', {slug: cat.slug}) }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ cat.name }}</a></li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Col 4: Contact details -->
+        <div data-aos="fade-up" data-aos-delay="300">
+            <h4 class="footer-title">Fale Conosco</h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                {% if currentTenant and currentTenant.address %}
+                    <li class="flex gap-3">
+                        <i class="bi bi-geo-alt text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <span>{{ currentTenant.address }}</span>
+                    </li>
+                {% endif %}
+                {% if currentTenant and currentTenant.contactEmail %}
+                    <li class="flex gap-3">
+                        <i class="bi bi-envelope text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <a href="mailto:{{ currentTenant.contactEmail }}" class="hover:underline text-gray-400">{{ currentTenant.contactEmail }}</a>
+                    </li>
+                {% endif %}
+                {% if currentTenant and currentTenant.phone %}
+                    <li class="flex gap-3">
+                        <i class="bi bi-telephone text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <a href="tel:{{ currentTenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" class="hover:underline text-gray-400">{{ currentTenant.phone }}</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="container mx-auto px-4 mt-10 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-xs">
+        <p>© {{ "now"|date("Y") }} {{ currentTenant ? currentTenant.name : 'CETEC' }}. Todos os Direitos Reservados.</p>
+        <div class="flex gap-4">
+            <a href="#" class="text-gray-500 hover:text-white transition-all">Termos de Uso</a>
+            <a href="#" class="text-gray-500 hover:text-white transition-all">Políticas de Privacidade</a>
+        </div>
+        <p>Desenvolvido por <a href="https://wab.com.br" target="_blank" class="text-gray-400 underline hover:text-white transition-all">wab.com.br</a></p>
+    </div>
+</footer>
+
+<style>
+.cetec-footer {
+    color: #94a3b8;
+}
+
+.footer-title {
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--color-secondary);
+    padding-left: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-headline);
+}
+
+.cetec-footer a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.cetec-footer a:hover {
+    color: var(--color-secondary) !important;
+}
+
+.social-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s var(--ease);
+}
+
+.social-icon-btn:hover {
+    background: var(--color-secondary);
+    transform: translateY(-3px);
+}
+</style>

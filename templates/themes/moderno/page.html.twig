@@ -6,12 +6,14 @@
 {% block body %}
 
 {# ── Page Hero ── #}
+{% if page.showTitle ?? true %}
 <div class="mp-hero">
     <div class="container">
         {% if page.category %}<span class="section-label" style="margin-bottom:1rem"><span class="glow-dot"></span>{{ page.category.name }}</span>{% endif %}
         <h1 class="mp-hero-title">{{ page.title }}</h1>
     </div>
 </div>
+{% endif %}
 
 {# ── Sections ── #}
 {% for section in page.sections %}{% if section.active %}
@@ -19,6 +21,17 @@
 {# ── Build background style ── #}
 {% set sectionStyle = '' %}
 {% set sectionClass = 'mp-section' %}
+{% set isDark = false %}
+{% if section.bgType in ['image', 'video', 'gradient'] %}
+    {% set isDark = true %}
+{% elseif section.bgType == 'color' and section.bgColor %}
+    {% set isDark = is_dark_color(section.bgColor) %}
+{% endif %}
+
+{% if isDark %}
+    {% set sectionClass = sectionClass ~ ' mp-section-dark' %}
+{% endif %}
+
 {% if section.bgType == 'color' and section.bgColor %}
     {% set sectionStyle = 'background:' ~ section.bgColor %}
 {% elseif section.bgType == 'gradient' and section.bgGradient %}
@@ -43,7 +56,7 @@
     {% endif %}
 
     <div class="container" style="position:relative;z-index:2">
-        {% if section.titlePart1 or section.titlePart2 %}
+        {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
         <div class="mp-two-tone">
             {% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}
             {% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}

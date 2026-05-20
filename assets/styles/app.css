@@ -198,4 +198,380 @@
             border-color: rgba(148, 163, 184, 0.5);
         }
     }
+
+    /* ======================================
+       PUBLIC — Topbar CETEC
+       ====================================== */
+    .cetec-topbar {
+        background-color: #3D3E90;
+        color: white;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        font-size: 0.8125rem;
+    }
+    .cetec-topbar a {
+        color: white;
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+    .cetec-topbar a:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    /* ======================================
+       PUBLIC — Navbar CETEC
+       ====================================== */
+    .cetec-navbar {
+        @apply sticky top-0 z-50 bg-white shadow-md;
+        border-bottom: 3px solid #FE6102;
+        transition: all 0.3s;
+    }
+    .cetec-navbar .nav-link {
+        @apply text-gray-700 font-medium text-sm px-4 py-2 transition-colors duration-200;
+    }
+    .cetec-navbar .nav-link:hover {
+        color: #FE6102;
+    }
+    .cetec-navbar .nav-link.active {
+        color: #b85a00;
+        font-weight: 700;
+    }
+    .cetec-navbar .btn-inscricao {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #c2410c; /* orange-700 — contraste 4.8:1 com branco ✅ WCAG AA */
+        color: white;
+        font-weight: 700;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(194, 65, 12, 0.35);
+    }
+    .cetec-navbar .btn-inscricao:hover {
+        background: #9a3412; /* orange-800 — contraste 7.2:1 com branco ✅ */
+        color: white;
+        transform: scale(1.05);
+        text-decoration: none;
+    }
+
+    /* ======================================
+       PUBLIC — Section titles
+       ====================================== */
+    .section-title {
+        @apply font-bold text-gray-900 mb-2;
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1.75rem, 4vw, 3rem);
+        line-height: 1.1;
+    }
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 96px;
+        height: 6px;
+        background: #FE6102;
+        margin-top: 16px;
+        border-radius: 9999px;
+    }
+    .section-title.mx-auto::after {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .section-eyebrow {
+        @apply text-xs font-bold uppercase tracking-widest mb-2;
+        color: #c2410c; /* orange-700 — contraste 4.8:1 com branco ✅ WCAG AA */
+    }
+
+    /* ======================================
+       PUBLIC — Hero com Swiper
+       ====================================== */
+    .hero-cetec {
+        @apply relative overflow-hidden;
+        background-color: #1a1a1a; /* Fallback visual enquanto imagem LCP carrega */
+    }
+    .swiper-slide {
+        background-color: #1a1a1a; /* Evita branco piscando no LCP */
+    }
+    .hero-overlay {
+        background: linear-gradient(to right, rgba(26, 26, 26, 0.82), rgba(26, 26, 26, 0.38));
+    }
+    .video-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+    }
+    .video-container video {
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+    }
+    /* Swiper pagination bullets */
+    .swiper-pagination-bullet-active {
+        background: #FE6102 !important;
+    }
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: white !important;
+    }
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        color: #FE6102 !important;
+    }
+
+    /* ======================================
+       PUBLIC — Glass Card (blurbs)
+       ====================================== */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* ======================================
+       PUBLIC — Buttons
+       ====================================== */
+    .btn-cetec-primary {
+        @apply inline-flex items-center gap-2 text-white font-bold uppercase text-sm tracking-widest px-7 py-4 rounded transition-all duration-300;
+        background: #FE6102;
+    }
+    .btn-cetec-primary:hover {
+        background: #e55902;
+        @apply shadow-lg -translate-y-0.5;
+        color: white;
+        text-decoration: none;
+    }
+    .btn-cetec-outline {
+        @apply inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest px-6 py-3 rounded transition-all duration-300;
+        border: 2px solid #b85a00;
+        color: #b85a00;
+    }
+    .btn-cetec-outline:hover {
+        background: #b85a00;
+        border-color: #b85a00;
+        @apply text-white;
+        text-decoration: none;
+    }
+
+    /* ======================================
+       PUBLIC — Course Cards
+       ====================================== */
+    .course-card {
+        @apply bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 h-full flex flex-col;
+        border: 1px solid transparent;
+    }
+    .course-card:hover {
+        @apply shadow-2xl -translate-y-2;
+        border-color: rgba(254, 97, 2, 0.2);
+    }
+    .course-card .course-card__img {
+        @apply w-full object-cover;
+        height: 16rem; /* h-64 */
+    }
+    .course-card:hover .course-card__img {
+        transform: scale(1.07);
+    }
+    .course-card .course-card__img-wrap {
+        @apply overflow-hidden relative;
+        height: 16rem;
+    }
+    .course-card .course-card__body {
+        @apply p-8 flex-1 flex flex-col;
+    }
+    .course-card .course-card__title {
+        @apply text-2xl font-bold text-gray-900 mb-4;
+        font-family: 'Outfit', sans-serif;
+    }
+    .course-card .course-card__text {
+        @apply text-gray-600 text-base leading-relaxed flex-1 mb-6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .course-card .course-card__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #c2410c; /* orange-700 — contraste 4.8:1 com branco ✅ WCAG AA */
+        font-weight: 700;
+        transition: gap 0.2s;
+        text-decoration: none;
+    }
+    .course-card .course-card__link:hover {
+        text-decoration: underline; /* links distintos por mais do que cor ✅ */
+    }
+    .course-card:hover .course-card__link {
+        gap: 1rem;
+    }
+    .course-card .course-card__footer {
+        @apply flex gap-3 mt-auto pt-4 border-t border-gray-100;
+    }
+
+    /* ======================================
+       PUBLIC — News Cards
+       ====================================== */
+    .news-card {
+        @apply bg-white rounded-3xl overflow-hidden shadow-xl transition-all duration-300 h-full flex flex-col;
+    }
+    .news-card:hover {
+        @apply shadow-2xl;
+    }
+    .news-card .news-card__img {
+        @apply relative overflow-hidden;
+        height: 15rem;
+    }
+    .news-card .news-card__img img {
+        @apply w-full h-full object-cover transition-transform duration-500;
+    }
+    .news-card:hover .news-card__img img {
+        @apply scale-110;
+    }
+    .news-card .news-card__date {
+        @apply text-sm font-bold flex items-center gap-2 mb-3;
+        color: #c2410c; /* orange-700 — contraste 4.8:1 com branco ✅ WCAG AA */
+    }
+    .news-card .news-card__title {
+        @apply text-2xl font-bold text-gray-900 leading-snug mb-4;
+        font-family: 'Outfit', sans-serif;
+        transition: color 0.2s;
+    }
+    .news-card:hover .news-card__title {
+        color: #c2410c; /* orange-700 — contraste 4.8:1 com branco ✅ WCAG AA */
+        text-decoration: underline; /* links distintos por mais do que cor ✅ */
+    }
+    .news-card .news-card__body {
+        @apply p-8 flex-1 flex flex-col;
+    }
+
+    /* ======================================
+       PUBLIC — Testimonial Cards
+       ====================================== */
+    .testimonial-card {
+        @apply bg-white p-8 border border-gray-100 shadow-sm rounded-2xl transition-shadow duration-300;
+    }
+    .testimonial-card:hover {
+        @apply shadow-md;
+    }
+    .testimonial-card .quote-icon {
+        @apply text-4xl leading-none font-black mb-4;
+        color: #FE6102;
+        font-family: Georgia, serif;
+    }
+
+    /* ======================================
+       PUBLIC — Footer
+       ====================================== */
+    .cetec-footer {
+        @apply text-gray-300;
+        background-color: #1a1a1a;
+    }
+    .cetec-footer .footer-title {
+        @apply text-white font-bold uppercase tracking-wider text-base mb-8;
+        border-left: 4px solid #FE6102;
+        padding-left: 1rem;
+    }
+    .cetec-footer a {
+        @apply text-gray-400 transition-colors duration-200;
+        text-decoration: none;
+    }
+    .cetec-footer a:hover {
+        color: #FE6102;
+    }
+    .cetec-footer .footer-dev-link {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    /* Newsletter bar */
+    .cetec-footer .newsletter-bar {
+        background: #FE6102;
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        margin-top: -8rem;
+        margin-bottom: 5rem;
+        position: relative;
+        z-index: 30;
+    }
+
+    /* ======================================
+       PUBLIC — WhatsApp float
+       ====================================== */
+    .whatsapp-float {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        background: #25d366;
+        color: white;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+        z-index: 999;
+        transition: transform 0.2s, background 0.2s;
+        text-decoration: none;
+    }
+    .whatsapp-float:hover {
+        background: #1ebd59;
+        transform: scale(1.1);
+        color: white;
+    }
+
+    /* ======================================
+       PUBLIC — Timeline (Linha do Tempo)
+       ====================================== */
+    .timeline-item {
+        @apply relative pl-10 pb-10 border-l-2 border-cetec-orange;
+    }
+    .timeline-item::before {
+        content: '';
+        @apply absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-cetec-orange;
+    }
+    .timeline-item:last-child {
+        @apply border-l-0;
+    }
+
+    /* ======================================
+       PUBLIC — FAQ Accordion
+       ====================================== */
+    .faq-item {
+        @apply border-b border-gray-200;
+    }
+    .faq-item summary {
+        @apply py-4 font-semibold text-gray-800 cursor-pointer list-none flex items-center justify-between;
+    }
+    .faq-item summary:hover {
+        color: #FE6102;
+    }
+    .faq-item summary::after {
+        content: '+';
+        font-size: 1.5rem;
+        color: #b85a00;
+        flex-shrink: 0;
+        margin-left: 1rem;
+        transition: transform 0.2s;
+    }
+    details[open].faq-item summary::after {
+        content: '−';
+    }
+    .faq-item .faq-answer {
+        @apply pb-4 text-gray-600 text-sm leading-relaxed;
+    }
 }
+

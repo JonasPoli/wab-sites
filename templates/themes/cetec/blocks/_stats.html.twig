@@ -1,0 +1,50 @@
+{% set config = block.config ?? {} %}
+{% set stats_list = [] %}
+{% if config.stats is defined and config.stats is iterable %}
+    {% for s in config.stats %}
+        {% if s.number is defined and s.number %}
+            {% set stats_list = stats_list|merge([{
+                'number': s.number,
+                'label': s.label ?? null,
+                'description': s.description ?? null
+            }]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if stats_list|length == 0 %}
+    {% for i in 1..4 %}
+        {% set num = config['stat' ~ i ~ '_number'] ?? null %}
+        {% if num %}
+            {% set stats_list = stats_list|merge([{
+                'number': num,
+                'label': config['stat' ~ i ~ '_label'] ?? null,
+                'description': config['stat' ~ i ~ '_description'] ?? null
+            }]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% set has_stats = stats_list|length > 0 %}
+{% if block.title or block.text or block.preTitle or has_stats %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    {% if has_stats %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+        {% for s in stats_list %}
+        <div class="bg-gray-50 dark:bg-cetec-dark/40 p-8 rounded-2xl border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/30 transition-all duration-300 transform hover:-translate-y-1">
+            <div class="text-4xl md:text-5xl font-black text-cetec-orange mb-2 group-hover:scale-105 transition-transform duration-300">{{ s.number }}</div>
+            {% if s.label %}<div class="font-bold text-cetec-dark dark:text-white text-base md:text-lg mb-1">{{ s.label }}</div>{% endif %}
+            {% if s.description %}<div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm leading-relaxed">{{ s.description }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}

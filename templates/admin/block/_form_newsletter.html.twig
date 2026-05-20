@@ -15,7 +15,7 @@
     <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Dois blorbs de destaque (opcional)</div>
     {% set cfg = block.config ?? {} %}
     {% for i in 0..1 %}
-    {% set b = cfg.blorbs[i] ?? {} %}
+    {% set b = {icon: '', title: '', text: ''}|merge(cfg.blorbs[i] ?? {}) %}
     <div class="card" style="margin:0;padding:1rem">
         <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Blorb {{ i+1 }}</div>
         <div class="af-row">

@@ -1,0 +1,9 @@
+{% if block.embedUrl %}
+<div class="wab-block">
+    {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+    {% if block.title %}<h2 class="section-heading" style="margin-bottom:1.5rem">{{ block.title }}</h2>{% endif %}
+    <div class="wab-map-wrap">
+        <iframe src="{{ block.embedUrl }}" width="100%" height="450" style="border:0;border-radius:var(--radius-lg)" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="{{ block.title }}"></iframe>
+    </div>
+</div>
+{% endif %}

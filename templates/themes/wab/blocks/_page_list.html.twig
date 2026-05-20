@@ -1,0 +1,38 @@
+{% set cat = block.relatedCategory %}
+<div class="wab-block">
+    {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+    {% if block.title %}<h2 class="section-heading">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);margin:.5rem 0 2rem">{{ block.text }}</p>{% endif %}
+    {% set pages = cat ? cat.pages : [] %}
+    {% if pages|length > 0 %}
+    <div class="wab-page-list">
+        {% for page in pages|slice(0, block.itemCount ?? 99) %}
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="wpl-card">
+            {% if page.coverImage %}
+            <div class="wpl-img" style="background-image:url('{{ asset('uploads/page_cover/' ~ page.coverImage) }}')"></div>
+            {% else %}
+            <div class="wpl-img wpl-img-placeholder"><i class="fa-solid fa-file-alt"></i></div>
+            {% endif %}
+            <div class="wpl-body">
+                <h3 class="wpl-title">{{ page.title }}</h3>
+                {% if page.seoDescription %}<p class="wpl-desc">{{ page.seoDescription|slice(0,120) }}…</p>{% endif %}
+                <span class="wpl-cta">Ler mais →</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-muted)">Nenhuma página encontrada.</p>
+    {% endif %}
+</div>
+<style>
+.wab-page-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.5rem; }
+.wpl-card { display:flex; flex-direction:column; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:transform .3s,border-color .3s; }
+.wpl-card:hover { transform:translateY(-6px); border-color:rgba(var(--color-secondary-rgb),.4); opacity:1; }
+.wpl-img { height:160px; background-size:cover; background-position:center; }
+.wpl-img-placeholder { display:flex; align-items:center; justify-content:center; background:var(--bg-alt); color:var(--text-muted); font-size:2rem; }
+.wpl-body { padding:1.25rem; flex:1; display:flex; flex-direction:column; }
+.wpl-title { font-weight:700; color:var(--text); margin-bottom:.5rem; font-size:1rem; }
+.wpl-desc { color:var(--text-muted); font-size:.85rem; flex:1; margin-bottom:.75rem; }
+.wpl-cta { color:var(--color-secondary); font-weight:600; font-size:.85rem; }
+</style>
