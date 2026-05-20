@@ -1,0 +1,28 @@
+{% set cat = block.relatedCategory %}
+{% if cat %}
+<div class="wab-block">
+    {% if block.preTitle %}<div style="text-align:center"><span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span></div>{% endif %}
+    {% if block.title %}<h2 class="section-heading" style="text-align:center;margin-bottom:.5rem">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:600px;margin:0 auto 2.5rem">{{ block.text }}</p>{% endif %}
+    {% set subs = cat.children %}
+    {% if subs|length > 0 %}
+    <div class="wab-subcats">
+        {% for sub in subs %}
+        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="subcat-card">
+            {% if sub.icon %}<div class="subcat-icon"><i class="{{ sub.icon }}"></i></div>{% endif %}
+            <h3 class="subcat-title">{{ sub.name }}</h3>
+            {% if sub.description %}<p class="subcat-desc">{{ sub.description|slice(0,100) }}</p>{% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<style>
+.wab-subcats { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.5rem; }
+.subcat-card { display:block; padding:2rem 1.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); transition:all .3s; }
+.subcat-card:hover { transform:translateY(-6px); border-color:rgba(var(--color-primary-rgb),.4); opacity:1; }
+.subcat-icon { font-size:2rem; color:var(--color-secondary); margin-bottom:1rem; }
+.subcat-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.5rem; }
+.subcat-desc { color:var(--text-muted); font-size:.85rem; line-height:1.6; }
+</style>
+{% endif %}

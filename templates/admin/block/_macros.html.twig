@@ -1,0 +1,15 @@
+{# Partial compartilhado: campos preTitle, title, text #}
+{% macro base(block) %}
+<div class="af-field">
+    <label>Pré-título <span class="af-hint" style="display:inline;margin-left:.5rem">(texto acima do título, destaque)</span></label>
+    <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}" placeholder="ex: Conheça nossos">
+</div>
+<div class="af-field">
+    <label>Título <span class="req">*</span></label>
+    <input type="text" name="title" class="ai" value="{{ block.title }}" required placeholder="Título do bloco">
+</div>
+<div class="af-field">
+    <label>Texto</label>
+    <textarea name="text" class="ate ckeditor" rows="5" placeholder="Conteúdo do bloco...">{{ block.text }}</textarea>
+</div>
+{% endmacro %}

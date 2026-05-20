@@ -1,0 +1,41 @@
+<div class="wab-block wab-newsletter">
+    <div class="nl-grid">
+        <div class="nl-left">
+            {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+            {% if block.title %}<h2 class="section-heading" style="font-size:clamp(1.6rem,3vw,2.4rem)">{{ block.title }}</h2>{% endif %}
+            {% if block.text %}<p class="nl-desc">{{ block.text }}</p>{% endif %}
+            <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="nl-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
+                <input type="email" name="email" placeholder="Seu melhor e-mail" required class="nl-input">
+                <button type="submit" class="btn btn-primary">Inscrever-se</button>
+            </form>
+        </div>
+        {% if block.config.blurb1_title or block.config.blurb2_title %}
+        <div class="nl-right">
+            {% set blorbs = [
+                {icon: block.config.blurb1_icon, title: block.config.blurb1_title, text: block.config.blurb1_text},
+                {icon: block.config.blurb2_icon, title: block.config.blurb2_title, text: block.config.blurb2_text},
+            ] %}
+            {% for b in blorbs %}{% if b.title %}
+            <div class="nl-blorb">
+                {% if b.icon %}<div class="nl-blorb-icon"><i class="{{ b.icon }}"></i></div>{% endif %}
+                <div><div class="nl-blorb-title">{{ b.title }}</div><div class="nl-blorb-text">{{ b.text }}</div></div>
+            </div>
+            {% endif %}{% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+<style>
+.wab-newsletter { background:var(--bg-alt); border-radius:var(--radius-lg); padding:3rem; }
+.nl-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+.nl-desc { color:var(--text-muted); margin:1rem 0 1.5rem; }
+.nl-form { display:flex; gap:.75rem; flex-wrap:wrap; }
+.nl-input { flex:1; min-width:200px; padding:.85rem 1.25rem; border-radius:50px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:.95rem; font-family:inherit; outline:none; }
+.nl-input:focus { border-color:var(--color-secondary); }
+.nl-blorb { display:flex; gap:1rem; margin-bottom:1.5rem; align-items:flex-start; }
+.nl-blorb-icon { width:40px;height:40px;background:rgba(var(--color-secondary-rgb),.1);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--color-secondary);flex-shrink:0; }
+.nl-blorb-title { font-weight:700; margin-bottom:.2rem; color:var(--text); }
+.nl-blorb-text { font-size:.88rem; color:var(--text-muted); }
+@media(max-width:768px){ .nl-grid { grid-template-columns:1fr; } }
+</style>

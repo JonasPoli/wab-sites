@@ -1,0 +1,39 @@
+{% set testimonials = block.testimonials %}
+{% if testimonials|length > 0 %}
+<div class="wab-block">
+    {% if block.preTitle %}<div style="text-align:center"><span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span></div>{% endif %}
+    {% if block.title %}<h2 class="section-heading" style="text-align:center;margin-bottom:.5rem">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:600px;margin:0 auto 2.5rem">{{ block.text }}</p>{% endif %}
+    <div class="wab-testimonials">
+        {% for t in testimonials %}
+        <div class="t-card">
+            <div class="t-stars">{% for s in 1..t.rating %}<i class="fa-solid fa-star"></i>{% endfor %}{% for s in (t.rating+1)..5 %}<i class="fa-regular fa-star"></i>{% endfor %}</div>
+            <p class="t-text">"{{ t.text }}"</p>
+            <div class="t-author">
+                {% if t.avatar %}
+                    <img src="{{ asset('uploads/testimonial_avatar/' ~ t.avatar) }}" alt="{{ t.name }}" class="t-avatar" loading="lazy">
+                {% else %}
+                    <div class="t-avatar t-avatar-ph"><i class="fa-solid fa-user"></i></div>
+                {% endif %}
+                <div>
+                    <div class="t-name">{{ t.name }}</div>
+                    {% if t.role %}<div class="t-role">{{ t.role }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<style>
+.wab-testimonials { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.5rem; }
+.t-card { padding:2rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); display:flex; flex-direction:column; gap:1rem; transition:transform .3s; }
+.t-card:hover { transform:translateY(-4px); }
+.t-stars { color:#f59e0b; font-size:.9rem; }
+.t-text { color:var(--text-muted); font-size:.95rem; line-height:1.7; flex:1; font-style:italic; }
+.t-author { display:flex; align-items:center; gap:.85rem; margin-top:auto; }
+.t-avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; }
+.t-avatar-ph { background:rgba(var(--color-primary-rgb),.12); display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:1.1rem; flex-shrink:0; }
+.t-name { font-weight:700; color:var(--text); font-size:.9rem; }
+.t-role { font-size:.8rem; color:var(--text-muted); }
+</style>
+{% endif %}

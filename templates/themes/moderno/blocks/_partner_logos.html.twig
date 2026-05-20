@@ -1,0 +1,41 @@
+{% set logos = block.partnerLogos %}
+{% if logos|length > 0 %}
+<div class="wab-block">
+    {% if block.preTitle %}<div style="text-align:center"><span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span></div>{% endif %}
+    {% if block.title %}<h2 class="section-heading" style="text-align:center;margin-bottom:.5rem">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:600px;margin:0 auto 2.5rem">{{ block.text }}</p>{% endif %}
+
+    {% set style = block.config.style ?? 'grid' %}
+    {% set cols = block.config.columns ?? 4 %}
+
+    {% if style == 'carousel' %}
+    <div class="pl-carousel-wrap">
+        <div class="pl-carousel">
+            {% for logo in logos %}{% include 'themes/moderno/blocks/_partner_logo_item.html.twig' %}{% endfor %}
+            {# Duplicate for infinite loop #}
+            {% for logo in logos %}{% include 'themes/moderno/blocks/_partner_logo_item.html.twig' %}{% endfor %}
+        </div>
+    </div>
+    <style>
+    .pl-carousel-wrap { overflow:hidden; }
+    .pl-carousel { display:flex; gap:2rem; animation:scrollLogos 20s linear infinite; width:max-content; }
+    .pl-carousel:hover { animation-play-state:paused; }
+    @keyframes scrollLogos { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    </style>
+    {% else %}
+    <div class="pl-grid" style="--cols:{{ cols }}">
+        {% for logo in logos %}{% include 'themes/moderno/blocks/_partner_logo_item.html.twig' %}{% endfor %}
+    </div>
+    <style>
+    .pl-grid { display:grid; grid-template-columns:repeat(var(--cols,4),1fr); gap:1.5rem; }
+    @media(max-width:768px){ .pl-grid { grid-template-columns:repeat(2,1fr); } }
+    </style>
+    {% endif %}
+</div>
+<style>
+.pl-logo-item { display:flex; align-items:center; justify-content:center; padding:1.25rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); transition:all .3s; }
+.pl-logo-item:hover { border-color:rgba(var(--color-primary-rgb),.3); transform:scale(1.04); opacity:1; }
+.pl-logo-item img { max-height:60px; max-width:130px; object-fit:contain; filter:grayscale(100%) opacity(.6); transition:.3s; }
+.pl-logo-item:hover img { filter:none; opacity:1; }
+</style>
+{% endif %}

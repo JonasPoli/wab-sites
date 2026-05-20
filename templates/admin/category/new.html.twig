@@ -1,0 +1,38 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Nova Categoria{% endblock %}{% block page_title %}Nova Categoria{% endblock %}
+{% block body %}
+<div class="ph"><h1>Nova Categoria</h1><a href="{{ path('admin_category_index') }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a></div>
+<div class="card"><form action="{{ path('admin_category_new') }}" method="post" class="af">
+    <div class="af-group">
+        <div class="af-field">
+            <label>Nome <span class="req">*</span></label>
+            <input type="text" name="name" class="ai" required autofocus>
+        </div>
+        <div class="af-field">
+            <label>Slug <small style="color:var(--muted)">(gerado automaticamente)</small></label>
+            <input type="text" name="slug" class="ai" placeholder="deixe em branco para gerar">
+        </div>
+    </div>
+    <div class="af-group">
+        <div class="af-field">
+            <label>Pré-título</label>
+            <input type="text" name="preTitle" class="ai" placeholder="Ex: Nossa">
+        </div>
+        <div class="af-field">
+            <label>Descrição</label>
+            <textarea name="description" class="ai" rows="3" placeholder="Texto exibido abaixo do título na página da categoria"></textarea>
+        </div>
+    </div>
+    <div class="af-group af-group--inline">
+        <label class="af-check">
+            <input type="checkbox" name="showInHeader" value="1">
+            <span>Aparece no menu do <strong>topo</strong></span>
+        </label>
+        <label class="af-check">
+            <input type="checkbox" name="showInFooter" value="1">
+            <span>Aparece no menu do <strong>rodapé</strong></span>
+        </label>
+    </div>
+    <div class="af-actions"><button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button><a href="{{ path('admin_category_index') }}" class="btn btn-g">Cancelar</a></div>
+</form></div>
+{% endblock %}

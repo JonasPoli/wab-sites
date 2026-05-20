@@ -1,0 +1,27 @@
+<div class="wab-block">
+    {% if block.preTitle %}<div style="text-align:center"><span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span></div>{% endif %}
+    {% if block.title %}<h2 class="section-heading" style="text-align:center;margin-bottom:.5rem">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:600px;margin:0 auto 3rem">{{ block.text }}</p>{% endif %}
+    <div class="wab-blurbs4">
+        {% for i in 1..4 %}
+        {% set icon = attribute(block.config, 'item' ~ i ~ '_icon') ?? null %}
+        {% set title = attribute(block.config, 'item' ~ i ~ '_title') ?? null %}
+        {% set text = attribute(block.config, 'item' ~ i ~ '_text') ?? null %}
+        {% if title %}
+        <div class="b4-card">
+            {% if icon %}<div class="b4-icon"><i class="{{ icon }}"></i></div>{% endif %}
+            <h3 class="b4-title">{{ title }}</h3>
+            {% if text %}<p class="b4-text">{{ text }}</p>{% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<style>
+.wab-blurbs4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.5rem; }
+.b4-card { padding:2rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); transition:transform .3s,border-color .3s; }
+.b4-card:hover { transform:translateY(-6px); border-color:rgba(var(--color-primary-rgb),.3); }
+.b4-icon { font-size:1.8rem; color:var(--color-secondary); margin-bottom:1rem; }
+.b4-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.5rem; }
+.b4-text { color:var(--text-muted); font-size:.88rem; line-height:1.7; }
+</style>

@@ -1,0 +1,122 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        products:
+            uri_prefix: /prod
+            upload_destination: '%kernel.project_dir%/public/prod'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        newsImage:
+            uri_prefix: /images/newsImage
+            upload_destination: '%kernel.project_dir%/public/images/newsImage'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        evento_banner:
+            uri_prefix: /uploads/evento/banner
+            upload_destination: '%kernel.project_dir%/public/uploads/evento/banner'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        evento_logo:
+            uri_prefix: /uploads/evento/logo
+            upload_destination: '%kernel.project_dir%/public/uploads/evento/logo'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        tenant_logo:
+            uri_prefix: /uploads/tenant/logo
+            upload_destination: '%kernel.project_dir%/public/uploads/tenant/logo'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        hero_banner:
+            uri_prefix: /uploads/hero
+            upload_destination: '%kernel.project_dir%/public/uploads/hero'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        article_image:
+            uri_prefix: /uploads/article
+            upload_destination: '%kernel.project_dir%/public/uploads/article'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        page_block_image:
+            uri_prefix: /uploads/page_block
+            upload_destination: '%kernel.project_dir%/public/uploads/page_block'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        tenant_about_image:
+            uri_prefix: /uploads/tenant/about
+            upload_destination: '%kernel.project_dir%/public/uploads/tenant/about'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        video_material:
+            uri_prefix: /uploads/video_material
+            upload_destination: '%kernel.project_dir%/public/uploads/video_material'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        article_gallery:
+            uri_prefix: /uploads/article_gallery
+            upload_destination: '%kernel.project_dir%/public/uploads/article_gallery'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        study_cover:
+            uri_prefix: /uploads/study_cover
+            upload_destination: '%kernel.project_dir%/public/uploads/study_cover'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        study_material:
+            uri_prefix: /uploads/study_material
+            upload_destination: '%kernel.project_dir%/public/uploads/study_material'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        page_block_gallery:
+            uri_prefix: /uploads/page_block_gallery
+            upload_destination: '%kernel.project_dir%/public/uploads/page_block_gallery'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        page_cover_image:
+            uri_prefix: /uploads/page_cover
+            upload_destination: '%kernel.project_dir%/public/uploads/page_cover'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        tenant_favicon:
+            uri_prefix: /uploads/tenant/favicon
+            upload_destination: '%kernel.project_dir%/public/uploads/tenant/favicon'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        section_bg_image:
+            uri_prefix: /uploads/section/bg
+            upload_destination: '%kernel.project_dir%/public/uploads/section/bg'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        section_bg_video:
+            uri_prefix: /uploads/section/video
+            upload_destination: '%kernel.project_dir%/public/uploads/section/video'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        testimonial_avatar:
+            uri_prefix: /uploads/testimonial_avatar
+            upload_destination: '%kernel.project_dir%/public/uploads/testimonial_avatar'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true
+
+        partner_logo:
+            uri_prefix: /uploads/partner_logo
+            upload_destination: '%kernel.project_dir%/public/uploads/partner_logo'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: true

@@ -1,0 +1,84 @@
+{% extends 'themes/moderno/base.html.twig' %}
+{% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
+{% block meta_description %}{% if page.seoDescription %}<meta name="description" content="{{ page.seoDescription }}">{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
+
+{% block body %}
+
+{# ── Page Hero ── #}
+<div class="mp-hero">
+    <div class="container">
+        {% if page.category %}<span class="section-label" style="margin-bottom:1rem"><span class="glow-dot"></span>{{ page.category.name }}</span>{% endif %}
+        <h1 class="mp-hero-title">{{ page.title }}</h1>
+    </div>
+</div>
+
+{# ── Sections ── #}
+{% for section in page.sections %}{% if section.active %}
+
+{# ── Build background style ── #}
+{% set sectionStyle = '' %}
+{% set sectionClass = 'mp-section' %}
+{% if section.bgType == 'color' and section.bgColor %}
+    {% set sectionStyle = 'background:' ~ section.bgColor %}
+{% elseif section.bgType == 'gradient' and section.bgGradient %}
+    {% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+{% elseif section.bgType in ['image', 'video'] %}
+    {% set sectionStyle = 'position:relative;overflow:hidden' %}
+{% endif %}
+
+<section class="{{ sectionClass }}" style="{{ sectionStyle }}">
+    {# Background image layer #}
+    {% if section.bgType == 'image' and section.bgImage %}
+    <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}');background-size:cover;background-position:{{ section.bgImagePosition }};opacity:{{ section.bgImageOpacity / 100 }};z-index:0;pointer-events:none"></div>
+    {% endif %}
+    {# Background video layer #}
+    {% if section.bgType == 'video' and section.bgVideo %}
+    <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0">
+        <source src="{{ asset('uploads/section/video/' ~ section.bgVideo) }}" type="video/mp4">
+    </video>
+    {% if section.bgColor %}
+    <div style="position:absolute;inset:0;background:{{ section.bgColor }};opacity:.5;z-index:1;pointer-events:none"></div>
+    {% endif %}
+    {% endif %}
+
+    <div class="container" style="position:relative;z-index:2">
+        {% if section.titlePart1 or section.titlePart2 %}
+        <div class="mp-two-tone">
+            {% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}
+            {% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}
+        </div>
+        {% endif %}
+
+        {% for block in section.blocks %}
+            {% include 'themes/moderno/_block.html.twig' %}
+        {% endfor %}
+    </div>
+</section>
+
+{% endif %}{% endfor %}
+
+{% endblock %}
+
+{% block stylesheets %}{{ parent() }}
+<style>
+.mp-hero {
+    padding:6rem 0 4rem;
+    background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.12),rgba(var(--color-secondary-rgb),.08));
+    border-bottom:1px solid var(--border);
+    text-align:center;
+}
+.mp-hero-title {
+    font-size:clamp(2rem,5vw,3.5rem); font-weight:900;
+    color:var(--text);
+    margin-top:.5rem;
+}
+.mp-section { padding:5rem 0; border-bottom:1px solid var(--border); }
+.mp-section:last-child { border-bottom:none; }
+.mp-two-tone { display:flex; justify-content:center; margin-bottom:3rem; border-radius:var(--radius); overflow:hidden; flex-wrap:wrap; }
+.mp-t1 { background:var(--color-secondary); color:#060612; padding:.75rem 2rem; font-size:1.3rem; font-weight:800; }
+.mp-t2 { background:var(--color-primary); color:#fff; padding:.75rem 2rem; font-size:1.3rem; font-weight:800; }
+.wab-block { margin-bottom:3rem; }
+.wab-block:last-child { margin-bottom:0; }
+</style>
+{% endblock %}

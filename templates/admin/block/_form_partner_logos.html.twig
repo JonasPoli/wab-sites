@@ -1,0 +1,64 @@
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="partner_logos">
+    <div class="af-field"><label>Pré-título</label><input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}"></div>
+    <div class="af-field"><label>Título <span class="req">*</span></label><input type="text" name="title" class="ai" value="{{ block.title }}" required></div>
+    <div class="af-field"><label>Texto de apoio</label><textarea name="text" class="ate" rows="2">{{ block.text }}</textarea></div>
+    <div class="af-row">
+        <div class="af-field"><label>Estilo de exibição</label>
+            <select name="config[style]" class="as">
+                <option value="grid" {{ (block.config.style ?? 'grid') == 'grid' ? 'selected' }}>Grade (fixo)</option>
+                <option value="carousel" {{ (block.config.style ?? '') == 'carousel' ? 'selected' }}>Carrossel infinito</option>
+            </select>
+        </div>
+        <div class="af-field"><label>Colunas na grade (3–6)</label>
+            <input type="number" name="config[columns]" class="ai" value="{{ block.config.columns ?? 4 }}" min="3" max="6">
+        </div>
+    </div>
+
+    <div style="margin:1.25rem 0 .75rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">
+        Logos ({{ block.partnerLogos|length }})
+    </div>
+
+    <div id="logos-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+    {% for logo in block.partnerLogos %}
+    <div class="card" style="margin:0;padding:1rem;text-align:center">
+        <input type="hidden" name="logos[{{ loop.index0 }}][id]" value="{{ logo.id }}">
+        {% if logo.logoFilename %}
+            <img src="{{ asset('uploads/partner_logo/' ~ logo.logoFilename) }}" style="max-height:60px;max-width:120px;margin:0 auto .75rem;object-fit:contain;filter:grayscale(100%);opacity:.7">
+        {% endif %}
+        <div class="af-field"><label style="font-size:.75rem">Nome</label><input type="text" name="logos[{{ loop.index0 }}][name]" class="ai" value="{{ logo.name }}" placeholder="Nome do parceiro"></div>
+        <div class="af-field"><label style="font-size:.75rem">Logo (substituir)</label><input type="file" name="logos[{{ loop.index0 }}][logoFile]" accept="image/*" class="ai"></div>
+        <div class="af-field"><label style="font-size:.75rem">Link (opcional)</label><input type="url" name="logos[{{ loop.index0 }}][url]" class="ai" value="{{ logo.url }}" placeholder="https://..."></div>
+        <label style="font-size:.75rem;color:var(--danger);cursor:pointer"><input type="checkbox" name="delete_logo[]" value="{{ logo.id }}"> Remover</label>
+    </div>
+    {% endfor %}
+    </div>
+
+    <div style="margin-top:1rem">
+        <label style="font-weight:600;font-size:.85rem;display:block;margin-bottom:.5rem">Adicionar logos (múltiplos)</label>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+            <label for="bulk-logos-up" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer">
+                <sl-icon name="upload"></sl-icon> Selecionar logos
+            </label>
+            <input type="file" id="bulk-logos-up" name="logoFiles[]" multiple accept="image/*" style="display:none" onchange="prevLogos(this)">
+        </div>
+        <div id="logos-preview" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem"></div>
+    </div>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>
+<script>
+function prevLogos(input) {
+    const wrap = document.getElementById('logos-preview');
+    wrap.innerHTML = '';
+    [...input.files].forEach(f => {
+        const img = document.createElement('img');
+        img.style = 'height:52px;border-radius:6px;object-fit:contain;background:#fff;padding:4px';
+        const r = new FileReader(); r.onload = e => img.src = e.target.result; r.readAsDataURL(f);
+        wrap.appendChild(img);
+    });
+}
+</script>

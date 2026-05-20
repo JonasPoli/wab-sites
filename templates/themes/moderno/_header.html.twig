@@ -1,0 +1,87 @@
+<header class="moderno-header" id="mheader">
+    <div class="container mh-inner">
+        <a href="{{ path('pub_home') }}" class="mh-logo" aria-label="Início">
+            {% if currentTenant and currentTenant.logo %}
+                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}" height="40">
+            {% else %}
+                <span class="mh-logo-text">{{ currentTenant ? currentTenant.name : 'WAB' }}</span>
+            {% endif %}
+        </a>
+
+        <nav class="mh-nav" aria-label="Navegação">
+            {% if headerCategories is defined %}
+                {% for cat in headerCategories %}
+                    {% if cat.children is defined and cat.children|length > 0 %}
+                        <div class="mh-dropdown">
+                            <span class="mh-link mh-dropdown-toggle">
+                                {% if cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                {{ cat.name }} <i class="fa-solid fa-chevron-down" style="font-size:.65rem;margin-left:.3rem"></i>
+                            </span>
+                            <div class="mh-dropdown-menu">
+                                {% for sub in cat.children %}
+                                <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="mh-dd-item">
+                                    {% if sub.icon %}<i class="{{ sub.icon }}"></i>{% endif %} {{ sub.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="mh-link">
+                            {% if cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {{ cat.name }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <a href="{{ path('pub_home') }}#contato" class="mh-cta btn btn-primary" style="padding:.6rem 1.5rem;font-size:.85rem">Contato</a>
+            <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" style="margin-left:.5rem">
+                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+            </button>
+        </nav>
+
+        <button class="mh-toggle" aria-label="Menu" onclick="document.querySelector('.mh-nav').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<style>
+.moderno-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: var(--header-bg); backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--header-border);
+    transition: background .25s;
+}
+.mh-inner { display:flex; align-items:center; justify-content:space-between; height:70px; gap:2rem; }
+.mh-logo-text {
+    font-size:1.4rem; font-weight:900;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.mh-nav { display:flex; align-items:center; gap:.5rem; }
+.mh-link { color:var(--text-muted); font-size:.9rem; font-weight:500; padding:.5rem .85rem; border-radius:8px; transition:all .2s; cursor:pointer; }
+.mh-link:hover { color:var(--text); background:var(--border); opacity:1; }
+
+/* Dropdown */
+.mh-dropdown { position:relative; }
+.mh-dropdown-toggle { user-select:none; }
+.mh-dropdown-menu {
+    display:none; position:absolute; top:calc(100% + .5rem); left:0; min-width:180px;
+    background:var(--bg-card); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow-lg); overflow:hidden; z-index:300;
+}
+.mh-dropdown:hover .mh-dropdown-menu { display:block; }
+.mh-dd-item { display:flex; align-items:center; gap:.6rem; padding:.65rem 1.1rem; color:var(--text); font-size:.88rem; transition:background .15s; }
+.mh-dd-item:hover { background:var(--bg-alt); opacity:1; }
+
+.mh-toggle { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:8px; }
+.mh-toggle span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:.2s; }
+@media(max-width:768px){
+    .mh-toggle{display:flex;}
+    .mh-nav{display:none;flex-direction:column;position:fixed;top:70px;left:0;right:0;background:var(--bg-card);padding:1.5rem;border-bottom:1px solid var(--border);}
+    .mh-nav.open{display:flex;}
+    .mh-link{width:100%;padding:0.85rem 1rem;}
+    .mh-dropdown-menu{position:static;box-shadow:none;border:none;padding-left:1rem;}
+}
+body { padding-top: 70px; }
+</style>

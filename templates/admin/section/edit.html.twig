@@ -1,0 +1,194 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Editar Seção{% endblock %}{% block page_title %}Editar Seção{% endblock %}
+{% block body %}
+<div class="ph">
+    <div>
+        <h1>Editar Seção</h1>
+        <div style="font-size:.8rem;color:var(--muted)">{{ section }}</div>
+    </div>
+    <a href="{{ section.page ? path('admin_section_index', {pageId: section.page.id}) : path('admin_cat_section_index', {catId: section.category.id}) }}" class="btn btn-g">
+        <sl-icon name="arrow-left"></sl-icon> Voltar
+    </a>
+</div>
+<div class="card">
+<form method="post" action="{{ path('admin_section_edit', {id: section.id}) }}" class="af" enctype="multipart/form-data">
+
+    {# ── Título ── #}
+    <div class="af-row">
+        <div class="af-field">
+            <label>Título — Parte 1 <span class="af-hint" style="display:inline;margin-left:.5rem">(cor secundária)</span></label>
+            <input type="text" name="titlePart1" class="ai" value="{{ section.titlePart1 }}">
+        </div>
+        <div class="af-field">
+            <label>Título — Parte 2 <span class="af-hint" style="display:inline;margin-left:.5rem">(cor primária)</span></label>
+            <input type="text" name="titlePart2" class="ai" value="{{ section.titlePart2 }}">
+        </div>
+    </div>
+    <div class="af-field">
+        <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
+            <input type="checkbox" name="active" value="1" {{ section.active ? 'checked' }} style="width:18px;height:18px;accent-color:var(--primary)">
+            Seção ativa (visível no site)
+        </label>
+    </div>
+
+    {# ── Background ── #}
+    <div style="margin:1.5rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Background da Seção</div>
+
+    <div class="af-field">
+        <label>Tipo de background</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.75rem" id="bg-type-btns">
+            {% set types = [
+                {val:'none',     label:'Nenhum',   icon:'fa-solid fa-ban'},
+                {val:'color',    label:'Cor',       icon:'fa-solid fa-palette'},
+                {val:'gradient', label:'Gradiente', icon:'fa-solid fa-paint-roller'},
+                {val:'image',    label:'Imagem',    icon:'fa-solid fa-image'},
+                {val:'video',    label:'Vídeo',     icon:'fa-solid fa-film'},
+            ] %}
+            {% for t in types %}
+            <label style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;border-radius:8px;border:1.5px solid {% if section.bgType == t.val %}var(--primary){% else %}var(--border){% endif %};background:{% if section.bgType == t.val %}rgba(79,110,247,.08){% else %}transparent{% endif %};cursor:pointer;transition:all .15s"
+                   onmouseover="this.style.borderColor='var(--primary)'" onmouseout="syncBorderColors()">
+                <input type="radio" name="bgType" value="{{ t.val }}" {{ section.bgType == t.val ? 'checked' }}
+                       style="display:none" onchange="showBgPanel('{{ t.val }}')">
+                <i class="{{ t.icon }}" style="color:var(--primary)"></i>
+                <span style="font-size:.85rem;font-weight:600">{{ t.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# Panel: Color #}
+    <div id="bg-panel-color" class="bg-panel {{ section.bgType == 'color' ? '' : 'hidden' }}" style="animation:fadeIn .2s">
+        <div class="af-field">
+            <label>Cor de fundo</label>
+            <div style="display:flex;align-items:center;gap:1rem">
+                <input type="color" name="bgColor" value="{{ section.bgColor ?? '#1e293b' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px">
+                <input type="text" id="bg-color-text" class="ai" style="width:140px" value="{{ section.bgColor ?? '#1e293b' }}"
+                       oninput="document.querySelector('[name=bgColor]').value=this.value">
+            </div>
+        </div>
+    </div>
+
+    {# Panel: Gradient #}
+    <div id="bg-panel-gradient" class="bg-panel {{ section.bgType == 'gradient' ? '' : 'hidden' }}" style="animation:fadeIn .2s">
+        <div class="af-field">
+            <label>CSS do gradiente <span class="af-hint" style="display:inline;margin-left:.5rem">(tudo após <code>linear-gradient(</code>)</span></label>
+            <input type="text" name="bgGradient" id="bg-gradient-input" class="ai" value="{{ section.bgGradient ?? '135deg, #0f172a 0%, #1e3a5f 100%' }}"
+                   placeholder="135deg, #0f172a 0%, #1e3a5f 100%"
+                   oninput="updateGradientPreview(this.value)">
+            <div id="gradient-preview" style="height:48px;border-radius:8px;margin-top:.5rem;background:linear-gradient({{ section.bgGradient ?? '135deg, #0f172a 0%, #1e3a5f 100%' }})"></div>
+            <p class="af-hint">Exemplos: <code>to right, #f00, #00f</code> · <code>135deg, #667eea, #764ba2</code></p>
+        </div>
+    </div>
+
+    {# Panel: Image #}
+    <div id="bg-panel-image" class="bg-panel {{ section.bgType == 'image' ? '' : 'hidden' }}" style="animation:fadeIn .2s">
+        <div class="af-field">
+            <label>Imagem de fundo</label>
+            <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                {% if section.bgImage %}
+                    <img id="bg-img-prev" src="{{ asset('uploads/section/bg/' ~ section.bgImage) }}"
+                         style="height:80px;border-radius:8px;object-fit:cover;max-width:160px">
+                {% else %}
+                    <div id="bg-img-prev" style="width:80px;height:80px;background:var(--bg3);border:1px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                        <sl-icon name="image"></sl-icon>
+                    </div>
+                {% endif %}
+                <div>
+                    <label for="bg-img-up" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer">
+                        <sl-icon name="upload"></sl-icon> Escolher imagem
+                    </label>
+                    <input type="file" id="bg-img-up" name="bgImageFile" accept="image/*" style="display:none" onchange="prevBgImg(this)">
+                </div>
+            </div>
+        </div>
+        <div class="af-row">
+            <div class="af-field">
+                <label>Opacidade da imagem: <strong id="opacity-val">{{ section.bgImageOpacity }}%</strong></label>
+                <input type="range" name="bgImageOpacity" min="0" max="100" value="{{ section.bgImageOpacity }}"
+                       style="width:100%" oninput="document.getElementById('opacity-val').textContent=this.value+'%'">
+            </div>
+            <div class="af-field">
+                <label>Posicionamento</label>
+                <select name="bgImagePosition" class="as">
+                    {% for pos in ['center','top','bottom','left','right'] %}
+                    <option value="{{ pos }}" {{ section.bgImagePosition == pos ? 'selected' }}>{{ pos|capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {# Panel: Video #}
+    <div id="bg-panel-video" class="bg-panel {{ section.bgType == 'video' ? '' : 'hidden' }}" style="animation:fadeIn .2s">
+        <div class="af-field">
+            <label>Arquivo de vídeo (MP4)</label>
+            {% if section.bgVideo %}
+                <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">
+                    <sl-icon name="film" style="margin-right:.4rem"></sl-icon>{{ section.bgVideo }}
+                </div>
+            {% endif %}
+            <input type="file" name="bgVideoFile" accept="video/mp4,video/webm" class="ai" style="cursor:pointer">
+            <p class="af-hint">MP4 ou WebM — recomendado até 15 MB · será exibido em loop, sem áudio</p>
+        </div>
+        <div class="af-field">
+            <label>Cor do overlay (transparência sobre o vídeo)</label>
+            <div style="display:flex;align-items:center;gap:1rem">
+                <input type="color" name="bgColor" value="{{ section.bgColor ?? '#000000' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px">
+                <input type="text" class="ai" style="width:140px" value="{{ section.bgColor ?? '#000000' }}"
+                       oninput="document.querySelector('[name=bgColor]').value=this.value">
+                <span class="af-hint">O overlay é exibido com 50% de opacidade sobre o vídeo</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ section.page ? path('admin_section_index', {pageId: section.page.id}) : path('admin_cat_section_index', {catId: section.category.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>
+</div>
+
+<style>
+.bg-panel.hidden { display:none; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+</style>
+{% endblock %}
+
+{% block javascripts %}{{ parent() }}
+<script>
+function showBgPanel(type) {
+    document.querySelectorAll('.bg-panel').forEach(el => el.classList.add('hidden'));
+    const p = document.getElementById('bg-panel-' + type);
+    if (p) p.classList.remove('hidden');
+    syncBorderColors();
+}
+function syncBorderColors() {
+    document.querySelectorAll('#bg-type-btns label').forEach(label => {
+        const radio = label.querySelector('input[type=radio]');
+        label.style.borderColor = radio.checked ? 'var(--primary)' : 'var(--border)';
+        label.style.background  = radio.checked ? 'rgba(79,110,247,.08)' : 'transparent';
+    });
+}
+function updateGradientPreview(val) {
+    document.getElementById('gradient-preview').style.background = 'linear-gradient(' + val + ')';
+}
+function prevBgImg(input) {
+    if (!input.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+        let el = document.getElementById('bg-img-prev');
+        if (el.tagName === 'DIV') {
+            const img = document.createElement('img');
+            img.id = 'bg-img-prev';
+            img.style.cssText = 'height:80px;border-radius:8px;object-fit:cover;max-width:160px';
+            el.replaceWith(img); el = img;
+        }
+        el.src = e.target.result;
+    };
+    r.readAsDataURL(input.files[0]);
+}
+// sync on load
+document.addEventListener('DOMContentLoaded', syncBorderColors);
+document.querySelectorAll('[name=bgType]').forEach(r => r.addEventListener('change', () => { showBgPanel(r.value); }));
+</script>
+{% endblock %}

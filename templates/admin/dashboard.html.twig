@@ -1,0 +1,58 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="stats">
+    <div class="stat">
+        <div class="stat-icon" style="color:var(--danger)"><sl-icon name="envelope-fill"></sl-icon></div>
+        <div class="stat-val" style="color:{% if unreadContacts > 0 %}var(--danger){% else %}var(--text){% endif %}">{{ unreadContacts }}</div>
+        <div class="stat-lbl">Contatos não lidos</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="color:var(--primary)"><sl-icon name="file-text-fill"></sl-icon></div>
+        <div class="stat-val">{{ pageCount }}</div>
+        <div class="stat-lbl">Páginas publicadas</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="color:var(--secondary)"><sl-icon name="tag-fill"></sl-icon></div>
+        <div class="stat-val">{{ categoryCount }}</div>
+        <div class="stat-lbl">Categorias</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="color:#34d399"><sl-icon name="send-fill"></sl-icon></div>
+        <div class="stat-val">{{ newsletterCount }}</div>
+        <div class="stat-lbl">Inscritos newsletter</div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem">
+    <a href="{{ path('admin_newsletter_index') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid var(--secondary);text-decoration:none">
+        <sl-icon name="send-fill" style="font-size:2rem;color:var(--secondary)"></sl-icon>
+        <div><div style="font-weight:700">Newsletter</div><div style="color:var(--muted);font-size:.8rem">Inscritos e exportação</div></div>
+    </a>
+    <a href="{{ path('admin_category_index') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid var(--primary);text-decoration:none">
+        <sl-icon name="tag-fill" style="font-size:2rem;color:var(--primary)"></sl-icon>
+        <div><div style="font-weight:700">Categorias</div><div style="color:var(--muted);font-size:.8rem">Organizar conteúdo</div></div>
+    </a>
+    <a href="{{ path('admin_page_index') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid #34d399;text-decoration:none">
+        <sl-icon name="file-text-fill" style="font-size:2rem;color:#34d399"></sl-icon>
+        <div><div style="font-weight:700">Páginas</div><div style="color:var(--muted);font-size:.8rem">Conteúdo e blocos</div></div>
+    </a>
+    <a href="{{ path('admin_contact_index') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid var(--{% if unreadContacts > 0 %}danger{% else %}border{% endif %});text-decoration:none">
+        <sl-icon name="envelope-fill" style="font-size:2rem;color:{% if unreadContacts > 0 %}var(--danger){% else %}var(--muted){% endif %}"></sl-icon>
+        <div>
+            <div style="font-weight:700">Contato {% if unreadContacts > 0 %}<span class="badge bg-err">{{ unreadContacts }} nova(s)</span>{% endif %}</div>
+            <div style="color:var(--muted);font-size:.8rem">Mensagens do site</div>
+        </div>
+    </a>
+    <a href="{{ path('admin_newsletter_index') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid #a78bfa;text-decoration:none">
+        <sl-icon name="send-fill" style="font-size:2rem;color:#a78bfa"></sl-icon>
+        <div><div style="font-weight:700">Newsletter</div><div style="color:var(--muted);font-size:.8rem">Inscrições de e-mail</div></div>
+    </a>
+    <a href="{{ path('admin_settings') }}" class="card" style="display:flex;align-items:center;gap:1rem;border-left:3px solid var(--muted);text-decoration:none">
+        <sl-icon name="gear-fill" style="font-size:2rem;color:var(--muted)"></sl-icon>
+        <div><div style="font-weight:700">Configurações</div><div style="color:var(--muted);font-size:.8rem">Site, SEO e favicon</div></div>
+    </a>
+</div>
+{% endblock %}

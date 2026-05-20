@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ currentTenant ? currentTenant.name : 'WAB Sites' }}{% endblock %}</title>
+    {% block meta_description %}{% endblock %}
+    {% block og_tags %}
+    <meta property="og:site_name" content="{{ currentTenant ? currentTenant.name : 'WAB Sites' }}">
+    <meta property="og:type" content="website">
+    {% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+    {% block canonical %}{% endblock %}
+    {% block robots %}{% endblock %}
+    {% if currentTenant and currentTenant.favicon %}
+        <link rel="icon" href="{{ asset('uploads/tenant/favicon/' ~ currentTenant.favicon) }}">
+    {% endif %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    {# Apply theme BEFORE paint to prevent flash #}
+    <script>
+    (function(){
+        var saved = localStorage.getItem('wab-theme') || 'auto';
+        var dark = saved === 'auto'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            : saved === 'dark';
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    })();
+    </script>
+
+    {{ tenant_css_vars()|raw }}
+
+    <style>
+    /* ── Design Tokens ── */
+    :root {
+        --font: 'Outfit', system-ui, sans-serif;
+        --radius: 16px; --radius-lg: 24px;
+        --ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --shadow: 0 8px 32px rgba(0,0,0,.1);
+        --shadow-lg: 0 24px 64px rgba(0,0,0,.15);
+        /* Light theme */
+        --bg:         #ffffff;
+        --bg-alt:     #f8fafc;
+        --bg-card:    #ffffff;
+        --bg-glass:   rgba(255,255,255,.7);
+        --text:       #0f172a;
+        --text-muted: #64748b;
+        --border:     rgba(0,0,0,.08);
+        --header-bg:  rgba(255,255,255,.85);
+        --header-border: rgba(0,0,0,.06);
+        --link:       #e2e8f0;
+    }
+    [data-theme="dark"] {
+        --bg:         #060612;
+        --bg-alt:     #0d0f1e;
+        --bg-card:    #131625;
+        --bg-glass:   rgba(6,6,18,.7);
+        --text:       #e2e8f0;
+        --text-muted: rgba(255,255,255,.45);
+        --border:     rgba(255,255,255,.07);
+        --header-bg:  rgba(6,1,18,.7);
+        --header-border: rgba(255,255,255,.06);
+        --link:       #e2e8f0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+        overflow-x: hidden;
+        transition: background .25s, color .25s;
+    }
+    a { color: var(--color-secondary); text-decoration: none; transition: opacity .2s; }
+    a:hover { opacity: .8; }
+    img { max-width: 100%; height: auto; display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .btn {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 50px; font-weight: 700; font-size: .95rem;
+        cursor: pointer; border: none; transition: all .3s var(--ease); letter-spacing: .02em;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        color: #fff; box-shadow: 0 8px 32px rgba(var(--color-primary-rgb),.4);
+    }
+    .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 16px 48px rgba(var(--color-primary-rgb),.5); opacity:1; }
+    .btn-ghost {
+        background: var(--bg-card);
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--bg-alt); opacity:1; }
+
+    .section-label {
+        display: inline-flex; align-items: center; gap: .5rem;
+        background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),.15), rgba(var(--color-primary-rgb),.1));
+        border: 1px solid rgba(var(--color-secondary-rgb),.3);
+        color: var(--color-secondary); font-size: .75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .1em;
+        padding: .35rem 1rem; border-radius: 50px; margin-bottom: 1.25rem;
+    }
+    .section-heading {
+        font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; line-height: 1.1;
+    }
+    [data-theme="dark"] .section-heading {
+        background: linear-gradient(135deg, #fff 0%, color-mix(in srgb, var(--color-secondary) 60%, #fff) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    [data-theme="light"] .section-heading { color: var(--text); }
+
+    .glow-dot {
+        width: 6px; height: 6px; border-radius: 50%; background: var(--color-secondary);
+        box-shadow: 0 0 12px var(--color-secondary);
+        display: inline-block; margin-right: .5rem;
+    }
+    .flash { padding:1rem 1.5rem; border-radius:var(--radius); margin:1rem 0; font-weight:500; }
+    .flash-success { background:rgba(16,185,129,.15); color:#065f46; border:1px solid rgba(16,185,129,.3); }
+    .flash-error   { background:rgba(239,68,68,.15); color:#991b1b; border:1px solid rgba(239,68,68,.3); }
+    [data-theme="dark"] .flash-success { color:#6ee7b7; }
+    [data-theme="dark"] .flash-error   { color:#fca5a5; }
+
+    /* ── Theme Toggle Button ── */
+    #wab-theme-btn {
+        display: inline-flex; align-items: center; gap: .4rem;
+        padding: .4rem .9rem; border-radius: 50px; border: 1px solid var(--border);
+        background: var(--bg-card); color: var(--text); font-size: .82rem;
+        font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    #wab-theme-btn:hover { border-color: var(--color-primary); }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+{% include 'themes/moderno/_header.html.twig' %}
+
+<main>
+    {% for msg in app.flashes('success') %}
+        <div class="container"><div class="flash flash-success">{{ msg }}</div></div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="container"><div class="flash flash-error">{{ msg }}</div></div>
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+
+{% include 'themes/moderno/_footer.html.twig' %}
+
+{% block javascripts %}
+<script>
+// ── Theme Toggle ──────────────────────────────────────────────────────────────
+const MODES = ['dark', 'light', 'auto'];
+const MODE_LABELS = {
+    dark: '<i class="fa-solid fa-moon"></i> Escuro',
+    light: '<i class="fa-solid fa-sun"></i> Claro',
+    auto: '<i class="fa-solid fa-circle-half-stroke"></i> Auto'
+};
+
+function applyTheme(mode) {
+    const dark = mode === 'auto'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        : mode === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    localStorage.setItem('wab-theme', mode);
+    const btn = document.getElementById('wab-theme-btn');
+    if (btn) btn.innerHTML = MODE_LABELS[mode];
+}
+
+function cycleTheme() {
+    const cur = localStorage.getItem('wab-theme') || 'auto';
+    const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
+    applyTheme(next);
+}
+
+// Sync button label on load
+document.addEventListener('DOMContentLoaded', () => {
+    const cur = localStorage.getItem('wab-theme') || 'auto';
+    const btn = document.getElementById('wab-theme-btn');
+    if (btn) btn.innerHTML = MODE_LABELS[cur];
+});
+
+// Listen for system preference changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('wab-theme') || 'auto') === 'auto') applyTheme('auto');
+});
+</script>
+{% endblock %}
+</body>
+</html>

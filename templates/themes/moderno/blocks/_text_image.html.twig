@@ -1,0 +1,24 @@
+{% set pos = block.config.imagePosition ?? 'right' %}
+<div class="wab-block wab-text-image {{ pos == 'left' ? 'ti-reverse' : '' }}">
+    <div class="ti-text">
+        {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="section-heading">{{ block.title }}</h2>{% endif %}
+        {% if block.text %}<div class="ti-body">{{ block.text|nl2br }}</div>{% endif %}
+        {% if block.config.ctaText and block.config.ctaLink %}
+            <a href="{{ block.config.ctaLink }}" class="btn btn-primary" style="margin-top:1.5rem">{{ block.config.ctaText }}</a>
+        {% endif %}
+    </div>
+    {% if block.image %}
+    <div class="ti-img-wrap">
+        <img src="{{ asset('uploads/page_block/' ~ block.image) }}" alt="{{ block.title }}" loading="lazy" class="ti-img">
+    </div>
+    {% endif %}
+</div>
+<style>
+.wab-text-image { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+.ti-reverse { direction:rtl; }
+.ti-reverse > * { direction:ltr; }
+.ti-body { color:var(--text-muted); margin-top:1rem; line-height:1.8; }
+.ti-img { border-radius:var(--radius-lg); object-fit:cover; width:100%; aspect-ratio:4/3; box-shadow:var(--shadow-lg); }
+@media(max-width:768px){ .wab-text-image { grid-template-columns:1fr; } .ti-reverse { direction:ltr; } }
+</style>

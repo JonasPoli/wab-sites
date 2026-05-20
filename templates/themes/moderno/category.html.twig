@@ -1,0 +1,98 @@
+{% extends 'themes/moderno/base.html.twig' %}
+{% block title %}{{ category.name }}{% endblock %}
+{% block meta_description %}{% if category.description %}<meta name="description" content="{{ category.description|striptags|slice(0,160) }}">{% endif %}{% endblock %}
+
+{% block body %}
+<div class="mp-hero">
+    <div class="container">
+        {% if category.parent %}<span class="section-label"><span class="glow-dot"></span>{{ category.parent.name }}</span>{% endif %}
+        {% if category.icon %}<div style="font-size:2.5rem;color:var(--color-secondary);margin-bottom:.75rem"><i class="{{ category.icon }}"></i></div>{% endif %}
+        <h1 class="mp-hero-title">{{ category.name }}</h1>
+        {% if category.description %}<p style="color:var(--text-muted);max-width:600px;margin:.75rem auto 0">{{ category.description }}</p>{% endif %}
+    </div>
+</div>
+
+{# ── Subcategorias ── #}
+{% if category.children is defined and category.children|length > 0 %}
+<section class="mp-section">
+    <div class="container">
+        <h2 class="section-heading" style="margin-bottom:2rem">Conteúdos</h2>
+        <div class="wab-subcats">
+            {% for sub in category.children %}
+            <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="subcat-card">
+                {% if sub.icon %}<div class="subcat-icon"><i class="{{ sub.icon }}"></i></div>{% endif %}
+                <h3 class="subcat-title">{{ sub.name }}</h3>
+                {% if sub.description %}<p class="subcat-desc">{{ sub.description|slice(0,100) }}</p>{% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# ── Páginas da categoria ── #}
+{% if category.pages is defined and category.pages|length > 0 %}
+<section class="mp-section">
+    <div class="container">
+        {% if not (category.children is defined and category.children|length > 0) %}
+            <h2 class="section-heading" style="margin-bottom:2rem">Páginas</h2>
+        {% endif %}
+        <div class="wab-page-list">
+            {% for page in category.pages %}
+            <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="wpl-card">
+                {% if page.coverImage %}<div class="wpl-img" style="background-image:url('{{ asset('uploads/page_cover/' ~ page.coverImage) }}')"></div>
+                {% else %}<div class="wpl-img wpl-img-placeholder"><i class="fa-solid fa-file-alt"></i></div>{% endif %}
+                <div class="wpl-body">
+                    <h3 class="wpl-title">{{ page.title }}</h3>
+                    {% if page.seoDescription %}<p class="wpl-desc">{{ page.seoDescription|slice(0,120) }}…</p>{% endif %}
+                    <span class="wpl-cta">Ler mais →</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# ── Seções da categoria ── #}
+{% for section in category.sections %}{% if section.active %}
+{% set sectionStyle = '' %}
+{% if section.bgType == 'color' and section.bgColor %}{% set sectionStyle = 'background:' ~ section.bgColor %}
+{% elseif section.bgType == 'gradient' and section.bgGradient %}{% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+{% elseif section.bgType in ['image','video'] %}{% set sectionStyle = 'position:relative;overflow:hidden' %}{% endif %}
+<section class="mp-section" style="{{ sectionStyle }}">
+    {% if section.bgType == 'image' and section.bgImage %}<div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}');background-size:cover;background-position:{{ section.bgImagePosition }};opacity:{{ section.bgImageOpacity/100 }};z-index:0"></div>{% endif %}
+    <div class="container" style="position:relative;z-index:2">
+        {% if section.titlePart1 or section.titlePart2 %}<div class="mp-two-tone">{% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}{% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}</div>{% endif %}
+        {% for block in section.blocks %}{% include 'themes/moderno/_block.html.twig' %}{% endfor %}
+    </div>
+</section>
+{% endif %}{% endfor %}
+
+{% endblock %}
+
+{% block stylesheets %}{{ parent() }}
+<style>
+.mp-hero{padding:6rem 0 4rem;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.12),rgba(var(--color-secondary-rgb),.08));border-bottom:1px solid var(--border);text-align:center;}
+.mp-hero-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:var(--text);margin-top:.5rem;}
+.mp-section{padding:5rem 0;border-bottom:1px solid var(--border);}
+.mp-two-tone{display:flex;justify-content:center;margin-bottom:3rem;border-radius:var(--radius);overflow:hidden;flex-wrap:wrap;}
+.mp-t1{background:var(--color-secondary);color:#060612;padding:.75rem 2rem;font-size:1.3rem;font-weight:800;}
+.mp-t2{background:var(--color-primary);color:#fff;padding:.75rem 2rem;font-size:1.3rem;font-weight:800;}
+.wab-subcats{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem;}
+.subcat-card{display:block;padding:2rem 1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);transition:all .3s;}
+.subcat-card:hover{transform:translateY(-6px);border-color:rgba(var(--color-primary-rgb),.4);opacity:1;}
+.subcat-icon{font-size:2rem;color:var(--color-secondary);margin-bottom:1rem;}
+.subcat-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+.subcat-desc{color:var(--text-muted);font-size:.85rem;line-height:1.6;}
+.wab-page-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.wpl-card{display:flex;flex-direction:column;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .3s;}
+.wpl-card:hover{transform:translateY(-6px);opacity:1;}
+.wpl-img{height:160px;background-size:cover;background-position:center;}
+.wpl-img-placeholder{display:flex;align-items:center;justify-content:center;background:var(--bg-alt);color:var(--text-muted);font-size:2rem;}
+.wpl-body{padding:1.25rem;flex:1;display:flex;flex-direction:column;}
+.wpl-title{font-weight:700;color:var(--text);margin-bottom:.5rem;font-size:1rem;}
+.wpl-desc{color:var(--text-muted);font-size:.85rem;flex:1;margin-bottom:.75rem;}
+.wpl-cta{color:var(--color-secondary);font-weight:600;font-size:.85rem;}
+</style>
+{% endblock %}

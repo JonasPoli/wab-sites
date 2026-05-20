@@ -1,0 +1,9 @@
+{% if logo.url %}
+<a href="{{ logo.url }}" target="_blank" rel="noopener" class="pl-logo-item">
+    <img src="{{ asset('uploads/partner_logo/' ~ logo.logoFilename) }}" alt="{{ logo.name }}" loading="lazy">
+</a>
+{% else %}
+<div class="pl-logo-item">
+    <img src="{{ asset('uploads/partner_logo/' ~ logo.logoFilename) }}" alt="{{ logo.name }}" loading="lazy">
+</div>
+{% endif %}

@@ -1,0 +1,23 @@
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="news_call">
+    <div class="af-field">
+        <label>Pré-título</label>
+        <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}">
+    </div>
+    <div class="af-field">
+        <label>Título <span class="req">*</span></label>
+        <input type="text" name="title" class="ai" value="{{ block.title }}" required>
+    </div>
+    <div class="af-field">
+        <label>Quantidade de notícias a exibir</label>
+        <select name="itemCount" class="as">
+            {% for n in [3, 4, 6, 8] %}
+            <option value="{{ n }}" {{ (block.itemCount ?? 3) == n ? 'selected' }}>{{ n }} notícias</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>

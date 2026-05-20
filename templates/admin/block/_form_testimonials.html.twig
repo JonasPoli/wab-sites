@@ -1,0 +1,67 @@
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="testimonials">
+    <div class="af-field"><label>Pré-título</label><input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}"></div>
+    <div class="af-field"><label>Título <span class="req">*</span></label><input type="text" name="title" class="ai" value="{{ block.title }}" required></div>
+    <div class="af-field"><label>Texto de apoio</label><textarea name="text" class="ate" rows="2">{{ block.text }}</textarea></div>
+
+    <div style="margin:1.25rem 0 .75rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">
+        Depoimentos ({{ block.testimonials|length }})
+    </div>
+
+    <div id="testimonials-wrap">
+    {% for t in block.testimonials %}
+    <div class="card" style="margin:0 0 1rem;padding:1.25rem">
+        <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem;color:var(--primary)">Depoimento #{{ loop.index }}</div>
+        <input type="hidden" name="testimonials[{{ loop.index0 }}][id]" value="{{ t.id }}">
+        <div class="af-row">
+            <div class="af-field"><label>Nome</label><input type="text" name="testimonials[{{ loop.index0 }}][name]" class="ai" value="{{ t.name }}"></div>
+            <div class="af-field"><label>Cargo / Função</label><input type="text" name="testimonials[{{ loop.index0 }}][role]" class="ai" value="{{ t.role }}"></div>
+        </div>
+        <div class="af-field"><label>Depoimento</label><textarea name="testimonials[{{ loop.index0 }}][text]" class="ate" rows="3">{{ t.text }}</textarea></div>
+        <div class="af-row">
+            <div class="af-field"><label>Avaliação (estrelas)</label>
+                <select name="testimonials[{{ loop.index0 }}][rating]" class="as">
+                    {% for s in 1..5 %}<option value="{{ s }}" {{ t.rating == s ? 'selected' }}>{{ '★' * s }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="af-field"><label>Foto (avatar)</label>
+                {% if t.avatar %}<img src="{{ asset('uploads/testimonial_avatar/' ~ t.avatar) }}" style="height:40px;border-radius:50%;margin-bottom:.5rem">{% endif %}
+                <input type="file" name="testimonials[{{ loop.index0 }}][avatarFile]" accept="image/*" class="ai">
+            </div>
+        </div>
+        <div style="text-align:right">
+            <label style="font-size:.8rem;color:var(--danger);cursor:pointer"><input type="checkbox" name="delete_testimonial[]" value="{{ t.id }}"> Remover este depoimento</label>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+
+    <button type="button" onclick="addTestimonial()" class="btn btn-g" style="margin-bottom:1.5rem"><sl-icon name="plus-lg"></sl-icon> Adicionar Depoimento</button>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>
+<template id="testimonial-tpl">
+<div class="card" style="margin:0 0 1rem;padding:1.25rem">
+    <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem;color:var(--primary)">Novo Depoimento</div>
+    <div class="af-row">
+        <div class="af-field"><label>Nome</label><input type="text" name="testimonials[__i__][name]" class="ai" placeholder="Nome do depoente"></div>
+        <div class="af-field"><label>Cargo / Função</label><input type="text" name="testimonials[__i__][role]" class="ai" placeholder="CEO, Cliente..."></div>
+    </div>
+    <div class="af-field"><label>Depoimento</label><textarea name="testimonials[__i__][text]" class="ate" rows="3" placeholder="Texto do depoimento..."></textarea></div>
+    <div class="af-row">
+        <div class="af-field"><label>Avaliação</label><select name="testimonials[__i__][rating]" class="as"><option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select></div>
+        <div class="af-field"><label>Foto (avatar)</label><input type="file" name="testimonials[__i__][avatarFile]" accept="image/*" class="ai"></div>
+    </div>
+</div>
+</template>
+<script>
+let tIdx = {{ block.testimonials|length }};
+function addTestimonial() {
+    const tpl = document.getElementById('testimonial-tpl').innerHTML.replaceAll('__i__', tIdx++);
+    const div = document.createElement('div'); div.innerHTML = tpl;
+    document.getElementById('testimonials-wrap').appendChild(div.firstElementChild);
+}
+</script>

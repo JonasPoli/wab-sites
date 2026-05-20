@@ -1,0 +1,45 @@
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="blurbs4">
+    <div class="af-field">
+        <label>Pré-título</label>
+        <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}">
+    </div>
+    <div class="af-field">
+        <label>Título <span class="req">*</span></label>
+        <input type="text" name="title" class="ai" value="{{ block.title }}" required>
+    </div>
+    <div class="af-field">
+        <label>Texto de apoio</label>
+        <textarea name="text" class="ate" rows="3">{{ block.text }}</textarea>
+    </div>
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">4 Blocos</div>
+    {% set cfg = block.config ?? {} %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    {% for i in 0..3 %}
+    {% set b = cfg.items[i] ?? {} %}
+    <div class="card" style="margin:0;padding:1rem">
+        <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Bloco {{ i+1 }}</div>
+        <div class="af-field">
+            <label>Ícone (Font Awesome)</label>
+            <div class="icon-picker-wrap">
+                <div class="icon-preview" id="blurb-prev-{{ i }}">{% if b.icon %}<i class="{{ b.icon }}"></i>{% endif %}</div>
+                <input type="text" id="blurb-icon-{{ i }}" name="config[items][{{ i }}][icon]" class="ai" value="{{ b.icon }}" placeholder="fa-solid fa-star" style="flex:1">
+                <button type="button" class="btn btn-g btn-sm" onclick="openIconPicker('blurb-icon-{{ i }}','blurb-prev-{{ i }}')">Escolher</button>
+            </div>
+        </div>
+        <div class="af-field">
+            <label>Título</label>
+            <input type="text" name="config[items][{{ i }}][title]" class="ai" value="{{ b.title }}">
+        </div>
+        <div class="af-field">
+            <label>Texto</label>
+            <textarea name="config[items][{{ i }}][text]" class="ate" rows="2">{{ b.text }}</textarea>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>

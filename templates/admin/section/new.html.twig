@@ -1,0 +1,73 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Nova Seção{% endblock %}{% block page_title %}Nova Seção{% endblock %}
+{% block body %}
+<div class="ph">
+    {% if page is defined and page %}
+        <h1>Nova Seção — <em style="color:var(--primary)">{{ page.title }}</em></h1>
+        <a href="{{ path('admin_section_index', {pageId: page.id}) }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a>
+    {% else %}
+        <h1>Nova Seção — <em style="color:var(--primary)">{{ category.name }}</em></h1>
+        <a href="{{ path('admin_cat_section_index', {catId: category.id}) }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a>
+    {% endif %}
+</div>
+<div class="card">
+<form action="{{ page is defined and page ? path('admin_section_new', {pageId: page.id}) : path('admin_cat_section_new', {catId: category.id}) }}" method="post" class="af" enctype="multipart/form-data">
+    <div class="af-row">
+        <div class="af-field"><label>Título Parte 1 <span class="af-hint" style="color:var(--secondary)">(cor secundária)</span></label><input type="text" name="titlePart1" class="ai" value=""></div>
+        <div class="af-field"><label>Título Parte 2 <span class="af-hint" style="color:var(--primary)">(cor primária)</span></label><input type="text" name="titlePart2" class="ai" value=""></div>
+    </div>
+    <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem">
+        <sl-switch name="active" value="1" checked></sl-switch>
+        <label style="color:var(--text)">Seção ativa</label>
+    </div>
+
+    <div style="margin:1.5rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Background da Seção</div>
+    <div class="af-field">
+        <label>Tipo de background</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.75rem" id="bg-type-btns">
+            {% set types = [
+                {val:'none',label:'Nenhum',icon:'fa-solid fa-ban'},
+                {val:'color',label:'Cor',icon:'fa-solid fa-palette'},
+                {val:'gradient',label:'Gradiente',icon:'fa-solid fa-paint-roller'},
+                {val:'image',label:'Imagem',icon:'fa-solid fa-image'},
+                {val:'video',label:'Vídeo',icon:'fa-solid fa-film'},
+            ] %}
+            {% for t in types %}
+            <label style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;border-radius:8px;border:1.5px solid {{ loop.first ? 'var(--primary)' : 'var(--border)' }};background:{{ loop.first ? 'rgba(79,110,247,.08)' : 'transparent' }};cursor:pointer;transition:all .15s">
+                <input type="radio" name="bgType" value="{{ t.val }}" {{ loop.first ? 'checked' }} style="display:none" onchange="showBgPanel('{{ t.val }}')">
+                <i class="{{ t.icon }}" style="color:var(--primary)"></i>
+                <span style="font-size:.85rem;font-weight:600">{{ t.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="bg-panel-color" class="bg-panel hidden"><div class="af-field"><label>Cor de fundo</label><div style="display:flex;align-items:center;gap:1rem"><input type="color" name="bgColor" value="#1e293b" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"><input type="text" id="bg-color-text" class="ai" style="width:140px" value="#1e293b" oninput="document.querySelector('[name=bgColor]').value=this.value"></div></div></div>
+    <div id="bg-panel-gradient" class="bg-panel hidden"><div class="af-field"><label>CSS do gradiente</label><input type="text" name="bgGradient" id="bg-gradient-input" class="ai" value="135deg, #0f172a 0%, #1e3a5f 100%" oninput="updateGradientPreview(this.value)"><div id="gradient-preview" style="height:48px;border-radius:8px;margin-top:.5rem;background:linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)"></div></div></div>
+    <div id="bg-panel-image" class="bg-panel hidden">
+        <div class="af-field"><label>Imagem de fundo</label><input type="file" name="bgImageFile" accept="image/*" class="ai" style="cursor:pointer"></div>
+        <div class="af-row">
+            <div class="af-field"><label>Opacidade: <strong id="opacity-val">100%</strong></label><input type="range" name="bgImageOpacity" min="0" max="100" value="100" style="width:100%" oninput="document.getElementById('opacity-val').textContent=this.value+'%'"></div>
+            <div class="af-field"><label>Posicionamento</label><select name="bgImagePosition" class="as">{% for pos in ['center','top','bottom','left','right'] %}<option value="{{ pos }}">{{ pos|capitalize }}</option>{% endfor %}</select></div>
+        </div>
+    </div>
+    <div id="bg-panel-video" class="bg-panel hidden">
+        <div class="af-field"><label>Arquivo de vídeo (MP4)</label><input type="file" name="bgVideoFile" accept="video/mp4,video/webm" class="ai" style="cursor:pointer"><p class="af-hint">MP4 ou WebM — até 15 MB · loop sem áudio</p></div>
+        <div class="af-field"><label>Cor do overlay</label><div style="display:flex;align-items:center;gap:1rem"><input type="color" name="bgColor" value="#000000" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"><input type="text" class="ai" style="width:140px" value="#000000" oninput="document.querySelectorAll('[name=bgColor]')[1].value=this.value"></div></div>
+    </div>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Criar Seção</button>
+        {% if page is defined and page %}<a href="{{ path('admin_section_index', {pageId: page.id}) }}" class="btn btn-g">Cancelar</a>
+        {% else %}<a href="{{ path('admin_cat_section_index', {catId: category.id}) }}" class="btn btn-g">Cancelar</a>{% endif %}
+    </div>
+</form>
+</div>
+<style>.bg-panel.hidden{display:none}</style>
+{% endblock %}
+{% block javascripts %}{{ parent() }}
+<script>
+function showBgPanel(t){document.querySelectorAll('.bg-panel').forEach(e=>e.classList.add('hidden'));const p=document.getElementById('bg-panel-'+t);if(p)p.classList.remove('hidden');document.querySelectorAll('#bg-type-btns label').forEach(l=>{const r=l.querySelector('input');l.style.borderColor=r.checked?'var(--primary)':'var(--border)';l.style.background=r.checked?'rgba(79,110,247,.08)':'transparent';});}
+function updateGradientPreview(v){document.getElementById('gradient-preview').style.background='linear-gradient('+v+')';}
+document.querySelectorAll('[name=bgType]').forEach(r=>r.addEventListener('change',()=>showBgPanel(r.value)));
+</script>
+{% endblock %}
