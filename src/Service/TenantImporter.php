@@ -23,18 +23,26 @@ class TenantImporter
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private string $projectDir
+        private string $projectDir,
+        private \Psr\Log\LoggerInterface $logger
     ) {}
 
     public function analyze(string $zipPath): array
     {
+        $this->logger->info('[TenantImporter] Iniciando análise do pacote de importação ZIP.', [
+            'zip_path' => $zipPath,
+            'zip_size' => file_exists($zipPath) ? filesize($zipPath) : 0
+        ]);
+
         $zip = new ZipArchive();
         if ($zip->open($zipPath) !== true) {
+            $this->logger->error('[TenantImporter] Erro crítico: Não foi possível abrir o arquivo ZIP.', ['zip_path' => $zipPath]);
             throw new \RuntimeException('Não foi possível abrir o arquivo ZIP.');
         }
 
         $jsonContent = $zip->getFromName('metadata.json');
         if (!$jsonContent) {
+            $this->logger->error('[TenantImporter] Erro crítico: O arquivo metadata.json não foi encontrado dentro do pacote ZIP.');
             $zip->close();
             throw new \RuntimeException('O arquivo metadata.json não foi encontrado dentro do pacote ZIP.');
         }
@@ -43,8 +51,13 @@ class TenantImporter
         $zip->close();
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->logger->error('[TenantImporter] Erro crítico: O metadata.json possui formato JSON inválido.', [
+                'json_error' => json_last_error_msg()
+            ]);
             throw new \RuntimeException('O metadata.json possui formato JSON inválido.');
         }
+
+        $this->logger->info('[TenantImporter] metadata.json lido com sucesso. Iniciando varredura de conflitos relacionais...');
 
         $conflicts = [
             'domain' => false,
@@ -57,6 +70,7 @@ class TenantImporter
         $existingTenant = $this->em->getRepository(Tenant::class)->findOneBy(['domain' => $domain]);
         if ($existingTenant) {
             $conflicts['domain'] = $domain;
+            $this->logger->warning('[TenantImporter] Conflito detectado: O domínio de acesso já está em uso.', ['domain' => $domain]);
         }
 
         // 2. Check for Tenant name conflict
@@ -64,6 +78,7 @@ class TenantImporter
         $existingTenantByName = $this->em->getRepository(Tenant::class)->findOneBy(['name' => $name]);
         if ($existingTenantByName) {
             $conflicts['tenant_name'] = $name;
+            $this->logger->warning('[TenantImporter] Conflito detectado: O nome do Tenant já está em uso.', ['name' => $name]);
         }
 
         // 3. Check for User username/email conflicts
@@ -82,10 +97,21 @@ class TenantImporter
                     'username_collision' => (bool)$existingUserByUsername,
                     'email_collision' => (bool)$existingUserByEmail,
                 ];
+                $this->logger->warning('[TenantImporter] Conflito detectado: Colisão de credenciais de usuário.', [
+                    'username' => $username,
+                    'email' => $email,
+                    'username_collision' => (bool)$existingUserByUsername,
+                    'email_collision' => (bool)$existingUserByEmail,
+                ]);
             }
         }
 
         $hasConflicts = !empty($conflicts['domain']) || !empty($conflicts['users']);
+
+        $this->logger->info('[TenantImporter] Análise de conflitos concluída.', [
+            'has_conflicts' => $hasConflicts,
+            'conflicts_count_users' => count($conflicts['users']),
+        ]);
 
         return [
             'metadata' => $data,
@@ -96,19 +122,29 @@ class TenantImporter
 
     public function import(array $data, array $resolutions, string $zipPath): Tenant
     {
+        $this->logger->info('[TenantImporter] Iniciando processo de importação relacional e física.', [
+            'zip_path' => $zipPath,
+            'resolutions' => $resolutions
+        ]);
+
         $filesystem = new Filesystem();
         $tempWorkDir = $this->projectDir . '/var/tmp/import_' . uniqid('', true);
         $filesystem->mkdir($tempWorkDir);
+
+        $this->logger->info('[TenantImporter] Extraindo pacote ZIP para espaço temporário de trabalho.', ['temp_dir' => $tempWorkDir]);
 
         // Extract ZIP contents
         $zip = new ZipArchive();
         if ($zip->open($zipPath) === true) {
             $zip->extractTo($tempWorkDir);
             $zip->close();
+            $this->logger->info('[TenantImporter] Pacote ZIP extraído com sucesso.');
         } else {
+            $this->logger->error('[TenantImporter] Falha crítica ao extrair o arquivo ZIP temporário.');
             throw new \RuntimeException('Não foi possível extrair o arquivo ZIP.');
         }
 
+        $this->logger->info('[TenantImporter] Iniciando transação no Banco de Dados...');
         $this->em->beginTransaction();
         try {
             // 1. Create and persist Tenant
@@ -427,12 +463,18 @@ class TenantImporter
 
             $this->em->flush();
             $this->em->commit();
+            $this->logger->info('[TenantImporter] Transação do Banco de Dados comitada com sucesso!');
 
             // Clear temporary workspace
             $filesystem->remove($tempWorkDir);
+            $this->logger->info('[TenantImporter] Workspace temporário limpo.', ['temp_dir' => $tempWorkDir]);
 
             return $tenant;
         } catch (\Exception $e) {
+            $this->logger->error('[TenantImporter] Erro catastrófico durante a importação. Revertendo transação (Rollback) e limpando workspace.', [
+                'exception_message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             $this->em->rollback();
             $filesystem->remove($tempWorkDir);
             throw $e;
@@ -448,8 +490,25 @@ class TenantImporter
         if (file_exists($source) && is_file($source)) {
             if (!is_dir($destinationDir)) {
                 mkdir($destinationDir, 0755, true);
+                $this->logger->info('[TenantImporter] Criando diretório de uploads de mídia de destino.', ['dir' => $destinationDir]);
             }
-            copy($source, $destination);
+            if (copy($source, $destination)) {
+                $this->logger->debug('[TenantImporter] Arquivo de mídia copiado com sucesso.', [
+                    'source' => $source,
+                    'destination' => $destination
+                ]);
+            } else {
+                $this->logger->error('[TenantImporter] Falha ao copiar arquivo de mídia.', [
+                    'source' => $source,
+                    'destination' => $destination
+                ]);
+            }
+        } else {
+            $this->logger->warning('[TenantImporter] ALERTA: Arquivo de mídia referenciado em metadata.json não foi encontrado dentro do ZIP.', [
+                'expected_source_path' => $source,
+                'mapping' => $mapping,
+                'filename' => $filename
+            ]);
         }
     }
 

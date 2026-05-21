@@ -372,8 +372,12 @@ class SuperAdminController extends AbstractController
     }
 
     #[Route('/tenant/{id}/export', name: 'tenant_export', methods: ['GET'])]
-    public function tenantExport(Tenant $tenant, \App\Service\TenantExporter $exporter): Response
+    public function tenantExport(Tenant $tenant, \App\Service\TenantExporter $exporter, \Psr\Log\LoggerInterface $logger): Response
     {
+        $logger->info('[SuperAdminController] Ação de exportação iniciada para o tenant.', [
+            'tenant_id' => $tenant->getId(),
+            'domain' => $tenant->getDomain()
+        ]);
         try {
             $zipPath = $exporter->export($tenant);
             $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($zipPath);
@@ -384,18 +388,30 @@ class SuperAdminController extends AbstractController
             $response->deleteFileAfterSend(true);
             return $response;
         } catch (\Exception $e) {
+            $logger->error('[SuperAdminController] Falha ao exportar tenant.', [
+                'tenant_id' => $tenant->getId(),
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             $this->addFlash('error', 'Erro ao exportar tenant: ' . $e->getMessage());
             return $this->redirectToRoute('superadmin_dash');
         }
     }
 
     #[Route('/tenant/import', name: 'tenant_import', methods: ['GET', 'POST'])]
-    public function tenantImport(Request $request, \App\Service\TenantImporter $importer): Response
+    public function tenantImport(Request $request, \App\Service\TenantImporter $importer, \Psr\Log\LoggerInterface $logger): Response
     {
         // 1. Check if this is the final resolution submit
         if ($request->isMethod('POST') && $request->request->has('zipPath')) {
             $zipPath = (string) $request->request->get('zipPath');
+            $logger->info('[SuperAdminController] Submissão de resolução de conflito de importação.', [
+                'zip_path' => $zipPath
+            ]);
+
             if (!file_exists($zipPath)) {
+                $logger->error('[SuperAdminController] Arquivo temporário de importação não encontrado para resolução.', [
+                    'zip_path' => $zipPath
+                ]);
                 $this->addFlash('error', 'Arquivo temporário de importação não encontrado. Por favor, faça o upload novamente.');
                 return $this->redirectToRoute('superadmin_tenant_import');
             }
@@ -419,6 +435,12 @@ class SuperAdminController extends AbstractController
                     ];
                 }
 
+                $logger->info('[SuperAdminController] Rodando importador com resoluções configuradas.', [
+                    'domain_res' => $resolutions['domain'],
+                    'name_res' => $resolutions['tenant_name'],
+                    'users_res_count' => count($resolutions['users'])
+                ]);
+
                 $importer->import($metadata, $resolutions, $zipPath);
                 
                 // Clean up ZIP upload
@@ -427,6 +449,11 @@ class SuperAdminController extends AbstractController
                 $this->addFlash('success', 'Tenant importado com sucesso!');
                 return $this->redirectToRoute('superadmin_dash');
             } catch (\Exception $e) {
+                $logger->error('[SuperAdminController] Falha na execução da importação final.', [
+                    'zip_path' => $zipPath,
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
                 $this->addFlash('error', 'Falha ao importar tenant: ' . $e->getMessage());
                 return $this->render('superadmin/tenant/import.html.twig', [
                     'metadata' => $metadata ?? null,
@@ -441,7 +468,16 @@ class SuperAdminController extends AbstractController
         if ($request->isMethod('POST') && $request->files->has('zipFile')) {
             /** @var UploadedFile $file */
             $file = $request->files->get('zipFile');
+            $logger->info('[SuperAdminController] Novo upload de arquivo ZIP para importação de tenant recebido.', [
+                'client_original_name' => $file?->getClientOriginalName(),
+                'client_size' => $file?->getSize(),
+                'is_valid' => $file?->isValid()
+            ]);
+
             if (!$file || !$file->isValid()) {
+                $logger->error('[SuperAdminController] Erro no upload: Arquivo inválido ou não enviado.', [
+                    'error_code' => $file?->getError()
+                ]);
                 $this->addFlash('error', 'Arquivo inválido ou não enviado.');
                 return $this->redirectToRoute('superadmin_tenant_import');
             }
@@ -455,10 +491,15 @@ class SuperAdminController extends AbstractController
                 $tempZipPath = $tempUploadDir . '/upload_' . uniqid() . '.zip';
                 $file->move($tempUploadDir, basename($tempZipPath));
 
+                $logger->info('[SuperAdminController] Arquivo ZIP movido para pasta temporária de upload.', [
+                    'temp_zip_path' => $tempZipPath
+                ]);
+
                 $analysis = $importer->analyze($tempZipPath);
 
                 // If no conflicts are present, import immediately!
                 if (!$analysis['has_conflicts']) {
+                    $logger->info('[SuperAdminController] Nenhum conflito relacional ou de domínio detectado. Executando importação imediata.');
                     $importer->import($analysis['metadata'], [], $tempZipPath);
                     @unlink($tempZipPath);
                     $this->addFlash('success', 'Tenant importado com sucesso!');
@@ -466,6 +507,10 @@ class SuperAdminController extends AbstractController
                 }
 
                 // If there are conflicts, render the wizard
+                $logger->info('[SuperAdminController] Conflitos detectados. Renderizando assistente de resolução para o SuperAdmin.', [
+                    'conflicts' => $analysis['conflicts']
+                ]);
+
                 return $this->render('superadmin/tenant/import.html.twig', [
                     'metadata' => $analysis['metadata'],
                     'conflicts' => $analysis['conflicts'],
@@ -473,6 +518,10 @@ class SuperAdminController extends AbstractController
                     'has_conflicts' => true,
                 ]);
             } catch (\Exception $e) {
+                $logger->error('[SuperAdminController] Erro inesperado ao analisar pacote ZIP.', [
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
                 $this->addFlash('error', 'Erro ao analisar pacote: ' . $e->getMessage());
                 return $this->redirectToRoute('superadmin_tenant_import');
             }

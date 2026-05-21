@@ -23,11 +23,18 @@ class TenantExporter
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private string $projectDir
+        private string $projectDir,
+        private \Psr\Log\LoggerInterface $logger
     ) {}
 
     public function export(Tenant $tenant): string
     {
+        $this->logger->info('[TenantExporter] Iniciando processo de exportação do Tenant.', [
+            'tenant_id' => $tenant->getId(),
+            'domain' => $tenant->getDomain(),
+            'name' => $tenant->getName()
+        ]);
+
         // 1. Create a safe temporary directory in the workspace
         $tempDir = $this->projectDir . '/var/tmp/export_' . uniqid('', true);
         $filesystem = new Filesystem();
@@ -35,12 +42,17 @@ class TenantExporter
 
         $zipPath = $tempDir . '/tenant_export_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $tenant->getDomain()) . '_' . date('Ymd_His') . '.zip';
 
+        $this->logger->info('[TenantExporter] Criando arquivo ZIP temporário.', ['zip_path' => $zipPath]);
+
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            $this->logger->error('[TenantExporter] Falha catastrófica ao criar o arquivo ZIP temporário.', ['zip_path' => $zipPath]);
             throw new \RuntimeException('Não foi possível criar o arquivo ZIP temporário.');
         }
 
         // 2. Gather database metadata
+        $this->logger->info('[TenantExporter] Serializando tabelas e metadados relacianais...');
+        
         $data = [
             'system' => [
                 'platform_version' => '2026.1',
@@ -57,13 +69,36 @@ class TenantExporter
             'contact_form_fields' => $this->serializeContactFormFields($tenant),
         ];
 
+        $this->logger->info('[TenantExporter] Metadados serializados com sucesso.', [
+            'users_count' => count($data['users']),
+            'categories_count' => count($data['categories']),
+            'pages_count' => count($data['pages']),
+            'sections_count' => count($data['sections']),
+            'blocks_count' => count($data['blocks']),
+            'hero_banners_count' => count($data['hero_banners']),
+            'research_lines_count' => count($data['research_lines']),
+            'contact_form_fields_count' => count($data['contact_form_fields']),
+        ]);
+
         // 3. Write metadata.json to zip
-        $zip->addFromString('metadata.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $metadataJson = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $zip->addFromString('metadata.json', $metadataJson);
+        $this->logger->info('[TenantExporter] metadata.json adicionado ao pacote ZIP.', [
+            'json_bytes' => strlen($metadataJson)
+        ]);
 
         // 4. Collect and add media files to zip
+        $this->logger->info('[TenantExporter] Escaneando e empacotando arquivos físicos de mídia...');
         $this->collectMediaFiles($tenant, $data, $zip);
 
         $zip->close();
+
+        $zipSize = file_exists($zipPath) ? filesize($zipPath) : 0;
+        $this->logger->info('[TenantExporter] Exportação finalizada com sucesso.', [
+            'zip_path' => $zipPath,
+            'zip_size_bytes' => $zipSize,
+            'zip_size_readable' => number_format($zipSize / 1024 / 1024, 2) . ' MB'
+        ]);
 
         return $zipPath;
     }
@@ -413,6 +448,17 @@ class TenantExporter
         $sourcePath = sprintf('%s/public/uploads/%s/%s', $this->projectDir, $this->getMappingPath($mapping), $filename);
         if (file_exists($sourcePath) && is_file($sourcePath)) {
             $zip->addFile($sourcePath, sprintf('media/%s/%s', $mapping, $filename));
+            $this->logger->debug('[TenantExporter] Arquivo de mídia adicionado ao ZIP.', [
+                'mapping' => $mapping,
+                'filename' => $filename,
+                'source_path' => $sourcePath
+            ]);
+        } else {
+            $this->logger->warning('[TenantExporter] ALERTA: Arquivo de mídia referenciado no banco de dados não existe no disco.', [
+                'mapping' => $mapping,
+                'filename' => $filename,
+                'expected_path' => $sourcePath
+            ]);
         }
     }
 
