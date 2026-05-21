@@ -12,7 +12,7 @@
             <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="flex flex-col sm:flex-row gap-4 w-full {{ not has_blurbs ? 'max-w-xl justify-center' : '' }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
                 <input type="email" name="email" placeholder="Seu melhor e-mail" required class="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-orange focus:border-transparent text-white placeholder-gray-400 shadow-inner">
-                <button type="submit" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-xl uppercase tracking-wider text-sm flex-shrink-0">Inscrever-se</button>
+                <button type="submit" class="bg-cetec-orange hover:brightness-90 text-white px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-xl uppercase tracking-wider text-sm flex-shrink-0">Inscrever-se</button>
             </form>
         </div>
         
