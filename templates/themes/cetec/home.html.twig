@@ -29,7 +29,7 @@
                             <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
                             <div class="container mx-auto px-4 relative z-20 text-left">
                                 <div class="max-w-3xl text-left mt-8 md:mt-0">
-                                    <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md animate-pulse">Líder em Ensino Técnico</span>
+                                    <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md animate-pulse">Líder em Ensino Técnico</span>
                                     
                                     <h2 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight">
                                         {{ b.title|raw }}
@@ -43,15 +43,15 @@
                                     
                                     <div class="flex flex-col sm:flex-row flex-wrap gap-4">
                                         {% if b.ctaText and b.ctaLink %}
-                                            <a href="{{ b.ctaLink }}" class="bg-cetec-orange hover:brightness-90 text-white px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">{{ b.ctaText }}</a>
+                                            <a href="{{ b.ctaLink }}" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">{{ b.ctaText }}</a>
                                         {% else %}
-                                            <a href="#cursos" class="bg-cetec-orange hover:brightness-90 text-white px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Conheça os Cursos</a>
+                                            <a href="#cursos" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Conheça os Cursos</a>
                                         {% endif %}
                                         
                                         <a href="#contato" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Fale Conosco</a>
                                     </div>
                                 </div>
-                            </div>
+                             </div>
                         </div>
                     {% endfor %}
                 {% else %}
@@ -61,11 +61,11 @@
                         <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
                         <div class="container mx-auto px-4 relative z-20">
                             <div class="max-w-3xl text-left" data-aos="fade-right">
-                                <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">Líder em Ensino Técnico</span>
-                                <h1 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight">Prepare-se para as Carreiras do <span class="text-cetec-orange italic">Futuro</span></h1>
+                                <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">Líder em Ensino Técnico</span>
+                                <h1 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight">Prepare-se para as Carreiras do <span class="text-cetec-secondary italic">Futuro</span></h1>
                                 <p class="text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl">O CETEC oferece os melhores cursos técnicos, focados em alta empregabilidade e intensa prática profissional.</p>
                                 <div class="flex flex-col sm:flex-row flex-wrap gap-4">
-                                    <a href="#cursos" class="bg-cetec-orange hover:brightness-90 text-white px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Ver Nossos Cursos</a>
+                                    <a href="#cursos" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Ver Nossos Cursos</a>
                                     <a href="#contato" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Fale Conosco</a>
                                 </div>
                             </div>
@@ -83,22 +83,22 @@
     <!-- Blurbs / Diferenciais -->
     <section class="py-12 bg-transparent relative z-20 -mt-12 md:-mt-20 max-w-6xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/50 transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                <div class="w-14 h-14 bg-cetec-orange/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-orange mb-4 group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="100">
+                <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                     <i class="bi bi-clock-history"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">20+ Anos de Tradição</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Somos referência regional em ensino técnico profissionalizante com qualidade comprovada.</p>
             </div>
-            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/50 transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                <div class="w-14 h-14 bg-cetec-orange/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-orange mb-4 group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                     <i class="bi bi-award"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">Autorizado pelo MEC</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Cursos totalmente credenciados e reconhecidos pelos conselhos profissionais nacionais.</p>
             </div>
-            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/50 transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                <div class="w-14 h-14 bg-cetec-orange/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-orange mb-4 group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+            <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="300">
+                <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                     <i class="bi bi-geo-alt"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">Unidades Regionais</h3>
@@ -125,16 +125,16 @@
     <section id="cursos" class="py-20 bg-gray-50 dark:bg-cetec-dark/50">
         <div class="container mx-auto px-4">
             <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Qual o curso ideal para <span class="text-cetec-orange italic">você?</span></h2>
-                <div class="w-24 h-1 bg-cetec-orange mx-auto mb-6 rounded-full"></div>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4 text-cetec-primary">Qual o curso ideal para <span class="text-cetec-secondary italic">você?</span></h2>
+                <div class="w-24 h-1 bg-cetec-secondary mx-auto mb-6 rounded-full"></div>
                 <p class="text-base md:text-lg text-gray-500 dark:text-gray-400">Selecione uma das nossas principais áreas de formação abaixo para iniciar a sua jornada rumo ao mercado de trabalho.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for cat in active_categories %}
-                <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="bg-white dark:bg-cetec-dark rounded-2xl p-8 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-white/5 flex flex-col group" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="bg-white dark:bg-cetec-dark rounded-2xl p-8 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-white/5 hover:border-cetec-secondary/50 flex flex-col group" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-14 h-14 bg-cetec-orange/10 rounded-xl flex items-center justify-center text-3xl text-cetec-orange group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+                        <div class="w-14 h-14 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-3xl text-cetec-secondary group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                             {% if cat.icon %}
                                 <i class="{{ cat.icon }}"></i>
                             {% else %}
@@ -142,7 +142,7 @@
                             {% endif %}
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold group-hover:text-cetec-orange transition-colors">{{ cat.name }}</h3>
+                            <h3 class="text-xl font-bold group-hover:text-cetec-secondary transition-colors">{{ cat.name }}</h3>
                             {% if cat.preTitle %}
                                 <span class="text-xs uppercase font-semibold text-gray-400">{{ cat.preTitle }}</span>
                             {% endif %}
@@ -151,7 +151,7 @@
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 flex-1 line-clamp-3">
                         {{ cat.description ?? 'Explore nossas opções de cursos profissionalizantes de alta performance nesta categoria.' }}
                     </p>
-                    <span class="flex items-center gap-2 text-cetec-orange font-bold text-sm group-hover:gap-4 transition-all">
+                    <span class="flex items-center gap-2 text-cetec-secondary font-bold text-sm group-hover:gap-4 transition-all">
                         Ver cursos e detalhes <i class="bi bi-arrow-right"></i>
                     </span>
                 </a>
@@ -168,8 +168,8 @@
             <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
                 <!-- Imagem (Lado Esquerdo) -->
                 <div class="lg:w-1/2 relative" data-aos="fade-right">
-                    <div class="absolute -top-6 -left-6 w-32 h-32 bg-cetec-orange/10 rounded-full blur-3xl"></div>
-                    <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-6 -left-6 w-32 h-32 bg-cetec-secondary/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
                     <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-cetec-dark bg-gray-50">
                         {% if currentTenant.aboutImage %}
                             <img src="{{ asset('uploads/tenant/about/' ~ currentTenant.aboutImage) }}" alt="Sobre o {{ currentTenant.name }}" class="w-full h-auto object-cover max-h-[480px]">
@@ -180,7 +180,7 @@
                         {% endif %}
                     </div>
                     <!-- Badge Flutuante -->
-                    <div class="absolute -bottom-4 -left-4 bg-cetec-orange text-white p-6 rounded-xl shadow-2xl z-20 hidden md:block" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="absolute -bottom-4 -left-4 bg-cetec-secondary text-cetec-dark p-6 rounded-xl shadow-2xl z-20 hidden md:block" data-aos="zoom-in" data-aos-delay="400">
                         <span class="text-3xl font-bold block mb-0.5">20+</span>
                         <span class="text-xs uppercase font-bold tracking-widest">Anos no Mercado</span>
                     </div>
@@ -188,9 +188,9 @@
 
                 <!-- Texto (Lado Direito) -->
                 <div class="lg:w-1/2" data-aos="fade-left">
-                    <span class="text-cetec-orange font-bold uppercase tracking-widest text-sm mb-2 block">Institucional</span>
-                    <h2 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-                        Excelência em <span class="text-cetec-orange">Educação</span> Técnica e Profissional
+                    <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Institucional</span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight text-cetec-primary">
+                        Excelência em <span class="text-cetec-secondary">Educação</span> Técnica e Profissional
                     </h2>
                     
                     <div class="text-gray-600 dark:text-gray-300 mb-8 space-y-4 text-base md:text-lg">
@@ -199,16 +199,16 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-orange text-xl"></i> Formação focada no mercado
+                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Formação focada no mercado
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-orange text-xl"></i> Laboratórios altamente equipados
+                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Laboratórios altamente equipados
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-orange text-xl"></i> Professores atuantes e experientes
+                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Professores atuantes e experientes
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-orange text-xl"></i> Diploma com validade nacional
+                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Diploma com validade nacional
                         </div>
                     </div>
                 </div>
@@ -222,35 +222,35 @@
         <div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16" data-aos="fade-up">
-                <span class="text-cetec-orange font-bold uppercase tracking-widest text-sm mb-2 block">Diferenciais</span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">3 Pilares de Nossa <span class="text-cetec-orange">Excelência</span></h2>
+                <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Diferenciais</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4 text-cetec-primary">3 Pilares de Nossa <span class="text-cetec-secondary">Excelência</span></h2>
                 <p class="text-gray-400 max-w-xl mx-auto">Entenda por que somos a instituição de ensino técnico mais recomendada do interior paulista.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Motivo 1 -->
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="100">
-                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-orange/10 transition-all pointer-events-none">1</div>
-                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-orange/30 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-orange text-4xl mb-4"><i class="bi bi-people-fill"></i></div>
+                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">1</div>
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
+                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-people-fill"></i></div>
                         <h3 class="text-xl font-bold mb-3">Docentes Altamente Qualificados</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Nossos professores não apenas ministram aulas teóricas, mas trazem a vivência de mercado de grandes hospitais e indústrias parceiras."</p>
                     </div>
                 </div>
                 <!-- Motivo 2 -->
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="200">
-                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-orange/10 transition-all pointer-events-none">2</div>
-                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-orange/30 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-orange text-4xl mb-4"><i class="bi bi-briefcase-fill"></i></div>
+                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">2</div>
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
+                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-briefcase-fill"></i></div>
                         <h3 class="text-xl font-bold mb-3">Grade Focada em Empregabilidade</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Nossos currículos são atualizados continuamente de acordo com o que os contratantes buscam, garantindo uma rápida inserção no mercado."</p>
                     </div>
                 </div>
                 <!-- Motivo 3 -->
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="300">
-                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-orange/10 transition-all pointer-events-none">3</div>
-                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-orange/30 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-orange text-4xl mb-4"><i class="bi bi-building-fill-gear"></i></div>
+                    <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">3</div>
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
+                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-building-fill-gear"></i></div>
                         <h3 class="text-xl font-bold mb-3">Estrutura Prática Completa</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Laboratórios modernos com simuladores reais, que trazem segurança total ao estudante no momento de exercer o estágio profissionalizante."</p>
                     </div>
@@ -265,14 +265,14 @@
             <div class="flex flex-col lg:flex-row gap-12 lg:gap-16">
                 <!-- Informações de Contato -->
                 <div class="lg:w-2/5" data-aos="fade-right">
-                    <span class="text-cetec-orange font-bold uppercase tracking-widest text-sm mb-2 block">Contato</span>
-                    <h2 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">Vamos construir seu <span class="text-cetec-orange underline decoration-cetec-orange/30">futuro</span> juntos?</h2>
+                    <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Contato</span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight text-cetec-primary">Vamos construir seu <span class="text-cetec-secondary underline decoration-cetec-secondary/30">futuro</span> juntos?</h2>
                     <p class="text-gray-500 dark:text-gray-400 text-sm md:text-base mb-8">Nossa equipe de consultores de carreira está à disposição para sanar suas dúvidas e orientar sua escolha de curso.</p>
                     
                     <div class="space-y-6">
                         {% if currentTenant and currentTenant.phone %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
-                            <div class="w-12 h-12 bg-cetec-orange/10 rounded-xl flex items-center justify-center text-cetec-orange text-xl group-hover:bg-cetec-orange group-hover:text-white transition-all shadow-sm">
+                            <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
                                 <i class="bi bi-telephone"></i>
                             </div>
                             <div>
@@ -289,26 +289,26 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">WhatsApp</h3>
-                                <a href="{{ currentTenant.whatsappLink }}" target="_blank" rel="noopener" class="text-gray-700 dark:text-gray-200 font-bold text-base hover:text-cetec-orange transition-colors">Enviar Mensagem</a>
+                                <a href="{{ currentTenant.whatsappLink }}" target="_blank" rel="noopener" class="text-gray-700 dark:text-gray-200 font-bold text-base hover:text-cetec-secondary transition-colors">Enviar Mensagem</a>
                             </div>
                         </div>
                         {% endif %}
                         
                         {% if currentTenant and currentTenant.contactEmail %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
-                            <div class="w-12 h-12 bg-cetec-orange/10 rounded-xl flex items-center justify-center text-cetec-orange text-xl group-hover:bg-cetec-orange group-hover:text-white transition-all shadow-sm">
+                            <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
                                 <i class="bi bi-envelope"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">E-mail</h3>
-                                <a href="mailto:{{ currentTenant.contactEmail }}" class="text-gray-700 dark:text-gray-200 font-bold text-base hover:text-cetec-orange transition-colors">{{ currentTenant.contactEmail }}</a>
+                                <a href="mailto:{{ currentTenant.contactEmail }}" class="text-gray-700 dark:text-gray-200 font-bold text-base hover:text-cetec-secondary transition-colors">{{ currentTenant.contactEmail }}</a>
                             </div>
                         </div>
                         {% endif %}
-
+ 
                         {% if currentTenant and currentTenant.address %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
-                            <div class="w-12 h-12 bg-cetec-orange/10 rounded-xl flex items-center justify-center text-cetec-orange text-xl group-hover:bg-cetec-orange group-hover:text-white transition-all shadow-sm">
+                            <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
                                 <i class="bi bi-geo-alt"></i>
                             </div>
                             <div>
@@ -319,7 +319,7 @@
                         {% endif %}
                     </div>
                 </div>
-
+ 
                 <!-- Formulário de Contato -->
                 <div class="lg:w-3/5" data-aos="fade-left">
                     <div class="bg-gray-50 dark:bg-cetec-dark/40 p-8 md:p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-white/5 relative">
@@ -328,18 +328,18 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-xs font-bold text-cetec-dark dark:text-gray-300 uppercase mb-2 ml-1">Nome Completo</label>
-                                    <input type="text" name="name" required placeholder="Digite seu nome" class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-orange focus:border-transparent transition-all shadow-sm dark:text-white">
+                                    <input type="text" name="name" required placeholder="Digite seu nome" class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-secondary focus:border-transparent transition-all shadow-sm dark:text-white">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-cetec-dark dark:text-gray-300 uppercase mb-2 ml-1">Seu melhor e-mail</label>
-                                    <input type="email" name="email" required placeholder="exemplo@email.com" class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-orange focus:border-transparent transition-all shadow-sm dark:text-white">
+                                    <input type="email" name="email" required placeholder="exemplo@email.com" class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-secondary focus:border-transparent transition-all shadow-sm dark:text-white">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-cetec-dark dark:text-gray-300 uppercase mb-2 ml-1">Como podemos te ajudar?</label>
-                                <textarea name="message" required rows="5" placeholder="Escreva sua dúvida ou mensagem..." class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-orange focus:border-transparent transition-all shadow-sm dark:text-white"></textarea>
+                                <textarea name="message" required rows="5" placeholder="Escreva sua dúvida ou mensagem..." class="w-full px-5 py-3.5 rounded-xl bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-secondary focus:border-transparent transition-all shadow-sm dark:text-white"></textarea>
                             </div>
-                            <button type="submit" class="w-full bg-cetec-orange text-white py-4.5 rounded-xl font-black text-lg shadow-xl hover:brightness-90 hover:-translate-y-0.5 transition-all uppercase tracking-widest">Enviar Mensagem</button>
+                            <button type="submit" class="w-full bg-cetec-secondary text-cetec-dark py-4.5 rounded-xl font-black text-lg shadow-xl hover:brightness-90 hover:-translate-y-0.5 transition-all uppercase tracking-widest">Enviar Mensagem</button>
                         </form>
                     </div>
                 </div>

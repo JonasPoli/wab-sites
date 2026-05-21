@@ -12,18 +12,18 @@
 
 {# ── Category Hero ── #}
 <div class="cetec-page-hero py-12 md:py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5 text-center relative overflow-hidden">
-    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
     
     <div class="container mx-auto px-4 relative z-10">
         {% if category.parent %}
-            <a href="{{ path('pub_category', {slug: category.parent.slug}) }}" class="inline-block bg-cetec-orange/10 text-cetec-orange px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 hover:bg-cetec-orange/20 transition-all">
+            <a href="{{ path('pub_category', {slug: category.parent.slug}) }}" class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 hover:bg-cetec-secondary/40 transition-all">
                 <i class="bi bi-chevron-left"></i> {{ category.parent.name }}
             </a>
         {% endif %}
         
         {% if category.icon %}
-            <div class="text-cetec-orange text-4xl mb-3">
+            <div class="text-cetec-secondary text-4xl mb-3">
                 <i class="{{ category.icon }}"></i>
             </div>
         {% endif %}
@@ -44,19 +44,19 @@
 {% if category.children is defined and category.children|length > 0 %}
 <section class="py-16 bg-white dark:bg-cetec-dark border-b border-gray-100 dark:border-white/5">
     <div class="container mx-auto px-4">
-        <h2 class="text-2xl md:text-3xl font-extrabold mb-8 text-cetec-dark dark:text-white border-l-4 border-cetec-orange pl-3">Subcategorias</h2>
+        <h2 class="text-2xl md:text-3xl font-extrabold mb-8 text-cetec-primary border-l-4 border-cetec-secondary pl-3">Subcategorias</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for sub in category.children %}
-            <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="bg-gray-50 dark:bg-cetec-dark/50 p-6 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md hover:border-cetec-orange/30 transition-all transform hover:-translate-y-1 group">
+            <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="bg-gray-50 dark:bg-cetec-dark/50 p-6 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md hover:border-cetec-secondary/50 transition-all transform hover:-translate-y-1 group">
                 <div class="flex items-center gap-4 mb-3">
-                    <div class="w-12 h-12 bg-cetec-orange/10 rounded-xl flex items-center justify-center text-cetec-orange text-2xl group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+                    <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-2xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                         {% if sub.icon %}
                             <i class="{{ sub.icon }}"></i>
                         {% else %}
                             <i class="bi bi-tag-fill"></i>
                         {% endif %}
                     </div>
-                    <h3 class="text-lg font-bold group-hover:text-cetec-orange transition-colors">{{ sub.name }}</h3>
+                    <h3 class="text-lg font-bold group-hover:text-cetec-secondary transition-colors">{{ sub.name }}</h3>
                 </div>
                 {% if sub.description %}
                     <p class="text-gray-500 dark:text-gray-400 text-xs line-clamp-2">{{ sub.description }}</p>
@@ -73,7 +73,7 @@
 <section class="py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5">
     <div class="container mx-auto px-4">
         {% if not (category.children is defined and category.children|length > 0) %}
-            <h2 class="text-2xl md:text-3xl font-extrabold mb-8 text-cetec-dark dark:text-white border-l-4 border-cetec-orange pl-3">Cursos e Páginas</h2>
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-8 text-cetec-primary border-l-4 border-cetec-secondary pl-3">Cursos e Páginas</h2>
         {% endif %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for page in category.pages %}
@@ -84,18 +84,18 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                     </div>
                 {% else %}
-                    <div class="h-48 bg-cetec-orange/5 dark:bg-cetec-dark/80 flex items-center justify-center text-5xl text-cetec-orange/40">
+                    <div class="h-48 bg-cetec-secondary/5 dark:bg-cetec-dark/80 flex items-center justify-center text-5xl text-cetec-secondary/40">
                         <i class="bi bi-file-earmark-text"></i>
                     </div>
                 {% endif %}
                 <div class="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                        <h3 class="text-xl font-bold mb-3 group-hover:text-cetec-orange transition-colors">{{ page.title }}</h3>
+                        <h3 class="text-xl font-bold mb-3 group-hover:text-cetec-secondary transition-colors">{{ page.title }}</h3>
                         {% if page.seoDescription %}
                             <p class="text-gray-500 dark:text-gray-400 text-xs line-clamp-3 mb-6">{{ page.seoDescription }}</p>
                         {% endif %}
                     </div>
-                    <span class="text-cetec-orange font-bold text-sm flex items-center gap-2 mt-auto">
+                    <span class="text-cetec-secondary font-bold text-sm flex items-center gap-2 mt-auto">
                         Saiba mais <i class="bi bi-arrow-right"></i>
                     </span>
                 </div>
@@ -155,7 +155,7 @@
                         <span class="bg-cetec-dark text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart1 }}</span>
                     {% endif %}
                     {% if section.titlePart2 %}
-                        <span class="bg-cetec-orange text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
+                        <span class="bg-cetec-secondary text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
                     {% endif %}
                 </div>
             {% endif %}

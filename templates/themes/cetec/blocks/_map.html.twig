@@ -1,9 +1,9 @@
 {% if block.embedUrl %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-10">
-        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     

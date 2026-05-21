@@ -1,18 +1,18 @@
 {% set has_blurbs = (block.config.blurb1_title ?? null) or (block.config.blurb2_title ?? null) %}
 <div class="wab-block my-16 bg-cetec-dark text-white rounded-3xl p-8 md:p-12 relative overflow-hidden border border-white/10 shadow-2xl" data-aos="fade-up">
-    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-orange/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-12 -right-12 w-64 h-64 bg-cetec-orange/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-12 -right-12 w-64 h-64 bg-cetec-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
     
     <div class="relative z-10 {{ has_blurbs ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center' : 'max-w-2xl mx-auto text-center' }}">
         <div class="{{ not has_blurbs ? 'flex flex-col items-center' : '' }}">
-            {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-            {% if block.title %}<h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">{{ block.title }}</h2>{% endif %}
+            {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+            {% if block.title %}<h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-cetec-primary">{{ block.title }}</h2>{% endif %}
             {% if block.text %}<p class="text-gray-300 text-sm md:text-base mb-8 leading-relaxed {{ has_blurbs ? 'max-w-lg' : 'max-w-2xl mx-auto' }}">{{ block.text }}</p>{% endif %}
             
             <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="flex flex-col sm:flex-row gap-4 w-full {{ not has_blurbs ? 'max-w-xl justify-center' : '' }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
-                <input type="email" name="email" placeholder="Seu melhor e-mail" required class="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-orange focus:border-transparent text-white placeholder-gray-400 shadow-inner">
-                <button type="submit" class="bg-cetec-orange hover:brightness-90 text-white px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-xl uppercase tracking-wider text-sm flex-shrink-0">Inscrever-se</button>
+                <input type="email" name="email" placeholder="Seu melhor e-mail" required class="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/10 focus:outline-none focus:ring-2 focus:ring-cetec-secondary focus:border-transparent text-white placeholder-gray-400 shadow-inner">
+                <button type="submit" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-xl uppercase tracking-wider text-sm flex-shrink-0">Inscrever-se</button>
             </form>
         </div>
         
@@ -25,12 +25,12 @@
             {% for b in blorbs %}{% if b.title %}
             <div class="flex gap-4 items-start group">
                 {% if b.icon %}
-                <div class="w-12 h-12 bg-cetec-orange/15 rounded-xl flex items-center justify-center text-cetec-orange text-xl flex-shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl flex-shrink-0 shadow-md group-hover:scale-110 transition-transform">
                     <i class="{{ b.icon }}"></i>
                 </div>
                 {% endif %}
                 <div class="text-left">
-                    <h3 class="font-bold text-lg text-white mb-1 group-hover:text-cetec-orange transition-colors">{{ b.title }}</h3>
+                    <h3 class="font-bold text-lg text-white mb-1 group-hover:text-cetec-secondary transition-colors">{{ b.title }}</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">{{ b.text }}</p>
                 </div>
             </div>

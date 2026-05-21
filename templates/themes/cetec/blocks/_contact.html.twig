@@ -3,9 +3,9 @@
     <div class="container mx-auto px-4">
         {# Block Header #}
         <div class="text-center max-w-3xl mx-auto mb-12">
-            {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-            {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-            <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+            {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+            {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+            <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
             {% if block.text %}<div class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text|raw }}</div>{% endif %}
         </div>
 
@@ -22,7 +22,7 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_nome">
                             Nome Completo *
                         </label>
-                        <input type="text" id="contato_publico_nome" name="name" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="Seu nome">
+                        <input type="text" id="contato_publico_nome" name="name" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-secondary transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="Seu nome">
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -30,13 +30,13 @@
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_email">
                                 E-mail *
                             </label>
-                            <input type="email" id="contato_publico_email" name="email" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="seu@email.com">
+                            <input type="email" id="contato_publico_email" name="email" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-secondary transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="seu@email.com">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1" for="contato_publico_telefone">
                                 Telefone / WhatsApp
                             </label>
-                            <input type="tel" id="contato_publico_telefone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="(16) 99999-9999">
+                            <input type="tel" id="contato_publico_telefone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-secondary transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" placeholder="(16) 99999-9999">
                         </div>
                     </div>
                     
@@ -44,10 +44,10 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 required" for="contato_publico_mensagem">
                             Mensagem *
                         </label>
-                        <textarea id="contato_publico_mensagem" name="message" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-orange transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" rows="5" placeholder="Como podemos ajudar?"></textarea>
+                        <textarea id="contato_publico_mensagem" name="message" required="required" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cetec-secondary transition-colors bg-white block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-white" rows="5" placeholder="Como podemos ajudar?"></textarea>
                     </div>
                     
-                    <button type="submit" class="btn-cetec-primary w-full justify-center py-4 text-base bg-cetec-orange hover:bg-cetec-orange-dark text-white font-bold rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
+                    <button type="submit" class="btn-cetec-primary w-full justify-center py-4 text-base bg-cetec-secondary hover:brightness-90 text-cetec-dark font-bold rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
                         <i class="bi bi-send"></i> Enviar Mensagem
                     </button>
                 </form>
@@ -61,8 +61,8 @@
                 <div class="space-y-5 mb-8">
                     {% if tenant.address %}
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
-                            <i class="bi bi-geo-alt-fill text-xl" style="color:#ff7f00"></i>
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-cetec-secondary/15">
+                            <i class="bi bi-geo-alt-fill text-xl text-cetec-secondary"></i>
                         </div>
                         <div>
                             <p class="font-bold text-gray-900 dark:text-white">Endereço</p>
@@ -73,24 +73,24 @@
 
                     {% if tenant.phone %}
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
-                            <i class="bi bi-telephone-fill text-xl" style="color:#ff7f00"></i>
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-cetec-secondary/15">
+                            <i class="bi bi-telephone-fill text-xl text-cetec-secondary"></i>
                         </div>
                         <div>
                             <p class="font-bold text-gray-900 dark:text-white">Telefone</p>
-                            <a href="tel:{{ tenant.phone }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-orange transition-colors text-decoration-none">{{ tenant.phone }}</a>
+                            <a href="tel:{{ tenant.phone }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-secondary transition-colors text-decoration-none">{{ tenant.phone }}</a>
                         </div>
                     </div>
                     {% endif %}
 
                     {% if tenant.contactEmail %}
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(255,127,0,0.1)">
-                            <i class="bi bi-envelope-fill text-xl" style="color:#ff7f00"></i>
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-cetec-secondary/15">
+                            <i class="bi bi-envelope-fill text-xl text-cetec-secondary"></i>
                         </div>
                         <div>
                             <p class="font-bold text-gray-900 dark:text-white">E-mail</p>
-                            <a href="mailto:{{ tenant.contactEmail }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-orange transition-colors text-decoration-none">
+                            <a href="mailto:{{ tenant.contactEmail }}" class="text-gray-500 dark:text-gray-400 text-sm hover:text-cetec-secondary transition-colors text-decoration-none">
                                 {{ tenant.contactEmail }}
                             </a>
                         </div>

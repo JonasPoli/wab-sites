@@ -5,7 +5,7 @@
     
     <!-- Newsletter Bar (Floating) -->
     <div class="container mx-auto px-4 absolute left-0 right-0 top-0 -translate-y-1/2 z-30">
-        <div class="bg-cetec-orange p-8 md:p-10 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8" data-aos="zoom-in" style="background-color: var(--color-secondary);">
+        <div class="bg-cetec-secondary p-8 md:p-10 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8" data-aos="zoom-in" style="background-color: var(--color-secondary);">
             <div class="text-white max-w-lg text-center lg:text-left">
                 <h3 class="text-2xl md:text-3xl font-extrabold mb-2" style="font-family: var(--font-headline);">Fique por dentro das novidades!</h3>
                 <p class="text-white/80 text-sm md:text-base">Assine nossa newsletter e receba informações sobre cursos e eventos.</p>
@@ -63,13 +63,13 @@
         <div data-aos="fade-up" data-aos-delay="100">
             <h4 class="footer-title">Links Rápidos</h4>
             <ul class="space-y-4 text-gray-400 text-sm">
-                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Início</a></li>
+                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Início</a></li>
                 {% if footerPages is defined %}
                     {% for page in footerPages %}
-                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ page.title }}</a></li>
+                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ page.title }}</a></li>
                     {% endfor %}
                 {% endif %}
-                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Contato</a></li>
+                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Contato</a></li>
             </ul>
         </div>
 
@@ -90,7 +90,7 @@
                     {% endfor %}
                     
                     {% for cat in active_footer_categories|slice(0, 5) %}
-                        <li><a href="{{ path('pub_category', {slug: cat.slug}) }}" class="hover:text-cetec-orange transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ cat.name }}</a></li>
+                        <li><a href="{{ path('pub_category', {slug: cat.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ cat.name }}</a></li>
                     {% endfor %}
                 {% endif %}
             </ul>
@@ -102,19 +102,19 @@
             <ul class="space-y-4 text-gray-400 text-sm">
                 {% if currentTenant and currentTenant.address %}
                     <li class="flex gap-3">
-                        <i class="bi bi-geo-alt text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <i class="bi bi-geo-alt text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
                         <span>{{ currentTenant.address }}</span>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.contactEmail %}
                     <li class="flex gap-3">
-                        <i class="bi bi-envelope text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <i class="bi bi-envelope text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
                         <a href="mailto:{{ currentTenant.contactEmail }}" class="hover:underline text-gray-400">{{ currentTenant.contactEmail }}</a>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.phone %}
                     <li class="flex gap-3">
-                        <i class="bi bi-telephone text-cetec-orange text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        <i class="bi bi-telephone text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
                         <a href="tel:{{ currentTenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" class="hover:underline text-gray-400">{{ currentTenant.phone }}</a>
                     </li>
                 {% endif %}

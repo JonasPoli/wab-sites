@@ -3,12 +3,12 @@
 <div class="wab-block flex flex-col {{ pos == 'left' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-16 py-8">
     <div class="flex-1 w-full text-left">
         {% if block.preTitle %}
-            <span class="inline-block bg-cetec-orange/10 text-cetec-orange px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+            <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
                 {{ block.preTitle }}
             </span>
         {% endif %}
         {% if block.title %}
-            <h2 class="text-2xl md:text-4xl font-extrabold mb-4 text-cetec-dark dark:text-white leading-tight">
+            <h2 class="text-2xl md:text-4xl font-extrabold mb-4 text-cetec-primary leading-tight">
                 {{ block.title }}
             </h2>
         {% endif %}
@@ -19,7 +19,7 @@
         {% endif %}
         {% if block.config and (block.config.ctaText ?? null) and (block.config.ctaLink ?? null) %}
             <div class="mt-6">
-                <a href="{{ block.config.ctaLink }}" class="bg-cetec-orange hover:brightness-90 text-white px-6 py-3 rounded-md font-black text-sm shadow-md transition-all inline-block">
+                <a href="{{ block.config.ctaLink }}" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-6 py-3 rounded-md font-black text-sm shadow-md transition-all inline-block">
                     {{ block.config.ctaText }}
                 </a>
             </div>
@@ -27,8 +27,8 @@
     </div>
     {% if block.image %}
     <div class="flex-1 w-full relative">
-        <div class="absolute -top-4 -left-4 w-24 h-24 bg-cetec-orange/5 rounded-full blur-2xl"></div>
-        <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-cetec-orange/5 rounded-full blur-2xl"></div>
+        <div class="absolute -top-4 -left-4 w-24 h-24 bg-cetec-secondary/5 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-cetec-secondary/5 rounded-full blur-2xl"></div>
         <img src="{{ asset('uploads/page_block/' ~ block.image) }}" 
              alt="{{ block.title }}" 
              loading="lazy" 

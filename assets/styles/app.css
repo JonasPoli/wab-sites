@@ -576,11 +576,11 @@
        PUBLIC — Timeline (Linha do Tempo)
        ====================================== */
     .timeline-item {
-        @apply relative pl-10 pb-10 border-l-2 border-cetec-orange;
+        @apply relative pl-10 pb-10 border-l-2 border-cetec-secondary;
     }
     .timeline-item::before {
         content: '';
-        @apply absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-cetec-orange;
+        @apply absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-cetec-secondary;
     }
     .timeline-item:last-child {
         @apply border-l-0;

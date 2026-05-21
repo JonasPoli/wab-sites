@@ -2,9 +2,9 @@
 {% if members|length > 0 %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-12">
-        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
 
@@ -79,13 +79,13 @@
 .cetec-team-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-    border-color: var(--color-primary, #ff7f00);
+    border-color: var(--color-secondary);
 }
 .team-img-wrap {
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: rgba(255, 127, 0, 0.05);
+    background: rgba(var(--color-primary-rgb), 0.05);
     border-bottom: 1px solid var(--border);
 }
 .team-img {
@@ -124,7 +124,7 @@
 .team-role {
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--color-primary, #ff7f00);
+    color: var(--color-primary);
     margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -148,7 +148,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 127, 0, 0.05);
+    background: rgba(var(--color-secondary-rgb), 0.08);
     color: var(--text);
     display: flex;
     align-items: center;
@@ -165,8 +165,8 @@
 .social-link.instagram:hover { background: #e1306c; }
 .social-link.facebook:hover { background: #1877f2; }
 .social-link.whatsapp:hover { background: #25d366; }
-.social-link.phone:hover { background: var(--color-primary, #ff7f00); }
-.social-link.email:hover { background: var(--color-secondary, #333); }
+.social-link.phone:hover { background: var(--color-primary); }
+.social-link.email:hover { background: var(--color-secondary); }
 
 @media(max-width: 1024px) {
     .cetec-team-card {

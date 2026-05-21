@@ -2,9 +2,9 @@
 {% if images|length > 0 %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-10">
-        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
@@ -23,12 +23,12 @@
         </div>
         
         {% if images|length > 1 %}
-        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-orange hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', -1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-orange hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', 1)"><i class="fa-solid fa-chevron-right"></i></button>
         
         <div class="wg-dots flex justify-center gap-2 mt-6">
             {% for img in images %}
-            <span class="wg-dot w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-white/20 cursor-pointer transition-all duration-300 {{ loop.first ? 'active !bg-cetec-orange !w-6' : '' }}" onclick="goSlide('{{ block.id }}', {{ loop.index0 }})"></span>
+            <span class="wg-dot w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-white/20 cursor-pointer transition-all duration-300 {{ loop.first ? 'active !bg-cetec-secondary !w-6' : '' }}" onclick="goSlide('{{ block.id }}', {{ loop.index0 }})"></span>
             {% endfor %}
         </div>
         {% endif %}
@@ -36,7 +36,7 @@
 </div>
 
 <div class="wab-lightbox fixed inset-0 bg-black/95 hidden items-center justify-center z-[9999] cursor-zoom-out" id="lb-{{ block.id }}" onclick="closeLightbox('{{ block.id }}')">
-    <button onclick="closeLightbox('{{ block.id }}')" class="fixed top-6 right-6 bg-transparent border-0 text-white text-4xl cursor-pointer hover:text-cetec-orange transition-colors">&times;</button>
+    <button onclick="closeLightbox('{{ block.id }}')" class="fixed top-6 right-6 bg-transparent border-0 text-white text-4xl cursor-pointer hover:text-cetec-secondary transition-colors">&times;</button>
     <img id="lb-img-{{ block.id }}" src="" class="max-w-[90vw] max-h-[85vh] rounded-2xl border-4 border-white/10 shadow-2xl">
 </div>
 
@@ -57,9 +57,9 @@
         document.querySelectorAll('#gallery-' + id + ' .wg-dot').forEach((d, i) => {
             d.classList.toggle('active', i === g.idx);
             if (i === g.idx) {
-                d.classList.add('!bg-cetec-orange', '!w-6');
+                d.classList.add('!bg-cetec-secondary', '!w-6');
             } else {
-                d.classList.remove('!bg-cetec-orange', '!w-6');
+                d.classList.remove('!bg-cetec-secondary', '!w-6');
             }
         });
     };

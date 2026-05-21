@@ -15,12 +15,12 @@
 {# ── Page Hero ── #}
 {% if page.showTitle ?? true %}
 <div class="cetec-page-hero py-12 md:py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5 text-center relative overflow-hidden">
-    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-orange/5 rounded-full blur-3xl"></div>
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
     
     <div class="container mx-auto px-4 relative z-10">
         {% if page.category %}
-            <span class="inline-block bg-cetec-orange/10 text-cetec-orange px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+            <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
                 {{ page.category.name }}
             </span>
         {% endif %}
@@ -92,7 +92,7 @@
                         <span class="bg-cetec-dark text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart1 }}</span>
                     {% endif %}
                     {% if section.titlePart2 %}
-                        <span class="bg-cetec-orange text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
+                        <span class="bg-cetec-secondary text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
                     {% endif %}
                 </div>
             {% endif %}

@@ -1,9 +1,9 @@
 {% set cat = block.relatedCategory %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-12">
-        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
@@ -11,7 +11,7 @@
     {% if pages|length > 0 %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for page in pages|slice(0, block.itemCount ?? 99) %}
-        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="bg-white dark:bg-cetec-dark border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col group">
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="bg-white dark:bg-cetec-dark border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col group">
             {% if page.coverImage %}
             <div class="h-48 overflow-hidden relative">
                 <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
@@ -23,7 +23,7 @@
             {% endif %}
             <div class="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-lg font-bold text-cetec-dark dark:text-white mb-2 line-clamp-2 group-hover:text-cetec-orange transition-colors">
+                    <h3 class="text-lg font-bold text-cetec-dark dark:text-white mb-2 line-clamp-2 group-hover:text-cetec-secondary transition-colors">
                         {{ page.title }}
                     </h3>
                     {% if page.seoDescription %}
@@ -33,7 +33,7 @@
                     {% endif %}
                 </div>
                 <div class="pt-4 border-t border-gray-100 dark:border-white/5">
-                    <span class="flex items-center gap-1.5 text-cetec-orange hover:brightness-90 text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
+                    <span class="flex items-center gap-1.5 text-cetec-secondary hover:brightness-90 text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
                         Ler mais <i class="bi bi-arrow-right"></i>
                     </span>
                 </div>

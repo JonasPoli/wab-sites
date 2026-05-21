@@ -29,22 +29,22 @@
 {% if block.title or block.text or block.preTitle or has_items %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-12">
-        {% if block.preTitle %}<span class="text-cetec-orange font-bold uppercase tracking-widest text-xs mb-2 block">{{ block.preTitle }}</span>{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3">{{ block.title }}</h2>{% endif %}
-        <div class="w-16 h-1 bg-cetec-orange mx-auto mb-4 rounded-full"></div>
+        {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
     {% if has_items %}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
         {% for it in items_list %}
-        <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-orange/50 transition-all duration-300 transform hover:-translate-y-1">
+        <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1">
             {% if it.icon %}
-            <div class="w-14 h-14 bg-cetec-orange/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-orange mb-4 group-hover:bg-cetec-orange group-hover:text-white transition-all duration-300">
+            <div class="w-14 h-14 bg-cetec-secondary/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                 <i class="{{ it.icon }}"></i>
             </div>
             {% endif %}
-            <h3 class="text-lg font-bold mb-2 text-cetec-dark dark:text-white group-hover:text-cetec-orange transition-colors">{{ it.title }}</h3>
+            <h3 class="text-lg font-bold mb-2 text-cetec-dark dark:text-white group-hover:text-cetec-secondary transition-colors">{{ it.title }}</h3>
             {% if it.text %}<p class="text-gray-500 dark:text-gray-400 text-xs md:text-sm leading-relaxed">{{ it.text }}</p>{% endif %}
         </div>
         {% endfor %}

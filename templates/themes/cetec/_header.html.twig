@@ -133,11 +133,11 @@
                     {% if sectionTitle == '' %}
                         {% set sectionTitle = 'Seção ' ~ loop.index %}
                     {% endif %}
-                    <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors" onclick="toggleMobileMenu()">{{ sectionTitle }}</a>
+                    <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-secondary transition-colors" onclick="toggleMobileMenu()">{{ sectionTitle }}</a>
                 {% endif %}
             {% endfor %}
         {% else %}
-            <a href="{{ path('pub_home') }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">Início</a>
+            <a href="{{ path('pub_home') }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-secondary transition-colors">Início</a>
             
             {% if headerCategories is defined %}
                 {% for cat in headerCategories %}
@@ -159,14 +159,14 @@
                                 </span>
                                 <div class="pl-4 mt-2 flex flex-col gap-2 border-l-2 border-gray-200">
                                     {% for sub in active_children %}
-                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="py-1 hover:text-cetec-orange transition-colors">
+                                    <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="py-1 hover:text-cetec-secondary transition-colors">
                                         {{ sub.name }}
                                     </a>
                                     {% endfor %}
                                 </div>
                             </div>
                         {% else %}
-                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-orange transition-colors">
+                            <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-secondary transition-colors">
                                 {{ cat.name }}
                             </a>
                         {% endif %}
@@ -174,7 +174,7 @@
                 {% endfor %}
             {% endif %}
             
-            <a href="{{ path('pub_home') }}#contato" class="mt-4 bg-cetec-orange text-white text-center font-bold py-3 rounded-md shadow-md hover:brightness-90 transition-colors" onclick="toggleMobileMenu()">
+            <a href="{{ path('pub_home') }}#contato" class="mt-4 bg-cetec-secondary text-cetec-dark text-center font-bold py-3 rounded-md shadow-md hover:brightness-90 transition-colors" onclick="toggleMobileMenu()">
                 Inscreva-se
             </a>
         {% endif %}
