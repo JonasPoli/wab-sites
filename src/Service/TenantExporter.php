@@ -15,6 +15,8 @@ use App\Entity\PageBlockTeamMember;
 use App\Entity\HeroBanner;
 use App\Entity\ResearchLine;
 use App\Entity\ContactFormField;
+use App\Entity\ContactMessage;
+use App\Entity\NewsletterSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZipArchive;
@@ -31,8 +33,8 @@ class TenantExporter
     {
         $this->logger->info('[TenantExporter] Iniciando processo de exportação do Tenant.', [
             'tenant_id' => $tenant->getId(),
-            'domain' => $tenant->getDomain(),
-            'name' => $tenant->getName()
+            'domain'    => $tenant->getDomain(),
+            'name'      => $tenant->getName(),
         ]);
 
         // 1. Create a safe temporary directory in the workspace
@@ -40,7 +42,9 @@ class TenantExporter
         $filesystem = new Filesystem();
         $filesystem->mkdir($tempDir);
 
-        $zipPath = $tempDir . '/tenant_export_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $tenant->getDomain()) . '_' . date('Ymd_His') . '.zip';
+        $zipPath = $tempDir . '/tenant_export_'
+            . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $tenant->getDomain())
+            . '_' . date('Ymd_His') . '.zip';
 
         $this->logger->info('[TenantExporter] Criando arquivo ZIP temporário.', ['zip_path' => $zipPath]);
 
@@ -51,40 +55,44 @@ class TenantExporter
         }
 
         // 2. Gather database metadata
-        $this->logger->info('[TenantExporter] Serializando tabelas e metadados relacianais...');
-        
+        $this->logger->info('[TenantExporter] Serializando tabelas e metadados relacionais...');
+
         $data = [
             'system' => [
-                'platform_version' => '2026.1',
+                'platform_version' => '2026.2',
                 'export_timestamp' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
             ],
-            'tenant' => $this->serializeTenant($tenant),
-            'users' => $this->serializeUsers($tenant),
-            'categories' => $this->serializeCategories($tenant),
-            'pages' => $this->serializePages($tenant),
-            'sections' => $this->serializeSections($tenant),
-            'blocks' => $this->serializeBlocks($tenant),
-            'hero_banners' => $this->serializeHeroBanners($tenant),
-            'research_lines' => $this->serializeResearchLines($tenant),
-            'contact_form_fields' => $this->serializeContactFormFields($tenant),
+            'tenant'               => $this->serializeTenant($tenant),
+            'users'                => $this->serializeUsers($tenant),
+            'categories'           => $this->serializeCategories($tenant),
+            'pages'                => $this->serializePages($tenant),
+            'sections'             => $this->serializeSections($tenant),
+            'blocks'               => $this->serializeBlocks($tenant),
+            'hero_banners'         => $this->serializeHeroBanners($tenant),
+            'research_lines'       => $this->serializeResearchLines($tenant),
+            'contact_form_fields'  => $this->serializeContactFormFields($tenant),
+            'contact_messages'     => $this->serializeContactMessages($tenant),
+            'newsletter_subscribers' => $this->serializeNewsletterSubscribers($tenant),
         ];
 
         $this->logger->info('[TenantExporter] Metadados serializados com sucesso.', [
-            'users_count' => count($data['users']),
-            'categories_count' => count($data['categories']),
-            'pages_count' => count($data['pages']),
-            'sections_count' => count($data['sections']),
-            'blocks_count' => count($data['blocks']),
-            'hero_banners_count' => count($data['hero_banners']),
-            'research_lines_count' => count($data['research_lines']),
-            'contact_form_fields_count' => count($data['contact_form_fields']),
+            'users_count'                  => count($data['users']),
+            'categories_count'             => count($data['categories']),
+            'pages_count'                  => count($data['pages']),
+            'sections_count'               => count($data['sections']),
+            'blocks_count'                 => count($data['blocks']),
+            'hero_banners_count'           => count($data['hero_banners']),
+            'research_lines_count'         => count($data['research_lines']),
+            'contact_form_fields_count'    => count($data['contact_form_fields']),
+            'contact_messages_count'       => count($data['contact_messages']),
+            'newsletter_subscribers_count' => count($data['newsletter_subscribers']),
         ]);
 
         // 3. Write metadata.json to zip
         $metadataJson = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $zip->addFromString('metadata.json', $metadataJson);
         $this->logger->info('[TenantExporter] metadata.json adicionado ao pacote ZIP.', [
-            'json_bytes' => strlen($metadataJson)
+            'json_bytes' => strlen($metadataJson),
         ]);
 
         // 4. Collect and add media files to zip
@@ -95,49 +103,53 @@ class TenantExporter
 
         $zipSize = file_exists($zipPath) ? filesize($zipPath) : 0;
         $this->logger->info('[TenantExporter] Exportação finalizada com sucesso.', [
-            'zip_path' => $zipPath,
-            'zip_size_bytes' => $zipSize,
-            'zip_size_readable' => number_format($zipSize / 1024 / 1024, 2) . ' MB'
+            'zip_path'         => $zipPath,
+            'zip_size_bytes'   => $zipSize,
+            'zip_size_readable' => number_format($zipSize / 1024 / 1024, 2) . ' MB',
         ]);
 
         return $zipPath;
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Serializers
+    // ─────────────────────────────────────────────────────────────
+
     private function serializeTenant(Tenant $t): array
     {
         return [
-            'id' => $t->getId(),
-            'domain' => $t->getDomain(),
-            'name' => $t->getName(),
-            'logo' => $t->getLogo(),
-            'darkLogo' => $t->getDarkLogo(),
-            'primaryColor' => $t->getPrimaryColor(),
-            'secondaryColor' => $t->getSecondaryColor(),
-            'primaryColorDark' => $t->getPrimaryColorDark(),
-            'secondaryColorDark' => $t->getSecondaryColorDark(),
-            'contactEmail' => $t->getContactEmail(),
-            'youtubeLink' => $t->getYoutubeLink(),
-            'instagramLink' => $t->getInstagramLink(),
-            'facebookLink' => $t->getFacebookLink(),
-            'whatsappLink' => $t->getWhatsappLink(),
-            'linkedinLink' => $t->getLinkedinLink(),
-            'aboutText' => $t->getAboutText(),
-            'aboutFullText' => $t->getAboutFullText(),
-            'aboutImage' => $t->getAboutImage(),
-            'address' => $t->getAddress(),
-            'phone' => $t->getPhone(),
-            'mapsEmbedUrl' => $t->getMapsEmbedUrl(),
-            'theme' => $t->getTheme(),
-            'homePageId' => $t->getHomePage()?->getId(),
-            'favicon' => $t->getFavicon(),
-            'seoTitle' => $t->getSeoTitle(),
-            'seoDescription' => $t->getSeoDescription(),
-            'seoKeywords' => $t->getSeoKeywords(),
-            'ogImage' => $t->getOgImage(),
-            'fontSettings' => $t->getFontSettings(),
-            'navigationSettings' => $t->getNavigationSettings(),
-            'showSectionTitles' => $t->isShowSectionTitles(),
-            'landingPageMode' => $t->isLandingPageMode(),
+            'id'                  => $t->getId(),
+            'domain'              => $t->getDomain(),
+            'name'                => $t->getName(),
+            'logo'                => $t->getLogo(),
+            'darkLogo'            => $t->getDarkLogo(),
+            'primaryColor'        => $t->getPrimaryColor(),
+            'secondaryColor'      => $t->getSecondaryColor(),
+            'primaryColorDark'    => $t->getPrimaryColorDark(),
+            'secondaryColorDark'  => $t->getSecondaryColorDark(),
+            'contactEmail'        => $t->getContactEmail(),
+            'youtubeLink'         => $t->getYoutubeLink(),
+            'instagramLink'       => $t->getInstagramLink(),
+            'facebookLink'        => $t->getFacebookLink(),
+            'whatsappLink'        => $t->getWhatsappLink(),
+            'linkedinLink'        => $t->getLinkedinLink(),
+            'aboutText'           => $t->getAboutText(),
+            'aboutFullText'       => $t->getAboutFullText(),
+            'aboutImage'          => $t->getAboutImage(),
+            'address'             => $t->getAddress(),
+            'phone'               => $t->getPhone(),
+            'mapsEmbedUrl'        => $t->getMapsEmbedUrl(),
+            'theme'               => $t->getTheme(),
+            'homePageId'          => $t->getHomePage()?->getId(),
+            'favicon'             => $t->getFavicon(),
+            'seoTitle'            => $t->getSeoTitle(),
+            'seoDescription'      => $t->getSeoDescription(),
+            'seoKeywords'         => $t->getSeoKeywords(),
+            'ogImage'             => $t->getOgImage(),
+            'fontSettings'        => $t->getFontSettings(),
+            'navigationSettings'  => $t->getNavigationSettings(),
+            'showSectionTitles'   => $t->isShowSectionTitles(),
+            'landingPageMode'     => $t->isLandingPageMode(),
         ];
     }
 
@@ -147,12 +159,12 @@ class TenantExporter
         $serialized = [];
         foreach ($users as $u) {
             $serialized[] = [
-                'username' => $u->getUsername(),
-                'name' => $u->getName(),
-                'email' => $u->getEmail(),
+                'username'  => $u->getUsername(),
+                'name'      => $u->getName(),
+                'email'     => $u->getEmail(),
                 'workGroup' => $u->getWorkGroup(),
-                'roles' => $u->getRoles(),
-                'password' => $u->getPassword(),
+                'roles'     => $u->getRoles(),
+                'password'  => $u->getPassword(),
             ];
         }
         return $serialized;
@@ -164,15 +176,15 @@ class TenantExporter
         $serialized = [];
         foreach ($cats as $c) {
             $serialized[] = [
-                'id' => $c->getId(),
-                'parent_id' => $c->getParent()?->getId(),
-                'name' => $c->getName(),
-                'slug' => $c->getSlug(),
-                'preTitle' => $c->getPreTitle(),
-                'description' => $c->getDescription(),
+                'id'           => $c->getId(),
+                'parent_id'    => $c->getParent()?->getId(),
+                'name'         => $c->getName(),
+                'slug'         => $c->getSlug(),
+                'preTitle'     => $c->getPreTitle(),
+                'description'  => $c->getDescription(),
                 'showInHeader' => $c->isShowInHeader(),
                 'showInFooter' => $c->isShowInFooter(),
-                'icon' => $c->getIcon(),
+                'icon'         => $c->getIcon(),
             ];
         }
         return $serialized;
@@ -184,17 +196,17 @@ class TenantExporter
         $serialized = [];
         foreach ($pages as $p) {
             $serialized[] = [
-                'id' => $p->getId(),
-                'title' => $p->getTitle(),
-                'slug' => $p->getSlug(),
-                'showInHeader' => $p->isShowInHeader(),
-                'showInFooter' => $p->isShowInFooter(),
-                'seoTitle' => $p->getSeoTitle(),
+                'id'             => $p->getId(),
+                'title'          => $p->getTitle(),
+                'slug'           => $p->getSlug(),
+                'showInHeader'   => $p->isShowInHeader(),
+                'showInFooter'   => $p->isShowInFooter(),
+                'seoTitle'       => $p->getSeoTitle(),
                 'seoDescription' => $p->getSeoDescription(),
-                'coverImage' => $p->getCoverImage(),
-                'position' => $p->getPosition(),
-                'category_id' => $p->getCategory()?->getId(),
-                'showTitle' => $p->isShowTitle(),
+                'coverImage'     => $p->getCoverImage(),
+                'position'       => $p->getPosition(),
+                'category_id'    => $p->getCategory()?->getId(),
+                'showTitle'      => $p->isShowTitle(),
             ];
         }
         return $serialized;
@@ -216,20 +228,20 @@ class TenantExporter
         foreach ($sections as $s) {
             /** @var PageSection $s */
             $serialized[] = [
-                'id' => $s->getId(),
-                'page_id' => $s->getPage()?->getId(),
-                'category_id' => $s->getCategory()?->getId(),
-                'titlePart1' => $s->getTitlePart1(),
-                'titlePart2' => $s->getTitlePart2(),
-                'position' => $s->getPosition(),
-                'active' => $s->isActive(),
-                'bgType' => $s->getBgType(),
-                'bgColor' => $s->getBgColor(),
-                'bgGradient' => $s->getBgGradient(),
-                'bgImage' => $s->getBgImage(),
-                'bgImageOpacity' => $s->getBgImageOpacity(),
-                'bgImagePosition' => $s->getBgImagePosition(),
-                'bgVideo' => $s->getBgVideo(),
+                'id'               => $s->getId(),
+                'page_id'          => $s->getPage()?->getId(),
+                'category_id'      => $s->getCategory()?->getId(),
+                'titlePart1'       => $s->getTitlePart1(),
+                'titlePart2'       => $s->getTitlePart2(),
+                'position'         => $s->getPosition(),
+                'active'           => $s->isActive(),
+                'bgType'           => $s->getBgType(),
+                'bgColor'          => $s->getBgColor(),
+                'bgGradient'       => $s->getBgGradient(),
+                'bgImage'          => $s->getBgImage(),
+                'bgImageOpacity'   => $s->getBgImageOpacity(),
+                'bgImagePosition'  => $s->getBgImagePosition(),
+                'bgVideo'          => $s->getBgVideo(),
             ];
         }
         return $serialized;
@@ -252,22 +264,22 @@ class TenantExporter
         foreach ($blocks as $b) {
             /** @var PageBlock $b */
             $serialized[] = [
-                'id' => $b->getId(),
-                'section_id' => $b->getSection()?->getId(),
-                'type' => $b->getType(),
-                'preTitle' => $b->getPreTitle(),
-                'title' => $b->getTitle(),
-                'text' => $b->getText(),
-                'image' => $b->getImage(),
-                'config' => $b->getConfig(),
-                'embedUrl' => $b->getEmbedUrl(),
-                'itemCount' => $b->getItemCount(),
-                'relatedCategory_id' => $b->getRelatedCategory()?->getId(),
-                'position' => $b->getPosition(),
-                'galleryImages' => $this->serializeGalleryImages($b),
-                'testimonials' => $this->serializeTestimonials($b),
-                'partnerLogos' => $this->serializePartnerLogos($b),
-                'teamMembers' => $this->serializeTeamMembers($b),
+                'id'                  => $b->getId(),
+                'section_id'          => $b->getSection()?->getId(),
+                'type'                => $b->getType(),
+                'preTitle'            => $b->getPreTitle(),
+                'title'               => $b->getTitle(),
+                'text'                => $b->getText(),
+                'image'               => $b->getImage(),
+                'config'              => $b->getConfig(),
+                'embedUrl'            => $b->getEmbedUrl(),
+                'itemCount'           => $b->getItemCount(),
+                'relatedCategory_id'  => $b->getRelatedCategory()?->getId(),
+                'position'            => $b->getPosition(),
+                'galleryImages'       => $this->serializeGalleryImages($b),
+                'testimonials'        => $this->serializeTestimonials($b),
+                'partnerLogos'        => $this->serializePartnerLogos($b),
+                'teamMembers'         => $this->serializeTeamMembers($b),
             ];
         }
         return $serialized;
@@ -279,9 +291,9 @@ class TenantExporter
         foreach ($b->getGalleryImages() as $img) {
             /** @var PageBlockImage $img */
             $res[] = [
-                'id' => $img->getId(),
+                'id'       => $img->getId(),
                 'filename' => $img->getFilename(),
-                'caption' => $img->getCaption(),
+                'caption'  => $img->getCaption(),
                 'position' => $img->getPosition(),
             ];
         }
@@ -294,12 +306,12 @@ class TenantExporter
         foreach ($b->getTestimonials() as $t) {
             /** @var PageBlockTestimonial $t */
             $res[] = [
-                'id' => $t->getId(),
-                'name' => $t->getName(),
-                'role' => $t->getRole(),
-                'text' => $t->getText(),
-                'rating' => $t->getRating(),
-                'avatar' => $t->getAvatar(),
+                'id'       => $t->getId(),
+                'name'     => $t->getName(),
+                'role'     => $t->getRole(),
+                'text'     => $t->getText(),
+                'rating'   => $t->getRating(),
+                'avatar'   => $t->getAvatar(),
                 'position' => $t->getPosition(),
             ];
         }
@@ -312,10 +324,10 @@ class TenantExporter
         foreach ($b->getPartnerLogos() as $p) {
             /** @var PageBlockPartnerLogo $p */
             $res[] = [
-                'id' => $p->getId(),
-                'name' => $p->getName(),
+                'id'           => $p->getId(),
+                'name'         => $p->getName(),
                 'logoFilename' => $p->getLogoFilename(),
-                'position' => $p->getPosition(),
+                'position'     => $p->getPosition(),
             ];
         }
         return $res;
@@ -327,18 +339,18 @@ class TenantExporter
         foreach ($b->getTeamMembers() as $m) {
             /** @var PageBlockTeamMember $m */
             $res[] = [
-                'id' => $m->getId(),
-                'name' => $m->getName(),
-                'role' => $m->getRole(),
-                'bio' => $m->getBio(),
-                'image' => $m->getImage(),
-                'linkedinUrl' => $m->getLinkedinUrl(),
-                'facebookUrl' => $m->getFacebookUrl(),
+                'id'           => $m->getId(),
+                'name'         => $m->getName(),
+                'role'         => $m->getRole(),
+                'bio'          => $m->getBio(),
+                'image'        => $m->getImage(),
+                'linkedinUrl'  => $m->getLinkedinUrl(),
+                'facebookUrl'  => $m->getFacebookUrl(),
                 'instagramUrl' => $m->getInstagramUrl(),
-                'whatsappUrl' => $m->getWhatsappUrl(),
-                'phone' => $m->getPhone(),
-                'email' => $m->getEmail(),
-                'position' => $m->getPosition(),
+                'whatsappUrl'  => $m->getWhatsappUrl(),
+                'phone'        => $m->getPhone(),
+                'email'        => $m->getEmail(),
+                'position'     => $m->getPosition(),
             ];
         }
         return $res;
@@ -350,14 +362,14 @@ class TenantExporter
         $serialized = [];
         foreach ($banners as $b) {
             $serialized[] = [
-                'id' => $b->getId(),
-                'title' => $b->getTitle(),
-                'subtitle' => $b->getSubtitle(),
-                'ctaText' => $b->getCtaText(),
-                'ctaLink' => $b->getCtaLink(),
+                'id'              => $b->getId(),
+                'title'           => $b->getTitle(),
+                'subtitle'        => $b->getSubtitle(),
+                'ctaText'         => $b->getCtaText(),
+                'ctaLink'         => $b->getCtaLink(),
                 'backgroundImage' => $b->getBackgroundImage(),
-                'active' => $b->isActive(),
-                'position' => $b->getPosition(),
+                'active'          => $b->isActive(),
+                'position'        => $b->getPosition(),
             ];
         }
         return $serialized;
@@ -369,11 +381,11 @@ class TenantExporter
         $serialized = [];
         foreach ($lines as $l) {
             $serialized[] = [
-                'id' => $l->getId(),
-                'title' => $l->getTitle(),
+                'id'          => $l->getId(),
+                'title'       => $l->getTitle(),
                 'description' => $l->getDescription(),
-                'icon' => $l->getIcon(),
-                'position' => $l->getPosition(),
+                'icon'        => $l->getIcon(),
+                'position'    => $l->getPosition(),
             ];
         }
         return $serialized;
@@ -385,10 +397,10 @@ class TenantExporter
         $serialized = [];
         foreach ($fields as $f) {
             $serialized[] = [
-                'id' => $f->getId(),
-                'label' => $f->getLabel(),
-                'type' => $f->getType(),
-                'options' => $f->getOptions(),
+                'id'       => $f->getId(),
+                'label'    => $f->getLabel(),
+                'type'     => $f->getType(),
+                'options'  => $f->getOptions(),
                 'required' => $f->isRequired(),
                 'position' => $f->getPosition(),
             ];
@@ -396,33 +408,70 @@ class TenantExporter
         return $serialized;
     }
 
+    private function serializeContactMessages(Tenant $t): array
+    {
+        $messages = $this->em->getRepository(ContactMessage::class)->findBy(['tenant' => $t]);
+        $serialized = [];
+        foreach ($messages as $m) {
+            $serialized[] = [
+                'senderName'  => $m->getSenderName(),
+                'senderEmail' => $m->getSenderEmail(),
+                'message'     => $m->getMessage(),
+                'phone'       => $m->getPhone(),
+                'extraData'   => $m->getExtraData(),
+                'isRead'      => $m->isRead(),
+                'createdAt'   => $m->getCreatedAt()->format(\DateTimeInterface::ATOM),
+            ];
+        }
+        $this->logger->info('[TenantExporter] Mensagens de contato serializadas.', ['count' => count($serialized)]);
+        return $serialized;
+    }
+
+    private function serializeNewsletterSubscribers(Tenant $t): array
+    {
+        $subscribers = $this->em->getRepository(NewsletterSubscriber::class)->findBy(['tenant' => $t]);
+        $serialized = [];
+        foreach ($subscribers as $s) {
+            $serialized[] = [
+                'name'         => $s->getName(),
+                'email'        => $s->getEmail(),
+                'subscribedAt' => $s->getSubscribedAt()->format(\DateTimeInterface::ATOM),
+            ];
+        }
+        $this->logger->info('[TenantExporter] Assinantes de newsletter serializados.', ['count' => count($serialized)]);
+        return $serialized;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Media file collection
+    // ─────────────────────────────────────────────────────────────
+
     private function collectMediaFiles(Tenant $tenant, array $data, ZipArchive $zip): void
     {
-        // 1. Tenant Images
-        $this->addMediaFile($zip, 'tenant_logo', $tenant->getLogo());
-        $this->addMediaFile($zip, 'tenant_dark_logo', $tenant->getDarkLogo());
+        // 1. Tenant branding assets
+        $this->addMediaFile($zip, 'tenant_logo',        $tenant->getLogo());
+        $this->addMediaFile($zip, 'tenant_dark_logo',   $tenant->getDarkLogo());
         $this->addMediaFile($zip, 'tenant_about_image', $tenant->getAboutImage());
-        $this->addMediaFile($zip, 'tenant_favicon', $tenant->getFavicon());
-        // ogImage can be a locally-uploaded file (not always an external URL)
-        $this->addMediaFile($zip, 'tenant_og_image', $tenant->getOgImage());
+        $this->addMediaFile($zip, 'tenant_favicon',     $tenant->getFavicon());
+        // ogImage may be a locally-uploaded file (not always an external URL)
+        $this->addMediaFile($zip, 'tenant_og_image',    $tenant->getOgImage());
 
         // 2. Page cover images
         foreach ($data['pages'] as $p) {
             $this->addMediaFile($zip, 'page_cover_image', $p['coverImage']);
         }
 
-        // 3. Section bg images & videos
+        // 3. Section background images & videos
         foreach ($data['sections'] as $s) {
             $this->addMediaFile($zip, 'section_bg_image', $s['bgImage']);
             $this->addMediaFile($zip, 'section_bg_video', $s['bgVideo']);
         }
 
-        // 4. PageBlock and inner entities
+        // 4. PageBlock and all inner relation images
         foreach ($data['blocks'] as $b) {
             $this->addMediaFile($zip, 'page_block_image', $b['image']);
 
-            // Extract images embedded inside block config JSON
-            // (e.g. banner block stores slide images in config.banners[].image)
+            // Banner carousel slides: images embedded in config JSON (config.banners[].image)
             $this->collectConfigImages($zip, $b['config'] ?? null);
 
             foreach ($b['galleryImages'] as $img) {
@@ -439,15 +488,15 @@ class TenantExporter
             }
         }
 
-        // 5. HeroBanners
+        // 5. HeroBanner background images
         foreach ($data['hero_banners'] as $hb) {
             $this->addMediaFile($zip, 'hero_banner', $hb['backgroundImage']);
         }
     }
 
     /**
-     * Recursively scans a block config array for image filenames and adds them
-     * to the ZIP. Handles known patterns like config.banners[].image.
+     * Scans a block config array for embedded image filenames and adds them to the ZIP.
+     * Handles banner carousel slides (config.banners[].image) and a generic config.image key.
      */
     private function collectConfigImages(ZipArchive $zip, mixed $config): void
     {
@@ -455,19 +504,19 @@ class TenantExporter
             return;
         }
 
-        // Handle banner carousel: config.banners[].image
+        // Banner carousel: config.banners[].image
         if (isset($config['banners']) && is_array($config['banners'])) {
             foreach ($config['banners'] as $slide) {
                 if (!empty($slide['image'])) {
-                    $this->logger->info('[TenantExporter] Encontrada imagem de slide de banner no config JSON.', [
-                        'image' => $slide['image']
+                    $this->logger->info('[TenantExporter] Imagem de slide de banner encontrada no config JSON.', [
+                        'image' => $slide['image'],
                     ]);
                     $this->addMediaFile($zip, 'page_block_image', $slide['image']);
                 }
             }
         }
 
-        // Handle any other top-level 'image' key in config (generic fallback)
+        // Generic top-level config.image fallback
         if (!empty($config['image']) && is_string($config['image'])) {
             $this->addMediaFile($zip, 'page_block_image', $config['image']);
         }
@@ -483,22 +532,21 @@ class TenantExporter
         if (file_exists($sourcePath) && is_file($sourcePath)) {
             $zip->addFile($sourcePath, sprintf('media/%s/%s', $mapping, $filename));
             $this->logger->debug('[TenantExporter] Arquivo de mídia adicionado ao ZIP.', [
-                'mapping' => $mapping,
-                'filename' => $filename,
-                'source_path' => $sourcePath
+                'mapping'     => $mapping,
+                'filename'    => $filename,
+                'source_path' => $sourcePath,
             ]);
         } else {
-            $this->logger->warning('[TenantExporter] ALERTA: Arquivo de mídia referenciado no banco de dados não existe no disco.', [
-                'mapping' => $mapping,
-                'filename' => $filename,
-                'expected_path' => $sourcePath
+            $this->logger->warning('[TenantExporter] ALERTA: Arquivo referenciado no BD não existe no disco.', [
+                'mapping'       => $mapping,
+                'filename'      => $filename,
+                'expected_path' => $sourcePath,
             ]);
         }
     }
 
     private function getMappingPath(string $mapping): string
     {
-        // Simple mapping translation to match folder structure under public/uploads
         $map = [
             'tenant_logo'        => 'tenant/logo',
             'tenant_dark_logo'   => 'tenant/dark_logo',

@@ -15,6 +15,8 @@ use App\Entity\PageBlockTeamMember;
 use App\Entity\HeroBanner;
 use App\Entity\ResearchLine;
 use App\Entity\ContactFormField;
+use App\Entity\ContactMessage;
+use App\Entity\NewsletterSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZipArchive;
@@ -27,11 +29,15 @@ class TenantImporter
         private \Psr\Log\LoggerInterface $logger
     ) {}
 
+    // ─────────────────────────────────────────────────────────────
+    // analyze(): open ZIP, read metadata.json, detect DB conflicts
+    // ─────────────────────────────────────────────────────────────
+
     public function analyze(string $zipPath): array
     {
         $this->logger->info('[TenantImporter] Iniciando análise do pacote de importação ZIP.', [
             'zip_path' => $zipPath,
-            'zip_size' => file_exists($zipPath) ? filesize($zipPath) : 0
+            'zip_size' => file_exists($zipPath) ? filesize($zipPath) : 0,
         ]);
 
         $zip = new ZipArchive();
@@ -42,7 +48,7 @@ class TenantImporter
 
         $jsonContent = $zip->getFromName('metadata.json');
         if (!$jsonContent) {
-            $this->logger->error('[TenantImporter] Erro crítico: O arquivo metadata.json não foi encontrado dentro do pacote ZIP.');
+            $this->logger->error('[TenantImporter] Erro crítico: metadata.json não encontrado dentro do pacote ZIP.');
             $zip->close();
             throw new \RuntimeException('O arquivo metadata.json não foi encontrado dentro do pacote ZIP.');
         }
@@ -51,57 +57,54 @@ class TenantImporter
         $zip->close();
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->logger->error('[TenantImporter] Erro crítico: O metadata.json possui formato JSON inválido.', [
-                'json_error' => json_last_error_msg()
+            $this->logger->error('[TenantImporter] Erro crítico: metadata.json possui formato JSON inválido.', [
+                'json_error' => json_last_error_msg(),
             ]);
             throw new \RuntimeException('O metadata.json possui formato JSON inválido.');
         }
 
-        $this->logger->info('[TenantImporter] metadata.json lido com sucesso. Iniciando varredura de conflitos relacionais...');
+        $this->logger->info('[TenantImporter] metadata.json lido com sucesso. Iniciando varredura de conflitos...');
 
         $conflicts = [
-            'domain' => false,
+            'domain'      => false,
             'tenant_name' => false,
-            'users' => [],
+            'users'       => [],
         ];
 
-        // 1. Check for Tenant domain conflict
+        // 1. Check Tenant domain conflict
         $domain = $data['tenant']['domain'] ?? '';
-        $existingTenant = $this->em->getRepository(Tenant::class)->findOneBy(['domain' => $domain]);
-        if ($existingTenant) {
+        if ($this->em->getRepository(Tenant::class)->findOneBy(['domain' => $domain])) {
             $conflicts['domain'] = $domain;
-            $this->logger->warning('[TenantImporter] Conflito detectado: O domínio de acesso já está em uso.', ['domain' => $domain]);
+            $this->logger->warning('[TenantImporter] Conflito de domínio.', ['domain' => $domain]);
         }
 
-        // 2. Check for Tenant name conflict
+        // 2. Check Tenant name conflict
         $name = $data['tenant']['name'] ?? '';
-        $existingTenantByName = $this->em->getRepository(Tenant::class)->findOneBy(['name' => $name]);
-        if ($existingTenantByName) {
+        if ($this->em->getRepository(Tenant::class)->findOneBy(['name' => $name])) {
             $conflicts['tenant_name'] = $name;
-            $this->logger->warning('[TenantImporter] Conflito detectado: O nome do Tenant já está em uso.', ['name' => $name]);
+            $this->logger->warning('[TenantImporter] Conflito de nome do Tenant.', ['name' => $name]);
         }
 
-        // 3. Check for User username/email conflicts
-        $users = $data['users'] ?? [];
-        foreach ($users as $u) {
+        // 3. Check User username/email conflicts
+        foreach ($data['users'] ?? [] as $u) {
             $username = $u['username'] ?? '';
-            $email = $u['email'] ?? '';
+            $email    = $u['email'] ?? '';
 
-            $existingUserByUsername = $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
-            $existingUserByEmail = $email ? $this->em->getRepository(User::class)->findOneBy(['email' => $email]) : null;
+            $usernameExists = $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
+            $emailExists    = $email ? $this->em->getRepository(User::class)->findOneBy(['email' => $email]) : null;
 
-            if ($existingUserByUsername || $existingUserByEmail) {
+            if ($usernameExists || $emailExists) {
                 $conflicts['users'][] = [
-                    'original_username' => $username,
-                    'original_email' => $email,
-                    'username_collision' => (bool)$existingUserByUsername,
-                    'email_collision' => (bool)$existingUserByEmail,
+                    'original_username'  => $username,
+                    'original_email'     => $email,
+                    'username_collision' => (bool) $usernameExists,
+                    'email_collision'    => (bool) $emailExists,
                 ];
-                $this->logger->warning('[TenantImporter] Conflito detectado: Colisão de credenciais de usuário.', [
-                    'username' => $username,
-                    'email' => $email,
-                    'username_collision' => (bool)$existingUserByUsername,
-                    'email_collision' => (bool)$existingUserByEmail,
+                $this->logger->warning('[TenantImporter] Conflito de credenciais de usuário.', [
+                    'username'           => $username,
+                    'email'              => $email,
+                    'username_collision' => (bool) $usernameExists,
+                    'email_collision'    => (bool) $emailExists,
                 ]);
             }
         }
@@ -109,91 +112,81 @@ class TenantImporter
         $hasConflicts = !empty($conflicts['domain']) || !empty($conflicts['users']);
 
         $this->logger->info('[TenantImporter] Análise de conflitos concluída.', [
-            'has_conflicts' => $hasConflicts,
+            'has_conflicts'        => $hasConflicts,
             'conflicts_count_users' => count($conflicts['users']),
         ]);
 
         return [
-            'metadata' => $data,
-            'conflicts' => $conflicts,
+            'metadata'     => $data,
+            'conflicts'    => $conflicts,
             'has_conflicts' => $hasConflicts,
         ];
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // import(): full transactional restore of all tenant data
+    // ─────────────────────────────────────────────────────────────
+
     public function import(array $data, array $resolutions, string $zipPath): Tenant
     {
         $this->logger->info('[TenantImporter] Iniciando processo de importação relacional e física.', [
-            'zip_path' => $zipPath,
-            'resolutions' => $resolutions
+            'zip_path'    => $zipPath,
+            'resolutions' => $resolutions,
         ]);
 
-        $filesystem = new Filesystem();
+        $filesystem  = new Filesystem();
         $tempWorkDir = $this->projectDir . '/var/tmp/import_' . uniqid('', true);
         $filesystem->mkdir($tempWorkDir);
 
-        $this->logger->info('[TenantImporter] Extraindo pacote ZIP para espaço temporário de trabalho.', ['temp_dir' => $tempWorkDir]);
+        $this->logger->info('[TenantImporter] Extraindo pacote ZIP para workspace temporário.', ['temp_dir' => $tempWorkDir]);
 
-        // Extract ZIP contents
+        // Extract ZIP
         $zip = new ZipArchive();
         if ($zip->open($zipPath) === true) {
             $zip->extractTo($tempWorkDir);
             $zip->close();
             $this->logger->info('[TenantImporter] Pacote ZIP extraído com sucesso.');
         } else {
-            $this->logger->error('[TenantImporter] Falha crítica ao extrair o arquivo ZIP temporário.');
+            $this->logger->error('[TenantImporter] Falha crítica ao extrair o arquivo ZIP.');
             throw new \RuntimeException('Não foi possível extrair o arquivo ZIP.');
         }
 
-        $this->logger->info('[TenantImporter] Iniciando transação no Banco de Dados...');
-
-        // --- Pre-flight: validate resolved credentials before any DB writes ---
-        $usersData = $data['users'] ?? [];
+        // ── Pre-flight: validate resolved credentials before any DB writes ──
         $credentialErrors = [];
-        foreach ($usersData as $uData) {
+        foreach ($data['users'] ?? [] as $uData) {
             $originalUsername = $uData['username'];
             $resolvedUsername = $resolutions['users'][$originalUsername]['username'] ?? $originalUsername;
             $resolvedEmail    = $resolutions['users'][$originalUsername]['email']    ?? $uData['email'];
 
-            // Check username uniqueness
-            if ($this->em->getRepository(\App\Entity\User::class)->findOneBy(['username' => $resolvedUsername])) {
-                $credentialErrors[] = sprintf(
-                    'Username "%s" já existe no banco de dados. Escolha um nome diferente.',
-                    $resolvedUsername
-                );
+            if ($this->em->getRepository(User::class)->findOneBy(['username' => $resolvedUsername])) {
+                $credentialErrors[] = sprintf('Username "%s" já existe. Escolha outro.', $resolvedUsername);
                 $this->logger->warning('[TenantImporter] Conflito de username detectado na pré-verificação.', [
                     'original_username' => $originalUsername,
                     'resolved_username' => $resolvedUsername,
                 ]);
             }
-
-            // Check email uniqueness (only when non-empty)
-            if (!empty($resolvedEmail)) {
-                if ($this->em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $resolvedEmail])) {
-                    $credentialErrors[] = sprintf(
-                        'E-mail "%s" já existe no banco de dados. Informe um e-mail diferente.',
-                        $resolvedEmail
-                    );
-                    $this->logger->warning('[TenantImporter] Conflito de e-mail detectado na pré-verificação.', [
-                        'original_username' => $originalUsername,
-                        'resolved_email'    => $resolvedEmail,
-                    ]);
-                }
+            if (!empty($resolvedEmail) && $this->em->getRepository(User::class)->findOneBy(['email' => $resolvedEmail])) {
+                $credentialErrors[] = sprintf('E-mail "%s" já existe. Informe outro.', $resolvedEmail);
+                $this->logger->warning('[TenantImporter] Conflito de e-mail detectado na pré-verificação.', [
+                    'original_username' => $originalUsername,
+                    'resolved_email'    => $resolvedEmail,
+                ]);
             }
         }
 
         if (!empty($credentialErrors)) {
             $filesystem->remove($tempWorkDir);
-            throw new \RuntimeException(
-                'Conflito de credenciais de usuários: ' . implode(' | ', $credentialErrors)
-            );
+            throw new \RuntimeException('Conflito de credenciais: ' . implode(' | ', $credentialErrors));
         }
-        // --- End pre-flight ---
+        // ── End pre-flight ──
 
+        $this->logger->info('[TenantImporter] Iniciando transação no Banco de Dados...');
         $this->em->beginTransaction();
 
         try {
-            // 1. Create and persist Tenant
             $tData = $data['tenant'];
+
+            // ── 1. Tenant ─────────────────────────────────────────────────
             $tenant = new Tenant();
             $tenant->setDomain($resolutions['domain'] ?? $tData['domain']);
             $tenant->setName($resolutions['tenant_name'] ?? $tData['name']);
@@ -216,13 +209,11 @@ class TenantImporter
             $tenant->setSeoTitle($tData['seoTitle'] ?? null);
             $tenant->setSeoDescription($tData['seoDescription'] ?? null);
             $tenant->setSeoKeywords($tData['seoKeywords'] ?? null);
-            $tenant->setOgImage($tData['ogImage'] ?? null);
             $tenant->setFontSettings($tData['fontSettings'] ?? []);
             $tenant->setNavigationSettings($tData['navigationSettings'] ?? []);
             $tenant->setShowSectionTitles($tData['showSectionTitles'] ?? true);
             $tenant->setLandingPageMode($tData['landingPageMode'] ?? false);
 
-            // Copy tenant branding assets
             if (!empty($tData['logo'])) {
                 $tenant->setLogo($tData['logo']);
                 $this->relocateMediaFile($tempWorkDir, 'tenant_logo', $tData['logo']);
@@ -241,113 +232,99 @@ class TenantImporter
             }
             if (!empty($tData['ogImage'])) {
                 $tenant->setOgImage($tData['ogImage']);
-                // Try to relocate as local file; if not in the zip, it stays as a URL string
                 $this->relocateMediaFile($tempWorkDir, 'tenant_og_image', $tData['ogImage']);
             }
 
             $this->em->persist($tenant);
 
-            // 2. Create Users
-            $usersData = $data['users'] ?? [];
-            foreach ($usersData as $uData) {
-                $user = new User();
+            // ── 2. Users ──────────────────────────────────────────────────
+            foreach ($data['users'] ?? [] as $uData) {
                 $originalUsername = $uData['username'];
-                
-                // Read resolved credentials from the Wizard inputs
                 $resolvedUsername = $resolutions['users'][$originalUsername]['username'] ?? $originalUsername;
-                $resolvedEmail = $resolutions['users'][$originalUsername]['email'] ?? $uData['email'];
+                $resolvedEmail    = $resolutions['users'][$originalUsername]['email']    ?? $uData['email'];
 
+                $user = new User();
                 $user->setUsername($resolvedUsername);
                 $user->setName($uData['name']);
                 $user->setEmail($resolvedEmail ?: null);
-                $user->setWorkGroup((int)$uData['workGroup']);
+                $user->setWorkGroup((int) $uData['workGroup']);
                 $user->setRoles($uData['roles']);
-                $user->setPassword($uData['password']); // Preserve hashed bcrypt/argon password
+                $user->setPassword($uData['password']); // Preserve hashed password
                 $user->setTenant($tenant);
-
                 $this->em->persist($user);
             }
 
-            // 3. Create Categories (2-pass hierarchy mapping)
+            // ── 3. Categories (2-pass for parent hierarchy) ───────────────
             $categoryMap = [];
-            $categoriesData = $data['categories'] ?? [];
-            
-            // First pass: save categories without parents
-            foreach ($categoriesData as $cData) {
+
+            // Pass 1: persist without parents
+            foreach ($data['categories'] ?? [] as $cData) {
                 $cat = new Category();
                 $cat->setTenant($tenant);
                 $cat->setName($cData['name']);
                 $cat->setSlug($cData['slug']);
                 $cat->setPreTitle($cData['preTitle'] ?? null);
                 $cat->setDescription($cData['description'] ?? null);
-                $cat->setShowInHeader((bool)$cData['showInHeader']);
-                $cat->setShowInFooter((bool)$cData['showInFooter']);
+                $cat->setShowInHeader((bool) $cData['showInHeader']);
+                $cat->setShowInFooter((bool) $cData['showInFooter']);
                 $cat->setIcon($cData['icon'] ?? null);
-
                 $this->em->persist($cat);
-                $this->em->flush(); // Assign DB auto-increment ID immediately
-
+                $this->em->flush();
                 $categoryMap[$cData['id']] = $cat;
             }
 
-            // Second pass: connect parent relationships
-            foreach ($categoriesData as $cData) {
+            // Pass 2: wire parent relationships
+            foreach ($data['categories'] ?? [] as $cData) {
                 if (!empty($cData['parent_id']) && isset($categoryMap[$cData['parent_id']])) {
                     $categoryMap[$cData['id']]->setParent($categoryMap[$cData['parent_id']]);
                 }
             }
 
-            // 4. Create Pages
+            // ── 4. Pages ──────────────────────────────────────────────────
             $pageMap = [];
-            $pagesData = $data['pages'] ?? [];
-            foreach ($pagesData as $pData) {
+            foreach ($data['pages'] ?? [] as $pData) {
                 $page = new Page();
                 $page->setTenant($tenant);
                 $page->setTitle($pData['title']);
                 $page->setSlug($pData['slug']);
-                $page->setShowInHeader((bool)$pData['showInHeader']);
-                $page->setShowInFooter((bool)$pData['showInFooter']);
+                $page->setShowInHeader((bool) $pData['showInHeader']);
+                $page->setShowInFooter((bool) $pData['showInFooter']);
                 $page->setSeoTitle($pData['seoTitle'] ?? null);
                 $page->setSeoDescription($pData['seoDescription'] ?? null);
-                $page->setPosition((int)$pData['position']);
-                $page->setShowTitle((bool)($pData['showTitle'] ?? true));
+                $page->setPosition((int) $pData['position']);
+                $page->setShowTitle((bool) ($pData['showTitle'] ?? true));
 
                 if (!empty($pData['coverImage'])) {
                     $page->setCoverImage($pData['coverImage']);
                     $this->relocateMediaFile($tempWorkDir, 'page_cover_image', $pData['coverImage']);
                 }
-
                 if (!empty($pData['category_id']) && isset($categoryMap[$pData['category_id']])) {
                     $page->setCategory($categoryMap[$pData['category_id']]);
                 }
 
                 $this->em->persist($page);
-                $this->em->flush(); // Assign page ID for downstream sections
-
+                $this->em->flush(); // Flush to get the new ID for downstream entities
                 $pageMap[$pData['id']] = $page;
             }
 
-            // 5. Create Sections
+            // ── 5. Sections ───────────────────────────────────────────────
             $sectionMap = [];
-            $sectionsData = $data['sections'] ?? [];
-            foreach ($sectionsData as $sData) {
+            foreach ($data['sections'] ?? [] as $sData) {
                 $sec = new PageSection();
-                
                 if (!empty($sData['page_id']) && isset($pageMap[$sData['page_id']])) {
                     $sec->setPage($pageMap[$sData['page_id']]);
                 }
                 if (!empty($sData['category_id']) && isset($categoryMap[$sData['category_id']])) {
                     $sec->setCategory($categoryMap[$sData['category_id']]);
                 }
-
                 $sec->setTitlePart1($sData['titlePart1'] ?? null);
                 $sec->setTitlePart2($sData['titlePart2'] ?? null);
-                $sec->setPosition((int)$sData['position']);
-                $sec->setActive((bool)$sData['active']);
+                $sec->setPosition((int) $sData['position']);
+                $sec->setActive((bool) $sData['active']);
                 $sec->setBgType($sData['bgType'] ?? 'none');
                 $sec->setBgColor($sData['bgColor'] ?? null);
                 $sec->setBgGradient($sData['bgGradient'] ?? null);
-                $sec->setBgImageOpacity((int)($sData['bgImageOpacity'] ?? 100));
+                $sec->setBgImageOpacity((int) ($sData['bgImageOpacity'] ?? 100));
                 $sec->setBgImagePosition($sData['bgImagePosition'] ?? 'center');
 
                 if (!empty($sData['bgImage'])) {
@@ -361,13 +338,11 @@ class TenantImporter
 
                 $this->em->persist($sec);
                 $this->em->flush();
-
                 $sectionMap[$sData['id']] = $sec;
             }
 
-            // 6. Create Blocks and inner relations
-            $blocksData = $data['blocks'] ?? [];
-            foreach ($blocksData as $bData) {
+            // ── 6. Blocks (with all inner entities) ───────────────────────
+            foreach ($data['blocks'] ?? [] as $bData) {
                 if (empty($bData['section_id']) || !isset($sectionMap[$bData['section_id']])) {
                     continue;
                 }
@@ -380,33 +355,30 @@ class TenantImporter
                 $block->setText($bData['text'] ?? null);
                 $block->setConfig($bData['config'] ?? null);
                 $block->setEmbedUrl($bData['embedUrl'] ?? null);
-                $block->setItemCount($bData['itemCount'] ? (int)$bData['itemCount'] : null);
-                $block->setPosition((int)$bData['position']);
+                $block->setItemCount($bData['itemCount'] ? (int) $bData['itemCount'] : null);
+                $block->setPosition((int) $bData['position']);
 
                 if (!empty($bData['relatedCategory_id']) && isset($categoryMap[$bData['relatedCategory_id']])) {
                     $block->setRelatedCategory($categoryMap[$bData['relatedCategory_id']]);
                 }
-
                 if (!empty($bData['image'])) {
                     $block->setImage($bData['image']);
                     $this->relocateMediaFile($tempWorkDir, 'page_block_image', $bData['image']);
                 }
 
-                // Relocate images embedded in config JSON
-                // (e.g. banner block stores slide images in config.banners[].image)
+                // Relocate banner carousel slide images embedded in config JSON
                 $this->relocateConfigImages($tempWorkDir, $bData['config'] ?? null);
 
                 $this->em->persist($block);
 
-                // Gallery Images
+                // Gallery images
                 foreach ($bData['galleryImages'] ?? [] as $imgData) {
                     if (empty($imgData['filename'])) continue;
                     $gImg = new PageBlockImage();
                     $gImg->setBlock($block);
                     $gImg->setFilename($imgData['filename']);
                     $gImg->setCaption($imgData['caption'] ?? null);
-                    $gImg->setPosition((int)$imgData['position']);
-                    
+                    $gImg->setPosition((int) $imgData['position']);
                     $this->em->persist($gImg);
                     $this->relocateMediaFile($tempWorkDir, 'page_block_gallery', $imgData['filename']);
                 }
@@ -418,9 +390,8 @@ class TenantImporter
                     $testi->setName($tData['name'] ?? $tData['author'] ?? '');
                     $testi->setRole($tData['role'] ?? null);
                     $testi->setText($tData['text'] ?? '');
-                    $testi->setRating((int)($tData['rating'] ?? 5));
-                    $testi->setPosition((int)$tData['position']);
-
+                    $testi->setRating((int) ($tData['rating'] ?? 5));
+                    $testi->setPosition((int) $tData['position']);
                     if (!empty($tData['avatar'])) {
                         $testi->setAvatar($tData['avatar']);
                         $this->relocateMediaFile($tempWorkDir, 'testimonial_avatar', $tData['avatar']);
@@ -428,20 +399,19 @@ class TenantImporter
                     $this->em->persist($testi);
                 }
 
-                // Partner Logos
+                // Partner logos
                 foreach ($bData['partnerLogos'] ?? [] as $pData) {
                     if (empty($pData['logoFilename'])) continue;
                     $partner = new PageBlockPartnerLogo();
                     $partner->setBlock($block);
                     $partner->setName($pData['name'] ?? '');
                     $partner->setLogoFilename($pData['logoFilename']);
-                    $partner->setPosition((int)$pData['position']);
-
+                    $partner->setPosition((int) $pData['position']);
                     $this->em->persist($partner);
                     $this->relocateMediaFile($tempWorkDir, 'partner_logo', $pData['logoFilename']);
                 }
 
-                // Team Members
+                // Team members
                 foreach ($bData['teamMembers'] ?? [] as $mData) {
                     $member = new PageBlockTeamMember();
                     $member->setBlock($block);
@@ -454,8 +424,7 @@ class TenantImporter
                     $member->setWhatsappUrl($mData['whatsappUrl'] ?? null);
                     $member->setPhone($mData['phone'] ?? null);
                     $member->setEmail($mData['email'] ?? null);
-                    $member->setPosition((int)$mData['position']);
-
+                    $member->setPosition((int) $mData['position']);
                     if (!empty($mData['image'])) {
                         $member->setImage($mData['image']);
                         $this->relocateMediaFile($tempWorkDir, 'team_member_image', $mData['image']);
@@ -464,7 +433,7 @@ class TenantImporter
                 }
             }
 
-            // 7. Connect HomePage — must be done after all pages are persisted and flushed
+            // ── 7. Connect home page ──────────────────────────────────────
             if (!empty($tData['homePageId']) && isset($pageMap[$tData['homePageId']])) {
                 $tenant->setHomePage($pageMap[$tData['homePageId']]);
                 $this->logger->info('[TenantImporter] Página inicial (homePage) conectada ao tenant.', [
@@ -478,18 +447,16 @@ class TenantImporter
                 ]);
             }
 
-            // 8. Create Hero Banners
-            $heroBannersData = $data['hero_banners'] ?? [];
-            foreach ($heroBannersData as $hbData) {
+            // ── 8. Hero Banners ───────────────────────────────────────────
+            foreach ($data['hero_banners'] ?? [] as $hbData) {
                 $hb = new HeroBanner();
                 $hb->setTenant($tenant);
                 $hb->setTitle($hbData['title'] ?? '');
                 $hb->setSubtitle($hbData['subtitle'] ?? null);
                 $hb->setCtaText($hbData['ctaText'] ?? null);
                 $hb->setCtaLink($hbData['ctaLink'] ?? null);
-                $hb->setActive((bool)$hbData['active']);
-                $hb->setPosition((int)$hbData['position']);
-
+                $hb->setActive((bool) $hbData['active']);
+                $hb->setPosition((int) $hbData['position']);
                 if (!empty($hbData['backgroundImage'])) {
                     $hb->setBackgroundImage($hbData['backgroundImage']);
                     $this->relocateMediaFile($tempWorkDir, 'hero_banner', $hbData['backgroundImage']);
@@ -497,58 +464,97 @@ class TenantImporter
                 $this->em->persist($hb);
             }
 
-            // 9. Create Research Lines
-            $researchLinesData = $data['research_lines'] ?? [];
-            foreach ($researchLinesData as $rlData) {
+            // ── 9. Research Lines ─────────────────────────────────────────
+            foreach ($data['research_lines'] ?? [] as $rlData) {
                 $rl = new ResearchLine();
                 $rl->setTenant($tenant);
                 $rl->setTitle($rlData['title'] ?? '');
                 $rl->setDescription($rlData['description'] ?? null);
                 $rl->setIcon($rlData['icon'] ?? null);
-                $rl->setPosition((int)$rlData['position']);
-
+                $rl->setPosition((int) $rlData['position']);
                 $this->em->persist($rl);
             }
 
-            // 10. Create Contact Form Fields
-            $formFieldsData = $data['contact_form_fields'] ?? [];
-            foreach ($formFieldsData as $ffData) {
+            // ── 10. Contact Form Fields ───────────────────────────────────
+            foreach ($data['contact_form_fields'] ?? [] as $ffData) {
                 $ff = new ContactFormField();
                 $ff->setTenant($tenant);
                 $ff->setLabel($ffData['label'] ?? '');
                 $ff->setType($ffData['type'] ?? 'text');
                 $ff->setOptions($ffData['options'] ?? null);
-                $ff->setRequired((bool)$ffData['required']);
-                $ff->setPosition((int)$ffData['position']);
-
+                $ff->setRequired((bool) $ffData['required']);
+                $ff->setPosition((int) $ffData['position']);
                 $this->em->persist($ff);
             }
 
+            // ── 11. Contact Messages ──────────────────────────────────────
+            $messagesImported = 0;
+            foreach ($data['contact_messages'] ?? [] as $mData) {
+                $msg = new ContactMessage();
+                $msg->setTenant($tenant);
+                $msg->setSenderName($mData['senderName'] ?? '');
+                $msg->setSenderEmail($mData['senderEmail'] ?? '');
+                $msg->setMessage($mData['message'] ?? '');
+                $msg->setPhone($mData['phone'] ?? null);
+                $msg->setExtraData($mData['extraData'] ?? null);
+                $msg->setIsRead((bool) ($mData['isRead'] ?? false));
+                // Preserve original createdAt timestamp
+                if (!empty($mData['createdAt'])) {
+                    $reflection = new \ReflectionProperty(ContactMessage::class, 'createdAt');
+                    $reflection->setAccessible(true);
+                    $reflection->setValue($msg, new \DateTimeImmutable($mData['createdAt']));
+                }
+                $this->em->persist($msg);
+                $messagesImported++;
+            }
+            $this->logger->info('[TenantImporter] Mensagens de contato importadas.', ['count' => $messagesImported]);
+
+            // ── 12. Newsletter Subscribers ────────────────────────────────
+            $subscribersImported = 0;
+            foreach ($data['newsletter_subscribers'] ?? [] as $sData) {
+                $sub = new NewsletterSubscriber();
+                $sub->setTenant($tenant);
+                $sub->setName($sData['name'] ?? '');
+                $sub->setEmail($sData['email'] ?? '');
+                // Preserve original subscribedAt timestamp
+                if (!empty($sData['subscribedAt'])) {
+                    $reflection = new \ReflectionProperty(NewsletterSubscriber::class, 'subscribedAt');
+                    $reflection->setAccessible(true);
+                    $reflection->setValue($sub, new \DateTimeImmutable($sData['subscribedAt']));
+                }
+                $this->em->persist($sub);
+                $subscribersImported++;
+            }
+            $this->logger->info('[TenantImporter] Assinantes de newsletter importados.', ['count' => $subscribersImported]);
+
+            // ── Final flush + commit ──────────────────────────────────────
             $this->em->flush();
             $this->em->commit();
-            $this->logger->info('[TenantImporter] Transação do Banco de Dados comitada com sucesso!');
+            $this->logger->info('[TenantImporter] Transação comitada com sucesso!');
 
-            // Clear temporary workspace
             $filesystem->remove($tempWorkDir);
             $this->logger->info('[TenantImporter] Workspace temporário limpo.', ['temp_dir' => $tempWorkDir]);
 
             return $tenant;
-        } catch (\Exception $e) {
-            $this->logger->error('[TenantImporter] Erro catastrófico durante a importação. Revertendo transação (Rollback) e limpando workspace.', [
-                'exception_message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+
+        } catch (\Throwable $e) {
             $this->em->rollback();
             $filesystem->remove($tempWorkDir);
+            $this->logger->error('[TenantImporter] Erro durante importação — transação revertida.', [
+                'exception' => $e->getMessage(),
+                'trace'     => $e->getTraceAsString(),
+            ]);
             throw $e;
         }
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────
+
     /**
-     * Scans the block config JSON for embedded image filenames and relocates
-     * them from the ZIP temp dir to the correct public/uploads/ folder.
-     * Handles banner carousel slides (config.banners[].image) and other
-     * known config image patterns.
+     * Scans block config JSON for embedded image filenames and relocates them.
+     * Handles banner carousel slides (config.banners[].image) and generic config.image.
      */
     private function relocateConfigImages(string $tempWorkDir, mixed $config): void
     {
@@ -561,14 +567,14 @@ class TenantImporter
             foreach ($config['banners'] as $slide) {
                 if (!empty($slide['image'])) {
                     $this->logger->info('[TenantImporter] Relocalizando imagem de slide de banner do config JSON.', [
-                        'image' => $slide['image']
+                        'image' => $slide['image'],
                     ]);
                     $this->relocateMediaFile($tempWorkDir, 'page_block_image', $slide['image']);
                 }
             }
         }
 
-        // Generic top-level config.image fallback
+        // Generic top-level config.image
         if (!empty($config['image']) && is_string($config['image'])) {
             $this->relocateMediaFile($tempWorkDir, 'page_block_image', $config['image']);
         }
@@ -576,31 +582,31 @@ class TenantImporter
 
     private function relocateMediaFile(string $tempWorkDir, string $mapping, string $filename): void
     {
-        $source = sprintf('%s/media/%s/%s', $tempWorkDir, $mapping, $filename);
+        $source         = sprintf('%s/media/%s/%s', $tempWorkDir, $mapping, $filename);
         $destinationDir = sprintf('%s/public/uploads/%s', $this->projectDir, $this->getMappingPath($mapping));
-        $destination = $destinationDir . '/' . $filename;
+        $destination    = $destinationDir . '/' . $filename;
 
         if (file_exists($source) && is_file($source)) {
             if (!is_dir($destinationDir)) {
                 mkdir($destinationDir, 0755, true);
-                $this->logger->info('[TenantImporter] Criando diretório de uploads de mídia de destino.', ['dir' => $destinationDir]);
+                $this->logger->info('[TenantImporter] Diretório de uploads criado.', ['dir' => $destinationDir]);
             }
             if (copy($source, $destination)) {
                 $this->logger->debug('[TenantImporter] Arquivo de mídia copiado com sucesso.', [
-                    'source' => $source,
-                    'destination' => $destination
+                    'source'      => $source,
+                    'destination' => $destination,
                 ]);
             } else {
                 $this->logger->error('[TenantImporter] Falha ao copiar arquivo de mídia.', [
-                    'source' => $source,
-                    'destination' => $destination
+                    'source'      => $source,
+                    'destination' => $destination,
                 ]);
             }
         } else {
-            $this->logger->warning('[TenantImporter] ALERTA: Arquivo de mídia referenciado em metadata.json não foi encontrado dentro do ZIP.', [
-                'expected_source_path' => $source,
-                'mapping' => $mapping,
-                'filename' => $filename
+            $this->logger->warning('[TenantImporter] Arquivo de mídia não encontrado no pacote ZIP.', [
+                'mapping'       => $mapping,
+                'filename'      => $filename,
+                'expected_path' => $source,
             ]);
         }
     }
