@@ -380,12 +380,42 @@ class SuperAdminController extends AbstractController
         ]);
         try {
             $zipPath = $exporter->export($tenant);
-            $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($zipPath);
-            $response->setContentDisposition(
-                \Symfony\Component\HttpFoundation\ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                sprintf('tenant_export_%s_%s.zip', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $tenant->getDomain()), date('Ymd_His'))
+
+            $filename = sprintf(
+                'tenant_export_%s_%s.zip',
+                preg_replace('/[^a-zA-Z0-9_\-]/', '_', $tenant->getDomain()),
+                date('Ymd_His')
             );
-            $response->deleteFileAfterSend(true);
+
+            $zipSize = filesize($zipPath);
+
+            // Use StreamedResponse to avoid calling ignore_user_abort() (disabled on some hosts)
+            $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($zipPath, $logger) {
+                $handle = fopen($zipPath, 'rb');
+                if ($handle === false) {
+                    $logger->error('[SuperAdminController] Não foi possível abrir o arquivo ZIP para streaming.', ['zip_path' => $zipPath]);
+                    return;
+                }
+                while (!feof($handle)) {
+                    echo fread($handle, 8192);
+                    flush();
+                }
+                fclose($handle);
+                // Delete after streaming is complete
+                @unlink($zipPath);
+                // Also try removing the temp dir
+                $dir = dirname($zipPath);
+                if (is_dir($dir) && count(scandir($dir)) === 2) {
+                    @rmdir($dir);
+                }
+            });
+
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            $response->headers->set('Content-Length', (string) $zipSize);
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
+
             return $response;
         } catch (\Exception $e) {
             $logger->error('[SuperAdminController] Falha ao exportar tenant.', [
