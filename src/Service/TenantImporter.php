@@ -342,6 +342,10 @@ class TenantImporter
                     $this->relocateMediaFile($tempWorkDir, 'page_block_image', $bData['image']);
                 }
 
+                // Relocate images embedded in config JSON
+                // (e.g. banner block stores slide images in config.banners[].image)
+                $this->relocateConfigImages($tempWorkDir, $bData['config'] ?? null);
+
                 $this->em->persist($block);
 
                 // Gallery Images
@@ -478,6 +482,36 @@ class TenantImporter
             $this->em->rollback();
             $filesystem->remove($tempWorkDir);
             throw $e;
+        }
+    }
+
+    /**
+     * Scans the block config JSON for embedded image filenames and relocates
+     * them from the ZIP temp dir to the correct public/uploads/ folder.
+     * Handles banner carousel slides (config.banners[].image) and other
+     * known config image patterns.
+     */
+    private function relocateConfigImages(string $tempWorkDir, mixed $config): void
+    {
+        if (empty($config) || !is_array($config)) {
+            return;
+        }
+
+        // Banner carousel: config.banners[].image
+        if (isset($config['banners']) && is_array($config['banners'])) {
+            foreach ($config['banners'] as $slide) {
+                if (!empty($slide['image'])) {
+                    $this->logger->info('[TenantImporter] Relocalizando imagem de slide de banner do config JSON.', [
+                        'image' => $slide['image']
+                    ]);
+                    $this->relocateMediaFile($tempWorkDir, 'page_block_image', $slide['image']);
+                }
+            }
+        }
+
+        // Generic top-level config.image fallback
+        if (!empty($config['image']) && is_string($config['image'])) {
+            $this->relocateMediaFile($tempWorkDir, 'page_block_image', $config['image']);
         }
     }
 

@@ -419,6 +419,10 @@ class TenantExporter
         foreach ($data['blocks'] as $b) {
             $this->addMediaFile($zip, 'page_block_image', $b['image']);
 
+            // Extract images embedded inside block config JSON
+            // (e.g. banner block stores slide images in config.banners[].image)
+            $this->collectConfigImages($zip, $b['config'] ?? null);
+
             foreach ($b['galleryImages'] as $img) {
                 $this->addMediaFile($zip, 'page_block_gallery', $img['filename']);
             }
@@ -436,6 +440,34 @@ class TenantExporter
         // 5. HeroBanners
         foreach ($data['hero_banners'] as $hb) {
             $this->addMediaFile($zip, 'hero_banner', $hb['backgroundImage']);
+        }
+    }
+
+    /**
+     * Recursively scans a block config array for image filenames and adds them
+     * to the ZIP. Handles known patterns like config.banners[].image.
+     */
+    private function collectConfigImages(ZipArchive $zip, mixed $config): void
+    {
+        if (empty($config) || !is_array($config)) {
+            return;
+        }
+
+        // Handle banner carousel: config.banners[].image
+        if (isset($config['banners']) && is_array($config['banners'])) {
+            foreach ($config['banners'] as $slide) {
+                if (!empty($slide['image'])) {
+                    $this->logger->info('[TenantExporter] Encontrada imagem de slide de banner no config JSON.', [
+                        'image' => $slide['image']
+                    ]);
+                    $this->addMediaFile($zip, 'page_block_image', $slide['image']);
+                }
+            }
+        }
+
+        // Handle any other top-level 'image' key in config (generic fallback)
+        if (!empty($config['image']) && is_string($config['image'])) {
+            $this->addMediaFile($zip, 'page_block_image', $config['image']);
         }
     }
 
