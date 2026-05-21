@@ -19,9 +19,14 @@
 {# ── TENANTS ── #}
 <div id="tenants" class="ph" style="margin-top:1.5rem">
     <h2 style="font-size:1.1rem;font-weight:700">Tenants</h2>
-    <a href="{{ path('superadmin_tenant_new') }}" class="btn btn-p btn-sm">
-        <sl-icon name="plus-lg"></sl-icon> Novo Tenant
-    </a>
+    <div style="display:flex;gap:0.5rem">
+        <a href="{{ path('superadmin_tenant_import') }}" class="btn btn-g btn-sm">
+            <sl-icon name="box-arrow-in-down"></sl-icon> Importar Tenant
+        </a>
+        <a href="{{ path('superadmin_tenant_new') }}" class="btn btn-p btn-sm">
+            <sl-icon name="plus-lg"></sl-icon> Novo Tenant
+        </a>
+    </div>
 </div>
 <div class="card">
     <div class="tw"><table class="at">
@@ -33,11 +38,11 @@
             <td>{{ t.domain ?? '—' }}</td>
             <td><span class="badge bg-neu">{{ t.theme ?? 'wab' }}</span></td>
             <td><div class="ta">
+                <a href="{{ path('superadmin_tenant_export', {id: t.id}) }}" class="btn btn-g btn-sm" title="Exportar Site (Download ZIP)"><sl-icon name="download"></sl-icon></a>
                 <a href="{{ path('superadmin_tenant_edit', {id: t.id}) }}" class="btn btn-g btn-sm"><sl-icon name="pencil-fill"></sl-icon></a>
-                <form action="{{ path('superadmin_tenant_delete', {id: t.id}) }}" method="post" onsubmit="return confirm('Remover tenant e TODOS os dados?')">
-                    <input type="hidden" name="_token" value="{{ csrf_token('del_tenant_' ~ t.id) }}">
-                    <button class="btn btn-d btn-sm"><sl-icon name="trash-fill"></sl-icon></button>
-                </form>
+                <button type="button" class="btn btn-d btn-sm" onclick="openSecureDeleteModal('{{ t.id }}', '{{ t.name|escape('js') }}', '{{ path('superadmin_tenant_delete', {id: t.id}) }}', '{{ csrf_token('del_tenant_' ~ t.id) }}', '{{ path('superadmin_tenant_export', {id: t.id}) }}')" title="Excluir Tenant de Forma Segura">
+                    <sl-icon name="trash-fill"></sl-icon>
+                </button>
             </div></td>
         </tr>
         {% else %}
@@ -91,4 +96,85 @@
         </tbody>
     </table></div>
 </div>
+
+<sl-dialog id="delete-tenant-dialog" label="Exclusão Segura de Tenant" class="dialog-overview">
+  <div class="secure-delete-content">
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem; color: #f87171;">
+      <sl-icon name="exclamation-octagon-fill" style="font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem;"></sl-icon>
+      <div>
+        <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.95rem;">Esta ação é irreversível e altamente destrutiva!</strong>
+        Todos os dados do site associado a este tenant (páginas, blocos, categorias, seções, configurações, usuários e links) e os arquivos de mídia enviados serão deletados permanentemente e de forma imediata do banco de dados e do disco.
+      </div>
+    </div>
+
+    <p style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text);">
+      Recomendamos enfaticamente que você <strong>faça o backup do site</strong> baixando o pacote de migração ZIP antes de prosseguir com a exclusão definitiva.
+    </p>
+
+    <div style="margin-bottom: 1.5rem;">
+      <a id="delete-backup-link" href="#" class="btn btn-g" style="width: 100%; display: inline-flex; justify-content: center; align-items: center; border-color: rgba(255,255,255,0.15)">
+        <sl-icon name="download"></sl-icon> Fazer Backup de Segurança (Exportar ZIP)
+      </a>
+    </div>
+
+    <form id="secure-delete-form" method="post" action="">
+      <input type="hidden" name="_token" id="delete-csrf-token" value="">
+      
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <label for="confirm-tenant-name" style="font-size: 0.85rem; font-weight: 600; color: var(--muted);">
+          Para confirmar, digite exatamente o nome do tenant <strong id="delete-target-name" style="color: var(--text)"></strong> abaixo:
+        </label>
+        <input type="text" name="confirm_name" id="confirm-tenant-name" class="ai" autocomplete="off" placeholder="Digite o nome do tenant" required style="width: 100%;">
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-g" onclick="document.getElementById('delete-tenant-dialog').hide()">Cancelar</button>
+        <button type="submit" id="delete-confirm-btn" class="btn btn-d" disabled style="opacity: 0.5; cursor: not-allowed;">
+          <sl-icon name="trash-fill"></sl-icon> Excluir Definitivamente
+        </button>
+      </div>
+    </form>
+  </div>
+</sl-dialog>
+
+<script>
+function openSecureDeleteModal(id, name, deleteUrl, csrfToken, exportUrl) {
+    const dialog = document.getElementById('delete-tenant-dialog');
+    const deleteForm = document.getElementById('secure-delete-form');
+    const deleteCsrfToken = document.getElementById('delete-csrf-token');
+    const deleteTargetName = document.getElementById('delete-target-name');
+    const confirmInput = document.getElementById('confirm-tenant-name');
+    const confirmBtn = document.getElementById('delete-confirm-btn');
+    const backupLink = document.getElementById('delete-backup-link');
+
+    // Configure form actions and target variables
+    deleteForm.action = deleteUrl;
+    deleteCsrfToken.value = csrfToken;
+    deleteTargetName.textContent = name;
+    backupLink.href = exportUrl;
+
+    // Reset validation and input states
+    confirmInput.value = '';
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.5';
+    confirmBtn.style.cursor = 'not-allowed';
+
+    // Real-time client-side name verification
+    confirmInput.oninput = function() {
+        const value = confirmInput.value.trim();
+        if (value === name) {
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '1';
+            confirmBtn.style.cursor = 'pointer';
+        } else {
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.5';
+            confirmBtn.style.cursor = 'not-allowed';
+        }
+    };
+
+    // Open Shoelace Dialog
+    dialog.show();
+}
+</script>
 {% endblock %}

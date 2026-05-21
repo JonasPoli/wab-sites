@@ -1,0 +1,220 @@
+{% extends 'superadmin/base.html.twig' %}
+{% block title %}Importar Tenant{% endblock %}
+{% block page_title %}Importar Tenant{% endblock %}
+
+{% block body %}
+<div class="ph">
+    <h1>📥 Importar Site (Tenant)</h1>
+    <a href="{{ path('superadmin_dash') }}" class="btn btn-g">
+        <sl-icon name="arrow-left"></sl-icon> Voltar
+    </a>
+</div>
+
+{% if not has_conflicts %}
+    {# ── UPLOAD FORM ── #}
+    <div class="card" style="max-width: 600px; margin: 0 auto; padding: 2.5rem 2rem; text-align: center;">
+        <sl-icon name="cloud-arrow-up-fill" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></sl-icon>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Carregar Pacote de Site</h2>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Selecione o arquivo <code>.zip</code> gerado pela exportação de outro servidor para iniciar o processo de migração completa.
+        </p>
+
+        <form action="{{ path('superadmin_tenant_import') }}" method="post" enctype="multipart/form-data" class="af" style="text-align: left;">
+            <div class="af-field" style="border: 2px dashed var(--border); padding: 2rem; border-radius: 12px; text-align: center; background: var(--bg3); transition: border-color var(--ease); cursor: pointer;" onclick="document.getElementById('zipFileInput').click()">
+                <sl-icon name="folder2-open" style="font-size: 1.8rem; color: var(--muted); margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;"></sl-icon>
+                <span id="file-label" style="font-weight: 600; font-size: 0.85rem; color: var(--text);">Clique para selecionar o arquivo ZIP</span>
+                <input type="file" id="zipFileInput" name="zipFile" accept=".zip" required style="display: none;" onchange="updateFileLabel(this)">
+            </div>
+            
+            <div class="af-actions" style="margin-top: 1.5rem; justify-content: center;">
+                <button type="submit" class="btn btn-p" style="padding: 0.65rem 2rem;">
+                    <sl-icon name="box-arrow-in-down"></sl-icon> Analisar e Importar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    function updateFileLabel(input) {
+        const label = document.getElementById('file-label');
+        if (input.files && input.files.length > 0) {
+            label.innerText = 'Arquivo selecionado: ' + input.files[0].name;
+            label.style.color = 'var(--success)';
+        } else {
+            label.innerText = 'Clique para selecionar o arquivo ZIP';
+            label.style.color = 'var(--text)';
+        }
+    }
+    </script>
+{% else %}
+    {# ── RESOLUTION WIZARD FORM ── #}
+    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start;">
+        
+        <div class="af">
+            <form action="{{ path('superadmin_tenant_import') }}" method="post" class="af">
+                <input type="hidden" name="zipPath" value="{{ zipPath }}">
+
+                {# 🌐 TENANT SETTINGS CONFLICTS #}
+                <div class="card">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <sl-icon name="globe" style="color: var(--primary);"></sl-icon> 1. Configurações Globais do Site (Tenant)
+                    </h2>
+
+                    <div class="af-row" style="margin-bottom: 1.25rem;">
+                        <div class="af-field">
+                            <label>Domínio de Acesso <span class="req">*</span></label>
+                            {% if conflicts.domain %}
+                                <div class="al al-err" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.8rem;">
+                                    <sl-icon name="exclamation-octagon-fill"></sl-icon> Domínio <code>{{ conflicts.domain }}</code> já está em uso localmente.
+                                </div>
+                                <input type="text" name="domain" class="ai" required value="{{ metadata.tenant.domain }}_copia" style="border-color: var(--danger)">
+                            {% else %}
+                                <input type="text" name="domain" class="ai" required value="{{ metadata.tenant.domain }}">
+                            {% endif %}
+                            <div class="af-hint">Ex: <code>portal-cetec.edu.br</code>. Deve ser único em todo o servidor.</div>
+                        </div>
+
+                        <div class="af-field">
+                            <label>Nome do Site (Tenant) <span class="req">*</span></label>
+                            {% if conflicts.tenant_name %}
+                                <div class="al al-warn" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.8rem;">
+                                    <sl-icon name="exclamation-triangle-fill"></sl-icon> Nome <code>{{ conflicts.tenant_name }}</code> já existe.
+                                </div>
+                                <input type="text" name="tenant_name" class="ai" required value="{{ metadata.tenant.name }} (Cópia)">
+                            {% else %}
+                                <input type="text" name="tenant_name" class="ai" required value="{{ metadata.tenant.name }}">
+                            {% endif %}
+                            <div class="af-hint">Ex: <code>CETEC - Campus Araraquara</code>.</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# 👤 USERS SETTINGS CONFLICTS #}
+                <div class="card">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <sl-icon name="people" style="color: var(--primary);"></sl-icon> 2. Contas de Usuários e Segurança
+                    </h2>
+                    
+                    <p style="color: var(--muted); font-size: 0.8rem; margin-bottom: 1.5rem;">
+                        Os logins de usuário e endereços de e-mail são únicos em todo o sistema. Abaixo estão listadas as contas contidas no pacote. Altere as credenciais em conflito para prosseguir com segurança.
+                    </p>
+
+                    {% for u in metadata.users %}
+                        {% set username_clean = u.username|replace({'.': '_'}) %}
+                        {% set conflict_item = null %}
+                        {% for c in conflicts.users %}
+                            {% if c.original_username == u.username %}
+                                {% set conflict_item = c %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <div style="padding: 1.25rem; border-radius: 8px; background: var(--bg3); border: 1px solid var(--border); margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <div style="font-weight: 700; font-size: 0.9rem; color: var(--text);">
+                                    <sl-icon name="person-fill" style="margin-right: 0.25rem;"></sl-icon> {{ u.name }}
+                                </div>
+                                <div>
+                                    {% if u.roles is defined and 'ROLE_ADMIN' in u.roles %}
+                                        <span class="badge bg-ok">Administrador do Site</span>
+                                    {% else %}
+                                        <span class="badge bg-neu">Colaborador</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="af-row">
+                                <div class="af-field">
+                                    <label>Username (Login) <span class="req">*</span></label>
+                                    {% if conflict_item and conflict_item.username_collision %}
+                                        <div class="al al-err" style="padding: 0.4rem 0.60rem; margin-bottom: 0.4rem; font-size: 0.75rem;">
+                                            <sl-icon name="shield-lock-fill"></sl-icon> Username <code>{{ u.username }}</code> já cadastrado no BD.
+                                        </div>
+                                        <input type="text" name="user_username_{{ username_clean }}" class="ai" required value="{{ u.username }}_import" style="border-color: var(--danger)">
+                                    {% else %}
+                                        <input type="text" name="user_username_{{ username_clean }}" class="ai" required value="{{ u.username }}">
+                                    {% endif %}
+                                </div>
+
+                                <div class="af-field">
+                                    <label>E-mail de Acesso <span class="req">*</span></label>
+                                    {% if conflict_item and conflict_item.email_collision %}
+                                        <div class="al al-err" style="padding: 0.4rem 0.60rem; margin-bottom: 0.4rem; font-size: 0.75rem;">
+                                            <sl-icon name="envelope-fill"></sl-icon> E-mail <code>{{ u.email }}</code> já está em uso por outro usuário.
+                                        </div>
+                                        {% set email_parts = u.email|split('@') %}
+                                        <input type="email" name="user_email_{{ username_clean }}" class="ai" required value="{{ email_parts[0] }}_novo@{{ email_parts[1] }}" style="border-color: var(--danger)">
+                                    {% else %}
+                                        <input type="email" name="user_email_{{ username_clean }}" class="ai" required value="{{ u.email }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# ── SUBMIT BUTTONS ── #}
+                <div class="af-actions">
+                    <button type="submit" class="btn btn-s">
+                        <sl-icon name="check-circle-fill"></sl-icon> Executar Importação Segura
+                    </button>
+                    <a href="{{ path('superadmin_dash') }}" class="btn btn-g">Cancelar</a>
+                </div>
+            </form>
+        </div>
+
+        {# 📊 SUMMARY SIDEBAR ── #}
+        <div class="card" style="position: sticky; top: var(--hh); padding: 1.25rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <sl-icon name="info-circle" style="color: var(--secondary);"></sl-icon> Resumo do Site Importado
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.8rem;">
+                <div>
+                    <span style="color: var(--muted); display: block;">Tema do Site</span>
+                    <span style="font-weight: 600; color: var(--text);" class="badge bg-inf">{{ metadata.tenant.theme|upper }}</span>
+                </div>
+                <div>
+                    <span style="color: var(--muted); display: block;">Versão de Origem</span>
+                    <span style="font-weight: 600; color: var(--text);">{{ metadata.system.platform_version }}</span>
+                </div>
+                <div>
+                    <span style="color: var(--muted); display: block;">Data de Exportação</span>
+                    <span style="font-weight: 600; color: var(--text);">{{ metadata.system.export_timestamp|date('d/m/Y H:i') }}</span>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Categorias</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.categories|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Páginas</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.pages|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Seções de Página</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.sections|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Blocos de Conteúdo</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.blocks|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Banners Principais</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.hero_banners|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Linhas de Pesquisa</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.research_lines|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">Usuários</span>
+                    <span style="font-weight: 700; color: var(--text);">{{ metadata.users|length }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endif %}
+{% endblock %}
