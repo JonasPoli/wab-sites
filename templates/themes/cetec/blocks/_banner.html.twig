@@ -37,8 +37,8 @@
         {% set containerStyles = containerStyles ~ ' min-height:100vh;padding:0;' %}
         {% set slideStyles = 'min-height:100vh;padding:8rem 2rem;' %}
     {% else %}
-        {% set containerStyles = containerStyles ~ ' min-height:400px;padding:0;' %}
-        {% set slideStyles = 'min-height:400px;padding:4rem 2rem;' %}
+        {% set containerStyles = containerStyles ~ ' padding:0;' %}
+        {% set slideStyles = 'padding:6rem 2rem;' %}
     {% endif %}
 
     {% if isFullWidth or isFullHeight %}
@@ -53,8 +53,7 @@
         <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
             {# Background image #}
             {% if b.image %}
-                <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg opacity-40"></div>
-                <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
+                <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg"></div>
             {% else %}
                 <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
             {% endif %}
@@ -65,7 +64,7 @@
             <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
                 <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
                     {% if block.preTitle %}
-                        <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                        <span class="inline-block bg-cetec-orange text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider">
                             {{ block.preTitle }}
                         </span>
                     {% endif %}
@@ -82,15 +81,15 @@
 
                     <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
                         {% if b.ctaText %}
-                            <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                            <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                 {{ b.ctaText }}
                             </a>
                         {% else %}
-                            <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                            <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                 Ver Nossos Cursos
                             </a>
                         {% endif %}
-                        <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                        <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                             Fale Conosco
                         </a>
                     </div>
@@ -105,8 +104,7 @@
                     <div class="swiper-slide" style="position:relative;display:flex;align-items:center;box-sizing:border-box;">
                         {# Background image #}
                         {% if b.image %}
-                            <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg opacity-40"></div>
-                            <div style="position:absolute;inset:0;background:var(--color-primary);opacity:.1;z-index:1"></div>
+                            <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg"></div>
                         {% else %}
                             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
                         {% endif %}
@@ -117,7 +115,7 @@
                         <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
                             <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
                                 {% if block.preTitle %}
-                                    <span class="inline-block bg-cetec-orange text-white px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">
+                                    <span class="inline-block bg-cetec-orange text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider">
                                         {{ block.preTitle }}
                                     </span>
                                 {% endif %}
@@ -134,15 +132,15 @@
 
                                 <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
                                     {% if b.ctaText %}
-                                        <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                        <a href="{{ b.ctaLink ?: '#cursos' }}" class="bg-cetec-orange hover:bg-[#e55902] text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                             {{ b.ctaText }}
                                         </a>
                                     {% else %}
-                                        <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-white px-8 py-3.5 rounded-md font-black text-base md:text-[19px] shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                        <a href="#cursos" class="bg-cetec-orange hover:bg-[#e55902] text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                             Ver Nossos Cursos
                                         </a>
                                     {% endif %}
-                                    <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                    <a href="{{ path('pub_contato') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                         Fale Conosco
                                     </a>
                                 </div>
@@ -186,6 +184,21 @@
     {% endif %}
 
     <style>
+    {% if not isFullHeight %}
+    .banner-swiper-{{ block.id }},
+    .banner-swiper-{{ block.id }} .swiper-slide,
+    .banner-block {
+        min-height: 550px;
+    }
+    @media (min-width: 768px) {
+        .banner-swiper-{{ block.id }},
+        .banner-swiper-{{ block.id }} .swiper-slide,
+        .banner-block {
+            min-height: 750px;
+        }
+    }
+    {% endif %}
+
     .banner-block:hover .banner-bg {
         transform: scale(1.03);
     }

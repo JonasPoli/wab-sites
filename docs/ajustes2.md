@@ -3,6 +3,8 @@ O banner da home não ficou legal, preciso que vc entenda como os banners foram 
 veja neste projeto, neste mesmo computador, como o banner da home aparece:
 /Users/jonaspoli/work/html/layouts/cetec-site-2026
 Principalmente na disposic'ào dos textos
+No admin do banner, as cores não estão legais, o tema está escuro, mas o cadastro de banner está claro.
+Sobre o o visual do banner criado com o módulo "Criando Bloco: Banner" deve ser ajustasto
 
 
 # Membros da equipe
