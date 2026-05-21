@@ -403,6 +403,8 @@ class TenantExporter
         $this->addMediaFile($zip, 'tenant_dark_logo', $tenant->getDarkLogo());
         $this->addMediaFile($zip, 'tenant_about_image', $tenant->getAboutImage());
         $this->addMediaFile($zip, 'tenant_favicon', $tenant->getFavicon());
+        // ogImage can be a locally-uploaded file (not always an external URL)
+        $this->addMediaFile($zip, 'tenant_og_image', $tenant->getOgImage());
 
         // 2. Page cover images
         foreach ($data['pages'] as $p) {
@@ -498,19 +500,20 @@ class TenantExporter
     {
         // Simple mapping translation to match folder structure under public/uploads
         $map = [
-            'tenant_logo' => 'tenant/logo',
-            'tenant_dark_logo' => 'tenant/dark_logo',
+            'tenant_logo'        => 'tenant/logo',
+            'tenant_dark_logo'   => 'tenant/dark_logo',
             'tenant_about_image' => 'tenant/about',
-            'tenant_favicon' => 'tenant/favicon',
-            'page_cover_image' => 'page_cover',
-            'section_bg_image' => 'section/bg',
-            'section_bg_video' => 'section/video',
-            'page_block_image' => 'page_block',
+            'tenant_favicon'     => 'tenant/favicon',
+            'tenant_og_image'    => 'tenant/og',
+            'page_cover_image'   => 'page_cover',
+            'section_bg_image'   => 'section/bg',
+            'section_bg_video'   => 'section/video',
+            'page_block_image'   => 'page_block',
             'page_block_gallery' => 'page_block_gallery',
             'testimonial_avatar' => 'testimonial_avatar',
-            'partner_logo' => 'partner_logo',
-            'team_member_image' => 'team_member_image',
-            'hero_banner' => 'hero',
+            'partner_logo'       => 'partner_logo',
+            'team_member_image'  => 'team_member_image',
+            'hero_banner'        => 'hero',
         ];
 
         return $map[$mapping] ?? $mapping;

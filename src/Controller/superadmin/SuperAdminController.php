@@ -485,11 +485,20 @@ class SuperAdminController extends AbstractController
                     'trace' => $e->getTraceAsString()
                 ]);
                 $this->addFlash('error', 'Falha ao importar tenant: ' . $e->getMessage());
+
+                // Re-run analyze to refresh conflict data and re-render wizard
+                try {
+                    $freshAnalysis = $importer->analyze($zipPath);
+                } catch (\Exception $ae) {
+                    $freshAnalysis = ['metadata' => $metadata ?? [], 'conflicts' => $analysis['conflicts'] ?? [], 'has_conflicts' => true];
+                }
+
                 return $this->render('superadmin/tenant/import.html.twig', [
-                    'metadata' => $metadata ?? null,
-                    'conflicts' => $analysis['conflicts'] ?? null,
-                    'zipPath' => $zipPath,
-                    'has_conflicts' => true,
+                    'metadata'            => $freshAnalysis['metadata'] ?? ($metadata ?? null),
+                    'conflicts'           => $freshAnalysis['conflicts'] ?? ($analysis['conflicts'] ?? null),
+                    'zipPath'             => $zipPath,
+                    'has_conflicts'       => true,
+                    'previous_resolutions'=> $resolutions,
                 ]);
             }
         }

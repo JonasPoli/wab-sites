@@ -145,7 +145,52 @@ class TenantImporter
         }
 
         $this->logger->info('[TenantImporter] Iniciando transação no Banco de Dados...');
+
+        // --- Pre-flight: validate resolved credentials before any DB writes ---
+        $usersData = $data['users'] ?? [];
+        $credentialErrors = [];
+        foreach ($usersData as $uData) {
+            $originalUsername = $uData['username'];
+            $resolvedUsername = $resolutions['users'][$originalUsername]['username'] ?? $originalUsername;
+            $resolvedEmail    = $resolutions['users'][$originalUsername]['email']    ?? $uData['email'];
+
+            // Check username uniqueness
+            if ($this->em->getRepository(\App\Entity\User::class)->findOneBy(['username' => $resolvedUsername])) {
+                $credentialErrors[] = sprintf(
+                    'Username "%s" já existe no banco de dados. Escolha um nome diferente.',
+                    $resolvedUsername
+                );
+                $this->logger->warning('[TenantImporter] Conflito de username detectado na pré-verificação.', [
+                    'original_username' => $originalUsername,
+                    'resolved_username' => $resolvedUsername,
+                ]);
+            }
+
+            // Check email uniqueness (only when non-empty)
+            if (!empty($resolvedEmail)) {
+                if ($this->em->getRepository(\App\Entity\User::class)->findOneBy(['email' => $resolvedEmail])) {
+                    $credentialErrors[] = sprintf(
+                        'E-mail "%s" já existe no banco de dados. Informe um e-mail diferente.',
+                        $resolvedEmail
+                    );
+                    $this->logger->warning('[TenantImporter] Conflito de e-mail detectado na pré-verificação.', [
+                        'original_username' => $originalUsername,
+                        'resolved_email'    => $resolvedEmail,
+                    ]);
+                }
+            }
+        }
+
+        if (!empty($credentialErrors)) {
+            $filesystem->remove($tempWorkDir);
+            throw new \RuntimeException(
+                'Conflito de credenciais de usuários: ' . implode(' | ', $credentialErrors)
+            );
+        }
+        // --- End pre-flight ---
+
         $this->em->beginTransaction();
+
         try {
             // 1. Create and persist Tenant
             $tData = $data['tenant'];
@@ -193,6 +238,11 @@ class TenantImporter
             if (!empty($tData['aboutImage'])) {
                 $tenant->setAboutImage($tData['aboutImage']);
                 $this->relocateMediaFile($tempWorkDir, 'tenant_about_image', $tData['aboutImage']);
+            }
+            if (!empty($tData['ogImage'])) {
+                $tenant->setOgImage($tData['ogImage']);
+                // Try to relocate as local file; if not in the zip, it stays as a URL string
+                $this->relocateMediaFile($tempWorkDir, 'tenant_og_image', $tData['ogImage']);
             }
 
             $this->em->persist($tenant);
@@ -414,9 +464,18 @@ class TenantImporter
                 }
             }
 
-            // 7. Connect HomePage
+            // 7. Connect HomePage — must be done after all pages are persisted and flushed
             if (!empty($tData['homePageId']) && isset($pageMap[$tData['homePageId']])) {
                 $tenant->setHomePage($pageMap[$tData['homePageId']]);
+                $this->logger->info('[TenantImporter] Página inicial (homePage) conectada ao tenant.', [
+                    'original_page_id' => $tData['homePageId'],
+                    'new_page_id'      => $pageMap[$tData['homePageId']]->getId(),
+                ]);
+            } else {
+                $this->logger->warning('[TenantImporter] homePageId não encontrado ou não mapeado. Home page não definida.', [
+                    'homePageId_from_export' => $tData['homePageId'] ?? null,
+                    'page_map_keys'          => array_keys($pageMap),
+                ]);
             }
 
             // 8. Create Hero Banners
@@ -549,19 +608,20 @@ class TenantImporter
     private function getMappingPath(string $mapping): string
     {
         $map = [
-            'tenant_logo' => 'tenant/logo',
-            'tenant_dark_logo' => 'tenant/dark_logo',
+            'tenant_logo'        => 'tenant/logo',
+            'tenant_dark_logo'   => 'tenant/dark_logo',
             'tenant_about_image' => 'tenant/about',
-            'tenant_favicon' => 'tenant/favicon',
-            'page_cover_image' => 'page_cover',
-            'section_bg_image' => 'section/bg',
-            'section_bg_video' => 'section/video',
-            'page_block_image' => 'page_block',
+            'tenant_favicon'     => 'tenant/favicon',
+            'tenant_og_image'    => 'tenant/og',
+            'page_cover_image'   => 'page_cover',
+            'section_bg_image'   => 'section/bg',
+            'section_bg_video'   => 'section/video',
+            'page_block_image'   => 'page_block',
             'page_block_gallery' => 'page_block_gallery',
             'testimonial_avatar' => 'testimonial_avatar',
-            'partner_logo' => 'partner_logo',
-            'team_member_image' => 'team_member_image',
-            'hero_banner' => 'hero',
+            'partner_logo'       => 'partner_logo',
+            'team_member_image'  => 'team_member_image',
+            'hero_banner'        => 'hero',
         ];
 
         return $map[$mapping] ?? $mapping;
