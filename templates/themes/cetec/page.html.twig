@@ -34,9 +34,20 @@
 {# ── Page Sections ── #}
 {% for section in page.sections %}{% if section.active %}
 
+    {# Detect if the section contains a banner block #}
+    {% set hasBanner = false %}
+    {% for block in section.blocks %}
+        {% if block.type == 'banner' %}
+            {% set hasBanner = true %}
+        {% endif %}
+    {% endfor %}
+
     {# ── Background Style Construction ── #}
     {% set sectionStyle = '' %}
     {% set sectionClass = 'cetec-section py-16 border-b border-gray-100 dark:border-white/5 relative' %}
+    {% if hasBanner %}
+        {% set sectionClass = sectionClass ~ ' section-has-banner' %}
+    {% endif %}
     {% set isDark = false %}
     {% if section.bgType in ['image', 'video', 'gradient'] %}
         {% set isDark = true %}
@@ -97,4 +108,13 @@
 
 {% endif %}{% endfor %}
 
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .cetec-section.section-has-banner {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+</style>
 {% endblock %}
