@@ -419,10 +419,26 @@ class AdminContentController extends AbstractController
         $section->setTitlePart1($r->request->get('titlePart1') ?: null);
         $section->setTitlePart2($r->request->get('titlePart2') ?: null);
         $section->setActive((bool) $r->request->get('active'));
-        // Background
-        $section->setBgType($r->request->get('bgType', 'none'));
-        $section->setBgColor($r->request->get('bgColor') ?: null);
-        $section->setBgGradient($r->request->get('bgGradient') ?: null);
+        
+        // Background type and cleanups
+        $bgType = $r->request->get('bgType', 'none');
+        $section->setBgType($bgType);
+        
+        if ($bgType === 'color') {
+            $section->setBgColor($r->request->get('bgColor') ?: null);
+            $section->setBgGradient(null);
+        } elseif ($bgType === 'gradient') {
+            $section->setBgColor(null);
+            $section->setBgGradient($r->request->get('bgGradient') ?: null);
+        } elseif ($bgType === 'video') {
+            $section->setBgColor($r->request->get('bgColor') ?: null); // Video overlay color
+            $section->setBgGradient(null);
+        } else {
+            // none or image
+            $section->setBgColor(null);
+            $section->setBgGradient(null);
+        }
+        
         $section->setBgImageOpacity((int) ($r->request->get('bgImageOpacity') ?? 100));
         $section->setBgImagePosition($r->request->get('bgImagePosition', 'center'));
         $bgImg = $r->files->get('bgImageFile');
