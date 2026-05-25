@@ -125,7 +125,24 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="af-field">
+                <label>Background 1 (Modo Claro)</label>
+                <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" name="bgColorLight1" id="bgColorLight1Input" value="{{ tenant.bgColorLight1 ?? '#ffffff' }}" style="width:45px;height:38px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer" oninput="document.getElementById('bgColorLight1Hex').value = this.value; updateContrastPreview();">
+                    <input type="text" id="bgColorLight1Hex" class="ai" value="{{ tenant.bgColorLight1 ?? '#ffffff' }}" style="flex:1" placeholder="#ffffff" oninput="document.getElementById('bgColorLight1Input').value = this.value; updateContrastPreview();">
+                </div>
+            </div>
+            <div class="af-field">
+                <label>Background 2 (Modo Claro)</label>
+                <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" name="bgColorLight2" id="bgColorLight2Input" value="{{ tenant.bgColorLight2 ?? '#f8fafc' }}" style="width:45px;height:38px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer" oninput="document.getElementById('bgColorLight2Hex').value = this.value; updateContrastPreview();">
+                    <input type="text" id="bgColorLight2Hex" class="ai" value="{{ tenant.bgColorLight2 ?? '#f8fafc' }}" style="flex:1" placeholder="#f8fafc" oninput="document.getElementById('bgColorLight2Input').value = this.value; updateContrastPreview();">
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
             <div class="af-field">
                 <label>Cor Primária (Modo Escuro)</label>
                 <div style="display:flex;gap:.5rem;align-items:center;">
@@ -138,6 +155,23 @@
                 <div style="display:flex;gap:.5rem;align-items:center;">
                     <input type="color" name="secondaryColorDark" id="secondaryColorDarkInput" value="{{ tenant.secondaryColorDark ?? '#fbbf24' }}" style="width:45px;height:38px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer" oninput="document.getElementById('secondaryColorDarkHex').value = this.value; updateContrastPreview();">
                     <input type="text" id="secondaryColorDarkHex" class="ai" value="{{ tenant.secondaryColorDark ?? '#fbbf24' }}" style="flex:1" placeholder="#fbbf24" oninput="document.getElementById('secondaryColorDarkInput').value = this.value; updateContrastPreview();">
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            <div class="af-field">
+                <label>Background 1 (Modo Escuro)</label>
+                <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" name="bgColorDark1" id="bgColorDark1Input" value="{{ tenant.bgColorDark1 ?? '#0d0f1a' }}" style="width:45px;height:38px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer" oninput="document.getElementById('bgColorDark1Hex').value = this.value; updateContrastPreview();">
+                    <input type="text" id="bgColorDark1Hex" class="ai" value="{{ tenant.bgColorDark1 ?? '#0d0f1a' }}" style="flex:1" placeholder="#0d0f1a" oninput="document.getElementById('bgColorDark1Input').value = this.value; updateContrastPreview();">
+                </div>
+            </div>
+            <div class="af-field">
+                <label>Background 2 (Modo Escuro)</label>
+                <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" name="bgColorDark2" id="bgColorDark2Input" value="{{ tenant.bgColorDark2 ?? '#131625' }}" style="width:45px;height:38px;padding:0;border:1px solid var(--border);border-radius:6px;cursor:pointer" oninput="document.getElementById('bgColorDark2Hex').value = this.value; updateContrastPreview();">
+                    <input type="text" id="bgColorDark2Hex" class="ai" value="{{ tenant.bgColorDark2 ?? '#131625' }}" style="flex:1" placeholder="#131625" oninput="document.getElementById('bgColorDark2Input').value = this.value; updateContrastPreview();">
                 </div>
             </div>
         </div>
@@ -159,67 +193,83 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
             {# MOCKUP MODO CLARO #}
-            <div id="preview-light" style="--preview-primary: {{ tenant.primaryColor ?? '#0044cc' }}; --preview-secondary: {{ tenant.secondaryColor ?? '#ffaa00' }}; background: #ffffff; color: #1f2937; border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 1.25rem;">
-                <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #f3f4f6; color: #4b5563; padding: 0.25rem 0.5rem; border-radius: 4px;">Modo Claro</div>
+            <div id="preview-light" style="--preview-primary: {{ tenant.primaryColor ?? '#0044cc' }}; --preview-secondary: {{ tenant.secondaryColor ?? '#ffaa00' }}; --preview-bg-1: {{ tenant.bgColorLight1 ?? '#ffffff' }}; --preview-bg-2: {{ tenant.bgColorLight2 ?? '#f8fafc' }}; background: var(--preview-bg-1); color: #1f2937; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                 
-                <div>
-                    <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 700; color: var(--preview-primary); transition: color 0.2s ease;">Título em Cor Primária</h3>
-                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.5; color: #4b5563;">
-                        Este parágrafo demonstra a legibilidade de textos normais. A cor secundária é usada para destacar detalhes e ações importantes.
+                {# Band 1: Background 1 #}
+                <div class="preview-stripe-1" style="background: var(--preview-bg-1); padding: 1.5rem; border-bottom: 1px dashed var(--border); position: relative;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #e5e7eb; color: #374151; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 1 (Bg 1)</div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.15rem; font-weight: 700; color: var(--preview-primary); transition: color 0.2s ease;">Título em Cor Primária</h3>
+                    <p style="margin: 0; font-size: 0.82rem; line-height: 1.5; color: #4b5563;">
+                        Este parágrafo simula um bloco de texto normal exibido sobre o <strong>Background 1</strong>.
                     </p>
                 </div>
 
-                {# Botão CTA com cor primária de fundo #}
-                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <button type="button" style="background: var(--preview-primary); color: #ffffff; border: none; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: default; transition: background 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-play"></i> Botão Primário
-                    </button>
-                    <button type="button" style="background: transparent; color: var(--preview-primary); border: 2px solid var(--preview-primary); padding: 0.4rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: default; transition: color 0.2s ease, border-color 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        Botão Outline
-                    </button>
+                {# Band 2: Background 2 #}
+                <div class="preview-stripe-2" style="background: var(--preview-bg-2); padding: 1.5rem; border-bottom: 1px dashed var(--border); position: relative;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #e5e7eb; color: #374151; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 2 (Bg 2)</div>
+                    <div style="background: var(--preview-bg-1); border-left: 4px solid var(--preview-secondary); border-radius: 8px; padding: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <div style="background: rgba(255,170,0,0.1); color: var(--preview-secondary); width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem;" class="preview-sec-bg-light">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.15rem; font-size: 0.85rem; font-weight: 600; color: #1f2937;">Destaque (Cor Secundária)</h4>
+                            <p style="margin: 0; font-size: 0.75rem; line-height: 1.4; color: #6b7280;">Este cartão lateral usa a cor secundária sobre o <strong>Background 2</strong>.</p>
+                        </div>
+                    </div>
                 </div>
 
-                {# Card Blurb com cor secundária ou bordas #}
-                <div style="background: #f9fafb; border-left: 4px solid var(--preview-secondary); border-radius: 6px; padding: 1rem; display: flex; gap: 0.75rem; align-items: flex-start; transition: border-color 0.2s ease;">
-                    <div style="background: rgba(255,170,0,0.1); color: var(--preview-secondary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; transition: color 0.2s, background-color 0.2s;" class="preview-sec-bg-light">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div>
-                        <h4 style="margin: 0 0 0.25rem; font-size: 0.9rem; font-weight: 600; color: #1f2937;">Destaque (Cor Secundária)</h4>
-                        <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #6b7280;">Este cartão lateral usa a cor secundária como borda de destaque e no ícone para chamar a atenção.</p>
+                {# Band 3: Background 1 (de novo) #}
+                <div class="preview-stripe-3" style="background: var(--preview-bg-1); padding: 1.5rem; position: relative; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #e5e7eb; color: #374151; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 3 (Bg 1)</div>
+                    <p style="margin: 0; font-size: 0.8rem; color: #4b5563;">Chamada de ação (CTA) finalizada no <strong>Background 1</strong>:</p>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <button type="button" style="background: var(--preview-primary); color: #ffffff; border: none; padding: 0.45rem 0.9rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; cursor: default; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-check"></i> Botão Primário
+                        </button>
+                        <button type="button" style="background: transparent; color: var(--preview-primary); border: 2px solid var(--preview-primary); padding: 0.35rem 0.8rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; cursor: default; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            Botão Outline
+                        </button>
                     </div>
                 </div>
             </div>
 
             {# MOCKUP MODO ESCURO #}
-            <div id="preview-dark" style="--preview-primary: {{ tenant.primaryColorDark ?? '#3b82f6' }}; --preview-secondary: {{ tenant.secondaryColorDark ?? '#fbbf24' }}; background: #0f172a; color: #f1f5f9; border: 1px solid #334155; border-radius: 12px; padding: 1.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 1.25rem;">
-                <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #1e293b; color: #94a3b8; padding: 0.25rem 0.5rem; border-radius: 4px;">Modo Escuro</div>
+            <div id="preview-dark" style="--preview-primary: {{ tenant.primaryColorDark ?? '#3b82f6' }}; --preview-secondary: {{ tenant.secondaryColorDark ?? '#fbbf24' }}; --preview-bg-1: {{ tenant.bgColorDark1 ?? '#0d0f1a' }}; --preview-bg-2: {{ tenant.bgColorDark2 ?? '#131625' }}; background: var(--preview-bg-1); color: #f1f5f9; border: 1px solid #334155; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                 
-                <div>
-                    <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 700; color: var(--preview-primary); transition: color 0.2s ease;">Título em Cor Primária</h3>
-                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.5; color: #94a3b8;">
-                        Este parágrafo demonstra a legibilidade de textos normais. A cor secundária é usada para destacar detalhes e ações importantes.
+                {# Band 1: Background 1 #}
+                <div class="preview-dark-stripe-1" style="background: var(--preview-bg-1); padding: 1.5rem; border-bottom: 1px dashed #334155; position: relative;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #1e293b; color: #94a3b8; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 1 (Bg 1)</div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.15rem; font-weight: 700; color: var(--preview-primary); transition: color 0.2s ease;">Título em Cor Primária</h3>
+                    <p style="margin: 0; font-size: 0.82rem; line-height: 1.5; color: #94a3b8;">
+                        Este parágrafo simula um bloco de texto normal exibido sobre o <strong>Background 1</strong>.
                     </p>
                 </div>
 
-                {# Botão CTA com cor primária de fundo #}
-                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <button type="button" style="background: var(--preview-primary); color: #ffffff; border: none; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: default; transition: background 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-play"></i> Botão Primário
-                    </button>
-                    <button type="button" style="background: transparent; color: var(--preview-primary); border: 2px solid var(--preview-primary); padding: 0.4rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: default; transition: color 0.2s ease, border-color 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        Botão Outline
-                    </button>
+                {# Band 2: Background 2 #}
+                <div class="preview-dark-stripe-2" style="background: var(--preview-bg-2); padding: 1.5rem; border-bottom: 1px dashed #334155; position: relative;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #1e293b; color: #94a3b8; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 2 (Bg 2)</div>
+                    <div style="background: var(--preview-bg-1); border-left: 4px solid var(--preview-secondary); border-radius: 8px; padding: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <div style="background: rgba(251,191,36,0.1); color: var(--preview-secondary); width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem;" class="preview-sec-bg-dark">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.15rem; font-size: 0.85rem; font-weight: 600; color: #f1f5f9;">Destaque (Cor Secundária)</h4>
+                            <p style="margin: 0; font-size: 0.75rem; line-height: 1.4; color: #94a3b8;">Este cartão lateral usa a cor secundária sobre o <strong>Background 2</strong>.</p>
+                        </div>
+                    </div>
                 </div>
 
-                {# Card Blurb com cor secundária ou bordas #}
-                <div style="background: #1e293b; border-left: 4px solid var(--preview-secondary); border-radius: 6px; padding: 1rem; display: flex; gap: 0.75rem; align-items: flex-start; transition: border-color 0.2s ease;">
-                    <div style="background: rgba(251,191,36,0.1); color: var(--preview-secondary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; transition: color 0.2s, background-color 0.2s;" class="preview-sec-bg-dark">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div>
-                        <h4 style="margin: 0 0 0.25rem; font-size: 0.9rem; font-weight: 600; color: #f1f5f9;">Destaque (Cor Secundária)</h4>
-                        <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #94a3b8;">Este cartão lateral usa a cor secundária como borda de destaque e no ícone para chamar a atenção.</p>
+                {# Band 3: Background 1 (de novo) #}
+                <div class="preview-dark-stripe-3" style="background: var(--preview-bg-1); padding: 1.5rem; position: relative; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #1e293b; color: #94a3b8; padding: 0.25rem 0.5rem; border-radius: 4px; z-index: 10;">Seção 3 (Bg 1)</div>
+                    <p style="margin: 0; font-size: 0.8rem; color: #94a3b8;">Chamada de ação (CTA) finalizada no <strong>Background 1</strong>:</p>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <button type="button" style="background: var(--preview-primary); color: #ffffff; border: none; padding: 0.45rem 0.9rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; cursor: default; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-check"></i> Botão Primário
+                        </button>
+                        <button type="button" style="background: transparent; color: var(--preview-primary); border: 2px solid var(--preview-primary); padding: 0.35rem 0.8rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; cursor: default; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            Botão Outline
+                        </button>
                     </div>
                 </div>
             </div>
@@ -607,10 +657,17 @@ function updateContrastPreview() {
     const primaryDark = document.getElementById('primaryColorDarkInput').value || '#3b82f6';
     const secondaryDark = document.getElementById('secondaryColorDarkInput').value || '#fbbf24';
 
+    const bgLight1 = document.getElementById('bgColorLight1Input').value || '#ffffff';
+    const bgLight2 = document.getElementById('bgColorLight2Input').value || '#f8fafc';
+    const bgDark1 = document.getElementById('bgColorDark1Input').value || '#0d0f1a';
+    const bgDark2 = document.getElementById('bgColorDark2Input').value || '#131625';
+
     const pLight = document.getElementById('preview-light');
     if (pLight) {
         pLight.style.setProperty('--preview-primary', primaryLight);
         pLight.style.setProperty('--preview-secondary', secondaryLight);
+        pLight.style.setProperty('--preview-bg-1', bgLight1);
+        pLight.style.setProperty('--preview-bg-2', bgLight2);
     }
     
     const lightBgEl = document.querySelector('.preview-sec-bg-light');
@@ -622,6 +679,8 @@ function updateContrastPreview() {
     if (pDark) {
         pDark.style.setProperty('--preview-primary', primaryDark);
         pDark.style.setProperty('--preview-secondary', secondaryDark);
+        pDark.style.setProperty('--preview-bg-1', bgDark1);
+        pDark.style.setProperty('--preview-bg-2', bgDark2);
     }
     
     const darkBgEl = document.querySelector('.preview-sec-bg-dark');

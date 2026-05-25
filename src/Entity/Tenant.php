@@ -46,6 +46,18 @@ class Tenant
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $secondaryColorDark = '#fbbf24';
 
+    #[ORM\Column(length: 7, nullable: true, options: ['default' => '#ffffff'])]
+    private ?string $bgColorLight1 = '#ffffff';
+
+    #[ORM\Column(length: 7, nullable: true, options: ['default' => '#f8fafc'])]
+    private ?string $bgColorLight2 = '#f8fafc';
+
+    #[ORM\Column(length: 7, nullable: true, options: ['default' => '#0d0f1a'])]
+    private ?string $bgColorDark1 = '#0d0f1a';
+
+    #[ORM\Column(length: 7, nullable: true, options: ['default' => '#131625'])]
+    private ?string $bgColorDark2 = '#131625';
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactEmail = null;
 
@@ -170,6 +182,18 @@ class Tenant
 
     public function getSecondaryColorDark(): ?string { return $this->secondaryColorDark; }
     public function setSecondaryColorDark(?string $secondaryColorDark): static { $this->secondaryColorDark = $secondaryColorDark; return $this; }
+
+    public function getBgColorLight1(): ?string { return $this->bgColorLight1; }
+    public function setBgColorLight1(?string $color): static { $this->bgColorLight1 = $color; return $this; }
+
+    public function getBgColorLight2(): ?string { return $this->bgColorLight2; }
+    public function setBgColorLight2(?string $color): static { $this->bgColorLight2 = $color; return $this; }
+
+    public function getBgColorDark1(): ?string { return $this->bgColorDark1; }
+    public function setBgColorDark1(?string $color): static { $this->bgColorDark1 = $color; return $this; }
+
+    public function getBgColorDark2(): ?string { return $this->bgColorDark2; }
+    public function setBgColorDark2(?string $color): static { $this->bgColorDark2 = $color; return $this; }
 
     public function getContactEmail(): ?string { return $this->contactEmail; }
     public function setContactEmail(?string $contactEmail): static { $this->contactEmail = $contactEmail; return $this; }
@@ -327,6 +351,10 @@ class Tenant
             'secondaryColor'   => $this->secondaryColor,
             'primaryColorDark'   => $this->primaryColorDark,
             'secondaryColorDark' => $this->secondaryColorDark,
+            'bgColorLight1'    => $this->bgColorLight1,
+            'bgColorLight2'    => $this->bgColorLight2,
+            'bgColorDark1'     => $this->bgColorDark1,
+            'bgColorDark2'     => $this->bgColorDark2,
             'contactEmail'     => $this->contactEmail,
             'youtubeLink'      => $this->youtubeLink,
             'instagramLink'    => $this->instagramLink,
@@ -367,6 +395,10 @@ class Tenant
         $this->secondaryColor    = $data['secondaryColor'];
         $this->primaryColorDark   = $data['primaryColorDark'] ?? '#3b82f6';
         $this->secondaryColorDark = $data['secondaryColorDark'] ?? '#fbbf24';
+        $this->bgColorLight1     = $data['bgColorLight1'] ?? '#ffffff';
+        $this->bgColorLight2     = $data['bgColorLight2'] ?? '#f8fafc';
+        $this->bgColorDark1      = $data['bgColorDark1'] ?? '#0d0f1a';
+        $this->bgColorDark2      = $data['bgColorDark2'] ?? '#131625';
         $this->contactEmail      = $data['contactEmail'];
         $this->youtubeLink       = $data['youtubeLink'];
         $this->instagramLink     = $data['instagramLink'];

@@ -68,6 +68,10 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         $secondary = htmlspecialchars($tenant->getSecondaryColor() ?? '#ffaa00');
         $primaryDark = htmlspecialchars($tenant->getPrimaryColorDark() ?? '#3b82f6');
         $secondaryDark = htmlspecialchars($tenant->getSecondaryColorDark() ?? '#fbbf24');
+        $bgColorLight1 = htmlspecialchars($tenant->getBgColorLight1() ?? '#ffffff');
+        $bgColorLight2 = htmlspecialchars($tenant->getBgColorLight2() ?? '#f8fafc');
+        $bgColorDark1 = htmlspecialchars($tenant->getBgColorDark1() ?? '#0d0f1a');
+        $bgColorDark2 = htmlspecialchars($tenant->getBgColorDark2() ?? '#131625');
 
         $isPrimaryDark = $this->isDarkColor($primary);
         $isPrimaryDarkDark = $this->isDarkColor($primaryDark);
@@ -174,16 +178,16 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
 
 /* Automatic alternating backgrounds for undefined sections */
 .auto-bg-a {
-  background-color: #ffffff !important;
+  background-color: {$bgColorLight1} !important;
 }
 .auto-bg-b {
-  background-color: color-mix(in srgb, var(--color-primary) 10%, #ffffff) !important;
+  background-color: {$bgColorLight2} !important;
 }
 [data-theme="dark"] .auto-bg-a, html.dark .auto-bg-a, .dark .auto-bg-a {
-  background-color: var(--bg, #0d0f1a) !important;
+  background-color: {$bgColorDark1} !important;
 }
 [data-theme="dark"] .auto-bg-b, html.dark .auto-bg-b, .dark .auto-bg-b {
-  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--bg, #0d0f1a)) !important;
+  background-color: {$bgColorDark2} !important;
 }
 </style>
 HTML;
