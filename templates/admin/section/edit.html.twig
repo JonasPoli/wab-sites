@@ -61,9 +61,10 @@
         <div class="af-field">
             <label>Cor de fundo</label>
             <div style="display:flex;align-items:center;gap:1rem">
-                <input type="color" name="bgColor" value="{{ section.bgColor ?? '#1e293b' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px">
+                <input type="color" name="bgColor" id="bg-color-picker" value="{{ section.bgColor ?? '#1e293b' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"
+                       oninput="document.getElementById('bg-color-text').value=this.value">
                 <input type="text" id="bg-color-text" class="ai" style="width:140px" value="{{ section.bgColor ?? '#1e293b' }}"
-                       oninput="document.querySelector('[name=bgColor]').value=this.value">
+                       oninput="document.getElementById('bg-color-picker').value=this.value">
             </div>
         </div>
     </div>
@@ -133,9 +134,10 @@
         <div class="af-field">
             <label>Cor do overlay (transparência sobre o vídeo)</label>
             <div style="display:flex;align-items:center;gap:1rem">
-                <input type="color" name="bgColor" value="{{ section.bgColor ?? '#000000' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px">
-                <input type="text" class="ai" style="width:140px" value="{{ section.bgColor ?? '#000000' }}"
-                       oninput="document.querySelector('[name=bgColor]').value=this.value">
+                <input type="color" name="bgColor" id="bg-video-color-picker" value="{{ section.bgColor ?? '#000000' }}" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"
+                       oninput="document.getElementById('bg-video-color-text').value=this.value">
+                <input type="text" id="bg-video-color-text" class="ai" style="width:140px" value="{{ section.bgColor ?? '#000000' }}"
+                       oninput="document.getElementById('bg-video-color-picker').value=this.value">
                 <span class="af-hint">O overlay é exibido com 50% de opacidade sobre o vídeo</span>
             </div>
         </div>
@@ -157,9 +159,19 @@
 {% block javascripts %}{{ parent() }}
 <script>
 function showBgPanel(type) {
-    document.querySelectorAll('.bg-panel').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.bg-panel').forEach(el => {
+        el.classList.add('hidden');
+        el.querySelectorAll('input[type=color]').forEach(input => {
+            input.disabled = true;
+        });
+    });
     const p = document.getElementById('bg-panel-' + type);
-    if (p) p.classList.remove('hidden');
+    if (p) {
+        p.classList.remove('hidden');
+        p.querySelectorAll('input[type=color]').forEach(input => {
+            input.disabled = false;
+        });
+    }
     syncBorderColors();
 }
 function syncBorderColors() {
@@ -188,7 +200,13 @@ function prevBgImg(input) {
     r.readAsDataURL(input.files[0]);
 }
 // sync on load
-document.addEventListener('DOMContentLoaded', syncBorderColors);
+document.addEventListener('DOMContentLoaded', () => {
+    syncBorderColors();
+    const checkedRadio = document.querySelector('[name=bgType]:checked');
+    if (checkedRadio) {
+        showBgPanel(checkedRadio.value);
+    }
+});
 document.querySelectorAll('[name=bgType]').forEach(r => r.addEventListener('change', () => { showBgPanel(r.value); }));
 </script>
 {% endblock %}

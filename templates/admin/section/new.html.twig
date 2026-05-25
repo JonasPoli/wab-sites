@@ -41,7 +41,17 @@
             {% endfor %}
         </div>
     </div>
-    <div id="bg-panel-color" class="bg-panel hidden"><div class="af-field"><label>Cor de fundo</label><div style="display:flex;align-items:center;gap:1rem"><input type="color" name="bgColor" value="#1e293b" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"><input type="text" id="bg-color-text" class="ai" style="width:140px" value="#1e293b" oninput="document.querySelector('[name=bgColor]').value=this.value"></div></div></div>
+    <div id="bg-panel-color" class="bg-panel hidden">
+        <div class="af-field">
+            <label>Cor de fundo</label>
+            <div style="display:flex;align-items:center;gap:1rem">
+                <input type="color" name="bgColor" id="bg-color-picker" value="#1e293b" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"
+                       oninput="document.getElementById('bg-color-text').value=this.value">
+                <input type="text" id="bg-color-text" class="ai" style="width:140px" value="#1e293b"
+                       oninput="document.getElementById('bg-color-picker').value=this.value">
+            </div>
+        </div>
+    </div>
     <div id="bg-panel-gradient" class="bg-panel hidden"><div class="af-field"><label>CSS do gradiente</label><input type="text" name="bgGradient" id="bg-gradient-input" class="ai" value="135deg, #0f172a 0%, #1e3a5f 100%" oninput="updateGradientPreview(this.value)"><div id="gradient-preview" style="height:48px;border-radius:8px;margin-top:.5rem;background:linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)"></div></div></div>
     <div id="bg-panel-image" class="bg-panel hidden">
         <div class="af-field"><label>Imagem de fundo</label><input type="file" name="bgImageFile" accept="image/*" class="ai" style="cursor:pointer"></div>
@@ -52,7 +62,15 @@
     </div>
     <div id="bg-panel-video" class="bg-panel hidden">
         <div class="af-field"><label>Arquivo de vídeo (MP4)</label><input type="file" name="bgVideoFile" accept="video/mp4,video/webm" class="ai" style="cursor:pointer"><p class="af-hint">MP4 ou WebM — até 15 MB · loop sem áudio</p></div>
-        <div class="af-field"><label>Cor do overlay</label><div style="display:flex;align-items:center;gap:1rem"><input type="color" name="bgColor" value="#000000" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"><input type="text" class="ai" style="width:140px" value="#000000" oninput="document.querySelectorAll('[name=bgColor]')[1].value=this.value"></div></div>
+        <div class="af-field">
+            <label>Cor do overlay</label>
+            <div style="display:flex;align-items:center;gap:1rem">
+                <input type="color" name="bgColor" id="bg-video-color-picker" value="#000000" style="height:44px;width:60px;border:none;background:none;cursor:pointer;border-radius:8px"
+                       oninput="document.getElementById('bg-video-color-text').value=this.value">
+                <input type="text" id="bg-video-color-text" class="ai" style="width:140px" value="#000000"
+                       oninput="document.getElementById('bg-video-color-picker').value=this.value">
+            </div>
+        </div>
     </div>
 
     <div class="af-actions">
@@ -66,8 +84,40 @@
 {% endblock %}
 {% block javascripts %}{{ parent() }}
 <script>
-function showBgPanel(t){document.querySelectorAll('.bg-panel').forEach(e=>e.classList.add('hidden'));const p=document.getElementById('bg-panel-'+t);if(p)p.classList.remove('hidden');document.querySelectorAll('#bg-type-btns label').forEach(l=>{const r=l.querySelector('input');l.style.borderColor=r.checked?'var(--primary)':'var(--border)';l.style.background=r.checked?'rgba(79,110,247,.08)':'transparent';});}
-function updateGradientPreview(v){document.getElementById('gradient-preview').style.background='linear-gradient('+v+')';}
-document.querySelectorAll('[name=bgType]').forEach(r=>r.addEventListener('change',()=>showBgPanel(r.value)));
+function showBgPanel(type) {
+    document.querySelectorAll('.bg-panel').forEach(el => {
+        el.classList.add('hidden');
+        el.querySelectorAll('input[type=color]').forEach(input => {
+            input.disabled = true;
+        });
+    });
+    const p = document.getElementById('bg-panel-' + type);
+    if (p) {
+        p.classList.remove('hidden');
+        p.querySelectorAll('input[type=color]').forEach(input => {
+            input.disabled = false;
+        });
+    }
+    syncBorderColors();
+}
+function syncBorderColors() {
+    document.querySelectorAll('#bg-type-btns label').forEach(label => {
+        const radio = label.querySelector('input[type=radio]');
+        label.style.borderColor = radio.checked ? 'var(--primary)' : 'var(--border)';
+        label.style.background  = radio.checked ? 'rgba(79,110,247,.08)' : 'transparent';
+    });
+}
+function updateGradientPreview(val) {
+    document.getElementById('gradient-preview').style.background = 'linear-gradient(' + val + ')';
+}
+// sync on load
+document.addEventListener('DOMContentLoaded', () => {
+    syncBorderColors();
+    const checkedRadio = document.querySelector('[name=bgType]:checked');
+    if (checkedRadio) {
+        showBgPanel(checkedRadio.value);
+    }
+});
+document.querySelectorAll('[name=bgType]').forEach(r => r.addEventListener('change', () => { showBgPanel(r.value); }));
 </script>
 {% endblock %}
