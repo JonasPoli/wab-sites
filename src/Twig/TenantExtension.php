@@ -171,6 +171,20 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
   --topbar-border: {$topbarBorderDark};
 }
 {$cssRules}
+
+/* Automatic alternating backgrounds for undefined sections */
+.auto-bg-a {
+  background-color: #ffffff !important;
+}
+.auto-bg-b {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, #ffffff) !important;
+}
+[data-theme="dark"] .auto-bg-a, html.dark .auto-bg-a, .dark .auto-bg-a {
+  background-color: var(--bg, #0d0f1a) !important;
+}
+[data-theme="dark"] .auto-bg-b, html.dark .auto-bg-b, .dark .auto-bg-b {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--bg, #0d0f1a)) !important;
+}
 </style>
 HTML;
     }

@@ -107,6 +107,7 @@
 {% endif %}
 
 {# ── Category Sections ── #}
+{% set undefinedSectionCount = 0 %}
 {% for section in category.sections %}{% if section.active %}
 
     {% set sectionStyle = '' %}
@@ -120,6 +121,16 @@
 
     {% if isDark %}
         {% set sectionClass = sectionClass ~ ' mp-section-dark text-white' %}
+    {% endif %}
+
+    {% set bgNotDefined = (section.bgType == 'none' or section.bgType is empty or (section.bgType == 'color' and not section.bgColor)) %}
+    {% if bgNotDefined %}
+        {% set undefinedSectionCount = undefinedSectionCount + 1 %}
+        {% if undefinedSectionCount % 2 == 1 %}
+            {% set sectionClass = sectionClass ~ ' auto-bg-a' %}
+        {% else %}
+            {% set sectionClass = sectionClass ~ ' auto-bg-b' %}
+        {% endif %}
     {% endif %}
 
     {% if section.bgType == 'color' and section.bgColor %}
