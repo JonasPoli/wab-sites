@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 border-b border-white/10 pb-16 pt-10">
+    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-white/10 pb-16 pt-10">
         <!-- Col 1: Brand Info -->
         <div data-aos="fade-up">
             <div class="mb-6">
@@ -35,7 +35,7 @@
                 {% if currentTenant and currentTenant.seoDescription %}
                     {{ currentTenant.seoDescription }}
                 {% else %}
-                    {{ currentTenant ? currentTenant.name : 'CETEC' }} — Líder em Ensino Técnico, oferecendo formação profissional de excelência há mais de 20 anos.
+                    {{ currentTenant ? currentTenant.name : 'CETEC' }} — Líder em Ensino Técnico, oferecendo formação profissional de excellence há mais de 20 anos.
                 {% endif %}
             </p>
             
@@ -70,29 +70,6 @@
                     {% endfor %}
                 {% endif %}
                 <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Contato</a></li>
-            </ul>
-        </div>
-
-        <!-- Col 3: Highlighted Categories -->
-        <div data-aos="fade-up" data-aos-delay="200">
-            <h4 class="footer-title">Áreas & Cursos</h4>
-            <ul class="space-y-4 text-gray-400 text-sm">
-                {% if footerCategories is defined %}
-                    {% set active_footer_categories = [] %}
-                    {% for cat in footerCategories %}
-                        {% set active_children_count = 0 %}
-                        {% for sub in cat.children %}
-                            {% if sub.pages|length > 0 %}{% set active_children_count = active_children_count + 1 %}{% endif %}
-                        {% endfor %}
-                        {% if cat.pages|length > 0 or active_children_count > 0 %}
-                            {% set active_footer_categories = active_footer_categories|merge([cat]) %}
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% for cat in active_footer_categories|slice(0, 5) %}
-                        <li><a href="{{ path('pub_category', {slug: cat.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ cat.name }}</a></li>
-                    {% endfor %}
-                {% endif %}
             </ul>
         </div>
 
