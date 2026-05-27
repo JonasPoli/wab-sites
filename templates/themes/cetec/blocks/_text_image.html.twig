@@ -1,7 +1,7 @@
 {% if block.title or block.text or block.preTitle or block.image %}
 {% set pos = block.config ? (block.config.imagePosition ?? 'right') : 'right' %}
 <div class="wab-block flex flex-col {{ pos == 'left' ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-16 py-8">
-    <div class="flex-1 w-full text-left">
+    <div class="flex-1 w-full text-left" data-aos="{{ pos == 'left' ? 'fade-left' : 'fade-right' }}">
         {% if block.preTitle %}
             <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
                 {{ block.preTitle }}
@@ -26,7 +26,7 @@
         {% endif %}
     </div>
     {% if block.image %}
-    <div class="flex-1 w-full relative">
+    <div class="flex-1 w-full relative" data-aos="{{ pos == 'left' ? 'fade-right' : 'fade-left' }}">
         <div class="absolute -top-4 -left-4 w-24 h-24 bg-cetec-secondary/5 rounded-full blur-2xl"></div>
         <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-cetec-secondary/5 rounded-full blur-2xl"></div>
         <img src="{{ asset('uploads/page_block/' ~ block.image) }}" 
