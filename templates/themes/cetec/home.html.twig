@@ -21,27 +21,28 @@
                                      alt="{{ b.title }}"
                                      class="absolute inset-0 w-full h-full object-cover object-center opacity-40 transition-transform duration-[6s] scale-100 swiper-lazy"
                                      fetchpriority="{{ loop.first ? 'high' : 'low' }}"
-                                     loading="{{ loop.first ? 'eager' : 'lazy' }}">
+                                     loading="{{ loop.first ? 'eager' : 'lazy' }}"
+                                     data-aos="fade" data-aos-duration="1000">
                             {% else %}
-                                <div class="absolute inset-0 bg-gradient-to-tr from-cetec-dark via-[#2b1f1a] to-cetec-dark opacity-80"></div>
+                                <div class="absolute inset-0 bg-gradient-to-tr from-cetec-dark via-[#2b1f1a] to-cetec-dark opacity-80" data-aos="fade" data-aos-duration="1000"></div>
                             {% endif %}
                             
                             <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
                             <div class="container mx-auto px-4 relative z-20 text-left">
                                 <div class="max-w-3xl text-left mt-8 md:mt-0">
-                                    <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md animate-pulse">Líder em Ensino Técnico</span>
+                                    <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md animate-pulse" data-aos="fade-up" data-aos-delay="200">Líder em Ensino Técnico</span>
                                     
-                                    <h2 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight">
+                                    <h2 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight" data-aos="fade-up" data-aos-delay="400">
                                         {{ b.title|raw }}
                                     </h2>
                                     
                                     {% if b.subtitle %}
-                                    <p class="text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl">
+                                    <p class="text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl" data-aos="fade-up" data-aos-delay="600">
                                         {{ b.subtitle }}
                                     </p>
                                     {% endif %}
                                     
-                                    <div class="flex flex-col sm:flex-row flex-wrap gap-4">
+                                    <div class="flex flex-col sm:flex-row flex-wrap gap-4" data-aos="fade-up" data-aos-delay="800">
                                         {% if b.ctaText and b.ctaLink %}
                                             <a href="{{ b.ctaLink }}" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">{{ b.ctaText }}</a>
                                         {% else %}
@@ -57,14 +58,14 @@
                 {% else %}
                     <!-- Fallback Banner -->
                     <div class="swiper-slide relative flex items-center bg-black">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-cetec-dark via-[#3a251a] to-cetec-dark opacity-60"></div>
+                        <div class="absolute inset-0 bg-gradient-to-tr from-cetec-dark via-[#3a251a] to-cetec-dark opacity-60" data-aos="fade" data-aos-duration="1000"></div>
                         <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
                         <div class="container mx-auto px-4 relative z-20">
-                            <div class="max-w-3xl text-left" data-aos="fade-right">
-                                <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md">Líder em Ensino Técnico</span>
-                                <h1 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight">Prepare-se para as Carreiras do <span class="text-cetec-secondary italic">Futuro</span></h1>
-                                <p class="text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl">O CETEC oferece os melhores cursos técnicos, focados em alta empregabilidade e intensa prática profissional.</p>
-                                <div class="flex flex-col sm:flex-row flex-wrap gap-4">
+                            <div class="max-w-3xl text-left">
+                                <span class="inline-block bg-cetec-secondary text-cetec-dark px-4 py-1.5 rounded-full text-xs font-black mb-4 uppercase tracking-wider shadow-md" data-aos="fade-up" data-aos-delay="200">Líder em Ensino Técnico</span>
+                                <h1 class="text-3xl sm:text-4xl md:text-6xl text-white font-extrabold mb-4 md:mb-6 leading-tight" data-aos="fade-up" data-aos-delay="400">Prepare-se para as Carreiras do <span class="text-cetec-secondary italic">Futuro</span></h1>
+                                <p class="text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl" data-aos="fade-up" data-aos-delay="600">O CETEC oferece os melhores cursos técnicos, focados em alta empregabilidade e intensa prática profissional.</p>
+                                <div class="flex flex-col sm:flex-row flex-wrap gap-4" data-aos="fade-up" data-aos-delay="800">
                                     <a href="#cursos" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-8 py-3.5 rounded-md font-black text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Ver Nossos Cursos</a>
                                     <a href="#contato" class="bg-white hover:bg-gray-100 text-cetec-dark px-8 py-3.5 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-0.5 text-center">Fale Conosco</a>
                                 </div>

@@ -53,9 +53,9 @@
         <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
             {# Background image #}
             {% if b.image %}
-                <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg"></div>
+                <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;transition:transform .5s ease" class="banner-bg" data-aos="fade" data-aos-duration="1000"></div>
             {% else %}
-                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0" data-aos="fade" data-aos-duration="1000"></div>
             {% endif %}
             
             <div class="hero-overlay"></div>
@@ -64,22 +64,22 @@
             <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
                 <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
                     {% if block.preTitle %}
-                        <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);">
+                        <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);" data-aos="fade-up" data-aos-delay="200">
                             {{ block.preTitle }}
                         </span>
                     {% endif %}
 
-                    <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md">
+                    <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md" data-aos="fade-up" data-aos-delay="400">
                         {{ b.title|raw }}
                     </h2>
 
                     {% if b.text %}
-                        <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                        <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed" data-aos="fade-up" data-aos-delay="600">
                             {{ b.text }}
                         </p>
                     {% endif %}
 
-                    <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8" data-aos="fade-up" data-aos-delay="800">
                         {% if b.ctaText %}
                             <a href="{{ b.ctaLink ?: '#cursos' }}" class="cetec-secondary-btn text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                 {{ b.ctaText }}
@@ -104,9 +104,9 @@
                     <div class="swiper-slide" style="position:relative;display:flex;align-items:center;box-sizing:border-box;">
                         {# Background image #}
                         {% if b.image %}
-                            <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg"></div>
+                            <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg" data-aos="fade" data-aos-duration="1000"></div>
                         {% else %}
-                            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0"></div>
+                            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0" data-aos="fade" data-aos-duration="1000"></div>
                         {% endif %}
 
                         <div class="hero-overlay"></div>
@@ -115,22 +115,22 @@
                         <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
                             <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
                                 {% if block.preTitle %}
-                                    <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);">
+                                    <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);" data-aos="fade-up" data-aos-delay="200">
                                         {{ block.preTitle }}
                                     </span>
                                 {% endif %}
 
-                                <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md">
+                                <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md" data-aos="fade-up" data-aos-delay="400">
                                     {{ b.title|raw }}
                                 </h2>
 
                                 {% if b.text %}
-                                    <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                                    <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed" data-aos="fade-up" data-aos-delay="600">
                                         {{ b.text }}
                                     </p>
                                 {% endif %}
 
-                                <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8">
+                                <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8" data-aos="fade-up" data-aos-delay="800">
                                     {% if b.ctaText %}
                                         <a href="{{ b.ctaLink ?: '#cursos' }}" class="cetec-secondary-btn text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
                                             {{ b.ctaText }}
