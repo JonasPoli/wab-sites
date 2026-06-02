@@ -172,6 +172,17 @@
 
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {% block stylesheets %}{% endblock %}
+
+    {# ── Google Analytics (GA4) ── #}
+    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ currentTenant.googleAnalyticsId|e('js') }}');
+    </script>
+    {% endif %}
 </head>
 <body>
 

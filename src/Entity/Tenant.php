@@ -130,6 +130,10 @@ class Tenant
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $ogImage = null;
 
+    /** Google Analytics Measurement ID (e.g. G-XXXXXXXXXX) */
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $googleAnalyticsId = null;
+
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $fontSettings = [];
 
@@ -269,6 +273,9 @@ class Tenant
     public function getOgImage(): ?string { return $this->ogImage; }
     public function setOgImage(?string $ogImage): static { $this->ogImage = $ogImage; return $this; }
 
+    public function getGoogleAnalyticsId(): ?string { return $this->googleAnalyticsId; }
+    public function setGoogleAnalyticsId(?string $googleAnalyticsId): static { $this->googleAnalyticsId = $googleAnalyticsId; return $this; }
+
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
 
@@ -374,13 +381,14 @@ class Tenant
             'seoDescription'   => $this->seoDescription,
             'seoKeywords'      => $this->seoKeywords,
             'ogImage'          => $this->ogImage,
-            'fontSettings'     => $this->fontSettings,
-            'navigationSettings'=> $this->navigationSettings,
-            'showSectionTitles' => $this->showSectionTitles,
-            'landingPageMode'  => $this->landingPageMode,
-            'darkLogo'         => $this->darkLogo,
-            'homePageId'       => $this->homePage?->getId(),
-            'updatedAt'        => $this->updatedAt,
+            'fontSettings'       => $this->fontSettings,
+            'navigationSettings' => $this->navigationSettings,
+            'showSectionTitles'  => $this->showSectionTitles,
+            'landingPageMode'    => $this->landingPageMode,
+            'darkLogo'           => $this->darkLogo,
+            'homePageId'         => $this->homePage?->getId(),
+            'googleAnalyticsId'  => $this->googleAnalyticsId,
+            'updatedAt'          => $this->updatedAt,
             // File objects intentionally excluded — not serializable
         ];
     }
@@ -423,6 +431,7 @@ class Tenant
         $this->showSectionTitles = $data['showSectionTitles'] ?? true;
         $this->landingPageMode   = $data['landingPageMode'] ?? false;
         $this->darkLogo          = $data['darkLogo'] ?? null;
+        $this->googleAnalyticsId = $data['googleAnalyticsId'] ?? null;
         $this->updatedAt         = $data['updatedAt'];
         $this->logoFile          = null;
         $this->darkLogoFile      = null;

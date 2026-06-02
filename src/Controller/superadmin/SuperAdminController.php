@@ -665,6 +665,7 @@ class SuperAdminController extends AbstractController
         $tenant->setSeoDescription($r->request->get('seoDescription') ?: null);
         $tenant->setSeoKeywords($r->request->get('seoKeywords') ?: null);
         $tenant->setOgImage($r->request->get('ogImage') ?: null);
+        $tenant->setGoogleAnalyticsId($r->request->get('googleAnalyticsId') ?: null);
 
         // Contact
         $tenant->setContactEmail($r->request->get('contactEmail') ?: null);

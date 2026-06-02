@@ -322,6 +322,29 @@
 
         <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
 
+        {# ── Google Analytics ── #}
+        <h3 style="margin-bottom: 1rem; color: var(--text)">
+            <twig:ux:icon name="fa6-brands:google" style="color:#e37400;margin-right:.4rem;vertical-align:middle"/>
+            Google Analytics
+        </h3>
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <label>Measurement ID (Tag do Google Analytics)</label>
+            <input type="text"
+                   name="googleAnalyticsId"
+                   id="googleAnalyticsId"
+                   class="ai"
+                   value="{{ tenant.googleAnalyticsId }}"
+                   placeholder="G-XXXXXXXXXX"
+                   style="font-family: monospace; letter-spacing: .04em;">
+            <p class="af-hint">
+                Preencha com o <strong>Measurement ID</strong> do Google Analytics 4 (começa com <code>G-</code>).
+                Encontre em: <em>Admin → Data Streams → selecione o stream → Measurement ID</em>.
+                Deixe em branco para desativar o rastreamento neste tenant.
+            </p>
+        </div>
+
+
+
         {# ── Favicon ── #}
         <h3 style="margin-bottom: 1rem; color: var(--text)">Favicon</h3>
         <div class="af-field" style="margin-bottom:1.5rem">
