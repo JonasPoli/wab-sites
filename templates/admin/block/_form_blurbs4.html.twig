@@ -31,11 +31,19 @@
                 {% set items = items|merge([{
                     'icon': cfg['item' ~ i ~ '_icon'] ?? '',
                     'title': title ?? '',
-                    'text': cfg['item' ~ i ~ '_text'] ?? ''
+                    'text': cfg['item' ~ i ~ '_text'] ?? '',
+                    'link': '',
+                    'linkTarget': '_self'
                 }]) %}
             {% endif %}
         {% endfor %}
     {% endif %}
+
+    {# Build pages JSON for the JS select #}
+    {% set pages_json = [] %}
+    {% for p in pages ?? [] %}
+        {% set pages_json = pages_json|merge([{'id': p.id, 'title': p.title, 'slug': p.slug}]) %}
+    {% endfor %}
 
     <div id="blurbs-container"></div>
 
@@ -46,7 +54,36 @@
 </form>
 
 <script>
-function addBlurb(icon = '', title = '', text = '') {
+const PAGES_LIST = {{ pages_json|json_encode|raw }};
+
+function buildPageSelect(uniqueId, selectedSlug, selectedTarget) {
+    const slugVal = selectedSlug || '';
+    const targetVal = selectedTarget || '_self';
+
+    let options = `<option value="">— Sem link —</option>`;
+    PAGES_LIST.forEach(p => {
+        const selected = (p.slug === slugVal) ? ' selected' : '';
+        options += `<option value="${escapeHtml(p.slug)}"${selected}>${escapeHtml(p.title)}</option>`;
+    });
+
+    return `
+        <div class="af-field" style="margin-top:0.75rem;">
+            <label>Página de destino</label>
+            <select class="ai blurb-link-input" id="link-${uniqueId}" style="width:100%;">
+                ${options}
+            </select>
+        </div>
+        <div class="af-field" style="margin-top:0.75rem;">
+            <label>Abrir link</label>
+            <select class="ai blurb-target-input" id="target-${uniqueId}" style="width:100%;">
+                <option value="_self"${targetVal === '_self' ? ' selected' : ''}>Na mesma janela</option>
+                <option value="_blank"${targetVal === '_blank' ? ' selected' : ''}>Em nova aba / janela</option>
+            </select>
+        </div>
+    `;
+}
+
+function addBlurb(icon = '', title = '', text = '', link = '', linkTarget = '_self') {
     const container = document.getElementById('blurbs-container');
     const uniqueId = 'blurb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
     
@@ -83,6 +120,7 @@ function addBlurb(icon = '', title = '', text = '') {
                     <label>Título <span class="req">*</span></label>
                     <input type="text" class="ai blurb-title-input" value="${escapeHtml(title)}" required>
                 </div>
+                ${buildPageSelect(uniqueId, link, linkTarget)}
             </div>
             
             <div class="af-field" style="margin-bottom:0;">
@@ -134,19 +172,29 @@ function reindexBlurbs() {
         item.querySelector('.blurb-index').textContent = index + 1;
         
         // Update input names
-        const iconInput = item.querySelector('.blurb-icon-input');
-        const titleInput = item.querySelector('.blurb-title-input');
-        const textInput = item.querySelector('.blurb-text-input');
+        const iconInput   = item.querySelector('.blurb-icon-input');
+        const titleInput  = item.querySelector('.blurb-title-input');
+        const textInput   = item.querySelector('.blurb-text-input');
+        const linkInput   = item.querySelector('.blurb-link-input');
+        const targetInput = item.querySelector('.blurb-target-input');
         
-        if (iconInput) iconInput.name = `config[items][${index}][icon]`;
-        if (titleInput) titleInput.name = `config[items][${index}][title]`;
-        if (textInput) textInput.name = `config[items][${index}][text]`;
+        if (iconInput)   iconInput.name   = `config[items][${index}][icon]`;
+        if (titleInput)  titleInput.name  = `config[items][${index}][title]`;
+        if (textInput)   textInput.name   = `config[items][${index}][text]`;
+        if (linkInput)   linkInput.name   = `config[items][${index}][link]`;
+        if (targetInput) targetInput.name = `config[items][${index}][linkTarget]`;
     });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
     {% for it in items %}
-        addBlurb('{{ it.icon|escape('js') }}', '{{ it.title|escape('js') }}', '{{ it.text|escape('js') }}');
+        addBlurb(
+            '{{ it.icon|default('')|escape('js') }}',
+            '{{ it.title|default('')|escape('js') }}',
+            '{{ it.text|default('')|escape('js') }}',
+            '{{ it.link|default('')|escape('js') }}',
+            '{{ it.linkTarget|default('_self')|escape('js') }}'
+        );
     {% endfor %}
     
     // Add one empty blurb if list is empty

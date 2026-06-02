@@ -481,7 +481,8 @@ class AdminContentController extends AbstractController
     #[Route('/section/{sectionId}/block/new', name: 'block_new', methods: ['GET', 'POST'])]
     public function blockNew(
         int $sectionId, Request $r, EntityManagerInterface $em,
-        PageSectionRepository $sections, CategoryRepository $cats
+        PageSectionRepository $sections, CategoryRepository $cats,
+        PageRepository $pages
     ): Response {
         $section = $sections->find($sectionId) ?? throw $this->createNotFoundException();
         $block = new PageBlock();
@@ -500,11 +501,12 @@ class AdminContentController extends AbstractController
             'block'      => $block,
             'type'       => $type ?: null,
             'categories' => $cats->findRootCategories(),
+            'pages'      => $pages->findBy([], ['position' => 'ASC', 'title' => 'ASC']),
         ]);
     }
 
     #[Route('/block/{id}/edit', name: 'block_edit', methods: ['GET', 'POST'])]
-    public function blockEdit(PageBlock $block, Request $r, EntityManagerInterface $em, CategoryRepository $cats): Response
+    public function blockEdit(PageBlock $block, Request $r, EntityManagerInterface $em, CategoryRepository $cats, PageRepository $pages): Response
     {
         if ($r->isMethod('POST')) {
             $this->populateBlock($block, $r, $em, $cats);
@@ -516,6 +518,7 @@ class AdminContentController extends AbstractController
             'block'      => $block,
             'type'       => $block->getType(),
             'categories' => $cats->findRootCategories(),
+            'pages'      => $pages->findBy([], ['position' => 'ASC', 'title' => 'ASC']),
         ]);
     }
 

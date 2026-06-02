@@ -23,7 +23,8 @@
         block: block,
         section: block.section,
         action: path('admin_block_edit', {id: block.id}),
-        categories: categories
+        categories: categories,
+        pages: pages ?? []
     } %}
 </div>
 {% endblock %}
