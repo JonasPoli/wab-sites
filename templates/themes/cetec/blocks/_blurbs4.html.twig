@@ -45,7 +45,7 @@
         {% set delay = loop.index0 * 200 %}
         {% set card_classes = "bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" %}
         {% if it.link %}
-            <a href="/{{ it.link }}" target="{{ it.linkTarget }}" class="{{ card_classes }}"
+            <a href="{{ path('pub_page_show', {slug: it.link}) }}" target="{{ it.linkTarget }}" class="{{ card_classes }}"
                data-aos="fade-up"
                data-aos-delay="{{ delay }}">
         {% else %}
