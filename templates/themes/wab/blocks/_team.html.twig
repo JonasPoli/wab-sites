@@ -22,7 +22,11 @@
     <div class="wab-team-grid">
         {% for m in members %}
         <div class="wab-team-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            {% if m.detailEnabled and m.slug %}
+            <a href="{{ path('pub_team_member', {slug: m.slug}) }}" class="team-img-wrap team-img-link" aria-label="Ver perfil de {{ m.name }}">
+            {% else %}
             <div class="team-img-wrap">
+            {% endif %}
                 {% if m.image %}
                     <img src="{{ vich_uploader_asset(m, 'imageFile') }}" alt="{{ m.name }}" class="team-img" loading="lazy">
                 {% else %}
@@ -30,7 +34,7 @@
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
                 {% endif %}
-            </div>
+            {% if m.detailEnabled and m.slug %}</a>{% else %}</div>{% endif %}
             
             <div class="team-info">
                 <h3 class="team-name">{{ m.name }}</h3>
@@ -59,6 +63,11 @@
                         <a href="mailto:{{ m.email }}" class="social-link email" title="E-mail"><i class="fa-solid fa-envelope"></i></a>
                     {% endif %}
                 </div>
+                {% endif %}
+                {% if m.detailEnabled and m.slug %}
+                <a href="{{ path('pub_team_member', {slug: m.slug}) }}" class="team-profile-link">
+                    Ver Perfil Completo <i class="fa-solid fa-arrow-right"></i>
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -98,6 +107,30 @@
     overflow: hidden;
     background: rgba(var(--color-primary-rgb, 79, 110, 247), 0.05);
     border-bottom: 1px solid var(--border);
+    display: block;
+    position: relative;
+}
+a.team-img-link {
+    cursor: pointer;
+    text-decoration: none;
+}
+a.team-img-link::after {
+    content: '\f06e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    background: rgba(0,0,0,0);
+    transition: background .3s ease;
+    pointer-events: none;
+}
+a.team-img-link:hover::after {
+    background: rgba(0,0,0,.45);
 }
 .team-img {
     width: 100%;
@@ -175,6 +208,27 @@
 .social-link.whatsapp:hover { background: #25d366; }
 .social-link.phone:hover { background: var(--color-primary); }
 .social-link.email:hover { background: var(--color-secondary, #333); }
+
+.team-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+    align-self: flex-start;
+}
+.team-profile-link:hover {
+    background: var(--color-primary);
+    color: #fff;
+    opacity: 1;
+}
 
 @media(max-width: 1024px) {
     .wab-team-card {

@@ -1,0 +1,348 @@
+{% extends 'themes/wab/base.html.twig' %}
+
+{% block title %}{{ member.name }} | {{ currentTenant ? currentTenant.name : '' }}{% endblock %}
+
+{% block meta_description %}
+{% if member.summary %}
+<meta name="description" content="{{ member.summary|striptags|slice(0,160) }}">
+{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* ── Print ── */
+@media print {
+    .profile-modern-hero, .profile-modern-actions, nav, header, footer { display: none !important; }
+    body { background: #fff; color: #000; }
+    .profile-modern-body { padding: 0 !important; }
+    .profile-modern-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Hero ── */
+.profile-modern-hero {
+    position: relative;
+    min-height: 460px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--color-primary) 90%, #000) 0%,
+        color-mix(in srgb, var(--color-secondary, #ff8c00) 80%, var(--color-primary)) 100%);
+}
+.profile-hero-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center top;
+    filter: brightness(.35) saturate(1.2);
+    transition: transform 8s ease;
+}
+.profile-modern-hero:hover .profile-hero-bg { transform: scale(1.04); }
+.profile-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.2) 60%, transparent 100%);
+}
+.profile-hero-photo {
+    position: absolute;
+    right: 5%;
+    bottom: 0;
+    height: 90%;
+    max-width: 300px;
+    object-fit: contain;
+    object-position: bottom;
+    filter: drop-shadow(-20px 0 40px rgba(0,0,0,.5));
+    z-index: 2;
+}
+.profile-hero-content {
+    position: relative; z-index: 3;
+    padding: 3rem 0 3rem;
+    width: 100%;
+}
+.profile-hero-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+.profile-hero-type {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.9);
+    font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    padding: .3rem .9rem; border-radius: 50px; margin-bottom: 1rem;
+}
+.profile-hero-name {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900; line-height: 1.05;
+    color: #fff; margin: 0 0 1.5rem;
+    max-width: 600px;
+    text-shadow: 0 2px 20px rgba(0,0,0,.4);
+}
+.profile-modern-actions {
+    display: flex; flex-wrap: wrap; gap: .75rem;
+}
+.profile-action-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .6rem 1.4rem; border-radius: 50px;
+    font-size: .85rem; font-weight: 700;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all .25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.profile-action-btn-primary {
+    background: #fff; color: var(--color-primary);
+}
+.profile-action-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.25); opacity: 1; color: var(--color-primary); }
+.profile-action-btn-outline {
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255,255,255,.4);
+    color: #fff;
+}
+.profile-action-btn-outline:hover { background: rgba(255,255,255,.25); transform: translateY(-2px); opacity: 1; color: #fff; }
+
+.profile-back-hero {
+    display: inline-flex; align-items: center; gap: .5rem;
+    color: rgba(255,255,255,.7); font-size: .82rem;
+    text-decoration: none; margin-bottom: 1.5rem; transition: color .2s;
+}
+.profile-back-hero:hover { color: #fff; opacity: 1; }
+
+/* ── Body ── */
+.profile-modern-body { padding: 4rem 0 6rem; }
+
+.profile-modern-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* ── Main Column ── */
+.profile-summary-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+}
+.profile-summary-text {
+    font-size: 1.05rem; color: var(--text-muted); line-height: 1.8;
+}
+
+.profile-exp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+}
+.profile-section-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(var(--color-primary-rgb,79,110,247),.1);
+    color: var(--color-primary);
+    font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+    padding: .3rem .9rem; border-radius: 50px; margin-bottom: 1.25rem;
+}
+.profile-section-title {
+    font-size: 1.4rem; font-weight: 900; color: var(--text); margin: 0 0 1.5rem;
+}
+.profile-experience-text {
+    font-size: .95rem; color: var(--text-muted); line-height: 1.8;
+}
+.profile-experience-text p { margin-bottom: 1em; }
+
+/* ── Side Column ── */
+.profile-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+    position: sticky; top: 100px;
+}
+.profile-info-card-section {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.profile-info-card-section:last-child { border-bottom: none; }
+.info-section-title {
+    font-size: .65rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--color-primary); margin-bottom: .75rem;
+}
+.info-item {
+    display: flex; align-items: center; gap: .6rem;
+    font-size: .85rem; color: var(--text-muted); margin-bottom: .5rem;
+    text-decoration: none; transition: color .2s;
+}
+.info-item:last-child { margin-bottom: 0; }
+.info-item:hover { color: var(--color-primary); opacity: 1; }
+.info-item i { width: 16px; text-align: center; color: var(--color-primary); flex-shrink: 0; }
+.info-socials { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.info-social-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(var(--color-primary-rgb,79,110,247),.08);
+    color: var(--text); display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; text-decoration: none; transition: all .2s;
+}
+.info-social-btn:hover { color: #fff; transform: scale(1.1); opacity: 1; }
+.info-social-btn.li:hover { background: #0077b5; }
+.info-social-btn.fb:hover { background: #1877f2; }
+.info-social-btn.ig:hover { background: #e1306c; }
+
+/* Áreas de Atuação — chips */
+.areas-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.area-chip {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: rgba(var(--color-primary-rgb,79,110,247),.08);
+    color: var(--color-primary);
+    border: 1px solid rgba(var(--color-primary-rgb,79,110,247),.2);
+    font-size: .78rem; font-weight: 700; padding: .3rem .8rem;
+    border-radius: 50px; text-decoration: none; transition: all .2s;
+}
+.area-chip:hover { background: var(--color-primary); color: #fff; opacity: 1; }
+.area-chip::before { content: '■'; font-size: .5em; opacity: .7; }
+
+/* ── Responsive ── */
+@media(max-width: 900px) {
+    .profile-modern-grid { grid-template-columns: 1fr; }
+    .profile-info-card { position: static; }
+    .profile-hero-photo { display: none; }
+    .profile-hero-name { max-width: 100%; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── HERO ── #}
+<section class="profile-modern-hero">
+    {% if member.image %}
+    <div class="profile-hero-bg" style="background-image: url('{{ vich_uploader_asset(member, 'imageFile') }}')"></div>
+    {% else %}
+    <div class="profile-hero-bg" style="background: linear-gradient(135deg, var(--color-primary), var(--color-secondary, #ff8c00))"></div>
+    {% endif %}
+    <div class="profile-hero-overlay"></div>
+
+    {% if member.image %}
+    <img src="{{ vich_uploader_asset(member, 'imageFile') }}" alt="{{ member.name }}" class="profile-hero-photo">
+    {% endif %}
+
+    <div class="profile-hero-content">
+        <div class="profile-hero-container">
+            <a href="javascript:history.back()" class="profile-back-hero">
+                <i class="fa-solid fa-arrow-left"></i> Voltar
+            </a>
+            {% if member.role %}
+            <div class="profile-hero-type">{{ member.role }}</div>
+            {% endif %}
+            <h1 class="profile-hero-name">{{ member.name }}</h1>
+            <div class="profile-modern-actions">
+                {% if member.email %}
+                <a href="mailto:{{ member.email }}" class="profile-action-btn profile-action-btn-primary">
+                    <i class="fa-solid fa-envelope"></i> Enviar por E-mail
+                </a>
+                {% endif %}
+                <button type="button" class="profile-action-btn profile-action-btn-outline" onclick="window.print()">
+                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ── BODY ── #}
+<div class="profile-modern-body">
+<div class="container">
+<div class="profile-modern-grid">
+
+    {# Coluna Principal #}
+    <div>
+        {% if member.summary %}
+        <div class="profile-summary-block" data-aos="fade-up">
+            <p class="profile-summary-text">{{ member.summary }}</p>
+        </div>
+        {% endif %}
+
+        {% if member.experience or member.bio %}
+        <div class="profile-exp-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="profile-section-badge"><i class="fa-solid fa-briefcase"></i> Experiência</div>
+            <div class="profile-experience-text">
+                {% if member.experience %}
+                    {{ member.experience|raw }}
+                {% else %}
+                    {{ member.bio|nl2br }}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Coluna Lateral #}
+    <aside>
+        <div class="profile-info-card" data-aos="fade-left">
+
+            {# Contato #}
+            {% set has_contact = member.email or member.phone or member.address %}
+            {% if has_contact %}
+            <div class="profile-info-card-section">
+                <div class="info-section-title">Contato</div>
+                {% if member.email %}
+                <a href="mailto:{{ member.email }}" class="info-item">
+                    <i class="fa-solid fa-envelope"></i> {{ member.email }}
+                </a>
+                {% endif %}
+                {% if member.phone %}
+                <a href="tel:{{ member.phone }}" class="info-item">
+                    <i class="fa-solid fa-phone"></i> {{ member.phone }}
+                </a>
+                {% endif %}
+                {% if member.address %}
+                <div class="info-item">
+                    <i class="fa-solid fa-location-dot"></i> {{ member.address }}
+                </div>
+                {% endif %}
+                {% if member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
+                <div class="info-socials">
+                    {% if member.linkedinUrl %}
+                    <a href="{{ member.linkedinUrl }}" target="_blank" class="info-social-btn li"><i class="fa-brands fa-linkedin-in"></i></a>
+                    {% endif %}
+                    {% if member.facebookUrl %}
+                    <a href="{{ member.facebookUrl }}" target="_blank" class="info-social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>
+                    {% endif %}
+                    {% if member.instagramUrl %}
+                    <a href="{{ member.instagramUrl }}" target="_blank" class="info-social-btn ig"><i class="fa-brands fa-instagram"></i></a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {# Áreas de Atuação #}
+            {% if member.practiceAreas %}
+            <div class="profile-info-card-section">
+                <div class="info-section-title">Áreas de Atuação</div>
+                <div class="areas-chips">
+                    {% for area in member.practiceAreas %}
+                        {% if area.url %}
+                        <a href="{{ area.url }}" class="area-chip">{{ area.name }}</a>
+                        {% else %}
+                        <span class="area-chip">{{ area.name }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Seções customizadas #}
+            {% for cs in (member.customSections ?? []) %}
+            {% if cs.title or cs.content %}
+            <div class="profile-info-card-section">
+                {% if cs.title %}<div class="info-section-title">{{ cs.title }}</div>{% endif %}
+                {% if cs.content %}<div style="font-size:.88rem;color:var(--text-muted);line-height:1.5">{{ cs.content }}</div>{% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+
+        </div>
+    </aside>
+
+</div>
+</div>
+</div>
+{% endblock %}

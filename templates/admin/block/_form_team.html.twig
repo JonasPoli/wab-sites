@@ -23,6 +23,7 @@
     <div id="team-members-wrap">
     {% for m in block.teamMembers %}
     <div class="card team-member-card" style="margin:0 0 1.5rem;padding:1.5rem;border:1px solid var(--border);position:relative;" data-index="{{ loop.index0 }}">
+        {% set memberIdx = loop.index0 %}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
             <div style="font-weight:700;font-size:.9rem;color:var(--primary)">Membro #{{ loop.index }}</div>
             <div style="display:flex;gap:0.5rem;align-items:center;">
@@ -39,14 +40,29 @@
                 <input type="text" name="team[{{ loop.index0 }}][name]" class="ai" value="{{ m.name }}" required>
             </div>
             <div class="af-field">
-                <label>Cargo / Função</label>
-                <input type="text" name="team[{{ loop.index0 }}][role]" class="ai" value="{{ m.role }}">
+                <label>Cargo / Função (Tipo de Associação)</label>
+                <input type="text" name="team[{{ loop.index0 }}][role]" class="ai" value="{{ m.role }}" placeholder="Ex: Sócio, Diretor, Associado">
             </div>
         </div>
 
         <div class="af-field">
-            <label>Minicurrículo / Bio</label>
+            <label>Resumo <small style="color:var(--muted)">(aparece no topo do perfil)</small></label>
+            <textarea name="team[{{ loop.index0 }}][summary]" class="ate" rows="2" placeholder="Ex: Paulo Cezar Aragão é sócio fundador do escritório...">{{ m.summary }}</textarea>
+        </div>
+
+        <div class="af-field">
+            <label>Minicurrículo / Bio <small style="color:var(--muted)">(exibido no card da lista)</small></label>
             <textarea name="team[{{ loop.index0 }}][bio]" class="ate" rows="3">{{ m.bio }}</textarea>
+        </div>
+
+        <div class="af-field">
+            <label>Experiência Profissional <small style="color:var(--muted)">(HTML — aparece na página de detalhe)</small></label>
+            {% include 'admin/_rich_editor.html.twig' with {
+                field_id: 'experience_' ~ loop.index0,
+                field_name: 'team[' ~ loop.index0 ~ '][experience]',
+                content: m.experience,
+                height: 250
+            } %}
         </div>
 
         <div class="af-row">
@@ -58,6 +74,11 @@
                 <label>Telefone</label>
                 <input type="text" name="team[{{ loop.index0 }}][phone]" class="ai" value="{{ m.phone }}">
             </div>
+        </div>
+
+        <div class="af-field">
+            <label>Endereço</label>
+            <input type="text" name="team[{{ loop.index0 }}][address]" class="ai" value="{{ m.address }}" placeholder="Ex: São Paulo, Rio de Janeiro, Brasília">
         </div>
 
         <div class="af-row">
@@ -79,6 +100,72 @@
             <div class="af-field">
                 <label>WhatsApp (URL)</label>
                 <input type="url" name="team[{{ loop.index0 }}][whatsappUrl]" class="ai" value="{{ m.whatsappUrl }}" placeholder="https://wa.me/...">
+            </div>
+        </div>
+
+        {# ── Seções Customizadas (Idiomas, OAB, etc.) ── #}
+        <div style="margin:1.25rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+            Seções de Destaque <small style="font-weight:400;text-transform:none;letter-spacing:0">(ex: Idiomas, OAB, Formação)</small>
+        </div>
+        <div id="custom-sections-{{ memberIdx }}" class="custom-sections-wrap">
+            {% for cs in (m.customSections ?? []) %}
+            <div class="custom-section-row" style="display:flex;gap:.75rem;align-items:flex-start;margin-bottom:.75rem;">
+                <div style="flex:1">
+                    <input type="text" name="team[{{ memberIdx }}][customSections][{{ loop.index0 }}][title]" class="ai" value="{{ cs.title }}" placeholder="Título (ex: Idiomas)">
+                </div>
+                <div style="flex:2">
+                    <input type="text" name="team[{{ memberIdx }}][customSections][{{ loop.index0 }}][content]" class="ai" value="{{ cs.content }}" placeholder="Conteúdo (ex: Português, Inglês, Francês)">
+                </div>
+                <button type="button" class="btn btn-g btn-sm" onclick="this.closest('.custom-section-row').remove()" title="Remover"><sl-icon name="trash"></sl-icon></button>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-g btn-sm" onclick="addCustomSection({{ memberIdx }})" style="margin-bottom:1rem">
+            <sl-icon name="plus-lg"></sl-icon> Adicionar Seção
+        </button>
+
+        {# ── Áreas de Atuação ── #}
+        <div style="margin:1.25rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+            Áreas de Atuação
+        </div>
+        <div id="practice-areas-{{ memberIdx }}" class="practice-areas-wrap">
+            {% for pa in (m.practiceAreas ?? []) %}
+            <div class="practice-area-row" style="display:flex;gap:.75rem;align-items:center;margin-bottom:.75rem;">
+                <div style="flex:2">
+                    <input type="text" name="team[{{ memberIdx }}][practiceAreas][{{ loop.index0 }}][name]" class="ai" value="{{ pa.name }}" placeholder="Nome da área (ex: Societário e M&A)">
+                </div>
+                <div style="flex:2">
+                    <input type="url" name="team[{{ memberIdx }}][practiceAreas][{{ loop.index0 }}][url]" class="ai" value="{{ pa.url ?? '' }}" placeholder="Link (opcional)">
+                </div>
+                <button type="button" class="btn btn-g btn-sm" onclick="this.closest('.practice-area-row').remove()" title="Remover"><sl-icon name="trash"></sl-icon></button>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-g btn-sm" onclick="addPracticeArea({{ memberIdx }})" style="margin-bottom:1rem">
+            <sl-icon name="plus-lg"></sl-icon> Adicionar Área
+        </button>
+
+        {# ── Página de Detalhe ── #}
+        <div style="margin:1.25rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+            Página de Detalhe do Perfil
+        </div>
+        <div class="af-row">
+            <div class="af-field" style="flex:.5">
+                <label>
+                    <input type="checkbox" name="team[{{ loop.index0 }}][detailEnabled]" value="1" {{ m.detailEnabled ? 'checked' : '' }}>
+                    Habilitar página de detalhe
+                </label>
+            </div>
+            <div class="af-field">
+                <label>Layout do perfil</label>
+                <select name="team[{{ loop.index0 }}][detailLayout]" class="ai">
+                    <option value="classic" {{ m.detailLayout == 'classic' ? 'selected' : '' }}>Clássico (coluna lateral)</option>
+                    <option value="modern" {{ m.detailLayout == 'modern' ? 'selected' : '' }}>Moderno (hero + cards)</option>
+                </select>
+            </div>
+            <div class="af-field">
+                <label>Slug (URL) <small style="color:var(--muted)">/membro/{slug}</small></label>
+                <input type="text" name="team[{{ loop.index0 }}][slug]" class="ai" value="{{ m.slug }}" placeholder="ex: paulo-cezar-aragao">
             </div>
         </div>
 
@@ -130,13 +217,23 @@
         </div>
         <div class="af-field">
             <label>Cargo / Função</label>
-            <input type="text" name="team[__i__][role]" class="ai" placeholder="Ex: Diretor, Desenvolvedor">
+            <input type="text" name="team[__i__][role]" class="ai" placeholder="Ex: Sócio, Associado">
         </div>
+    </div>
+
+    <div class="af-field">
+        <label>Resumo</label>
+        <textarea name="team[__i__][summary]" class="ate" rows="2" placeholder="Resumo curto para o topo do perfil..."></textarea>
     </div>
 
     <div class="af-field">
         <label>Minicurrículo / Bio</label>
         <textarea name="team[__i__][bio]" class="ate" rows="3" placeholder="Pequena biografia..."></textarea>
+    </div>
+
+    <div class="af-field">
+        <label>Experiência Profissional</label>
+        <textarea name="team[__i__][experience]" class="ate" rows="4" placeholder="Experiência completa (HTML permitido)..."></textarea>
     </div>
 
     <div class="af-row">
@@ -148,6 +245,11 @@
             <label>Telefone</label>
             <input type="text" name="team[__i__][phone]" class="ai" placeholder="(00) 00000-0000">
         </div>
+    </div>
+
+    <div class="af-field">
+        <label>Endereço</label>
+        <input type="text" name="team[__i__][address]" class="ai" placeholder="Ex: São Paulo, Rio de Janeiro, Brasília">
     </div>
 
     <div class="af-row">
@@ -172,6 +274,45 @@
         </div>
     </div>
 
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+        Seções de Destaque
+    </div>
+    <div id="custom-sections-__i__" class="custom-sections-wrap"></div>
+    <button type="button" class="btn btn-g btn-sm" onclick="addCustomSection('__i__')" style="margin-bottom:1rem">
+        <sl-icon name="plus-lg"></sl-icon> Adicionar Seção
+    </button>
+
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+        Áreas de Atuação
+    </div>
+    <div id="practice-areas-__i__" class="practice-areas-wrap"></div>
+    <button type="button" class="btn btn-g btn-sm" onclick="addPracticeArea('__i__')" style="margin-bottom:1rem">
+        <sl-icon name="plus-lg"></sl-icon> Adicionar Área
+    </button>
+
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border);padding-top:1rem">
+        Página de Detalhe do Perfil
+    </div>
+    <div class="af-row">
+        <div class="af-field" style="flex:.5">
+            <label>
+                <input type="checkbox" name="team[__i__][detailEnabled]" value="1">
+                Habilitar página de detalhe
+            </label>
+        </div>
+        <div class="af-field">
+            <label>Layout do perfil</label>
+            <select name="team[__i__][detailLayout]" class="ai">
+                <option value="classic">Clássico (coluna lateral)</option>
+                <option value="modern">Moderno (hero + cards)</option>
+            </select>
+        </div>
+        <div class="af-field">
+            <label>Slug (URL)</label>
+            <input type="text" name="team[__i__][slug]" class="ai" placeholder="ex: nome-do-profissional">
+        </div>
+    </div>
+
     <div class="af-row">
         <div class="af-field">
             <label>Foto (avatar)</label>
@@ -189,13 +330,11 @@ function updateIndexes() {
     cards.forEach((card, index) => {
         card.setAttribute('data-index', index);
         
-        // Update Title
         const titleEl = card.querySelector('div > div:first-child');
         if (titleEl && !titleEl.textContent.includes('Novo')) {
             titleEl.textContent = 'Membro #' + (index + 1);
         }
         
-        // Update form fields names
         const inputs = card.querySelectorAll('input, textarea, select');
         inputs.forEach(input => {
             const name = input.getAttribute('name');
@@ -203,6 +342,18 @@ function updateIndexes() {
                 input.setAttribute('name', name.replace(/team\[\d+\]/, 'team[' + index + ']'));
             }
         });
+
+        // Update IDs for custom-sections and practice-areas containers
+        const csWrap = card.querySelector('.custom-sections-wrap');
+        if (csWrap) csWrap.id = 'custom-sections-' + index;
+        const paWrap = card.querySelector('.practice-areas-wrap');
+        if (paWrap) paWrap.id = 'practice-areas-' + index;
+
+        // Update button onclick
+        const csBtns = card.querySelectorAll('[onclick^="addCustomSection"]');
+        csBtns.forEach(b => b.setAttribute('onclick', 'addCustomSection(' + index + ')'));
+        const paBtns = card.querySelectorAll('[onclick^="addPracticeArea"]');
+        paBtns.forEach(b => b.setAttribute('onclick', 'addPracticeArea(' + index + ')'));
     });
     document.getElementById('members-count').textContent = cards.length;
 }
@@ -225,10 +376,20 @@ function toggleDeleteMember(checkbox) {
     const card = checkbox.closest('.team-member-card');
     if (checkbox.checked) {
         card.style.opacity = '0.5';
-        card.style.background = '#ffe5e5';
+        card.style.background = 'rgba(239,68,68,.08)';
+        // Remove required so browser won't block form submission on deleted rows
+        card.querySelectorAll('[required]').forEach(el => {
+            el.removeAttribute('required');
+            el.dataset.wasRequired = '1';
+        });
     } else {
         card.style.opacity = '1';
         card.style.background = 'none';
+        // Restore required
+        card.querySelectorAll('[data-was-required]').forEach(el => {
+            el.setAttribute('required', '');
+            delete el.dataset.wasRequired;
+        });
     }
 }
 
@@ -248,5 +409,41 @@ function moveMemberDown(btn) {
         card.parentNode.insertBefore(next, card);
         updateIndexes();
     }
+}
+
+function addCustomSection(memberIdx) {
+    const wrap = document.getElementById('custom-sections-' + memberIdx);
+    const sIdx = wrap.children.length;
+    const row = document.createElement('div');
+    row.className = 'custom-section-row';
+    row.style.cssText = 'display:flex;gap:.75rem;align-items:flex-start;margin-bottom:.75rem;';
+    row.innerHTML = `
+        <div style="flex:1">
+            <input type="text" name="team[${memberIdx}][customSections][${sIdx}][title]" class="ai" placeholder="Título (ex: Idiomas)">
+        </div>
+        <div style="flex:2">
+            <input type="text" name="team[${memberIdx}][customSections][${sIdx}][content]" class="ai" placeholder="Conteúdo (ex: Português, Inglês)">
+        </div>
+        <button type="button" class="btn btn-g btn-sm" onclick="this.closest('.custom-section-row').remove()" title="Remover"><sl-icon name="trash"></sl-icon></button>
+    `;
+    wrap.appendChild(row);
+}
+
+function addPracticeArea(memberIdx) {
+    const wrap = document.getElementById('practice-areas-' + memberIdx);
+    const pIdx = wrap.children.length;
+    const row = document.createElement('div');
+    row.className = 'practice-area-row';
+    row.style.cssText = 'display:flex;gap:.75rem;align-items:center;margin-bottom:.75rem;';
+    row.innerHTML = `
+        <div style="flex:2">
+            <input type="text" name="team[${memberIdx}][practiceAreas][${pIdx}][name]" class="ai" placeholder="Área (ex: Societário e M&A)">
+        </div>
+        <div style="flex:2">
+            <input type="url" name="team[${memberIdx}][practiceAreas][${pIdx}][url]" class="ai" placeholder="Link (opcional)">
+        </div>
+        <button type="button" class="btn btn-g btn-sm" onclick="this.closest('.practice-area-row').remove()" title="Remover"><sl-icon name="trash"></sl-icon></button>
+    `;
+    wrap.appendChild(row);
 }
 </script>

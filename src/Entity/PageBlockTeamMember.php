@@ -53,6 +53,32 @@ class PageBlockTeamMember
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $summary = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $experience = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $address = null;
+
+    /** [{title: string, content: string}] */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $customSections = null;
+
+    /** [{name: string, url?: string}] */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $practiceAreas = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $detailEnabled = false;
+
+    #[ORM\Column(length: 20, options: ['default' => 'classic'])]
+    private string $detailLayout = 'classic';
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
     #[ORM\Column(options: ['default' => 0])]
     private int $position = 0;
 
@@ -106,6 +132,30 @@ class PageBlockTeamMember
 
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(?string $email): static { $this->email = $email; return $this; }
+
+    public function getSummary(): ?string { return $this->summary; }
+    public function setSummary(?string $summary): static { $this->summary = $summary; return $this; }
+
+    public function getExperience(): ?string { return $this->experience; }
+    public function setExperience(?string $experience): static { $this->experience = $experience; return $this; }
+
+    public function getAddress(): ?string { return $this->address; }
+    public function setAddress(?string $address): static { $this->address = $address; return $this; }
+
+    public function getCustomSections(): ?array { return $this->customSections; }
+    public function setCustomSections(?array $customSections): static { $this->customSections = $customSections; return $this; }
+
+    public function getPracticeAreas(): ?array { return $this->practiceAreas; }
+    public function setPracticeAreas(?array $practiceAreas): static { $this->practiceAreas = $practiceAreas; return $this; }
+
+    public function isDetailEnabled(): bool { return $this->detailEnabled; }
+    public function setDetailEnabled(bool $detailEnabled): static { $this->detailEnabled = $detailEnabled; return $this; }
+
+    public function getDetailLayout(): string { return $this->detailLayout; }
+    public function setDetailLayout(string $detailLayout): static { $this->detailLayout = $detailLayout; return $this; }
+
+    public function getSlug(): ?string { return $this->slug; }
+    public function setSlug(?string $slug): static { $this->slug = $slug; return $this; }
 
     public function getPosition(): int { return $this->position; }
     public function setPosition(int $position): static { $this->position = $position; return $this; }

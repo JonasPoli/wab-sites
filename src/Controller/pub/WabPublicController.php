@@ -8,6 +8,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\HeroBannerRepository;
 use App\Repository\NewsletterSubscriberRepository;
 use App\Repository\PageRepository;
+use App\Repository\PageBlockTeamMemberRepository;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,6 +64,22 @@ class WabPublicController extends AbstractController
     {
         $page = $repo->findOneBy(['slug' => $slug]) ?? throw $this->createNotFoundException('Página não encontrada.');
         return $this->render($this->theme('page.html.twig'), ['page' => $page]);
+    }
+
+    // ── Membro da Equipe (perfil detalhado) ──────────────────────────────────
+
+    #[Route('/membro/{slug}', name: 'pub_team_member')]
+    public function teamMember(string $slug, PageBlockTeamMemberRepository $repo): Response
+    {
+        $member = $repo->findBySlug($slug);
+        if (!$member) {
+            throw $this->createNotFoundException('Perfil não encontrado.');
+        }
+
+        $layout = $member->getDetailLayout() ?: 'classic';
+        $template = "team_member_{$layout}.html.twig";
+
+        return $this->render($this->theme($template), ['member' => $member]);
     }
 
     // ── Categoria pública ─────────────────────────────────────────────────────
