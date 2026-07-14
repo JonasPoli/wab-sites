@@ -25,6 +25,17 @@ fi
 
 echo -e "${BLUE}==> Iniciando limpeza completa...${NC}"
 
+# 0. Instalar dependências via Composer se necessário
+if [ -f "composer.json" ]; then
+    echo -e "${GREEN}--> Executando composer install com o PHP correto...${NC}"
+    COMPOSER_PATH=$(which composer 2>/dev/null || echo "/usr/local/bin/composer")
+    if [ -f "$COMPOSER_PATH" ]; then
+        $PHP_BIN "$COMPOSER_PATH" install --no-interaction --optimize-autoloader
+    else
+        $PHP_BIN composer install --no-interaction --optimize-autoloader
+    fi
+fi
+
 # 1. Limpar Cache do Symfony
 echo -e "${GREEN}--> Limpando cache do Symfony...${NC}"
 $PHP_BIN bin/console cache:clear
