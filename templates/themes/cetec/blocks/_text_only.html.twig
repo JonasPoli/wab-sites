@@ -1,0 +1,29 @@
+{% if block.title or block.text or block.preTitle %}
+{% set align = block.config ? (block.config.textAlign ?? 'left') : 'left' %}
+{% set maxWidth = block.config ? (block.config.maxWidth ?? 'full') : 'full' %}
+{% set mw = maxWidth == 'narrow' ? '600px' : (maxWidth == 'wide' ? '800px' : '100%') %}
+<div class="wab-block py-8" style="text-align:{{ align }};max-width:{{ mw }};margin-left:auto;margin-right:auto;">
+    {% if block.preTitle %}
+        <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+            {{ block.preTitle }}
+        </span>
+    {% endif %}
+    {% if block.title %}
+        <h2 class="text-2xl md:text-4xl font-extrabold mb-4 text-cetec-primary leading-tight">
+            {{ block.title }}
+        </h2>
+    {% endif %}
+    {% if block.text %}
+        <div class="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed space-y-4 prose max-w-none">
+            {{ block.text|raw }}
+        </div>
+    {% endif %}
+    {% if block.config and (block.config.ctaText ?? null) and (block.config.ctaLink ?? null) %}
+        <div class="mt-6">
+            <a href="{{ block.config.ctaLink }}" class="bg-cetec-secondary hover:brightness-90 text-cetec-dark px-6 py-3 rounded-md font-black text-sm shadow-md transition-all inline-block">
+                {{ block.config.ctaText }}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endif %}

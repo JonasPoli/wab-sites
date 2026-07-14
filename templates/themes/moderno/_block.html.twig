@@ -1,6 +1,8 @@
 {% set t = block.type %}
 {% if t == 'text_image' %}
     {% include 'themes/moderno/blocks/_text_image.html.twig' %}
+{% elseif t == 'text_only' %}
+    {% include 'themes/moderno/blocks/_text_only.html.twig' %}
 {% elseif t == 'gallery' %}
     {% include 'themes/moderno/blocks/_gallery.html.twig' %}
 {% elseif t == 'newsletter' %}

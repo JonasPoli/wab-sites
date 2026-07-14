@@ -1,0 +1,25 @@
+{% if block.title or block.text or block.preTitle %}
+{% set align = block.config ? (block.config.textAlign ?? 'left') : 'left' %}
+{% set maxWidth = block.config ? (block.config.maxWidth ?? 'full') : 'full' %}
+{% set mw = maxWidth == 'narrow' ? '600px' : (maxWidth == 'wide' ? '800px' : '100%') %}
+<div class="wab-block wab-text-only" style="text-align:{{ align }};max-width:{{ mw }};margin-left:auto;margin-right:auto;">
+    {% if block.preTitle %}<span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span>{% endif %}
+    {% if block.title %}<h2 class="section-heading">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}
+    <div class="to-body">{{ block.text|raw }}</div>
+    {% endif %}
+    {% if block.config and (block.config.ctaText ?? null) and (block.config.ctaLink ?? null) %}
+        <a href="{{ block.config.ctaLink }}" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex;">{{ block.config.ctaText }}</a>
+    {% endif %}
+</div>
+<style>
+.wab-text-only { padding: 1rem 0; }
+.to-body { color: var(--text-muted); margin-top: 1.25rem; line-height: 1.9; font-size: 1.05rem; }
+.to-body p { margin-bottom: 1rem; }
+.to-body ul, .to-body ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+.to-body li { margin-bottom: .4rem; }
+.to-body h3 { font-size: 1.2rem; font-weight: 700; margin: 1.5rem 0 .5rem; color: var(--text); }
+.to-body a { color: var(--color-secondary); text-decoration: underline; }
+.to-body strong, .to-body b { color: var(--text); font-weight: 700; }
+</style>
+{% endif %}

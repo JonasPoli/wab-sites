@@ -64,11 +64,21 @@ class AdminUserCommand extends Command
 
         // Solicitar valores caso não sejam informados
         if (!$userName) {
-            $userName = $io->ask('Por favor, informe o nome de usuário (username)', 'admin');
+            $userName = $io->ask('Por favor, informe o nome de usuário (username)', 'admin', function (?string $value): string {
+                if (empty($value)) {
+                    throw new \RuntimeException('O nome de usuário não pode estar vazio.');
+                }
+                return $value;
+            });
         }
 
         if (!$pass) {
-            $pass = $io->ask('Por favor, informe a senha (password)');
+            $pass = $io->askHidden('Por favor, informe a senha (password)', function (?string $value): string {
+                if (empty($value)) {
+                    throw new \RuntimeException('A senha não pode estar vazia.');
+                }
+                return $value;
+            });
         }
 
         // Criar e salvar o usuário
