@@ -175,9 +175,11 @@
         <a href="{{ path('admin_contact_index') }}" class="nl {% if '/admin/contact' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="envelope-fill"></sl-icon> Contato
         </a>
+        {% if currentTenant and currentTenant.newsletterEnabled %}
         <a href="{{ path('admin_newsletter_index') }}" class="nl {% if '/admin/newsletter' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="send-fill"></sl-icon> Newsletter
         </a>
+        {% endif %}
         {% if app.user and app.user.workGroup == 0 %}
         <div class="nav-sec">Gestão</div>
         <a href="{{ path('admin_editor_index') }}" class="nl {% if '/admin/editors' in app.request.pathInfo %}on{% endif %}">

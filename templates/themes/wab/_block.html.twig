@@ -4,7 +4,9 @@
 {% elseif t == 'gallery' %}
     {% include 'themes/wab/blocks/_gallery.html.twig' %}
 {% elseif t == 'newsletter' %}
-    {% include 'themes/wab/blocks/_newsletter.html.twig' %}
+    {% if currentTenant.newsletterEnabled %}
+        {% include 'themes/wab/blocks/_newsletter.html.twig' %}
+    {% endif %}
 {% elseif t == 'blurbs4' %}
     {% include 'themes/wab/blocks/_blurbs4.html.twig' %}
 {% elseif t == 'stats' %}

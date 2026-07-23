@@ -654,6 +654,7 @@ class SuperAdminController extends AbstractController
         $tenant->setTheme((string) $r->request->get('theme', 'wab'));
         $tenant->setShowSectionTitles($r->request->get('showSectionTitles') === '1');
         $tenant->setLandingPageMode($r->request->get('landingPageMode') === '1');
+        $tenant->setNewsletterEnabled($r->request->get('newsletterEnabled') === '1');
 
         // HomePage
         $homePageId = $r->request->get('homePageId');

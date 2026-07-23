@@ -344,6 +344,70 @@
         </div>
 
 
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
+        {# ── Newsletter ── #}
+        <div style="margin-bottom: 2rem; border-radius: 16px; overflow: hidden; border: 2px solid rgba(79,110,247,.25); background: linear-gradient(135deg, rgba(79,110,247,.08), rgba(34,197,94,.06));">
+            {# Header banner #}
+            <div style="background: linear-gradient(135deg, #4f6ef7, #22c55e); padding: 1.25rem 1.75rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: rgba(255,255,255,.2); backdrop-filter: blur(8px); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-envelope-open-text" style="font-size: 1.4rem; color: #fff;"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -.01em;">Sistema de Newsletter</h3>
+                    <p style="margin: 0; font-size: .8rem; color: rgba(255,255,255,.8); font-weight: 500;">Controle a captação de e-mails de visitantes do site</p>
+                </div>
+            </div>
+
+            {# Body #}
+            <div style="padding: 1.5rem 1.75rem;">
+                <div style="display: flex; align-items: flex-start; gap: 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="flex: 1;">
+                        <p style="margin: 0 0 .75rem; font-size: .88rem; color: var(--text); line-height: 1.6;">
+                            O <strong>sistema de Newsletter</strong> permite que visitantes do site público se inscrevam deixando seu e-mail.
+                            Os e-mails coletados ficam acessíveis no painel administrativo para exportação e gestão.
+                        </p>
+                        <p style="margin: 0; font-size: .82rem; color: var(--muted); line-height: 1.5;">
+                            Ao <strong>desabilitar</strong>, o seguinte é ocultado automaticamente:
+                        </p>
+                        <ul style="margin: .5rem 0 0; padding-left: 1.25rem; font-size: .8rem; color: var(--muted); line-height: 1.8;">
+                            <li>Barra/formulário de newsletter no rodapé e blocos do site público</li>
+                            <li>Menu "Newsletter" no painel administrativo do usuário comum</li>
+                            <li>Cards e estatísticas de newsletter no dashboard</li>
+                            <li>Opção de criar bloco "Newsletter" nas páginas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {# Toggle switch #}
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg3); transition: all .3s ease;" id="newsletter-toggle-container">
+                    <label class="nl-toggle" for="newsletterEnabled" style="cursor: pointer; position: relative; display: inline-block; width: 56px; height: 30px; flex-shrink: 0;">
+                        <input type="checkbox" id="newsletterEnabled" name="newsletterEnabled" value="1"
+                               {% if tenant.newsletterEnabled %}checked{% endif %}
+                               style="opacity: 0; width: 0; height: 0; position: absolute;"
+                               onchange="updateNewsletterToggleUI(this.checked)">
+                        <span class="nl-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; border-radius: 30px; transition: all .3s cubic-bezier(.4,0,.2,1);">
+                        </span>
+                    </label>
+                    <div>
+                        <div id="newsletter-status-text" style="font-size: .92rem; font-weight: 700; transition: color .3s ease;">
+                            {% if tenant.newsletterEnabled %}
+                                <span style="color: #22c55e;">✓ Newsletter Habilitada</span>
+                            {% else %}
+                                <span style="color: #ef4444;">✗ Newsletter Desabilitada</span>
+                            {% endif %}
+                        </div>
+                        <div id="newsletter-status-desc" style="font-size: .78rem; color: var(--muted); margin-top: .15rem;">
+                            {% if tenant.newsletterEnabled %}
+                                Os visitantes podem se inscrever e os e-mails são coletados normalmente.
+                            {% else %}
+                                Nenhum formulário de newsletter é exibido e novas inscrições são bloqueadas.
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {# ── Favicon ── #}
         <h3 style="margin-bottom: 1rem; color: var(--text)">Favicon</h3>
@@ -598,6 +662,30 @@
 .logo-upload-btn:hover {
     background: rgba(124,58,237,.1);
 }
+
+/* Newsletter toggle switch */
+.nl-toggle input:checked + .nl-toggle-slider {
+    background-color: #22c55e;
+}
+.nl-toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+}
+.nl-toggle input:checked + .nl-toggle-slider::before {
+    transform: translateX(26px);
+    box-shadow: 0 2px 8px rgba(34,197,94,.4);
+}
+.nl-toggle:hover .nl-toggle-slider::before {
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
 </style>
 {% endblock %}
 
@@ -725,6 +813,26 @@ function hexToRgbaStr(hex, alpha) {
 
 document.addEventListener('DOMContentLoaded', () => {
     updateContrastPreview();
+    // Initialize toggle UI state
+    const cb = document.getElementById('newsletterEnabled');
+    if (cb) updateNewsletterToggleUI(cb.checked);
 });
+
+function updateNewsletterToggleUI(checked) {
+    const statusText = document.getElementById('newsletter-status-text');
+    const statusDesc = document.getElementById('newsletter-status-desc');
+    const container = document.getElementById('newsletter-toggle-container');
+    if (!statusText || !statusDesc) return;
+
+    if (checked) {
+        statusText.innerHTML = '<span style="color: #22c55e;">✓ Newsletter Habilitada</span>';
+        statusDesc.textContent = 'Os visitantes podem se inscrever e os e-mails são coletados normalmente.';
+        if (container) container.style.borderColor = 'rgba(34,197,94,.3)';
+    } else {
+        statusText.innerHTML = '<span style="color: #ef4444;">✗ Newsletter Desabilitada</span>';
+        statusDesc.textContent = 'Nenhum formulário de newsletter é exibido e novas inscrições são bloqueadas.';
+        if (container) container.style.borderColor = 'rgba(239,68,68,.3)';
+    }
+}
 </script>
 {% endblock %}
