@@ -8,6 +8,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\HeroBannerRepository;
 use App\Repository\NewsletterSubscriberRepository;
 use App\Repository\PageRepository;
+use App\Repository\PageBlockTeamMemberRepository;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -65,6 +66,22 @@ class WabPublicController extends AbstractController
         return $this->render($this->theme('page.html.twig'), ['page' => $page]);
     }
 
+    // ── Membro da Equipe (perfil detalhado) ──────────────────────────────────
+
+    #[Route('/membro/{slug}', name: 'pub_team_member')]
+    public function teamMember(string $slug, PageBlockTeamMemberRepository $repo): Response
+    {
+        $member = $repo->findBySlug($slug);
+        if (!$member) {
+            throw $this->createNotFoundException('Perfil não encontrado.');
+        }
+
+        $layout = $member->getDetailLayout() ?: 'classic';
+        $template = "team_member_{$layout}.html.twig";
+
+        return $this->render($this->theme($template), ['member' => $member]);
+    }
+
     // ── Categoria pública ─────────────────────────────────────────────────────
 
     #[Route('/categoria/{slug}', name: 'pub_category')]
@@ -87,11 +104,18 @@ class WabPublicController extends AbstractController
         EntityManagerInterface $em,
         NewsletterSubscriberRepository $repo,
     ): Response {
+        $tenant = $this->tenantContext->requireTenant();
+
+        if (!$tenant->isNewsletterEnabled()) {
+            $this->addFlash('error', 'Newsletter não está disponível neste momento.');
+            return $this->redirect($request->headers->get('referer') ?: '/');
+        }
+
         $email = trim((string) $request->request->get('email'));
 
         if ($email && filter_var($email, FILTER_VALIDATE_EMAIL) && !$repo->emailExists($email)) {
             $sub = new NewsletterSubscriber();
-            $sub->setTenant($this->tenantContext->requireTenant());
+            $sub->setTenant($tenant);
             $sub->setEmail($email);
             $em->persist($sub);
             $em->flush();

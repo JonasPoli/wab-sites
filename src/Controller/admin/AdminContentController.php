@@ -641,6 +641,21 @@ class AdminContentController extends AbstractController
             $items = $r->request->all('team') ?: [];
             $files = $r->files->all('team') ?: [];
             foreach ($items as $idx => $data) {
+                $customSections = array_values(array_filter(
+                    array_map(function ($cs) {
+                        $title   = trim($cs['title'] ?? '');
+                        $content = trim($cs['content'] ?? '');
+                        return ($title || $content) ? ['title' => $title, 'content' => $content] : null;
+                    }, $data['customSections'] ?? [])
+                ));
+                $practiceAreas = array_values(array_filter(
+                    array_map(function ($pa) {
+                        $name = trim($pa['name'] ?? '');
+                        $url  = trim($pa['url'] ?? '');
+                        return $name ? ['name' => $name, 'url' => $url ?: null] : null;
+                    }, $data['practiceAreas'] ?? [])
+                ));
+
                 if (!empty($data['id'])) {
                     // Find existing and update
                     foreach ($block->getTeamMembers() as $m) {
@@ -648,6 +663,14 @@ class AdminContentController extends AbstractController
                             $m->setName($data['name'] ?? '');
                             $m->setRole($data['role'] ?? null);
                             $m->setBio($data['bio'] ?? null);
+                            $m->setSummary($data['summary'] ?? null);
+                            $m->setExperience($data['experience'] ?? null);
+                            $m->setAddress($data['address'] ?? null);
+                            $m->setCustomSections($customSections ?: null);
+                            $m->setPracticeAreas($practiceAreas ?: null);
+                            $m->setDetailEnabled(!empty($data['detailEnabled']));
+                            $m->setDetailLayout($data['detailLayout'] ?? 'classic');
+                            $m->setSlug(!empty($data['slug']) ? strtolower(trim($data['slug'])) : null);
                             $m->setLinkedinUrl($data['linkedinUrl'] ?? null);
                             $m->setFacebookUrl($data['facebookUrl'] ?? null);
                             $m->setInstagramUrl($data['instagramUrl'] ?? null);
@@ -666,6 +689,14 @@ class AdminContentController extends AbstractController
                     $m->setName($data['name'] ?? '');
                     $m->setRole($data['role'] ?? null);
                     $m->setBio($data['bio'] ?? null);
+                    $m->setSummary($data['summary'] ?? null);
+                    $m->setExperience($data['experience'] ?? null);
+                    $m->setAddress($data['address'] ?? null);
+                    $m->setCustomSections($customSections ?: null);
+                    $m->setPracticeAreas($practiceAreas ?: null);
+                    $m->setDetailEnabled(!empty($data['detailEnabled']));
+                    $m->setDetailLayout($data['detailLayout'] ?? 'classic');
+                    $m->setSlug(!empty($data['slug']) ? strtolower(trim($data['slug'])) : null);
                     $m->setLinkedinUrl($data['linkedinUrl'] ?? null);
                     $m->setFacebookUrl($data['facebookUrl'] ?? null);
                     $m->setInstagramUrl($data['instagramUrl'] ?? null);
@@ -680,6 +711,7 @@ class AdminContentController extends AbstractController
                 }
             }
         }
+
 
         // Banners (multi-slide support)
         if ($type === 'banner') {

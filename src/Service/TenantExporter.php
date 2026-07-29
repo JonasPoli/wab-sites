@@ -150,6 +150,7 @@ class TenantExporter
             'navigationSettings'  => $t->getNavigationSettings(),
             'showSectionTitles'   => $t->isShowSectionTitles(),
             'landingPageMode'     => $t->isLandingPageMode(),
+            'newsletterEnabled'   => $t->isNewsletterEnabled(),
         ];
     }
 

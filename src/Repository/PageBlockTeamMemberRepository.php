@@ -8,4 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 class PageBlockTeamMemberRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry) { parent::__construct($registry, PageBlockTeamMember::class); }
+
+    public function findBySlug(string $slug): ?PageBlockTeamMember
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.slug = :slug')
+            ->andWhere('m.detailEnabled = true')
+            ->setParameter('slug', $slug)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

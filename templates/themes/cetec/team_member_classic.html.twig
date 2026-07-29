@@ -1,0 +1,417 @@
+{% extends 'themes/cetec/base.html.twig' %}
+
+{% block title %}{{ member.name }} | {{ currentTenant ? currentTenant.name : '' }}{% endblock %}
+
+{% block meta_description %}
+{% if member.summary %}
+<meta name="description" content="{{ member.summary|striptags|slice(0,160) }}">
+{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+@media print {
+    /* ── Reset geral ── */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff !important; color: #1a1a1a !important; font-family: 'Helvetica Neue', Arial, sans-serif !important; font-size: 10pt !important; }
+    @page { margin: 18mm 18mm 15mm; size: A4 portrait; }
+
+    /* ── Ocultar elementos de navegação/ação ── */
+    header, footer, nav, .profile-back, .profile-actions,
+    .sidebar-social-row, .whatsapp-float { display: none !important; }
+
+    /* ── Remover box-shadows, borders estilizados, backgrounds ── */
+    .profile-page { padding: 0 !important; min-height: auto !important; }
+    .profile-sidebar { border: none !important; box-shadow: none !important; border-radius: 0 !important; background: transparent !important; position: static !important; }
+    .profile-sidebar-body { padding: 0 !important; }
+
+    /* ── Cabeçalho de impressão: Logo + linha ── */
+    .print-header { display: block !important; }
+    .print-header-logo { display: block; margin-bottom: 12pt; }
+    .print-header-logo img { height: 36pt; width: auto; object-fit: contain; }
+    .print-header-logo-text {
+        font-size: 18pt; font-weight: 900; color: var(--color-primary) !important;
+        letter-spacing: -.02em; line-height: 1;
+    }
+    .print-header-divider {
+        border: none;
+        border-top: 2pt solid var(--color-primary);
+        margin: 0 0 14pt;
+        display: block !important;
+    }
+
+    /* ── Layout: grid 2 colunas ── */
+    .profile-classic-layout {
+        display: grid !important;
+        grid-template-columns: 170pt 1fr !important;
+        gap: 18pt !important;
+        align-items: start !important;
+    }
+
+    /* ── Coluna esquerda: Foto ── */
+    .profile-photo-wrap {
+        width: 170pt !important;
+        aspect-ratio: auto !important;
+        height: 190pt !important;
+        overflow: hidden !important;
+        border-radius: 0 !important;
+        background: #f0f0f0 !important;
+    }
+    .profile-photo-wrap img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+    .profile-photo-placeholder { height: 100% !important; }
+
+    /* ── Sidebar sections ── */
+    .sidebar-section { border-top: 0.5pt solid #e0e0e0 !important; padding: 7pt 0 !important; }
+    .sidebar-section:first-child { border-top: none !important; padding-top: 5pt !important; }
+
+    .sidebar-label {
+        font-size: 7pt !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .1em !important;
+        color: var(--color-primary) !important;
+        margin-bottom: 4pt !important;
+    }
+
+    .sidebar-contact-item {
+        font-size: 8.5pt !important;
+        color: #333 !important;
+        margin-bottom: 3pt !important;
+        display: block !important;
+        text-decoration: none !important;
+    }
+    .sidebar-contact-item i { display: none !important; }
+
+    .sidebar-custom-content {
+        font-size: 8.5pt !important;
+        color: #333 !important;
+        line-height: 1.5 !important;
+    }
+
+    /* ── Coluna direita: Nome + conteúdo ── */
+    .profile-type-label {
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .1em !important;
+        color: #888 !important;
+        margin-bottom: 3pt !important;
+    }
+    .profile-name {
+        font-size: 22pt !important;
+        font-weight: 900 !important;
+        color: var(--color-primary) !important;
+        margin: 0 0 8pt !important;
+        line-height: 1.1 !important;
+    }
+    .profile-name-underline { display: none !important; }
+
+    .profile-summary {
+        font-size: 9pt !important;
+        color: #333 !important;
+        line-height: 1.65 !important;
+        margin-bottom: 10pt !important;
+    }
+
+    .profile-areas-title {
+        font-size: 8pt !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .1em !important;
+        color: var(--color-primary) !important;
+        margin-bottom: 5pt !important;
+    }
+    .profile-areas-list { margin: 0 0 10pt !important; padding: 0 !important; }
+    .profile-areas-list li {
+        font-size: 8.5pt !important;
+        color: #333 !important;
+        border-left: 2pt solid var(--color-primary) !important;
+        padding-left: 6pt !important;
+        margin-bottom: 3pt !important;
+        list-style: none !important;
+    }
+    .profile-areas-list li a { color: #333 !important; text-decoration: none !important; }
+
+    .profile-exp-title {
+        font-size: 10pt !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .05em !important;
+        color: #1a1a1a !important;
+        margin-bottom: 4pt !important;
+    }
+    .profile-exp-divider { display: none !important; }
+
+    .profile-experience {
+        font-size: 8.5pt !important;
+        color: #333 !important;
+        line-height: 1.65 !important;
+    }
+    .profile-experience p { margin-bottom: 6pt !important; }
+
+    /* ── Garantir quebra de página limpa ── */
+    .profile-experience { page-break-inside: auto; }
+    .profile-experience p { page-break-inside: avoid; }
+}
+
+.profile-page { padding: 3rem 0 5rem; min-height: 80vh; }
+.profile-back {
+    display: inline-flex; align-items: center; gap: .5rem;
+    color: var(--text-muted); font-size: .85rem; margin-bottom: 2rem;
+    text-decoration: none; transition: color .2s;
+}
+.profile-back:hover { color: var(--color-primary); opacity: 1; }
+
+.profile-classic-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem; align-items: start;
+}
+
+/* Sidebar */
+.profile-sidebar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 24px);
+    overflow: hidden;
+    position: sticky; top: 100px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.06);
+}
+.profile-photo-wrap {
+    width: 100%; aspect-ratio: 1/1; overflow: hidden;
+    background: rgba(var(--color-primary-rgb),0.05);
+}
+.profile-photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.profile-photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; color: var(--color-primary); opacity: .2;
+}
+.profile-sidebar-body { padding: 1.5rem; }
+
+.sidebar-section { padding: 1rem 0; border-top: 1px solid var(--border); }
+.sidebar-section:first-child { border-top: none; padding-top: 0; }
+.sidebar-label {
+    font-size: .65rem; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--color-secondary);
+    margin-bottom: .6rem;
+}
+.sidebar-contact-item {
+    display: flex; align-items: center; gap: .6rem;
+    font-size: .85rem; color: var(--text-muted); margin-bottom: .5rem;
+    text-decoration: none; transition: color .2s;
+}
+.sidebar-contact-item:hover { color: var(--color-primary); opacity: 1; }
+.sidebar-contact-item i { width: 16px; text-align: center; color: var(--color-secondary); flex-shrink: 0; }
+.sidebar-social-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.sidebar-social-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(var(--color-secondary-rgb),.1);
+    color: var(--text); display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; text-decoration: none; transition: all .2s;
+}
+.sidebar-social-btn:hover { color: #fff; transform: scale(1.1); opacity: 1; }
+.sidebar-social-btn.li:hover { background: #0077b5; }
+.sidebar-social-btn.fb:hover { background: #1877f2; }
+.sidebar-social-btn.ig:hover { background: #e1306c; }
+.sidebar-custom-content { font-size: .88rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Main */
+.profile-type-label {
+    font-size: .7rem; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .14em; color: var(--color-secondary); margin-bottom: .4rem;
+}
+.profile-name {
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; line-height: 1.1;
+    color: var(--color-primary); font-family: var(--font-headline, 'Outfit', sans-serif);
+    margin: 0 0 .5rem;
+}
+.profile-name-underline {
+    width: 48px; height: 4px;
+    background: var(--color-secondary);
+    border-radius: 2px; margin-bottom: 2rem;
+}
+.profile-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem; }
+.profile-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .65rem 1.5rem; border-radius: 50px;
+    font-size: .85rem; font-weight: 800; letter-spacing: .02em;
+    text-decoration: none; cursor: pointer;
+    transition: all .25s cubic-bezier(0.34,1.56,0.64,1);
+    border: 2px solid transparent;
+}
+.profile-btn-email { background: var(--color-primary); color: #fff; }
+.profile-btn-email:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(var(--color-primary-rgb),.35); opacity: 1; color: #fff; }
+.profile-btn-pdf { background: transparent; color: var(--color-primary); border-color: var(--color-primary); }
+.profile-btn-pdf:hover { background: var(--color-primary); color: #fff; opacity: 1; transform: translateY(-2px); }
+
+.profile-summary { font-size: 1rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 2.5rem; }
+
+.profile-areas-title {
+    font-size: .65rem; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .14em; color: var(--color-secondary); margin-bottom: 1rem;
+}
+.profile-areas-list { list-style: none; padding: 0; margin: 0 0 2.5rem; }
+.profile-areas-list li {
+    padding: .4rem 0 .4rem .75rem;
+    border-left: 3px solid var(--color-secondary);
+    margin-bottom: .35rem; font-size: .9rem; color: var(--text);
+}
+.profile-areas-list li a { color: inherit; text-decoration: none; transition: color .2s; }
+.profile-areas-list li a:hover { color: var(--color-primary); }
+
+.profile-exp-title {
+    font-size: 1.2rem; font-weight: 900; font-family: var(--font-headline, 'Outfit', sans-serif);
+    color: var(--text); margin-bottom: .5rem;
+}
+.profile-exp-divider { width: 40px; height: 4px; background: var(--color-secondary); border-radius: 2px; margin-bottom: 1.5rem; }
+.profile-experience { font-size: .95rem; color: var(--text-muted); line-height: 1.8; }
+.profile-experience p { margin-bottom: 1em; }
+
+@media(max-width: 900px) {
+    .profile-classic-layout { grid-template-columns: 1fr; }
+    .profile-sidebar { position: static; }
+    .profile-photo-wrap { aspect-ratio: 16/9; max-height: 320px; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-page">
+<div class="container">
+
+    <a href="javascript:history.back()" class="profile-back">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+    </a>
+
+    {# ── Cabeçalho exclusivo para impressão (oculto em tela) ── #}
+    <div class="print-header" style="display:none">
+        <div class="print-header-logo">
+            {% if currentTenant and currentTenant.logo %}
+                <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}">
+            {% else %}
+                <span class="print-header-logo-text">{{ currentTenant ? currentTenant.name : '' }}</span>
+            {% endif %}
+        </div>
+        <hr class="print-header-divider">
+    </div>
+
+    <div class="profile-classic-layout">
+
+        <aside class="profile-sidebar" data-aos="fade-right">
+            <div class="profile-photo-wrap">
+                {% if member.image %}
+                    <img src="{{ vich_uploader_asset(member, 'imageFile') }}" alt="{{ member.name }}">
+                {% else %}
+                    <div class="profile-photo-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                {% endif %}
+            </div>
+            <div class="profile-sidebar-body">
+                {% set has_contact = member.email or member.phone or member.address or member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
+                {% if has_contact %}
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Contato</div>
+                    {% if member.email %}
+                    <a href="mailto:{{ member.email }}" class="sidebar-contact-item"><i class="fa-solid fa-envelope"></i> {{ member.email }}</a>
+                    {% endif %}
+                    {% if member.phone %}
+                    <a href="tel:{{ member.phone }}" class="sidebar-contact-item"><i class="fa-solid fa-phone"></i> {{ member.phone }}</a>
+                    {% endif %}
+                    {% if member.address %}
+                    <div class="sidebar-contact-item"><i class="fa-solid fa-location-dot"></i> {{ member.address }}</div>
+                    {% endif %}
+                    {% if member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
+                    <div class="sidebar-social-row">
+                        {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="sidebar-social-btn li"><i class="fa-brands fa-linkedin-in"></i></a>{% endif %}
+                        {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="sidebar-social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                        {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="sidebar-social-btn ig"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% for cs in (member.customSections ?? []) %}
+                {% if cs.title or cs.content %}
+                <div class="sidebar-section">
+                    {% if cs.title %}<div class="sidebar-label">{{ cs.title }}</div>{% endif %}
+                    {% if cs.content %}<div class="sidebar-custom-content">{{ cs.content }}</div>{% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </aside>
+
+        <main data-aos="fade-left">
+            {% if member.role %}<div class="profile-type-label">{{ member.role }}</div>{% endif %}
+            <h1 class="profile-name">{{ member.name }}</h1>
+            <div class="profile-name-underline"></div>
+
+            <div class="profile-actions">
+                <button type="button" class="profile-btn profile-btn-pdf" onclick="window.print()">
+                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                </button>
+            </div>
+
+
+            {% if member.summary %}
+            <div class="profile-summary">{{ member.summary }}</div>
+            {% endif %}
+
+            {% if member.practiceAreas %}
+            <div class="profile-areas-title">Áreas de Atuação</div>
+            <ul class="profile-areas-list">
+                {% for area in member.practiceAreas %}
+                <li>{% if area.url %}<a href="{{ area.url }}">{{ area.name }}</a>{% else %}{{ area.name }}{% endif %}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if member.experience or member.bio %}
+            <div class="profile-exp-title">Experiência</div>
+            <div class="profile-exp-divider"></div>
+            <div class="profile-experience">
+                {% if member.experience %}{{ member.experience|raw }}{% else %}{{ member.bio|nl2br }}{% endif %}
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+</div>
+</div>
+
+<script>
+(function() {
+    function beforePrint() {
+        // Mostra o cabeçalho de impressão
+        var ph = document.querySelector('.print-header');
+        if (ph) ph.style.display = '';
+
+        // Força visibilidade de todos os elementos AOS (que ficam com opacity:0 antes de animar)
+        document.querySelectorAll('[data-aos]').forEach(function(el) {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+            el.style.visibility = 'visible';
+            el.style.transition = 'none';
+            el.classList.add('aos-animate');
+        });
+
+        // Remove sticky do sidebar para o grid funcionar no print
+        var sidebar = document.querySelector('.profile-sidebar');
+        if (sidebar) sidebar.style.position = 'static';
+    }
+
+    function afterPrint() {
+        var ph = document.querySelector('.print-header');
+        if (ph) ph.style.display = 'none';
+    }
+
+    if (window.matchMedia) {
+        var mq = window.matchMedia('print');
+        mq.addEventListener('change', function(e) {
+            if (e.matches) beforePrint(); else afterPrint();
+        });
+    }
+    window.onbeforeprint = beforePrint;
+    window.onafterprint  = afterPrint;
+})();
+</script>
+{% endblock %}

@@ -213,6 +213,7 @@ class TenantImporter
             $tenant->setNavigationSettings($tData['navigationSettings'] ?? []);
             $tenant->setShowSectionTitles($tData['showSectionTitles'] ?? true);
             $tenant->setLandingPageMode($tData['landingPageMode'] ?? false);
+            $tenant->setNewsletterEnabled($tData['newsletterEnabled'] ?? true);
 
             if (!empty($tData['logo'])) {
                 $tenant->setLogo($tData['logo']);

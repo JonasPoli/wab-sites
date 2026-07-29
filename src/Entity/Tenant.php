@@ -146,6 +146,9 @@ class Tenant
     #[ORM\Column(options: ['default' => false])]
     private bool $landingPageMode = false;
 
+    #[ORM\Column(options: ['default' => true])]
+    private bool $newsletterEnabled = true;
+
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
@@ -341,6 +344,17 @@ class Tenant
         return $this;
     }
 
+    public function isNewsletterEnabled(): bool
+    {
+        return $this->newsletterEnabled;
+    }
+
+    public function setNewsletterEnabled(bool $newsletterEnabled): static
+    {
+        $this->newsletterEnabled = $newsletterEnabled;
+        return $this;
+    }
+
 
     /**
      * Exclude $logoFile (Symfony\Component\HttpFoundation\File\File) from serialization.
@@ -385,6 +399,7 @@ class Tenant
             'navigationSettings' => $this->navigationSettings,
             'showSectionTitles'  => $this->showSectionTitles,
             'landingPageMode'    => $this->landingPageMode,
+            'newsletterEnabled'  => $this->newsletterEnabled,
             'darkLogo'           => $this->darkLogo,
             'homePageId'         => $this->homePage?->getId(),
             'googleAnalyticsId'  => $this->googleAnalyticsId,
@@ -430,6 +445,7 @@ class Tenant
         $this->navigationSettings = $data['navigationSettings'] ?? [];
         $this->showSectionTitles = $data['showSectionTitles'] ?? true;
         $this->landingPageMode   = $data['landingPageMode'] ?? false;
+        $this->newsletterEnabled = $data['newsletterEnabled'] ?? true;
         $this->darkLogo          = $data['darkLogo'] ?? null;
         $this->googleAnalyticsId = $data['googleAnalyticsId'] ?? null;
         $this->updatedAt         = $data['updatedAt'];

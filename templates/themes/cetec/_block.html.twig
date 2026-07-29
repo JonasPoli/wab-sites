@@ -6,7 +6,9 @@
 {% elseif t == 'gallery' %}
     {% include 'themes/cetec/blocks/_gallery.html.twig' %}
 {% elseif t == 'newsletter' %}
-    {% include 'themes/cetec/blocks/_newsletter.html.twig' %}
+    {% if currentTenant.newsletterEnabled %}
+        {% include 'themes/cetec/blocks/_newsletter.html.twig' %}
+    {% endif %}
 {% elseif t == 'blurbs4' %}
     {% include 'themes/cetec/blocks/_blurbs4.html.twig' %}
 {% elseif t == 'stats' %}

@@ -1,0 +1,270 @@
+{% extends 'themes/moderno/base.html.twig' %}
+
+{% block title %}{{ member.name }} | {{ currentTenant ? currentTenant.name : '' }}{% endblock %}
+
+{% block meta_description %}
+{% if member.summary %}
+<meta name="description" content="{{ member.summary|striptags|slice(0,160) }}">
+{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+@media print {
+    .profile-modern-hero, .profile-action-btn, nav, header, footer { display: none !important; }
+    body { background: #fff; color: #000; }
+    .profile-modern-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Hero circular foto ── */
+.profile-modern-hero {
+    padding: 5rem 0 4rem;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+.profile-hero-bg-pattern {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(var(--color-primary-rgb),.06) 0%, transparent 70%),
+        radial-gradient(ellipse at 80% 50%, rgba(var(--color-primary-rgb),.04) 0%, transparent 70%);
+}
+.profile-hero-inner {
+    position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 0 1.5rem;
+}
+.profile-back-hero {
+    display: inline-flex; align-items: center; gap: .5rem;
+    color: var(--text-muted); font-size: .82rem;
+    text-decoration: none; margin-bottom: 2.5rem; transition: color .2s;
+}
+.profile-back-hero:hover { color: var(--color-primary); opacity: 1; }
+.profile-hero-avatar-wrap {
+    width: 160px; height: 160px;
+    border-radius: 50%; overflow: hidden;
+    margin: 0 auto 1.75rem;
+    border: 4px solid var(--color-primary);
+    box-shadow: 0 0 0 8px rgba(var(--color-primary-rgb),.1), 0 20px 40px rgba(0,0,0,.12);
+    background: rgba(var(--color-primary-rgb),.06);
+    position: relative;
+    transition: box-shadow .3s var(--transition);
+}
+.profile-hero-avatar-wrap:hover {
+    box-shadow: 0 0 0 12px rgba(var(--color-primary-rgb),.15), 0 25px 50px rgba(0,0,0,.15);
+}
+.profile-hero-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.profile-hero-avatar-wrap .avatar-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; color: var(--color-primary); opacity: .5;
+}
+.profile-hero-type {
+    display: inline-block;
+    background: rgba(var(--color-primary-rgb),.1);
+    color: var(--color-primary);
+    font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    padding: .3rem .9rem; border-radius: 50px; margin-bottom: .75rem;
+}
+.profile-hero-name {
+    font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1;
+    color: var(--text); margin: 0 0 2rem;
+}
+.profile-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+.profile-action-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .65rem 1.5rem; border-radius: 50px;
+    font-size: .85rem; font-weight: 700;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all .25s var(--transition);
+}
+.profile-action-btn-primary { background: var(--color-primary); color: #fff; }
+.profile-action-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(var(--color-primary-rgb),.35); opacity: 1; color: #fff; }
+.profile-action-btn-outline { background: var(--bg-card); color: var(--color-primary); border: 2px solid var(--color-primary); }
+.profile-action-btn-outline:hover { background: var(--color-primary); color: #fff; opacity: 1; transform: translateY(-2px); }
+
+/* ── Body ── */
+.profile-modern-body { padding: 3rem 0 6rem; }
+.profile-modern-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 3rem; align-items: start;
+}
+
+/* Cards */
+.profile-content-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+    transition: box-shadow .2s var(--transition);
+}
+.profile-content-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+.profile-card-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(var(--color-primary-rgb),.08);
+    color: var(--color-primary);
+    font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+    padding: .25rem .8rem; border-radius: 50px; margin-bottom: 1rem;
+}
+.profile-summary-text { font-size: 1rem; color: var(--text-muted); line-height: 1.8; }
+.profile-experience-text { font-size: .95rem; color: var(--text-muted); line-height: 1.8; }
+.profile-experience-text p { margin-bottom: 1em; }
+
+/* Sidebar */
+.profile-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+    position: sticky; top: 100px;
+}
+.info-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+.info-section:last-child { border-bottom: none; }
+.info-section-title {
+    font-size: .62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--color-primary); margin-bottom: .7rem;
+}
+.info-item {
+    display: flex; align-items: center; gap: .6rem;
+    font-size: .85rem; color: var(--text-muted); margin-bottom: .45rem;
+    text-decoration: none; transition: color .2s;
+}
+.info-item:hover { color: var(--color-primary); opacity: 1; }
+.info-item i { width: 16px; text-align: center; color: var(--color-primary); flex-shrink: 0; }
+.info-socials { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.info-social-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(var(--color-primary-rgb),.07);
+    color: var(--text); display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; text-decoration: none; transition: all .2s var(--transition);
+}
+.info-social-btn:hover { color: #fff; transform: scale(1.1); opacity: 1; }
+.info-social-btn.li:hover { background: #0077b5; }
+.info-social-btn.fb:hover { background: #1877f2; }
+.info-social-btn.ig:hover { background: #e1306c; }
+
+/* Áreas */
+.areas-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.area-chip {
+    display: inline-flex; align-items: center;
+    background: rgba(var(--color-primary-rgb),.08);
+    color: var(--color-primary);
+    border: 1px solid rgba(var(--color-primary-rgb),.18);
+    font-size: .75rem; font-weight: 700; padding: .25rem .7rem;
+    border-radius: 50px; text-decoration: none; transition: all .2s var(--transition);
+}
+.area-chip:hover { background: var(--color-primary); color: #fff; opacity: 1; }
+
+@media(max-width: 900px) {
+    .profile-modern-grid { grid-template-columns: 1fr; }
+    .profile-info-card { position: static; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── HERO ── #}
+<section class="profile-modern-hero">
+    <div class="profile-hero-bg-pattern"></div>
+    <div class="profile-hero-inner">
+        <a href="javascript:history.back()" class="profile-back-hero">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+        </a>
+
+        <div class="profile-hero-avatar-wrap" data-aos="zoom-in">
+            {% if member.image %}
+            <img src="{{ vich_uploader_asset(member, 'imageFile') }}" alt="{{ member.name }}">
+            {% else %}
+            <div class="avatar-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+            {% endif %}
+        </div>
+
+        {% if member.role %}
+        <div class="profile-hero-type" data-aos="fade-up" data-aos-delay="100">{{ member.role }}</div>
+        {% endif %}
+        <h1 class="profile-hero-name" data-aos="fade-up" data-aos-delay="150">{{ member.name }}</h1>
+
+        <div class="profile-hero-actions" data-aos="fade-up" data-aos-delay="200">
+            {% if member.email %}
+            <a href="mailto:{{ member.email }}" class="profile-action-btn profile-action-btn-primary">
+                <i class="fa-solid fa-envelope"></i> Enviar por E-mail
+            </a>
+            {% endif %}
+            <button type="button" class="profile-action-btn profile-action-btn-outline" onclick="window.print()">
+                <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+            </button>
+        </div>
+    </div>
+</section>
+
+{# ── BODY ── #}
+<div class="profile-modern-body">
+<div class="container">
+<div class="profile-modern-grid">
+
+    <div>
+        {% if member.summary %}
+        <div class="profile-content-card" data-aos="fade-up">
+            <div class="profile-summary-text">{{ member.summary }}</div>
+        </div>
+        {% endif %}
+
+        {% if member.experience or member.bio %}
+        <div class="profile-content-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="profile-card-badge"><i class="fa-solid fa-briefcase"></i> Experiência</div>
+            <div class="profile-experience-text">
+                {% if member.experience %}{{ member.experience|raw }}{% else %}{{ member.bio|nl2br }}{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <aside>
+        <div class="profile-info-card" data-aos="fade-left">
+            {% set has_contact = member.email or member.phone or member.address %}
+            {% if has_contact %}
+            <div class="info-section">
+                <div class="info-section-title">Contato</div>
+                {% if member.email %}<a href="mailto:{{ member.email }}" class="info-item"><i class="fa-solid fa-envelope"></i> {{ member.email }}</a>{% endif %}
+                {% if member.phone %}<a href="tel:{{ member.phone }}" class="info-item"><i class="fa-solid fa-phone"></i> {{ member.phone }}</a>{% endif %}
+                {% if member.address %}<div class="info-item"><i class="fa-solid fa-location-dot"></i> {{ member.address }}</div>{% endif %}
+                {% if member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
+                <div class="info-socials">
+                    {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="info-social-btn li"><i class="fa-brands fa-linkedin-in"></i></a>{% endif %}
+                    {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="info-social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                    {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="info-social-btn ig"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if member.practiceAreas %}
+            <div class="info-section">
+                <div class="info-section-title">Áreas de Atuação</div>
+                <div class="areas-chips">
+                    {% for area in member.practiceAreas %}
+                    {% if area.url %}<a href="{{ area.url }}" class="area-chip">{{ area.name }}</a>
+                    {% else %}<span class="area-chip">{{ area.name }}</span>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% for cs in (member.customSections ?? []) %}
+            {% if cs.title or cs.content %}
+            <div class="info-section">
+                {% if cs.title %}<div class="info-section-title">{{ cs.title }}</div>{% endif %}
+                {% if cs.content %}<div style="font-size:.88rem;color:var(--text-muted);line-height:1.5">{{ cs.content }}</div>{% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </aside>
+</div>
+</div>
+</div>
+{% endblock %}
