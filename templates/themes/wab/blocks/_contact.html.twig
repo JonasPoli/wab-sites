@@ -110,17 +110,17 @@
                     {% endif %}
                 </div>
 
+                {% if tenant.openingHours is not empty %}
                 <div class="working-hours-card">
                     <h4 class="working-hours-title"><i class="fa-solid fa-clock"></i> Horário de Funcionamento</h4>
+                    {% for item in tenant.openingHours %}
                     <div class="working-hours-row">
-                        <span class="working-hours-days">Segunda a Sexta:</span>
-                        <span class="working-hours-time">08h00 às 22h00</span>
+                        {% if item.days %}<span class="working-hours-days">{{ item.days }}</span>{% endif %}
+                        {% if item.hours %}<span class="working-hours-time">{{ item.hours }}</span>{% endif %}
                     </div>
-                    <div class="working-hours-row">
-                        <span class="working-hours-days">Sábado:</span>
-                        <span class="working-hours-time">08h00 às 13h00</span>
-                    </div>
+                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
         </div>
 

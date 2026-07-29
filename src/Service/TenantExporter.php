@@ -147,6 +147,7 @@ class TenantExporter
             'seoKeywords'         => $t->getSeoKeywords(),
             'ogImage'             => $t->getOgImage(),
             'fontSettings'        => $t->getFontSettings(),
+            'openingHours'        => $t->getOpeningHours(),
             'navigationSettings'  => $t->getNavigationSettings(),
             'showSectionTitles'   => $t->isShowSectionTitles(),
             'landingPageMode'     => $t->isLandingPageMode(),

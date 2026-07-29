@@ -458,6 +458,32 @@
             <p class="af-hint">No Google Maps: Compartilhar → Incorporar um mapa → copie apenas o valor do atributo <code>src</code></p>
         </div>
 
+        {# ── Horários de Funcionamento ── #}
+        <div class="af-field" style="margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+                <label style="margin:0;font-weight:600">Horários de Funcionamento</label>
+                <button type="button" class="btn btn-g" id="add-opening-hour-btn" style="font-size:0.8rem;padding:0.35rem 0.75rem;display:inline-flex;align-items:center;gap:0.35rem">
+                    <sl-icon name="plus-lg"></sl-icon> Adicionar Horário
+                </button>
+            </div>
+            <p class="af-hint" style="margin-bottom:0.75rem">Adicione os dias e os horários de funcionamento (textos livres). Se nada for preenchido, serão exibidos os valores padrão: <strong>Segunda a Sexta: 08h00 às 22h00</strong> e <strong>Sábado: 08h00 às 13h00</strong>.</p>
+            <div id="opening-hours-list" style="display:flex;flex-direction:column;gap:0.75rem">
+                {% for index, item in tenant.openingHours %}
+                    <div class="opening-hour-row" style="display:flex;gap:0.75rem;align-items:center">
+                        <div style="flex:1">
+                            <input type="text" name="openingHours[{{ index }}][days]" class="ai" value="{{ item.days }}" placeholder="Ex: Segunda a Sexta:">
+                        </div>
+                        <div style="flex:1">
+                            <input type="text" name="openingHours[{{ index }}][hours]" class="ai" value="{{ item.hours }}" placeholder="Ex: 08h00 às 22h00">
+                        </div>
+                        <button type="button" class="btn btn-g remove-opening-hour-btn" style="color:var(--danger, #ef4444);padding:0.5rem 0.75rem" title="Remover item">
+                            <sl-icon name="trash"></sl-icon>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
         <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
 
         {# ── Redes Sociais ── #}
@@ -816,6 +842,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize toggle UI state
     const cb = document.getElementById('newsletterEnabled');
     if (cb) updateNewsletterToggleUI(cb.checked);
+
+    // Opening Hours dynamic list
+    const ohContainer = document.getElementById('opening-hours-list');
+    const ohAddBtn = document.getElementById('add-opening-hour-btn');
+
+    if (ohContainer && ohAddBtn) {
+        ohAddBtn.addEventListener('click', () => {
+            const index = Date.now();
+            const row = document.createElement('div');
+            row.className = 'opening-hour-row';
+            row.style.cssText = 'display:flex;gap:0.75rem;align-items:center';
+            row.innerHTML = `
+                <div style="flex:1">
+                    <input type="text" name="openingHours[${index}][days]" class="ai" placeholder="Ex: Segunda a Sexta:">
+                </div>
+                <div style="flex:1">
+                    <input type="text" name="openingHours[${index}][hours]" class="ai" placeholder="Ex: 08h00 às 22h00">
+                </div>
+                <button type="button" class="btn btn-g remove-opening-hour-btn" style="color:var(--danger, #ef4444);padding:0.5rem 0.75rem" title="Remover item">
+                    <sl-icon name="trash"></sl-icon>
+                </button>
+            `;
+            ohContainer.appendChild(row);
+        });
+
+        ohContainer.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.remove-opening-hour-btn');
+            if (removeBtn) {
+                const row = removeBtn.closest('.opening-hour-row');
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
+    }
 });
 
 function updateNewsletterToggleUI(checked) {

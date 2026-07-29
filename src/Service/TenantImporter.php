@@ -210,6 +210,9 @@ class TenantImporter
             $tenant->setSeoDescription($tData['seoDescription'] ?? null);
             $tenant->setSeoKeywords($tData['seoKeywords'] ?? null);
             $tenant->setFontSettings($tData['fontSettings'] ?? []);
+            if (array_key_exists('openingHours', $tData)) {
+                $tenant->setOpeningHours($tData['openingHours']);
+            }
             $tenant->setNavigationSettings($tData['navigationSettings'] ?? []);
             $tenant->setShowSectionTitles($tData['showSectionTitles'] ?? true);
             $tenant->setLandingPageMode($tData['landingPageMode'] ?? false);

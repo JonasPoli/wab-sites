@@ -138,6 +138,9 @@ class Tenant
     private ?array $fontSettings = [];
 
     #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $openingHours = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $navigationSettings = [];
 
     #[ORM\Column(options: ['default' => true])]
@@ -293,6 +296,24 @@ class Tenant
         return $this;
     }
 
+    public function getOpeningHours(): array
+    {
+        if (empty($this->openingHours)) {
+            return [
+                ['days' => 'Segunda a Sexta:', 'hours' => '08h00 às 22h00'],
+                ['days' => 'Sábado:', 'hours' => '08h00 às 13h00'],
+            ];
+        }
+
+        return $this->openingHours;
+    }
+
+    public function setOpeningHours(?array $openingHours): static
+    {
+        $this->openingHours = $openingHours;
+        return $this;
+    }
+
     public function getNavigationSettings(): ?array
     {
         return $this->navigationSettings ?? [
@@ -396,6 +417,7 @@ class Tenant
             'seoKeywords'      => $this->seoKeywords,
             'ogImage'          => $this->ogImage,
             'fontSettings'       => $this->fontSettings,
+            'openingHours'       => $this->openingHours,
             'navigationSettings' => $this->navigationSettings,
             'showSectionTitles'  => $this->showSectionTitles,
             'landingPageMode'    => $this->landingPageMode,
@@ -442,6 +464,7 @@ class Tenant
         $this->seoKeywords       = $data['seoKeywords'] ?? null;
         $this->ogImage           = $data['ogImage'] ?? null;
         $this->fontSettings      = $data['fontSettings'] ?? [];
+        $this->openingHours      = $data['openingHours'] ?? null;
         $this->navigationSettings = $data['navigationSettings'] ?? [];
         $this->showSectionTitles = $data['showSectionTitles'] ?? true;
         $this->landingPageMode   = $data['landingPageMode'] ?? false;

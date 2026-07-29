@@ -674,6 +674,25 @@ class SuperAdminController extends AbstractController
         $tenant->setAddress($r->request->get('address') ?: null);
         $tenant->setMapsEmbedUrl($r->request->get('mapsEmbedUrl') ?: null);
 
+        // Operating Hours
+        $rawOpeningHours = $r->request->all('openingHours');
+        $cleanOpeningHours = [];
+        if (is_array($rawOpeningHours)) {
+            foreach ($rawOpeningHours as $item) {
+                if (is_array($item)) {
+                    $days = trim((string) ($item['days'] ?? ''));
+                    $hours = trim((string) ($item['hours'] ?? ''));
+                    if ($days !== '' || $hours !== '') {
+                        $cleanOpeningHours[] = [
+                            'days'  => $days,
+                            'hours' => $hours,
+                        ];
+                    }
+                }
+            }
+        }
+        $tenant->setOpeningHours(!empty($cleanOpeningHours) ? $cleanOpeningHours : null);
+
         // Social Networks
         $tenant->setYoutubeLink($r->request->get('youtubeLink') ?: null);
         $tenant->setInstagramLink($r->request->get('instagramLink') ?: null);

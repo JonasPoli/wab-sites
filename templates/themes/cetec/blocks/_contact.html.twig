@@ -112,19 +112,19 @@
                     {% endif %}
                 </div>
 
+                {% if tenant.openingHours is not empty %}
                 <div class="mt-6 p-4 bg-white dark:bg-cetec-dark border border-gray-200 dark:border-white/5 rounded-xl shadow-md">
                     <h4 class="font-bold text-gray-900 dark:text-white text-sm uppercase tracking-wider mb-3">Horário de Funcionamento</h4>
                     <div class="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                        {% for item in tenant.openingHours %}
                         <div class="flex justify-between">
-                            <span>Segunda a Sexta:</span>
-                            <span class="font-semibold">08h00 às 22h00</span>
+                            {% if item.days %}<span>{{ item.days }}</span>{% endif %}
+                            {% if item.hours %}<span class="font-semibold">{{ item.hours }}</span>{% endif %}
                         </div>
-                        <div class="flex justify-between">
-                            <span>Sábado:</span>
-                            <span class="font-semibold">08h00 às 13h00</span>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
 
