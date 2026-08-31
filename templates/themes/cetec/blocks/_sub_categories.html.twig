@@ -1,5 +1,14 @@
 {% set cat = block.relatedCategory %}
 {% if cat %}
+    {% set pages = cat.pages %}
+    {% if pages is empty and cat.children|length > 0 %}
+        {% set pages = [] %}
+        {% for child in cat.children %}
+            {% for p in child.pages %}
+                {% set pages = pages|merge([p]) %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-12">
         {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
@@ -8,38 +17,22 @@
         {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
-    {% set subs = cat.children %}
-    {% if subs|length > 0 %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for sub in subs %}
-        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="bg-white dark:bg-cetec-dark p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 dark:border-white/5 hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-2 flex flex-col justify-between group">
-            <div>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 bg-cetec-secondary/10 rounded-xl flex items-center justify-center text-3xl text-cetec-secondary group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300 flex-shrink-0">
-                        {% if sub.icon %}
-                            <i class="{{ sub.icon }}"></i>
-                        {% else %}
-                            <i class="bi bi-journal-bookmark-fill"></i>
-                        {% endif %}
+    {% if pages|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-transparent">
+        {% for page in pages %}
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="flex flex-col items-center text-center bg-transparent group cursor-pointer transition-transform duration-300 transform hover:-translate-y-2">
+            <div class="w-full h-60 flex items-center justify-center bg-transparent overflow-hidden mb-4">
+                {% if page.coverImage %}
+                    <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="max-w-full max-h-full w-auto h-auto object-contain bg-transparent transition-transform duration-500 group-hover:scale-105 group-hover:drop-shadow-lg" loading="lazy">
+                {% else %}
+                    <div class="text-5xl text-gray-300 dark:text-white/20 bg-transparent flex items-center justify-center w-full h-full">
+                        <i class="bi bi-image"></i>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold group-hover:text-cetec-secondary transition-colors text-cetec-primary">{{ sub.name }}</h3>
-                        {% if sub.preTitle %}
-                            <span class="text-xs uppercase font-semibold text-gray-400">{{ sub.preTitle }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% if sub.description %}
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
-                    {{ sub.description }}
-                </p>
                 {% endif %}
             </div>
-            <div class="pt-4 border-t border-gray-100 dark:border-white/5">
-                <span class="flex items-center gap-1.5 text-cetec-secondary hover:brightness-90 text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
-                    Ver cursos e detalhes <i class="bi bi-arrow-right"></i>
-                </span>
-            </div>
+            <h3 class="text-lg md:text-xl font-bold text-cetec-primary group-hover:text-cetec-secondary transition-colors duration-300">
+                {{ page.title }}
+            </h3>
         </a>
         {% endfor %}
     </div>

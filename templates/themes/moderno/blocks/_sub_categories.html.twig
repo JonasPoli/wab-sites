@@ -1,28 +1,122 @@
 {% set cat = block.relatedCategory %}
 {% if cat %}
+    {% set pages = cat.pages %}
+    {% if pages is empty and cat.children|length > 0 %}
+        {% set pages = [] %}
+        {% for child in cat.children %}
+            {% for p in child.pages %}
+                {% set pages = pages|merge([p]) %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
 <div class="wab-block">
     {% if block.preTitle %}<div style="text-align:center"><span class="section-label"><span class="glow-dot"></span>{{ block.preTitle }}</span></div>{% endif %}
     {% if block.title %}<h2 class="section-heading" style="text-align:center;margin-bottom:.5rem">{{ block.title }}</h2>{% endif %}
-    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:600px;margin:0 auto 2.5rem">{{ block.text }}</p>{% endif %}
-    {% set subs = cat.children %}
-    {% if subs|length > 0 %}
-    <div class="wab-subcats">
-        {% for sub in subs %}
-        <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="subcat-card">
-            {% if sub.icon %}<div class="subcat-icon"><i class="{{ sub.icon }}"></i></div>{% endif %}
-            <h3 class="subcat-title">{{ sub.name }}</h3>
-            {% if sub.description %}<p class="subcat-desc">{{ sub.description|slice(0,100) }}</p>{% endif %}
+    {% if block.text %}<p style="color:var(--text-muted);text-align:center;max-width:640px;margin:0 auto 3rem;font-size:1.05rem;line-height:1.6">{{ block.text }}</p>{% endif %}
+
+    {% if pages|length > 0 %}
+    <div class="wab-subcat-pages">
+        {% for page in pages %}
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="subcat-page-card">
+            <div class="subcat-page-img-wrap">
+                {% if page.coverImage %}
+                    <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="subcat-page-img" loading="lazy">
+                {% else %}
+                    <div class="subcat-page-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <h3 class="subcat-page-title">{{ page.title }}</h3>
         </a>
         {% endfor %}
     </div>
     {% endif %}
 </div>
 <style>
-.wab-subcats { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.5rem; }
-.subcat-card { display:block; padding:2rem 1.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); transition:all .3s; }
-.subcat-card:hover { transform:translateY(-6px); border-color:rgba(var(--color-primary-rgb),.4); opacity:1; }
-.subcat-icon { font-size:2rem; color:var(--color-secondary); margin-bottom:1rem; }
-.subcat-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.5rem; }
-.subcat-desc { color:var(--text-muted); font-size:.85rem; line-height:1.6; }
+.wab-subcat-pages {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
+    align-items: stretch;
+    background: transparent;
+}
+.subcat-page-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.subcat-page-card:hover {
+    transform: translateY(-8px);
+    opacity: 1;
+}
+.subcat-page-img-wrap {
+    width: 100%;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+}
+.subcat-page-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background: transparent;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
+}
+.subcat-page-card:hover .subcat-page-img {
+    transform: scale(1.05);
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.18));
+}
+.subcat-page-placeholder {
+    font-size: 3.5rem;
+    color: var(--text-muted);
+    opacity: 0.35;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.subcat-page-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+}
+.subcat-page-card:hover .subcat-page-title {
+    color: var(--color-primary);
+}
+@media (max-width: 991px) {
+    .wab-subcat-pages {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem 1.5rem;
+    }
+    .subcat-page-img-wrap {
+        height: 200px;
+    }
+}
+@media (max-width: 600px) {
+    .wab-subcat-pages {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .subcat-page-img-wrap {
+        height: 180px;
+    }
+}
 </style>
 {% endif %}
