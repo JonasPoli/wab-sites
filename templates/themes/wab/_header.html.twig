@@ -22,6 +22,7 @@
         </a>
 
         {% set showMenuIcons = currentTenant.navigationSettings.showMenuIcons ?? true %}
+        {% set customMenuItems = currentTenant.navigationSettings.customMenuItems ?? [] %}
 
         {# Nav #}
         <nav class="header-nav" aria-label="Navegação principal">
@@ -52,6 +53,14 @@
                             {% set sectionTitle = 'Seção ' ~ loop.index %}
                         {% endif %}
                         <a href="{{ anchorPrefix }}#section-{{ section.id }}" class="nav-link">{{ sectionTitle }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% for item in customMenuItems %}
+                    {% if item.active and item.url %}
+                        <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {{ item.label }}
+                        </a>
                     {% endif %}
                 {% endfor %}
             {% else %}
@@ -99,6 +108,14 @@
                         {% endif %}
                     {% endfor %}
                 {% endif %}
+                {% for item in customMenuItems %}
+                    {% if item.active and item.url %}
+                        <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {{ item.label }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
                 <a href="{{ path('pub_articles') }}" class="nav-link">Notícias</a>
                 <a href="{{ path('pub_home') }}#contato" class="nav-link">Contato</a>
             {% endif %}

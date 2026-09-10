@@ -342,6 +342,25 @@
 				</div>
 			</div>
 
+			{# ── Links Adicionais no Menu Principal ── #}
+			<div style="margin:2.5rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Links Adicionais no Menu Principal</div>
+			<p class="af-hint" style="margin-top:-.5rem;margin-bottom:1rem">Cadastre links extras que serão exibidos na barra de navegação (ex: "Loja", "Portal", links externos para e-commerce ou parceiros).</p>
+
+			<div style="border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.015);padding:1.25rem;margin-bottom:2rem">
+				<div id="custom-menu-empty" style="color:var(--muted);font-size:0.85rem;font-style:italic;padding:0.75rem 0;display:none;">
+					Nenhum link adicional cadastrado. Clique no botão abaixo para adicionar.
+				</div>
+				<div id="custom-menu-items-container" style="display:flex;flex-direction:column;gap:.75rem">
+					{# Preenchido via JavaScript #}
+				</div>
+
+				<div style="margin-top:1.25rem;display:flex;justify-content:flex-start">
+					<button type="button" class="btn btn-g btn-sm" onclick="addCustomMenuItem()">
+						<i class="fa-solid fa-plus"></i> Adicionar Link ao Menu
+					</button>
+				</div>
+			</div>
+
 			<div class="af-actions">
 				<button type="submit" class="btn btn-p">
 					<sl-icon name="check-lg"></sl-icon>
@@ -420,8 +439,88 @@ reader.readAsDataURL(input.files[0]);
 			return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 		}
 
+		let customMenuIndex = 0;
+		function addCustomMenuItem(data = {}) {
+			const container = document.getElementById('custom-menu-items-container');
+			const emptyMsg = document.getElementById('custom-menu-empty');
+			if (emptyMsg) emptyMsg.style.display = 'none';
+
+			const idx = customMenuIndex++;
+			const label = data.label || '';
+			const url = data.url || '';
+			const icon = data.icon || '';
+			const target = data.target === '_blank' ? 'checked' : '';
+			const active = data.active !== false ? 'checked' : '';
+
+			const row = document.createElement('div');
+			row.className = 'custom-menu-row';
+			row.style.cssText = 'display:grid;grid-template-columns: minmax(130px, 1.5fr) minmax(180px, 2.5fr) minmax(130px, 1.2fr) auto auto auto;gap:0.75rem;align-items:center;background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:0.75rem 1rem;border-radius:6px;';
+			row.innerHTML = `
+				<div>
+					<label style="display:block;font-size:0.7rem;color:var(--muted);margin-bottom:0.25rem;text-transform:uppercase;font-weight:600">Rótulo / Título</label>
+					<input type="text" name="customMenuItems[${idx}][label]" value="${escapeHtml(label)}" placeholder="Ex: Loja" class="ai" style="width:100%" required>
+				</div>
+				<div>
+					<label style="display:block;font-size:0.7rem;color:var(--muted);margin-bottom:0.25rem;text-transform:uppercase;font-weight:600">URL de Destino</label>
+					<input type="text" name="customMenuItems[${idx}][url]" value="${escapeHtml(url)}" placeholder="https://loja.exemplo.com.br" class="ai" style="width:100%" required>
+				</div>
+				<div>
+					<label style="display:block;font-size:0.7rem;color:var(--muted);margin-bottom:0.25rem;text-transform:uppercase;font-weight:600">Ícone (opcional)</label>
+					<input type="text" name="customMenuItems[${idx}][icon]" value="${escapeHtml(icon)}" placeholder="fa-solid fa-store" class="ai" style="width:100%">
+				</div>
+				<div style="padding-top:1.1rem">
+					<label style="display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;cursor:pointer;white-space:nowrap;user-select:none">
+						<input type="checkbox" name="customMenuItems[${idx}][target]" value="_blank" ${target}>
+						<span>Nova aba</span>
+					</label>
+				</div>
+				<div style="padding-top:1.1rem">
+					<label style="display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;cursor:pointer;white-space:nowrap;user-select:none">
+						<input type="checkbox" name="customMenuItems[${idx}][active]" value="1" ${active}>
+						<span>Ativo</span>
+					</label>
+				</div>
+				<div style="padding-top:1.1rem">
+					<button type="button" class="btn btn-d btn-sm" onclick="removeCustomMenuItem(this)" title="Excluir link" style="padding:0.45rem 0.65rem">
+						<i class="fa-solid fa-trash"></i>
+					</button>
+				</div>
+			`;
+			container.appendChild(row);
+		}
+
+		function removeCustomMenuItem(btn) {
+			const row = btn.closest('.custom-menu-row');
+			if (row) {
+				row.remove();
+				const container = document.getElementById('custom-menu-items-container');
+				const emptyMsg = document.getElementById('custom-menu-empty');
+				if (container.querySelectorAll('.custom-menu-row').length === 0 && emptyMsg) {
+					emptyMsg.style.display = 'block';
+				}
+			}
+		}
+
+		function escapeHtml(str) {
+			if (!str) return '';
+			return String(str)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
+		}
+
 		document.addEventListener('DOMContentLoaded', () => {
 			updateContrastPreview();
+
+			const initialCustomMenuItems = {{ (navSettings.customMenuItems ?? [])|json_encode|raw }};
+			if (Array.isArray(initialCustomMenuItems) && initialCustomMenuItems.length > 0) {
+				initialCustomMenuItems.forEach(item => addCustomMenuItem(item));
+			} else {
+				const emptyMsg = document.getElementById('custom-menu-empty');
+				if (emptyMsg) emptyMsg.style.display = 'block';
+			}
 		});
 	</script>
 {% endblock %}

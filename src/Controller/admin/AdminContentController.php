@@ -943,11 +943,34 @@ class AdminContentController extends AbstractController
             $topBarLeft = $r->request->all('topBarLeft');
             $topBarRight = $r->request->all('topBarRight');
 
+            $rawCustomItems = $r->request->all('customMenuItems');
+            $customMenuItems = [];
+            if (is_array($rawCustomItems)) {
+                foreach ($rawCustomItems as $item) {
+                    $label = trim((string)($item['label'] ?? ''));
+                    $url = trim((string)($item['url'] ?? ''));
+                    if ($label === '' || $url === '') {
+                        continue;
+                    }
+                    if (!preg_match('#^(https?://|//|mailto:|tel:|/|#)#i', $url)) {
+                        $url = 'https://' . $url;
+                    }
+                    $customMenuItems[] = [
+                        'label'  => $label,
+                        'url'    => $url,
+                        'target' => ($item['target'] ?? '') === '_blank' ? '_blank' : '_self',
+                        'icon'   => trim((string)($item['icon'] ?? '')),
+                        'active' => !empty($item['active']),
+                    ];
+                }
+            }
+
             $tenant->setNavigationSettings([
-                'showMenuIcons' => $showMenuIcons,
-                'topBarEnabled' => $topBarEnabled,
-                'topBarLeft'    => $topBarLeft,
-                'topBarRight'   => $topBarRight,
+                'showMenuIcons'   => $showMenuIcons,
+                'topBarEnabled'   => $topBarEnabled,
+                'topBarLeft'      => $topBarLeft,
+                'topBarRight'     => $topBarRight,
+                'customMenuItems' => $customMenuItems,
             ]);
 
             $em->flush();

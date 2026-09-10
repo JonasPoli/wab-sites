@@ -317,10 +317,11 @@ class Tenant
     public function getNavigationSettings(): ?array
     {
         return $this->navigationSettings ?? [
-            'showMenuIcons' => true,
-            'topBarEnabled' => false,
-            'topBarLeft'    => [],
-            'topBarRight'   => [],
+            'showMenuIcons'   => true,
+            'topBarEnabled'   => false,
+            'topBarLeft'      => [],
+            'topBarRight'     => [],
+            'customMenuItems' => [],
         ];
     }
 

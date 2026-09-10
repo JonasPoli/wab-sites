@@ -706,11 +706,13 @@ class SuperAdminController extends AbstractController
         $topBarLeft = $r->request->all('topBarLeft');
         $topBarRight = $r->request->all('topBarRight');
 
+        $existingNav = $tenant->getNavigationSettings() ?? [];
         $tenant->setNavigationSettings([
-            'showMenuIcons' => $showMenuIcons,
-            'topBarEnabled' => $topBarEnabled,
-            'topBarLeft'    => $topBarLeft,
-            'topBarRight'   => $topBarRight,
+            'showMenuIcons'   => $showMenuIcons,
+            'topBarEnabled'   => $topBarEnabled,
+            'topBarLeft'      => $topBarLeft,
+            'topBarRight'     => $topBarRight,
+            'customMenuItems' => $existingNav['customMenuItems'] ?? [],
         ]);
 
         $fontSettings = [];
