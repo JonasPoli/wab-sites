@@ -42,6 +42,9 @@ class PageSection
     #[ORM\Column(options: ['default' => true])]
     private bool $active = true;
 
+    #[ORM\Column(options: ['default' => true])]
+    private bool $showInMenu = true;
+
     // ── Background ────────────────────────────────────────────────────────────
 
     /** none | color | gradient | image | video */
@@ -112,6 +115,10 @@ class PageSection
 
     public function isActive(): bool { return $this->active; }
     public function setActive(bool $active): static { $this->active = $active; return $this; }
+
+    public function isShowInMenu(): bool { return $this->showInMenu; }
+    public function getShowInMenu(): bool { return $this->showInMenu; }
+    public function setShowInMenu(bool $showInMenu): static { $this->showInMenu = $showInMenu; return $this; }
 
     // ── Background accessors ──────────────────────────────────────────────────
 

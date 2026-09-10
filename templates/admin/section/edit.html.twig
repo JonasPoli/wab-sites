@@ -24,11 +24,19 @@
             <input type="text" name="titlePart2" class="ai" value="{{ section.titlePart2 }}">
         </div>
     </div>
-    <div class="af-field">
-        <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
-            <input type="checkbox" name="active" value="1" {{ section.active ? 'checked' }} style="width:18px;height:18px;accent-color:var(--primary)">
-            Seção ativa (visível no site)
-        </label>
+    <div class="af-row">
+        <div class="af-field">
+            <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
+                <input type="checkbox" name="active" value="1" {{ section.active ? 'checked' }} style="width:18px;height:18px;accent-color:var(--primary)">
+                Seção ativa (visível no site)
+            </label>
+        </div>
+        <div class="af-field">
+            <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
+                <input type="checkbox" name="showInMenu" value="1" {{ section.showInMenu ? 'checked' }} style="width:18px;height:18px;accent-color:var(--primary)">
+                Exibir no menu?
+            </label>
+        </div>
     </div>
 
     {# ── Background ── #}

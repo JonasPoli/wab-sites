@@ -46,6 +46,7 @@
             <div style="font-size:.78rem;color:var(--muted)">{{ section.blocks|length }} bloco(s)</div>
         </div>
         <span class="badge {{ section.active ? 'bg-ok' : 'bg-neu' }}">{{ section.active ? 'Ativo' : 'Inativo' }}</span>
+        {% if section.showInMenu %}<span class="badge bg-inf" title="Exibido no menu">No menu</span>{% endif %}
         <div class="ta">
             <a href="{{ path('admin_block_index', {sectionId: section.id}) }}" class="btn btn-g btn-sm" title="Gerenciar blocos"><sl-icon name="grid"></sl-icon></a>
             <a href="{{ path('admin_section_edit', {id: section.id}) }}" class="btn btn-g btn-sm"><sl-icon name="pencil-fill"></sl-icon></a>

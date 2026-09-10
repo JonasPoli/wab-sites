@@ -237,6 +237,7 @@ class TenantExporter
                 'titlePart2'       => $s->getTitlePart2(),
                 'position'         => $s->getPosition(),
                 'active'           => $s->isActive(),
+                'showInMenu'       => $s->isShowInMenu(),
                 'bgType'           => $s->getBgType(),
                 'bgColor'          => $s->getBgColor(),
                 'bgGradient'       => $s->getBgGradient(),

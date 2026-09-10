@@ -23,7 +23,7 @@
                 {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
                 {% set anchorPrefix = isHome ? '' : path('pub_home') %}
                 {% for section in currentTenant.homePage.sections %}
-                    {% if section.active %}
+                    {% if section.active and (section.showInMenu ?? true) %}
                         {% set sectionTitle = '' %}
                         {% if section.titlePart1 or section.titlePart2 %}
                             {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
@@ -111,7 +111,7 @@
             {% set isHome = app.request.attributes.get('_route') == 'pub_home' %}
             {% set anchorPrefix = isHome ? '' : path('pub_home') %}
             {% for section in currentTenant.homePage.sections %}
-                {% if section.active %}
+                {% if section.active and (section.showInMenu ?? true) %}
                     {% set sectionTitle = '' %}
                     {% if section.titlePart1 or section.titlePart2 %}
                         {% set sectionTitle = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}

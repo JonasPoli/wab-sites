@@ -250,9 +250,7 @@ class AdminContentController extends AbstractController
         $section = new PageSection();
         if ($r->isMethod('POST')) {
             $section->setCategory($cat);
-            $section->setTitlePart1($r->request->get('titlePart1') ?: null);
-            $section->setTitlePart2($r->request->get('titlePart2') ?: null);
-            $section->setActive((bool) $r->request->get('active'));
+            $this->populateSection($section, $r);
             $em->persist($section);
             $em->flush();
             $this->addFlash('success', 'Seção criada.');
@@ -419,6 +417,7 @@ class AdminContentController extends AbstractController
         $section->setTitlePart1($r->request->get('titlePart1') ?: null);
         $section->setTitlePart2($r->request->get('titlePart2') ?: null);
         $section->setActive((bool) $r->request->get('active'));
+        $section->setShowInMenu((bool) $r->request->get('showInMenu'));
         
         // Background type and cleanups
         $bgType = $r->request->get('bgType', 'none');

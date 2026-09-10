@@ -325,6 +325,7 @@ class TenantImporter
                 $sec->setTitlePart2($sData['titlePart2'] ?? null);
                 $sec->setPosition((int) $sData['position']);
                 $sec->setActive((bool) $sData['active']);
+                $sec->setShowInMenu((bool) ($sData['showInMenu'] ?? true));
                 $sec->setBgType($sData['bgType'] ?? 'none');
                 $sec->setBgColor($sData['bgColor'] ?? null);
                 $sec->setBgGradient($sData['bgGradient'] ?? null);

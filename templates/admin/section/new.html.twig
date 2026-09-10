@@ -16,9 +16,19 @@
         <div class="af-field"><label>Título Parte 1 <span class="af-hint" style="color:var(--secondary)">(cor secundária)</span></label><input type="text" name="titlePart1" class="ai" value=""></div>
         <div class="af-field"><label>Título Parte 2 <span class="af-hint" style="color:var(--primary)">(cor primária)</span></label><input type="text" name="titlePart2" class="ai" value=""></div>
     </div>
-    <div class="af-field" style="flex-direction:row;align-items:center;gap:.75rem">
-        <sl-switch name="active" value="1" checked></sl-switch>
-        <label style="color:var(--text)">Seção ativa</label>
+    <div class="af-row">
+        <div class="af-field">
+            <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
+                <input type="checkbox" name="active" value="1" checked style="width:18px;height:18px;accent-color:var(--primary)">
+                Seção ativa (visível no site)
+            </label>
+        </div>
+        <div class="af-field">
+            <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer">
+                <input type="checkbox" name="showInMenu" value="1" checked style="width:18px;height:18px;accent-color:var(--primary)">
+                Exibir no menu?
+            </label>
+        </div>
     </div>
 
     <div style="margin:1.5rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Background da Seção</div>
