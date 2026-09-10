@@ -952,7 +952,7 @@ class AdminContentController extends AbstractController
                     if ($label === '' || $url === '') {
                         continue;
                     }
-                    if (!preg_match('#^(https?://|//|mailto:|tel:|/|#)#i', $url)) {
+                    if (!preg_match('~^(https?://|//|mailto:|tel:|/|#)~i', $url)) {
                         $url = 'https://' . $url;
                     }
                     $customMenuItems[] = [
