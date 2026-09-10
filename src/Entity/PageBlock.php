@@ -104,7 +104,17 @@ class PageBlock
     public function getType(): string { return $this->type; }
     public function setType(string $type): static { $this->type = $type; return $this; }
 
-    public function getBlockType(): BlockType { return BlockType::from($this->type); }
+    public function getBlockType(): ?BlockType { return BlockType::tryFrom($this->type); }
+
+    public function getBlockTypeLabel(): string
+    {
+        return $this->getBlockType()?->label() ?? ucfirst(str_replace('_', ' ', $this->type));
+    }
+
+    public function getBlockTypeIcon(): string
+    {
+        return $this->getBlockType()?->icon() ?? 'fa-solid fa-cube';
+    }
 
     public function getPreTitle(): ?string { return $this->preTitle; }
     public function setPreTitle(?string $preTitle): static { $this->preTitle = $preTitle; return $this; }

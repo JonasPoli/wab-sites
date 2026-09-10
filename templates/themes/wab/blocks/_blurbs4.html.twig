@@ -3,10 +3,24 @@
 {% if config.items is defined and config.items is iterable %}
     {% for it in config.items %}
         {% if it.title is defined and it.title %}
+            {% set item_url = null %}
+            {% if (it.link ?? null) == 'external' and (it.externalUrl ?? null) %}
+                {% set item_url = it.externalUrl|trim %}
+                {% if item_url and not (item_url starts with 'http://' or item_url starts with 'https://' or item_url starts with '//' or item_url starts with 'mailto:' or item_url starts with 'tel:' or item_url starts with '/' or item_url starts with '#') %}
+                    {% set item_url = 'https://' ~ item_url %}
+                {% endif %}
+            {% elseif (it.link ?? null) and (it.link starts with 'http://' or it.link starts with 'https://' or it.link starts with '//') %}
+                {% set item_url = it.link|trim %}
+            {% elseif (it.link ?? null) and (it.link != 'external') %}
+                {% set item_url = path('pub_page_show', {slug: it.link}) %}
+            {% endif %}
+
             {% set items_list = items_list|merge([{
                 'icon': it.icon ?? null,
                 'title': it.title,
-                'text': it.text ?? null
+                'text': it.text ?? null,
+                'url': item_url,
+                'linkTarget': it.linkTarget ?? '_self'
             }]) %}
         {% endif %}
     {% endfor %}
@@ -19,7 +33,9 @@
             {% set items_list = items_list|merge([{
                 'icon': config['item' ~ i ~ '_icon'] ?? null,
                 'title': title,
-                'text': config['item' ~ i ~ '_text'] ?? null
+                'text': config['item' ~ i ~ '_text'] ?? null,
+                'url': null,
+                'linkTarget': '_self'
             }]) %}
         {% endif %}
     {% endfor %}
@@ -49,7 +65,11 @@
     {% if has_items %}
     <div class="wab-blurbs4">
         {% for it in items_list %}
+        {% if it.url %}
+        <a href="{{ it.url }}" target="{{ it.linkTarget }}" class="b4-card b4-link"{% if it.linkTarget == '_blank' %} rel="noopener noreferrer"{% endif %}>
+        {% else %}
         <div class="b4-card">
+        {% endif %}
             {% if it.icon %}
             <div class="b4-icon">
                 <i class="{{ it.icon }}"></i>
@@ -59,7 +79,11 @@
                 <h3 class="b4-title">{{ it.title }}</h3>
                 {% if it.text %}<p class="b4-text">{{ it.text }}</p>{% endif %}
             </div>
+        {% if it.url %}
+        </a>
+        {% else %}
         </div>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
@@ -83,7 +107,10 @@
         max-width: 56rem;
     }
 }
-.b4-card { display:flex; gap:1.25rem; align-items:flex-start; }
+.b4-card { display:flex; gap:1.25rem; align-items:flex-start; text-decoration:none; color:inherit; }
+a.b4-card { transition: transform 0.2s ease, opacity 0.2s ease; cursor: pointer; }
+a.b4-card:hover { transform: translateY(-2px); }
+a.b4-card:hover .b4-title { color: var(--color-primary); }
 .b4-icon { width:48px; height:48px; background:linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.25rem; box-shadow: 0 4px 14px rgba(var(--color-primary-rgb),.2); }
 .b4-content { flex:1; }
 .b4-title { font-size:1.1rem; font-weight:700; color:var(--text); margin:0 0 0.4rem 0; line-height:1.3; }

@@ -538,6 +538,19 @@ class AdminContentController extends AbstractController
 
         // Config JSON
         $cfg = $r->request->all('config');
+        if (isset($cfg['items']) && is_array($cfg['items'])) {
+            foreach ($cfg['items'] as $idx => $it) {
+                if (($it['link'] ?? '') !== 'external') {
+                    $cfg['items'][$idx]['externalUrl'] = '';
+                } else {
+                    $extUrl = trim((string)($it['externalUrl'] ?? ''));
+                    if ($extUrl !== '' && !preg_match('#^([a-z]+:)?//#i', $extUrl) && !str_starts_with($extUrl, '/') && !str_starts_with($extUrl, '#') && !str_starts_with($extUrl, 'mailto:') && !str_starts_with($extUrl, 'tel:')) {
+                        $extUrl = 'https://' . $extUrl;
+                    }
+                    $cfg['items'][$idx]['externalUrl'] = $extUrl;
+                }
+            }
+        }
         $block->setConfig($cfg ?: null);
 
         // Main image (text_image)

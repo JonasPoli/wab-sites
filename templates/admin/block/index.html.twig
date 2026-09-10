@@ -28,21 +28,33 @@
         <span class="drag-h"><sl-icon name="grip-vertical"></sl-icon></span>
         <span class="badge bg-neu" style="font-size:.72rem">#{{ loop.index }}</span>
         {% if block.image %}
-            <img src="/uploads/page_block/{{ block.image }}" alt="" style="width:60px;height:40px;object-fit:cover;border-radius:4px">
+            <img src="/uploads/page_block/{{ block.image }}" alt="" class="block-thumb">
+        {% elseif block.galleryImages is defined and block.galleryImages|length > 0 %}
+            <img src="/uploads/page_block_gallery/{{ block.galleryImages.first.filename }}" alt="" class="block-thumb">
+        {% else %}
+            <div class="block-thumb block-thumb-placeholder" title="{{ block.blockTypeLabel }}">
+                <i class="{{ block.blockTypeIcon }}"></i>
+            </div>
         {% endif %}
-        <div style="flex:1">
-            <div style="font-weight:600">{{ block.title ?? '(sem título)' }}</div>
-            {% if block.preTitle %}<div style="font-size:.75rem;color:var(--muted)">{{ block.preTitle }}</div>{% endif %}
+        <span class="badge bg-inf block-type-badge">
+            <i class="{{ block.blockTypeIcon }}"></i>
+            {{ block.blockTypeLabel }}
+        </span>
+        <div class="block-details" style="flex:1;min-width:0">
+            <a href="{{ path('admin_block_edit', {id: block.id}) }}" style="font-weight:600;color:var(--text);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text)'">
+                {{ block.title ?: '(sem título)' }}
+            </a>
+            {% if block.preTitle %}<div style="font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ block.preTitle }}</div>{% endif %}
         </div>
         <div class="ta">
-            <a href="{{ path('admin_block_edit', {id: block.id}) }}" class="btn btn-g btn-sm"><sl-icon name="pencil-fill"></sl-icon></a>
+            <a href="{{ path('admin_block_edit', {id: block.id}) }}" class="btn btn-g btn-sm" title="Editar"><sl-icon name="pencil-fill"></sl-icon></a>
             <form action="{{ path('admin_block_duplicate', {id: block.id}) }}" method="post" style="display:inline">
                 <input type="hidden" name="_token" value="{{ csrf_token('dup_block_' ~ block.id) }}">
                 <button class="btn btn-g btn-sm" title="Duplicar"><sl-icon name="copy"></sl-icon></button>
             </form>
             <form action="{{ path('admin_block_delete', {id: block.id}) }}" method="post" onsubmit="return confirm('Remover bloco?')">
                 <input type="hidden" name="_token" value="{{ csrf_token('del_block_' ~ block.id) }}">
-                <button class="btn btn-d btn-sm"><sl-icon name="trash-fill"></sl-icon></button>
+                <button class="btn btn-d btn-sm" title="Excluir"><sl-icon name="trash-fill"></sl-icon></button>
             </form>
         </div>
     </li>
@@ -54,8 +66,17 @@
 {% endblock %}
 {% block stylesheets %}{{ parent() }}<style>
 .sortable-list{list-style:none;padding:0;margin:0}
-.sortable-item{display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.sortable-item{display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);transition:background var(--ease)}
+.sortable-item:hover{background:rgba(255,255,255,.02)}
 .sortable-item:last-child{border-bottom:none}
+.block-thumb{width:60px;height:42px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0}
+.block-thumb-placeholder{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03);border:1px dashed var(--border);color:var(--muted);font-size:1.15rem}
+.block-type-badge{display:inline-flex;align-items:center;gap:.45rem;font-size:.76rem;padding:.28rem .7rem;font-weight:600;flex-shrink:0;white-space:nowrap}
+@media (max-width:768px){
+    .sortable-item{flex-wrap:wrap;gap:.6rem}
+    .block-details{order:5;width:100%;flex-basis:100%}
+    .ta{margin-left:auto}
+}
 </style>{% endblock %}
 {% block javascripts %}{{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>

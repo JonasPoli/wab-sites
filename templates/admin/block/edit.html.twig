@@ -4,7 +4,7 @@
 <div class="ph" style="margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:1.5rem">
     <div>
         <h1 style="margin:0;font-size:1.6rem;font-weight:800">
-            Editar Bloco: <span style="color:var(--primary)">{{ block.blockType.label() }}</span>
+            Editar Bloco: <span style="color:var(--primary)"><i class="{{ block.blockTypeIcon }}" style="font-size:1.2rem;margin-right:.35rem"></i>{{ block.blockTypeLabel }}</span>
         </h1>
         <div style="display:flex;align-items:center;gap:1rem;margin-top:.5rem;font-size:.85rem;color:var(--muted);flex-wrap:wrap">
             {% if block.section.page %}

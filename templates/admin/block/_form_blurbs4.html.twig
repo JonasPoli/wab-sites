@@ -33,7 +33,8 @@
                     'title': title ?? '',
                     'text': cfg['item' ~ i ~ '_text'] ?? '',
                     'link': '',
-                    'linkTarget': '_self'
+                    'linkTarget': '_self',
+                    'externalUrl': ''
                 }]) %}
             {% endif %}
         {% endfor %}
@@ -56,22 +57,52 @@
 <script>
 const PAGES_LIST = {{ pages_json|json_encode|raw }};
 
-function buildPageSelect(uniqueId, selectedSlug, selectedTarget) {
-    const slugVal = selectedSlug || '';
+function toggleExternalUrlField(uniqueId, val) {
+    const wrap = document.getElementById('ext-wrap-' + uniqueId);
+    if (!wrap) return;
+    if (val === 'external') {
+        wrap.style.display = 'block';
+        const input = wrap.querySelector('.blurb-external-url-input');
+        if (input) input.focus();
+    } else {
+        wrap.style.display = 'none';
+    }
+}
+
+function buildPageSelect(uniqueId, selectedSlug, selectedTarget, selectedExternalUrl) {
+    let slugVal = selectedSlug || '';
     const targetVal = selectedTarget || '_self';
+    let extUrlVal = selectedExternalUrl || '';
+
+    // If slugVal is already a URL, treat as external
+    if (slugVal.startsWith('http://') || slugVal.startsWith('https://') || slugVal.startsWith('//')) {
+        if (!extUrlVal) extUrlVal = slugVal;
+        slugVal = 'external';
+    } else if (extUrlVal && (!slugVal || slugVal === 'external')) {
+        slugVal = 'external';
+    }
+
+    const isExternal = (slugVal === 'external');
 
     let options = `<option value="">— Sem link —</option>`;
+    options += `<option value="external"${isExternal ? ' selected' : ''}>Página externa</option>`;
+
     PAGES_LIST.forEach(p => {
-        const selected = (p.slug === slugVal) ? ' selected' : '';
+        const selected = (!isExternal && p.slug === slugVal) ? ' selected' : '';
         options += `<option value="${escapeHtml(p.slug)}"${selected}>${escapeHtml(p.title)}</option>`;
     });
 
     return `
         <div class="af-field" style="margin-top:0.75rem;">
             <label>Página de destino</label>
-            <select class="ai blurb-link-input" id="link-${uniqueId}" style="width:100%;">
+            <select class="ai blurb-link-input" id="link-${uniqueId}" onchange="toggleExternalUrlField('${uniqueId}', this.value)" style="width:100%;">
                 ${options}
             </select>
+        </div>
+        <div class="af-field blurb-external-url-wrap" id="ext-wrap-${uniqueId}" style="margin-top:0.75rem; display: ${isExternal ? 'block' : 'none'};">
+            <label>URL da página externa <span class="req">*</span></label>
+            <input type="text" class="ai blurb-external-url-input" id="ext-${uniqueId}" value="${escapeHtml(extUrlVal)}" placeholder="https://exemplo.com.br">
+            <span class="af-hint" style="font-size:.75rem; color:var(--muted); margin-top:.25rem; display:block;">Informe a URL de destino (ex: https://site.com.br)</span>
         </div>
         <div class="af-field" style="margin-top:0.75rem;">
             <label>Abrir link</label>
@@ -83,7 +114,7 @@ function buildPageSelect(uniqueId, selectedSlug, selectedTarget) {
     `;
 }
 
-function addBlurb(icon = '', title = '', text = '', link = '', linkTarget = '_self') {
+function addBlurb(icon = '', title = '', text = '', link = '', linkTarget = '_self', externalUrl = '') {
     const container = document.getElementById('blurbs-container');
     const uniqueId = 'blurb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
     
@@ -120,7 +151,7 @@ function addBlurb(icon = '', title = '', text = '', link = '', linkTarget = '_se
                     <label>Título <span class="req">*</span></label>
                     <input type="text" class="ai blurb-title-input" value="${escapeHtml(title)}" required>
                 </div>
-                ${buildPageSelect(uniqueId, link, linkTarget)}
+                ${buildPageSelect(uniqueId, link, linkTarget, externalUrl)}
             </div>
             
             <div class="af-field" style="margin-bottom:0;">
@@ -176,12 +207,14 @@ function reindexBlurbs() {
         const titleInput  = item.querySelector('.blurb-title-input');
         const textInput   = item.querySelector('.blurb-text-input');
         const linkInput   = item.querySelector('.blurb-link-input');
+        const extUrlInput = item.querySelector('.blurb-external-url-input');
         const targetInput = item.querySelector('.blurb-target-input');
         
         if (iconInput)   iconInput.name   = `config[items][${index}][icon]`;
         if (titleInput)  titleInput.name  = `config[items][${index}][title]`;
         if (textInput)   textInput.name   = `config[items][${index}][text]`;
         if (linkInput)   linkInput.name   = `config[items][${index}][link]`;
+        if (extUrlInput) extUrlInput.name = `config[items][${index}][externalUrl]`;
         if (targetInput) targetInput.name = `config[items][${index}][linkTarget]`;
     });
 }
@@ -193,7 +226,8 @@ document.addEventListener("DOMContentLoaded", function() {
             '{{ it.title|default('')|escape('js') }}',
             '{{ it.text|default('')|escape('js') }}',
             '{{ it.link|default('')|escape('js') }}',
-            '{{ it.linkTarget|default('_self')|escape('js') }}'
+            '{{ it.linkTarget|default('_self')|escape('js') }}',
+            '{{ it.externalUrl|default('')|escape('js') }}'
         );
     {% endfor %}
     
@@ -201,5 +235,23 @@ document.addEventListener("DOMContentLoaded", function() {
     if (document.querySelectorAll('.blurb-item').length === 0) {
         addBlurb();
     }
+
+    // Client-side validation on form submit
+    document.querySelector('form.af')?.addEventListener('submit', function(e) {
+        const items = document.querySelectorAll('.blurb-item');
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const linkSelect = item.querySelector('.blurb-link-input');
+            const extUrlInput = item.querySelector('.blurb-external-url-input');
+            if (linkSelect && linkSelect.value === 'external') {
+                if (!extUrlInput || !extUrlInput.value.trim()) {
+                    e.preventDefault();
+                    alert(`Por favor, informe a URL da página externa para o Item ${i + 1}.`);
+                    extUrlInput?.focus();
+                    return false;
+                }
+            }
+        }
+    });
 });
 </script>
