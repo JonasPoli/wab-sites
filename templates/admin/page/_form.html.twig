@@ -17,6 +17,13 @@
             </select>
         </div>
         <div class="af-field">
+            <label>Data de publicação</label>
+            <input type="date" name="publishedAt" class="ai" value="{{ (page.publishedAt ?? date())|date('Y-m-d') }}">
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
             <label>Imagem de capa</label>
             <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
                 {% if page.coverImage %}

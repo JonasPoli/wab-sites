@@ -61,6 +61,10 @@ class Page implements TenantAwareInterface
     #[ORM\Column(options: ['default' => true])]
     private bool $showTitle = true;
 
+    /** Publication date — orders pages in news listings (news_call) */
+    #[ORM\Column]
+    private \DateTimeImmutable $publishedAt;
+
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
@@ -73,6 +77,7 @@ class Page implements TenantAwareInterface
     {
         $this->sections = new ArrayCollection();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->publishedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -117,6 +122,9 @@ class Page implements TenantAwareInterface
 
     public function isShowTitle(): bool { return $this->showTitle; }
     public function setShowTitle(bool $showTitle): static { $this->showTitle = $showTitle; return $this; }
+
+    public function getPublishedAt(): \DateTimeImmutable { return $this->publishedAt; }
+    public function setPublishedAt(\DateTimeImmutable $publishedAt): static { $this->publishedAt = $publishedAt; return $this; }
 
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }

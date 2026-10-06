@@ -1,5 +1,4 @@
-{% set count = block.itemCount ?? 3 %}
-{% set pages = footerPages is defined ? footerPages|slice(0, count) : [] %}
+{% set pages = latest_pages(block.relatedCategory, block.itemCount ?? 3) %}
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-12">
         {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
@@ -25,6 +24,7 @@
                             {{ page.category.name }}
                         </span>
                         {% endif %}
+                        <time datetime="{{ page.publishedAt|date('Y-m-d') }}" class="text-gray-400 text-xs">{{ page.publishedAt|date('d/m/Y') }}</time>
                     </div>
                     <h3 class="text-lg font-bold text-cetec-primary mb-2 line-clamp-2 group-hover:text-cetec-secondary transition-colors">
                         <a href="{{ path('pub_page_show', {slug: page.slug}) }}">{{ page.title }}</a>
@@ -43,6 +43,11 @@
             </div>
         </article>
         {% endfor %}
+    </div>
+    <div class="text-center mt-10">
+        <a href="{{ path('pub_category', {slug: block.relatedCategory.slug}) }}" class="inline-flex items-center gap-1.5 text-cetec-secondary hover:brightness-90 text-sm font-bold tracking-wider">
+            Ver todas <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
     {% endif %}
 </div>

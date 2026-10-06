@@ -45,7 +45,14 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('tenant', $this->getTenant(...)),
             new TwigFunction('tenant_css_vars', $this->getCssVars(...), ['is_safe' => ['html']]),
             new TwigFunction('is_dark_color', $this->isDarkColor(...)),
+            new TwigFunction('latest_pages', $this->getLatestPages(...)),
         ];
+    }
+
+    /** @return \App\Entity\Page[] */
+    public function getLatestPages(?\App\Entity\Category $category, ?int $limit = null): array
+    {
+        return $category ? $this->pageRepository->findLatestInCategory($category, $limit ?: 3) : [];
     }
 
     public function getTenant(): ?\App\Entity\Tenant

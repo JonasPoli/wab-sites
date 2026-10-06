@@ -297,6 +297,9 @@ class TenantImporter
                 $page->setSeoDescription($pData['seoDescription'] ?? null);
                 $page->setPosition((int) $pData['position']);
                 $page->setShowTitle((bool) ($pData['showTitle'] ?? true));
+                if (!empty($pData['publishedAt'])) {
+                    $page->setPublishedAt(new \DateTimeImmutable($pData['publishedAt']));
+                }
 
                 if (!empty($pData['coverImage'])) {
                     $page->setCoverImage($pData['coverImage']);

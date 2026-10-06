@@ -209,6 +209,7 @@ class TenantExporter
                 'position'       => $p->getPosition(),
                 'category_id'    => $p->getCategory()?->getId(),
                 'showTitle'      => $p->isShowTitle(),
+                'publishedAt'    => $p->getPublishedAt()->format(\DATE_ATOM),
             ];
         }
         return $serialized;

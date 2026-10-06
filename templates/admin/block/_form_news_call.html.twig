@@ -9,12 +9,28 @@
         <input type="text" name="title" class="ai" value="{{ block.title }}" required>
     </div>
     <div class="af-field">
-        <label>Quantidade de notícias a exibir</label>
-        <select name="itemCount" class="as">
-            {% for n in [3, 4, 6, 8] %}
-            <option value="{{ n }}" {{ (block.itemCount ?? 3) == n ? 'selected' }}>{{ n }} notícias</option>
-            {% endfor %}
-        </select>
+        <label>Texto de apoio</label>
+        <textarea name="text" class="ate" rows="3">{{ block.text }}</textarea>
+    </div>
+    <div class="af-row">
+        <div class="af-field">
+            <label>Categoria das notícias <span class="req">*</span></label>
+            <select name="relatedCategoryId" class="as" required>
+                <option value="">— Selecione —</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {{ block.relatedCategory and block.relatedCategory.id == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <small style="color:var(--muted)">Exibe as páginas desta categoria (e subcategorias), da mais recente para a mais antiga, pela data de publicação.</small>
+        </div>
+        <div class="af-field">
+            <label>Quantidade de notícias a exibir</label>
+            <select name="itemCount" class="as">
+                {% for n in [3, 4, 6, 8] %}
+                <option value="{{ n }}" {{ (block.itemCount ?? 3) == n ? 'selected' }}>{{ n }} notícias</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
     <div class="af-actions">
         <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>

@@ -1019,6 +1019,11 @@ class AdminContentController extends AbstractController
         $page->setSeoTitle($r->request->get('seoTitle') ?: null);
         $page->setSeoDescription($r->request->get('seoDescription') ?: null);
         $page->setShowTitle((bool) $r->request->get('showTitle'));
+        // Publication date — keep the stored time unless the day changed
+        $pubDate = \DateTimeImmutable::createFromFormat('!Y-m-d', (string) $r->request->get('publishedAt'));
+        if ($pubDate && $pubDate->format('Y-m-d') !== $page->getPublishedAt()->format('Y-m-d')) {
+            $page->setPublishedAt($pubDate);
+        }
         // Category
         if ($cats) {
             $catId = (int) $r->request->get('categoryId');
