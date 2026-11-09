@@ -13,10 +13,12 @@ context: |
   É projeto interno da WAB (cliente WAB 196 "Wab", sem contrato de horas). Pedidos sobre o site de um cliente
   chegam por ticket no cliente dele (projeto "Demandas Gerais - <cliente>", sem plano de horas).
   Tenants em produção (09/11/2026): 1 marapossi.com.br (Mara Possi Advocacia, cliente 200),
-  3 pkwy.com.br, 4 cemporcentoexpresso.com.br (100% Expresso, cliente 199), 5 imperiodainformatica.com.br,
-  6 site.transterraararaquara.com.br (Transterra, cliente 180), 7 site.petvida.com.br,
-  8 site.topdrim.com.br (Top Drim, cliente 177), 9 site.abifer.com.br (Abifer, cliente 1) e 2 localhost
-  (sobra das fixtures). Todos os tenants reais usam o tema cetec com o Modo Landing Page ligado.
+  3 pkwy.com.br, 4 cemporcentoexpresso.com.br (100% Expresso, cliente 199, confirmado pelo Jonas em 09/11),
+  5 imperiodainformatica.com.br, 6 site.transterraararaquara.com.br (Transterra, cliente 180),
+  7 site.petvida.com.br, 8 site.topdrim.com.br (Top Drim, cliente 177) e 9 site.abifer.com.br (Abifer, cliente 1).
+  pkwy.com.br, imperiodainformatica.com.br e site.petvida.com.br ainda não têm cliente identificado no sistema
+  WAB. O tenant 2 (localhost, sobra das fixtures) não existia mais na noite de 09/11/2026.
+  Todos os tenants reais usam o tema cetec com o Modo Landing Page ligado.
   O site principal de vários desses clientes é outro (WordPress no wab2); aqui ficam os subdomínios site.*.
 
   Produção (conferida em 09/11/2026)
@@ -32,10 +34,11 @@ context: |
   - Leitura em produção é livre; qualquer escrita (deploy, banco, arquivos) exige aprovação explícita do Jonas.
     Valores do .env.local nunca são exibidos.
   - Sem cron e sem worker do Messenger: o e-mail é enviado na hora (SendEmailMessage não vai para fila).
-  - E-mail: o .env.local de produção não define MAILER_DSN, EMAIL_FROM nem EMAIL_CONTACT_TO; valem os do .env
-    versionado, e o MAILER_DSN resolve para null://. As variáveis CONTACT_TO, MAIL_FROM, MAIL_BCC, WMAILER_*
-    e MAIL_SENDER* do .env.local não são lidas pelo código. Na prática o formulário de contato só grava em
-    contact_message (262 mensagens em 09/11, nenhuma marcada como lida).
+  - E-mail: em 09/11/2026 o .env.local de produção passou a ter MAILER_DSN (WMailer), EMAIL_FROM=noreply@wab.com.br
+    e EMAIL_CONTACT_TO=suporte@wab.com.br (destino do contato dos sites sem contactEmail). Antes disso valiam os do
+    .env versionado, o MAILER_DSN resolvia para null:// e o formulário de contato só gravava em contact_message
+    (262 mensagens até 09/11, nenhuma marcada como lida). As variáveis CONTACT_TO, MAIL_FROM, MAIL_BCC, WMAILER_*
+    e MAIL_SENDER* do .env.local continuam não sendo lidas pelo código.
   - O Monolog de prod escreve no stderr do PHP-FPM, que o runcloud não lê; var/log fica vazio.
   - public/uploads (228 MB), public/media/cache (LiipImagine) e public/assets (AssetMapper) ficam fora do git.
   - var/tmp guarda ZIPs de exportação/importação de tenants que nunca foram apagados; eles têm hashes de senha
