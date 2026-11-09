@@ -1,0 +1,68 @@
+schema: spec-driven
+
+# Contexto do projeto: só restrições que um agente não descobre lendo o código.
+# O README.md descreve a arquitetura (tenant por domínio, seções e blocos, temas, papéis); o CLAUDE.md da raiz
+# só traz as regras do Symfony UX. Os docs/ são prompts e planos de implementação, não refletem o estado atual.
+context: |
+  Language: pt-BR
+  All artifacts must be written in pt-BR.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Projeto: WAB Sites, construtor multi-tenant de sites institucionais e landing pages que a WAB monta para
+  clientes. Uma instalação e um banco atendem vários domínios; cada domínio é um Tenant (match exato do host).
+  É projeto interno da WAB (cliente WAB 196 "Wab", sem contrato de horas). Pedidos sobre o site de um cliente
+  chegam por ticket no cliente dele (projeto "Demandas Gerais - <cliente>", sem plano de horas).
+  Tenants em produção (09/11/2026): 1 marapossi.com.br (Mara Possi Advocacia, cliente 200),
+  3 pkwy.com.br, 4 cemporcentoexpresso.com.br (100% Expresso, cliente 199), 5 imperiodainformatica.com.br,
+  6 site.transterraararaquara.com.br (Transterra, cliente 180), 7 site.petvida.com.br,
+  8 site.topdrim.com.br (Top Drim, cliente 177), 9 site.abifer.com.br (Abifer, cliente 1) e 2 localhost
+  (sobra das fixtures). Todos os tenants reais usam o tema cetec com o Modo Landing Page ligado.
+  O site principal de vários desses clientes é outro (WordPress no wab2); aqui ficam os subdomínios site.*.
+
+  Produção (conferida em 09/11/2026)
+  - Servidor wabsites (162.243.56.194, DigitalOcean + RunCloud, Ubuntu 24.04, 1 vCPU, 2 GB). Webapp
+    app-wab-sites em /home/runcloud/webapps/app-wab-sites (docroot public/), branch main, remoto GitHub
+    JonasPoli/wab-sites. Acesso: ssh runcloud@162.243.56.194 (o runcloud é o dono). Único vizinho: app-pma
+    (phpMyAdmin em pma.site.wab.com.br).
+  - O pool do site roda PHP 8.3: usar /RunCloud/Packages/php83rc/bin/php. Symfony 7.2.3, MySQL 8.4
+    (o .env.local diz serverVersion=8.0; doctrine:migrations:status funciona). O console sem --env já roda em prod.
+  - site.wab.com.br aponta para o servidor mas não é tenant: responde 404 "Domínio não configurado" em
+    qualquer rota, inclusive /login e /superadmin. O /superadmin só abre por um domínio de tenant.
+    www.<domínio> também não é tenant.
+  - Leitura em produção é livre; qualquer escrita (deploy, banco, arquivos) exige aprovação explícita do Jonas.
+    Valores do .env.local nunca são exibidos.
+  - Sem cron e sem worker do Messenger: o e-mail é enviado na hora (SendEmailMessage não vai para fila).
+  - E-mail: o .env.local de produção não define MAILER_DSN, EMAIL_FROM nem EMAIL_CONTACT_TO; valem os do .env
+    versionado, e o MAILER_DSN resolve para null://. As variáveis CONTACT_TO, MAIL_FROM, MAIL_BCC, WMAILER_*
+    e MAIL_SENDER* do .env.local não são lidas pelo código. Na prática o formulário de contato só grava em
+    contact_message (262 mensagens em 09/11, nenhuma marcada como lida).
+  - O Monolog de prod escreve no stderr do PHP-FPM, que o runcloud não lê; var/log fica vazio.
+  - public/uploads (228 MB), public/media/cache (LiipImagine) e public/assets (AssetMapper) ficam fora do git.
+  - var/tmp guarda ZIPs de exportação/importação de tenants que nunca foram apagados; eles têm hashes de senha
+    e mensagens de contato: não copiar nem exibir.
+  - Nunca apagar tenant por SQL: user.tenant_id é ON DELETE SET NULL, e usuário sem tenant com workGroup 0
+    vira SuperAdmin. Excluir só pelo /superadmin, que apaga os usuários antes.
+  - O filtro de tenant do domínio continua ligado no /superadmin. Exportar, excluir ou trocar a home de um
+    tenant deve ser feito com o /superadmin aberto no domínio desse mesmo tenant.
+
+  Deploy
+  - Local: git push origin main. No servidor, como runcloud, em ~/webapps/app-wab-sites: git pull; depois
+    ./build.sh se mudou template, CSS, JS ou dependência, ou só bin/console cache:clear se mudou apenas PHP;
+    bin/console doctrine:migrations:migrate se há migration. Não há documento de deploy no projeto.
+  - O build.sh roda composer install, cache:clear, tailwind:build --minify, asset-map:compile e
+    liip:imagine:cache:remove, e apaga var/log/* e public/media/cache/* (as miniaturas são refeitas no
+    primeiro acesso, o que pesa num servidor de 1 vCPU). Ele escolhe o php84rc antes do php83rc, então no
+    servidor o build roda em PHP 8.4 enquanto o site roda em 8.3.
+  - Última migration aplicada em produção: Version20261006170000.
+
+rules:
+  design:
+    - Quando tocar em produção, dizer se a ação é leitura ou escrita.
+    - Mudança que lê ou grava conteúdo diz como o isolamento por tenant é garantido; PageSection, PageBlock e os filhos do bloco não têm tenant_id e só ficam isolados se o acesso passar pela Page ou Category do tenant.
+    - Template público novo ou alterado diz em quais temas (cetec, moderno, wab) ele existe; todos os tenants reais usam o cetec.
+  tasks:
+    - Toda tarefa que muda servidor ou banco de produção tem uma tarefa de backup antes e uma de conferência depois.
+    - Mudança de esquema só por doctrine:migrations:diff e doctrine:migrations:migrate, nunca SQL manual.
+    - Os testes em tests/ estão desatualizados (citam a entidade SuperTestFields, que não existe); a conferência é feita em localhost e 127.0.0.1 com as fixtures, e a tarefa diz o que foi conferido.
+    - A tarefa de deploy diz quais passos se aplicam (git pull, build.sh ou cache:clear, migrations) e termina com o HTTP 200 dos 8 domínios de cliente.
+    - Quando for pedido de cliente, registrar o resultado no ticket do sistema WAB do cliente daquele site.
