@@ -31,7 +31,7 @@
   - antes: dump do banco em `~/backups/` e os valores de antes anotados (Outfit 400 e "Padrão do Tema", no `fonte-open-sans` 1.1);
   - gravar pelo `/superadmin` H1 a H5 em Open Sans, peso 700 e os tamanhos 2.5rem, 1.5rem, 1.25rem, 1rem e 0.875rem;
   - conferir que, ao reabrir a edição, os valores estão marcados.
-- [ ] 4.5 Conferência no ajope (leitura): o script da 1.1 no ajope e no g1 dá as mesmas medidas, nos dois tamanhos de tela; os prints da notícia e da home vão para o Jonas.
+- [x] 4.5 Conferência no ajope (leitura): o script da 1.1 no ajope e no g1 dá as mesmas medidas, nos dois tamanhos de tela; os prints da notícia e da home vão para o Jonas. (10/11/2026: `compara.py` com o ajope e o g1 → na notícia e na home, a 1280 e a 390 px, tamanho, peso, entrelinha e espaço entre letras iguais em todos os elementos presentes nos dois sites. Ficaram de fora o link no texto (as notícias de exemplo não têm), o "Mais notícias" (a home tem só 20) e o "Mais lidas" no celular (o g1 não tem). Prints da home e da notícia no Claro e no Escuro, computador e celular, em `ajope-prints-tipografia/` no scratchpad. O lote de exemplo do ajope foi trocado por `--substituir` depois da correção da citação (8d662ce))
 
 ## Workflow follow-up
 
