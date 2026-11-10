@@ -18,7 +18,7 @@
 
 ## 2b. Correção (10/11/2026)
 
-- [ ] 2.5 Aceitar o WhatsApp com +55 e com o 0 de discagem (design, decisão 2), e mudar a dica do campo para "Com DDD. Ex.: (16) 98179-1110". Conferir com `php -r`: "+5516981791110", "16 98179-1110", "(16) 3333-4444" e "016981791110" aceitos; "1234", "5516" e "+1 415 555 0100" recusados. No perfil local, o mesmo número salva. Publicar com backup do HEAD, `git pull` e `./build.sh` (muda template), e terminar com HTTP 200 nos 8 domínios de cliente e no ajope.
+- [x] 2.5 Aceitar o WhatsApp com +55 e com o 0 de discagem (design, decisão 2), e mudar a dica do campo para "Com DDD. Ex.: (16) 98179-1110". Conferir com `php -r`: "+5516981791110", "16 98179-1110", "(16) 3333-4444" e "016981791110" aceitos; "1234", "5516" e "+1 415 555 0100" recusados. No perfil local, o mesmo número salva. Publicar com backup do HEAD, `git pull` e `./build.sh` (muda template), e terminar com HTTP 200 nos 8 domínios de cliente e no ajope. (10/11/2026: o `php -r` aceita "+5516981791110", "+55 (16) 98179-1110", "16 98179-1110", "(16) 3333-4444", "016981791110" e "5516981791110", e recusa "1234", "5516", "+1 415 555 0100", "+5516" e vazio; o perfil local salvou "+5516981791110". Publicado às 20:24 UTC com a autorização do Jonas ("pode publicar"): HEAD 8d662ce anotado em `~/backups/wab-sites-HEAD-antes-20261110-2024.txt`, `git pull` até dcebe3d e `./build.sh`; no servidor, `isValidWhatsapp("+5516981791110")` dá true; HTTP 200 nos 8 domínios de cliente e no ajope; o cadastro do ajope mostra "Com DDD. Ex.: (16) 98179-1110")
 
 ## 3. Produção
 
