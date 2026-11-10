@@ -278,6 +278,8 @@ class TenantImporter
                 $cat->setShowInHeader((bool) $cData['showInHeader']);
                 $cat->setShowInFooter((bool) $cData['showInFooter']);
                 $cat->setIcon($cData['icon'] ?? null);
+                // Arquivo exportado antes da marca de exemplo: tudo real
+                $cat->setSample((bool) ($cData['sample'] ?? false));
                 $this->em->persist($cat);
                 $this->em->flush();
                 $categoryMap[$cData['id']] = $cat;
@@ -559,7 +561,8 @@ class TenantImporter
                     ->setOutlet($auData['outlet'] ?? null)
                     ->setCity($auData['city'] ?? null)
                     ->setBio($auData['bio'] ?? null)
-                    ->setStatus(AuthorStatus::tryFrom($auData['status'] ?? '') ?? AuthorStatus::Pending);
+                    ->setStatus(AuthorStatus::tryFrom($auData['status'] ?? '') ?? AuthorStatus::Pending)
+                    ->setSample((bool) ($auData['sample'] ?? false));
                 foreach (['consentAt' => 'setConsentAt', 'createdAt' => 'setCreatedAt', 'updatedAt' => 'setUpdatedAt'] as $key => $setter) {
                     if (!empty($auData[$key])) {
                         $author->$setter(new \DateTimeImmutable($auData[$key]));
@@ -592,7 +595,8 @@ class TenantImporter
                     ->setStatus(ArticleStatus::tryFrom($arData['status'] ?? '') ?? ArticleStatus::Draft)
                     ->setRelatedLinks($arData['relatedLinks'] ?? [])
                     ->setFeatured((bool) ($arData['featured'] ?? false))
-                    ->setViewCount(0);
+                    ->setViewCount(0)
+                    ->setSample((bool) ($arData['sample'] ?? false));
                 foreach (['publishedAt' => 'setPublishedAt', 'createdAt' => 'setCreatedAt', 'updatedAt' => 'setUpdatedAt'] as $key => $setter) {
                     if (!empty($arData[$key])) {
                         $article->$setter(new \DateTimeImmutable($arData[$key]));

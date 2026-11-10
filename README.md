@@ -126,6 +126,14 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
 * **Drag-and-Drop (`SortableJS`)**: Reordenação intuitiva de banners, páginas, seções e blocos diretamente no painel administrativo, acionando endpoints assíncronos (`fetch` POST) para persistência imediata no banco de dados.
 * **Geração de Pix (`PixService`)**: Conversor embutido para gerar códigos Pix "Copia e Cola" e QR Code em formato SVG nativo (injetável inline nas views sem dependência de drivers gráficos como a extensão `gd` do PHP).
 * **Maker de CRUD (`CrudPolisher`)**: Serviço voltado à aceleração do desenvolvimento que gera páginas de listagem e formulários administrativos padronizados a partir dos metadados de uma Entidade do Doctrine, registrando-a de forma automatizada no menu lateral da base.
+* **Conteúdo de exemplo (`app:conteudo-exemplo`)**: enche um site com conteúdo fictício para mostrar o layout antes do conteúdo real. Hoje só o tema `noticias` tem conteúdo de exemplo: o comando cria notícias (20 por padrão, até 30), as editorias que faltam e três jornalistas, com fotos do picsum.photos (ou degradê, sem rede). Ele nunca altera o tenant (nome, cores, logo, tema, configurações).
+  ```bash
+  php bin/console app:conteudo-exemplo noticias.localhost --simular           # mostra o plano, não grava
+  php bin/console app:conteudo-exemplo noticias.localhost                     # 20 notícias de exemplo
+  php bin/console app:conteudo-exemplo noticias.localhost --substituir --quantidade=10
+  php bin/console app:conteudo-exemplo noticias.localhost --remover           # apaga só o que é de exemplo
+  ```
+  Tudo o que o comando cria fica com a marca `sample` (selo "Exemplo" nas listas do `/admin`). As notícias de exemplo saem com `noindex` e ficam fora do `/sitemap.xml`, e os jornalistas de exemplo (`@exemplo.invalid`) não conseguem entrar. O `--remover` mantém, com aviso, editorias e jornalistas que passaram a ter conteúdo real. **Rode `--remover` antes de divulgar o site.** As datas saem no horário de Brasília mesmo com o PHP de linha de comando em UTC, como no servidor.
 
 ---
 

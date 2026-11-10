@@ -16,7 +16,7 @@
     <tbody>
     {% for a in authors %}
     <tr>
-        <td style="font-weight:600">{{ a.name }}</td>
+        <td style="font-weight:600">{{ a.name }}{% if a.sample %} <span class="badge bg-warn" title="Criado pelo comando app:conteudo-exemplo; sai com --remover">Exemplo</span>{% endif %}</td>
         <td>{{ a.user ? a.user.email : '—' }}</td>
         <td>{{ a.outlet ?? '—' }}</td>
         <td><span class="badge {{ a.status.badgeClass }}">{{ a.status.label }}</span></td>

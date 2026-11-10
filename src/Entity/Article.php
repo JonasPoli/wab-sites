@@ -102,6 +102,10 @@ class Article implements TenantAwareInterface
     #[ORM\Column(options: ['default' => 0])]
     private int $viewCount = 0;
 
+    /** Criada pelo comando app:conteudo-exemplo; sai com --remover (nenhum formulário altera) */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $sample = false;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -208,6 +212,9 @@ class Article implements TenantAwareInterface
 
     public function getViewCount(): int { return $this->viewCount; }
     public function setViewCount(int $viewCount): static { $this->viewCount = $viewCount; return $this; }
+
+    public function isSample(): bool { return $this->sample; }
+    public function setSample(bool $sample): static { $this->sample = $sample; return $this; }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }

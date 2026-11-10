@@ -13,6 +13,7 @@
     <tr>
         <td style="font-weight:600;max-width:380px">
             {{ a.title }}
+            {% if a.sample %}<span class="badge bg-warn" title="Criado pelo comando app:conteudo-exemplo; sai com --remover">Exemplo</span>{% endif %}
             {% if a.featured %}<span class="badge bg-inf" title="Leia também">Leia também</span>{% endif %}
         </td>
         <td>{% if a.category %}<span class="badge bg-inf">{{ a.category.name }}</span>{% else %}<span style="color:var(--muted)">—</span>{% endif %}</td>

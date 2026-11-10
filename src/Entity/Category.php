@@ -49,6 +49,10 @@ class Category implements TenantAwareInterface
     #[ORM\Column(options: ['default' => false])]
     private bool $showInFooter = false;
 
+    /** Criada pelo comando app:conteudo-exemplo; sai com --remover (nenhum formulário altera) */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $sample = false;
+
     /** Font Awesome class (e.g. 'fa-solid fa-home') or empty for no icon */
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $icon = null;
@@ -101,6 +105,9 @@ class Category implements TenantAwareInterface
 
     public function isShowInFooter(): bool { return $this->showInFooter; }
     public function setShowInFooter(bool $showInFooter): static { $this->showInFooter = $showInFooter; return $this; }
+
+    public function isSample(): bool { return $this->sample; }
+    public function setSample(bool $sample): static { $this->sample = $sample; return $this; }
 
     public function getIcon(): ?string { return $this->icon; }
     public function setIcon(?string $icon): static { $this->icon = $icon; return $this; }

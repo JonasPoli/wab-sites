@@ -4,6 +4,7 @@
 {% set months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'] %}
 
 {% block title %}{{ article.title }} | {{ currentTenant.name }}{% endblock %}
+{% block robots %}{% if article.sample %}<meta name="robots" content="noindex, follow">{% else %}{{ parent() }}{% endif %}{% endblock %}
 {% block meta_description %}{% if article.summary %}<meta name="description" content="{{ article.summary|striptags|slice(0, 160) }}">{% endif %}{% endblock %}
 {% block og_tags %}
     <meta property="og:site_name" content="{{ currentTenant.name }}">

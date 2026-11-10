@@ -80,6 +80,10 @@ class Author implements TenantAwareInterface
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $reviewedBy = null;
 
+    /** Criado pelo comando app:conteudo-exemplo; sai com --remover (nenhum formulário altera) */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $sample = false;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -153,6 +157,9 @@ class Author implements TenantAwareInterface
 
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
+    public function isSample(): bool { return $this->sample; }
+    public function setSample(bool $sample): static { $this->sample = $sample; return $this; }
 
     public function __toString(): string { return $this->name; }
 }

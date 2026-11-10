@@ -193,6 +193,7 @@ class TenantExporter
                 'showInHeader' => $c->isShowInHeader(),
                 'showInFooter' => $c->isShowInFooter(),
                 'icon'         => $c->getIcon(),
+                'sample'       => $c->isSample(),
             ];
         }
         return $serialized;
@@ -473,6 +474,7 @@ class TenantExporter
                 'reviewedAt'               => $a->getReviewedAt()?->format(\DateTimeInterface::ATOM),
                 'createdAt'                => $a->getCreatedAt()->format(\DateTimeInterface::ATOM),
                 'updatedAt'                => $a->getUpdatedAt()->format(\DateTimeInterface::ATOM),
+                'sample'                   => $a->isSample(),
             ];
         }
         $this->logger->info('[TenantExporter] Autores serializados.', ['count' => count($serialized)]);
@@ -503,6 +505,7 @@ class TenantExporter
                 'featured'     => $a->isFeatured(),
                 'createdAt'    => $a->getCreatedAt()->format(\DateTimeInterface::ATOM),
                 'updatedAt'    => $a->getUpdatedAt()->format(\DateTimeInterface::ATOM),
+                'sample'       => $a->isSample(),
             ];
         }
         $this->logger->info('[TenantExporter] Notícias serializadas.', ['count' => count($serialized)]);

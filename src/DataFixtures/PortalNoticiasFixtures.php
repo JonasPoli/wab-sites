@@ -14,6 +14,7 @@ use App\Entity\PageBlockTestimonial;
 use App\Entity\PageSection;
 use App\Entity\Tenant;
 use App\Entity\User;
+use App\Service\PlaceholderImageFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -40,6 +41,7 @@ class PortalNoticiasFixtures extends Fixture
         private readonly UserPasswordHasherInterface $hasher,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
+        private readonly PlaceholderImageFactory $images,
     ) {
         $this->fs = new Filesystem();
     }
@@ -337,27 +339,6 @@ class PortalNoticiasFixtures extends Fixture
     /** Gera uma imagem em degradê (GD) e devolve o nome do arquivo. */
     private function makeImage(string $dir, string $name, int $w, int $h, array $from, array $to): ?string
     {
-        if (!function_exists('imagecreatetruecolor')) {
-            return null;
-        }
-        $path = $this->projectDir . '/public/' . $dir . '/' . $name;
-        $this->fs->mkdir(dirname($path));
-        $img = imagecreatetruecolor($w, $h);
-        for ($x = 0; $x < $w; $x++) {
-            $t = $x / max(1, $w - 1);
-            $color = imagecolorallocate(
-                $img,
-                (int) ($from[0] + ($to[0] - $from[0]) * $t),
-                (int) ($from[1] + ($to[1] - $from[1]) * $t),
-                (int) ($from[2] + ($to[2] - $from[2]) * $t),
-            );
-            imageline($img, $x, 0, $x, $h, $color);
-        }
-        // Um círculo claro para dar forma à imagem
-        $white = imagecolorallocatealpha($img, 255, 255, 255, 90);
-        imagefilledellipse($img, (int) ($w * 0.7), (int) ($h * 0.45), (int) ($h * 0.6), (int) ($h * 0.6), $white);
-        imagejpeg($img, $path, 82);
-        imagedestroy($img);
-        return $name;
+        return $this->images->gradient($dir, $name, $w, $h, $from, $to);
     }
 }

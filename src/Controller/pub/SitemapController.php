@@ -52,9 +52,10 @@ class SitemapController extends AbstractController
             ];
         }
 
-        // Portal de notícias: uma URL por notícia visível (publicada e com data no passado)
+        // Portal de notícias: uma URL por notícia visível (publicada e com data no passado),
+        // menos as de exemplo (app:conteudo-exemplo), que também saem com noindex
         if ($tenant?->getTheme() === 'noticias') {
-            foreach ($this->articleRepository->findAllVisible() as $article) {
+            foreach ($this->articleRepository->findAllVisible(withSamples: false) as $article) {
                 $urls[] = [
                     'loc'        => $baseUrl . '/noticias/' . rawurlencode($article->getSlug()),
                     'changefreq' => 'weekly',

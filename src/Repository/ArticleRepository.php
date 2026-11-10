@@ -168,10 +168,17 @@ class ArticleRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /** @return Article[] Todas as visíveis (sitemap). */
-    public function findAllVisible(): array
+    /**
+     * @return Article[] Todas as visíveis. O sitemap passa $withSamples = false:
+     *                   notícias de exemplo (app:conteudo-exemplo) não vão para buscadores.
+     */
+    public function findAllVisible(bool $withSamples = true): array
     {
-        return $this->orderNewestFirst($this->visibleQueryBuilder())->getQuery()->getResult();
+        $qb = $this->visibleQueryBuilder();
+        if (!$withSamples) {
+            $qb->andWhere('a.sample = false');
+        }
+        return $this->orderNewestFirst($qb)->getQuery()->getResult();
     }
 
     /**
