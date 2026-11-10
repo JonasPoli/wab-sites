@@ -167,20 +167,20 @@ Conferência em `http://noticias.localhost:8000` (tenant novo das fixtures, tema
 
 ## 9. Produção
 
-- [ ] 9.1 Conferência antes (leitura, com `ssh runcloud@162.243.56.194`):
+- [x] 9.1 Conferência antes (leitura, com `ssh runcloud@162.243.56.194`): (10/11/2026, leitura: última aplicada Version20261006170000 (28 executadas, nenhuma nova); tabelas `article`, `article_category` e `author` ausentes; fuso: o PHP 8.3 CLI responde UTC; o pool (config não legível como runcloud; a auditoria de 21/10 registra `date.timezone = America/Sao_Paulo`) grava em America/Sao_Paulo, porque o último contato do site ficou com 11:18 de 10/11, horário de Brasília)
   - `doctrine:migrations:status` (última aplicada `Version20261006170000`);
   - ausência das tabelas `article`, `article_category` e `author`;
   - fuso padrão do PHP 8.3 do pool (`/RunCloud/Packages/php83rc/bin/php -r 'echo date_default_timezone_get();'`).
 
   Se existir alguma dessas tabelas, parar e falar com o Jonas. Anotar o fuso encontrado neste arquivo.
-- [ ] 9.2 Backup (escrita no servidor, com aprovação do Jonas): dump do banco do app-wab-sites fora do docroot e `git rev-parse HEAD` do webapp anotado, antes do deploy.
-- [ ] 9.3 Deploy (escrita, com aprovação do Jonas): `git push origin main` local; no servidor, como runcloud, em `~/webapps/app-wab-sites`:
+- [x] 9.2 Backup (escrita no servidor, com aprovação do Jonas): dump do banco do app-wab-sites fora do docroot e `git rev-parse HEAD` do webapp anotado, antes do deploy. (10/11/2026 14:35 UTC, autorizado pelo Jonas no pedido de 10/11 11:07: HEAD f089e6b anotado em `~/backups/wab-sites-HEAD-antes-20261110-1435.txt`; dump em `~/backups/wab-sites-antes-deploy-20261110-1435.sql.gz` (chmod 600, com nice), 17 tabelas e 11 usuários)
+- [x] 9.3 Deploy (escrita, com aprovação do Jonas): `git push origin main` local; no servidor, como runcloud, em `~/webapps/app-wab-sites`: (10/11/2026 14:37 UTC (11:37 em Brasília): 0666069 no ar, junto com isolamento-entre-sites e newsletter-csv-e-rotas-de-tema; git pull, `./build.sh` (com nice) e a migration Version20261110015129 aplicada; HTTP 200 em `/` nos 8 domínios)
   - `git pull`;
   - `./build.sh` (mudou template, CSS, dependência e configuração de segurança);
   - `bin/console doctrine:migrations:migrate --no-interaction` (cria as três tabelas).
 
   Conferir HTTP 200 em `/` dos 8 domínios de cliente: marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br e site.abifer.com.br.
-- [ ] 9.4 Conferência depois (leitura):
+- [ ] 9.4 Conferência depois (leitura): (10/11/2026: migrations sem pendência; o sitemap de marapossi.com.br tem 19 URLs e nenhuma de notícia; `/noticias` 200 e `/noticias/qualquer` 404 nos 8 domínios; `/jornalista/cadastro` e `/autor/qualquer` 404 nos 8; nenhum erro novo nos logs do nginx e do apache e nenhum 5xx depois do deploy. Pendente: o Jonas conferir o login de um usuário de painel e o menu do /admin de um site cetec)
   - `doctrine:migrations:status` sem pendências;
   - `/sitemap.xml` de marapossi.com.br sem URLs de notícia;
   - `/noticias` e `/noticias/qualquer` nos 8 domínios com o mesmo comportamento de antes (lista vazia do cetec e 404);
