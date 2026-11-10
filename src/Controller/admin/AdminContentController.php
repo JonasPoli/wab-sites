@@ -35,11 +35,22 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/admin', name: 'admin_')]
 class AdminContentController extends AbstractController
 {
-    public function __construct(
-        private readonly TenantContext $tenantContext,
-        private readonly PageSectionRepository $sectionRepo,
-        private readonly PageBlockRepository $blockRepo,
-    ) {}
+    /** Serviços dos helpers de isolamento (sem construtor: os testes instanciam o controller direto). */
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return parent::getSubscribedServices() + [
+            TenantContext::class         => TenantContext::class,
+            PageSectionRepository::class => PageSectionRepository::class,
+            PageBlockRepository::class   => PageBlockRepository::class,
+        ];
+    }
+
+    /** Tenant do domínio da requisição. */
+    private function domainTenant(): \App\Entity\Tenant
+    {
+        return $this->container->get(TenantContext::class)->requireTenant();
+    }
 
     // ── Dashboard ────────────────────────────────────────────────────────────
 
@@ -488,7 +499,7 @@ class AdminContentController extends AbstractController
     public function sectionReorder(Request $r, EntityManagerInterface $em): JsonResponse
     {
         // Só as seções do site do domínio recebem posição; ids de outro site são ignorados
-        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->sectionRepo->findForTenantByIds($ids, $this->tenantContext->requireTenant()));
+        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->container->get(PageSectionRepository::class)->findForTenantByIds($ids, $this->domainTenant()));
     }
 
     // ── PageBlock ─────────────────────────────────────────────────────────────
@@ -834,7 +845,7 @@ class AdminContentController extends AbstractController
     public function blockReorder(Request $r, EntityManagerInterface $em): JsonResponse
     {
         // Só os blocos do site do domínio recebem posição; ids de outro site são ignorados
-        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->blockRepo->findForTenantByIds($ids, $this->tenantContext->requireTenant()));
+        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->container->get(PageBlockRepository::class)->findForTenantByIds($ids, $this->domainTenant()));
     }
 
     // ── Duplicar ──────────────────────────────────────────────────────────────
@@ -887,7 +898,7 @@ class AdminContentController extends AbstractController
     public function editorIndex(UserRepository $users): Response
     {
         return $this->render('admin/editor/index.html.twig', [
-            'editors' => $users->findBy(['tenant' => $this->tenantContext->requireTenant(), 'workGroup' => [1, 2]]),
+            'editors' => $users->findBy(['tenant' => $this->domainTenant(), 'workGroup' => [1, 2]]),
         ]);
     }
 
@@ -903,7 +914,7 @@ class AdminContentController extends AbstractController
             // Só editor (1) ou revisor (2); qualquer outro valor vira editor
             $workGroup = (int) $r->request->get('workGroup', 1);
             $editor->setWorkGroup(in_array($workGroup, [1, 2], true) ? $workGroup : 1);
-            $editor->setTenant($this->tenantContext->requireTenant());
+            $editor->setTenant($this->domainTenant());
             $editor->setPassword($hasher->hashPassword($editor, (string) $r->request->get('password')));
             $em->persist($editor);
             $em->flush();
@@ -918,7 +929,7 @@ class AdminContentController extends AbstractController
     public function editorDelete(User $editor, Request $r, EntityManagerInterface $em): Response
     {
         // Só editor ou revisor do tenant do domínio
-        $sameTenant = $editor->getTenant()?->getId() === $this->tenantContext->requireTenant()->getId();
+        $sameTenant = $editor->getTenant()?->getId() === $this->domainTenant()->getId();
         if ($sameTenant && in_array($editor->getWorkGroup(), [1, 2], true)) {
             if ($this->isCsrfTokenValid('del_editor_' . $editor->getId(), (string) $r->request->get('_token'))) {
                 $em->remove($editor);
@@ -1020,14 +1031,14 @@ class AdminContentController extends AbstractController
     /** Seção de página ou categoria do site do domínio, ou 404 (não depende do tenant_filter). */
     private function sectionOr404(int $id): PageSection
     {
-        return $this->sectionRepo->findOneForTenant($id, $this->tenantContext->requireTenant())
+        return $this->container->get(PageSectionRepository::class)->findOneForTenant($id, $this->domainTenant())
             ?? throw $this->createNotFoundException('Seção não encontrada.');
     }
 
     /** Bloco de seção do site do domínio, ou 404 (não depende do tenant_filter). */
     private function blockOr404(int $id): PageBlock
     {
-        return $this->blockRepo->findOneForTenant($id, $this->tenantContext->requireTenant())
+        return $this->container->get(PageBlockRepository::class)->findOneForTenant($id, $this->domainTenant())
             ?? throw $this->createNotFoundException('Bloco não encontrado.');
     }
 
