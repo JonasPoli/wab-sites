@@ -114,7 +114,8 @@ class WabPublicController extends AbstractController
     #[Route('/membro/{slug}', name: 'pub_team_member')]
     public function teamMember(string $slug, PageBlockTeamMemberRepository $repo): Response
     {
-        $member = $repo->findBySlug($slug);
+        // Só membro de bloco de página ou categoria do site do domínio
+        $member = $repo->findBySlug($slug, $this->tenantContext->requireTenant());
         if (!$member) {
             throw $this->createNotFoundException('Perfil não encontrado.');
         }

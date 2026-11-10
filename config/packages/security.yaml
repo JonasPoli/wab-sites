@@ -15,7 +15,8 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            # Checkers encadeados (tag security.user_checker.main), ex.: App\Security\JournalistStatusChecker
+            # Checkers encadeados (tag security.user_checker.main): App\Security\TenantUserChecker
+            # (login só no site do usuário) e App\Security\JournalistStatusChecker
             user_checker: security.user_checker.chain.main
             form_login:
                 login_path: app_login
@@ -33,7 +34,8 @@ security:
         - { path: ^/jornalista/cadastro, roles: PUBLIC_ACCESS }
         - { path: ^/jornalista, roles: ROLE_JOURNALIST }
         - { path: ^/superadmin, roles: ROLE_SUPER_ADMIN }
-        - { path: ^/admin,      roles: ROLE_ADMIN }
+        # TENANT_ACCESS (App\Security\Voter\TenantAccessVoter): ROLE_ADMIN no site do domínio, ou SuperAdmin
+        - { path: ^/admin,      roles: TENANT_ACCESS }
 
 when@test:
     security:

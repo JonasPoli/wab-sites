@@ -669,9 +669,21 @@ class SuperAdminController extends AbstractController
      * first admin of a given tenant. Symfony Security handles the rest.
      */
     #[Route('/impersonate/{id}', name: 'impersonate', methods: ['GET'])]
-    public function impersonate(User $user): Response
+    public function impersonate(User $user, Request $request): Response
     {
-        return $this->redirect('/admin?_switch_user=' . urlencode((string) $user->getUsername()));
+        $target = '/admin?_switch_user=' . urlencode((string) $user->getUsername());
+
+        // O login só vale no site do usuário: a troca acontece no domínio do tenant dele,
+        // com o esquema e a porta desta requisição (a porta só fora de 80/443).
+        // Usuário sem tenant fica no domínio atual.
+        $domain = $user->getTenant()?->getDomain();
+        if ($domain) {
+            $port = (int) $request->getPort();
+            $portPart = in_array($port, [80, 443], true) ? '' : ':' . $port;
+            $target = $request->getScheme() . '://' . $domain . $portPart . $target;
+        }
+
+        return $this->redirect($target);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -693,9 +705,12 @@ class SuperAdminController extends AbstractController
         $tenant->setLandingPageMode($r->request->get('landingPageMode') === '1');
         $tenant->setNewsletterEnabled($r->request->get('newsletterEnabled') === '1');
 
-        // HomePage
-        $homePageId = $r->request->get('homePageId');
-        $homePage = $homePageId ? $pageRepo->find((int) $homePageId) : null;
+        // HomePage: só página do próprio tenant editado (o /superadmin roda sem o filtro do
+        // domínio). Tenant novo ainda não tem páginas: a home fica nula.
+        $homePageId = (int) $r->request->get('homePageId');
+        $homePage = ($homePageId && $tenant->getId() !== null)
+            ? $pageRepo->findOneBy(['id' => $homePageId, 'tenant' => $tenant])
+            : null;
         $tenant->setHomePage($homePage);
 
         // SEO

@@ -35,6 +35,12 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/admin', name: 'admin_')]
 class AdminContentController extends AbstractController
 {
+    public function __construct(
+        private readonly TenantContext $tenantContext,
+        private readonly PageSectionRepository $sectionRepo,
+        private readonly PageBlockRepository $blockRepo,
+    ) {}
+
     // ── Dashboard ────────────────────────────────────────────────────────────
 
     #[Route('', name: 'dash')]
@@ -398,8 +404,9 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/section/{id}/edit', name: 'section_edit', methods: ['GET', 'POST'])]
-    public function sectionEdit(PageSection $section, Request $r, EntityManagerInterface $em): Response
+    public function sectionEdit(int $id, Request $r, EntityManagerInterface $em): Response
     {
+        $section = $this->sectionOr404($id);
         if ($r->isMethod('POST')) {
             $this->populateSection($section, $r);
             $em->flush();
@@ -448,8 +455,9 @@ class AdminContentController extends AbstractController
 
 
     #[Route('/section/{id}/delete', name: 'section_delete', methods: ['POST'])]
-    public function sectionDelete(PageSection $section, Request $r, EntityManagerInterface $em): Response
+    public function sectionDelete(int $id, Request $r, EntityManagerInterface $em): Response
     {
+        $section = $this->sectionOr404($id);
         $catId  = $section->getCategory()?->getId();
         $pageId = $section->getPage()?->getId();
         if ($this->isCsrfTokenValid('del_sec_' . $section->getId(), (string) $r->request->get('_token'))) {
@@ -463,27 +471,27 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/section/reorder', name: 'section_reorder', methods: ['POST'])]
-    public function sectionReorder(Request $r, PageSectionRepository $repo, EntityManagerInterface $em): JsonResponse
+    public function sectionReorder(Request $r, EntityManagerInterface $em): JsonResponse
     {
-        return $this->reorderEntities($r, $repo, $em);
+        // Só as seções do site do domínio recebem posição; ids de outro site são ignorados
+        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->sectionRepo->findForTenantByIds($ids, $this->tenantContext->requireTenant()));
     }
 
     // ── PageBlock ─────────────────────────────────────────────────────────────
 
     #[Route('/section/{sectionId}/block', name: 'block_index')]
-    public function blockIndex(int $sectionId, PageSectionRepository $sections): Response
+    public function blockIndex(int $sectionId): Response
     {
-        $section = $sections->find($sectionId) ?? throw $this->createNotFoundException();
+        $section = $this->sectionOr404($sectionId);
         return $this->render('admin/block/index.html.twig', ['section' => $section, 'blocks' => $section->getBlocks()]);
     }
 
     #[Route('/section/{sectionId}/block/new', name: 'block_new', methods: ['GET', 'POST'])]
     public function blockNew(
         int $sectionId, Request $r, EntityManagerInterface $em,
-        PageSectionRepository $sections, CategoryRepository $cats,
-        PageRepository $pages
+        CategoryRepository $cats, PageRepository $pages
     ): Response {
-        $section = $sections->find($sectionId) ?? throw $this->createNotFoundException();
+        $section = $this->sectionOr404($sectionId);
         $block = new PageBlock();
         $type  = $r->query->get('type', $r->request->get('type', ''));
 
@@ -505,8 +513,9 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/block/{id}/edit', name: 'block_edit', methods: ['GET', 'POST'])]
-    public function blockEdit(PageBlock $block, Request $r, EntityManagerInterface $em, CategoryRepository $cats, PageRepository $pages): Response
+    public function blockEdit(int $id, Request $r, EntityManagerInterface $em, CategoryRepository $cats, PageRepository $pages): Response
     {
+        $block = $this->blockOr404($id);
         if ($r->isMethod('POST')) {
             $this->populateBlock($block, $r, $em, $cats);
             $em->flush();
@@ -796,8 +805,9 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/block/{id}/delete', name: 'block_delete', methods: ['POST'])]
-    public function blockDelete(PageBlock $block, Request $r, EntityManagerInterface $em): Response
+    public function blockDelete(int $id, Request $r, EntityManagerInterface $em): Response
     {
+        $block = $this->blockOr404($id);
         $sectionId = $block->getSection()?->getId();
         if ($this->isCsrfTokenValid('del_block_' . $block->getId(), (string) $r->request->get('_token'))) {
             $em->remove($block);
@@ -807,9 +817,10 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/block/reorder', name: 'block_reorder', methods: ['POST'])]
-    public function blockReorder(Request $r, PageBlockRepository $repo, EntityManagerInterface $em): JsonResponse
+    public function blockReorder(Request $r, EntityManagerInterface $em): JsonResponse
     {
-        return $this->reorderEntities($r, $repo, $em);
+        // Só os blocos do site do domínio recebem posição; ids de outro site são ignorados
+        return $this->reorderTenantEntities($r, $em, fn (array $ids) => $this->blockRepo->findForTenantByIds($ids, $this->tenantContext->requireTenant()));
     }
 
     // ── Duplicar ──────────────────────────────────────────────────────────────
@@ -825,8 +836,9 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/section/{id}/duplicate', name: 'section_duplicate', methods: ['POST'])]
-    public function sectionDuplicate(PageSection $section, Request $r, \App\Service\DuplicatorService $dup): Response
+    public function sectionDuplicate(int $id, Request $r, \App\Service\DuplicatorService $dup): Response
     {
+        $section = $this->sectionOr404($id);
         $pageId = $section->getPage()?->getId();
         $catId  = $section->getCategory()?->getId();
         if ($this->isCsrfTokenValid('dup_sec_' . $section->getId(), (string) $r->request->get('_token'))) {
@@ -838,8 +850,9 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/block/{id}/duplicate', name: 'block_duplicate', methods: ['POST'])]
-    public function blockDuplicate(PageBlock $block, Request $r, \App\Service\DuplicatorService $dup): Response
+    public function blockDuplicate(int $id, Request $r, \App\Service\DuplicatorService $dup): Response
     {
+        $block = $this->blockOr404($id);
         $sectionId = $block->getSection()?->getId();
         if ($this->isCsrfTokenValid('dup_block_' . $block->getId(), (string) $r->request->get('_token'))) {
             $dup->duplicateBlock($block);
@@ -852,28 +865,31 @@ class AdminContentController extends AbstractController
 
     // ── Editor Users (managed by Tenant Admin) ────────────────────────────────
 
+    // Editores e revisores sempre no tenant do domínio (para quem não é SuperAdmin, é o
+    // tenant do próprio usuário: TenantUserChecker e TenantAccessVoter).
+
     #[Route('/editors', name: 'editor_index')]
+    #[IsGranted('TENANT_MANAGE')]
     public function editorIndex(UserRepository $users): Response
     {
-        /** @var User $me */
-        $me = $this->getUser();
         return $this->render('admin/editor/index.html.twig', [
-            'editors' => $users->findBy(['tenant' => $me->getTenant(), 'workGroup' => [1, 2]]),
+            'editors' => $users->findBy(['tenant' => $this->tenantContext->requireTenant(), 'workGroup' => [1, 2]]),
         ]);
     }
 
     #[Route('/editors/new', name: 'editor_new', methods: ['GET', 'POST'])]
+    #[IsGranted('TENANT_MANAGE')]
     public function editorNew(Request $r, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
     {
-        /** @var User $me */
-        $me = $this->getUser();
         $editor = new User();
         if ($r->isMethod('POST')) {
             $editor->setUsername((string) $r->request->get('username'));
             $editor->setName((string) $r->request->get('name'));
             $editor->setEmail($r->request->get('email') ?: null);
-            $editor->setWorkGroup((int) $r->request->get('workGroup', 1));
-            $editor->setTenant($me->getTenant());
+            // Só editor (1) ou revisor (2); qualquer outro valor vira editor
+            $workGroup = (int) $r->request->get('workGroup', 1);
+            $editor->setWorkGroup(in_array($workGroup, [1, 2], true) ? $workGroup : 1);
+            $editor->setTenant($this->tenantContext->requireTenant());
             $editor->setPassword($hasher->hashPassword($editor, (string) $r->request->get('password')));
             $em->persist($editor);
             $em->flush();
@@ -884,11 +900,12 @@ class AdminContentController extends AbstractController
     }
 
     #[Route('/editors/{id}/delete', name: 'editor_delete', methods: ['POST'])]
+    #[IsGranted('TENANT_MANAGE')]
     public function editorDelete(User $editor, Request $r, EntityManagerInterface $em): Response
     {
-        /** @var User $me */
-        $me = $this->getUser();
-        if ($editor->getTenant() === $me->getTenant()) {
+        // Só editor ou revisor do tenant do domínio
+        $sameTenant = $editor->getTenant()?->getId() === $this->tenantContext->requireTenant()->getId();
+        if ($sameTenant && in_array($editor->getWorkGroup(), [1, 2], true)) {
             if ($this->isCsrfTokenValid('del_editor_' . $editor->getId(), (string) $r->request->get('_token'))) {
                 $em->remove($editor);
                 $em->flush();
@@ -900,6 +917,7 @@ class AdminContentController extends AbstractController
     // ── Tenant Settings ───────────────────────────────────────────────────────
 
     #[Route('/settings', name: 'settings', methods: ['GET', 'POST'])]
+    #[IsGranted('TENANT_MANAGE')]
     public function settings(
         Request $r,
         EntityManagerInterface $em,
@@ -984,6 +1002,43 @@ class AdminContentController extends AbstractController
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /** Seção de página ou categoria do site do domínio, ou 404 (não depende do tenant_filter). */
+    private function sectionOr404(int $id): PageSection
+    {
+        return $this->sectionRepo->findOneForTenant($id, $this->tenantContext->requireTenant())
+            ?? throw $this->createNotFoundException('Seção não encontrada.');
+    }
+
+    /** Bloco de seção do site do domínio, ou 404 (não depende do tenant_filter). */
+    private function blockOr404(int $id): PageBlock
+    {
+        return $this->blockRepo->findOneForTenant($id, $this->tenantContext->requireTenant())
+            ?? throw $this->createNotFoundException('Bloco não encontrado.');
+    }
+
+    /**
+     * Reordenação de seções ou blocos: a posição é o índice do id na lista enviada,
+     * aplicada só às entidades que $loadForTenant devolve (as do site do domínio).
+     *
+     * @param callable(int[]): array $loadForTenant
+     */
+    private function reorderTenantEntities(Request $r, EntityManagerInterface $em, callable $loadForTenant): JsonResponse
+    {
+        $data = json_decode((string) $r->getContent(), true);
+        $ids = array_map('intval', (array) ($data['ids'] ?? []));
+        $byId = [];
+        foreach ($loadForTenant(array_values(array_unique($ids))) as $entity) {
+            $byId[$entity->getId()] = $entity;
+        }
+        foreach ($ids as $position => $id) {
+            if (isset($byId[$id])) {
+                $byId[$id]->setPosition($position);
+            }
+        }
+        $em->flush();
+        return new JsonResponse(['ok' => true]);
+    }
 
     private function reorderEntities(Request $r, $repo, EntityManagerInterface $em): JsonResponse
     {

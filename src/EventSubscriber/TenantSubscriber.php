@@ -59,6 +59,13 @@ class TenantSubscriber implements EventSubscriberInterface
         // Store tenant for use in controllers/templates
         $this->tenantContext->setTenant($tenant);
 
+        // O /superadmin trabalha sem o filtro do domínio aberto: editar, exportar e excluir um
+        // site dá o mesmo resultado em qualquer domínio de tenant. Por isso, toda consulta do
+        // /superadmin a entidade com tenant PRECISA informar o tenant (ex.: findBy(['tenant' => $t])).
+        if (preg_match('~^/superadmin(/|$)~', $request->getPathInfo())) {
+            return;
+        }
+
         // Enable the Doctrine filter and parameterize it
         $filter = $this->em->getFilters()->enable('tenant_filter');
         $filter->setParameter('tenant_id', $tenant->getId(), 'integer');
