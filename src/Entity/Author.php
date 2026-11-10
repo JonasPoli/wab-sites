@@ -157,11 +157,26 @@ class Author implements TenantAwareInterface
     public function getSpiritistCenter(): ?string { return $this->spiritistCenter; }
     public function setSpiritistCenter(?string $spiritistCenter): static { $this->spiritistCenter = $spiritistCenter; return $this; }
 
-    /** WhatsApp (coluna phone): 10 ou 11 dígitos, desconsiderada a pontuação. */
+    /**
+     * WhatsApp (coluna phone): DDD e número, 10 ou 11 dígitos, desconsiderados a pontuação,
+     * o código do país 55 ("+55 16 98179-1110") e o 0 de discagem ("016 98179-1110").
+     * Começando com "+", só o Brasil (+55) é aceito.
+     */
     public static function isValidWhatsapp(?string $value): bool
     {
-        $digits = preg_replace('/\D/', '', (string) $value);
-        return strlen($digits) === 10 || strlen($digits) === 11;
+        $raw = trim((string) $value);
+        $digits = (string) preg_replace('/\D/', '', $raw);
+        if (str_starts_with($raw, '+')) {
+            if (!str_starts_with($digits, '55')) {
+                return false;
+            }
+            $digits = substr($digits, 2);
+        } elseif (str_starts_with($digits, '55') && in_array(strlen($digits), [12, 13], true)) {
+            $digits = substr($digits, 2);
+        } elseif (str_starts_with($digits, '0') && in_array(strlen($digits), [11, 12], true)) {
+            $digits = substr($digits, 1);
+        }
+        return in_array(strlen($digits), [10, 11], true) && $digits[0] !== '0';
     }
 
     public function getBio(): ?string { return $this->bio; }

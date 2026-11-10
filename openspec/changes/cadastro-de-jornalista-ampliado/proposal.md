@@ -14,7 +14,7 @@ Hoje o formulário tem nome, e-mail, senha, telefone, registro profissional, ve�
 ## What Changes
 
 - No cadastro público, entram **Endereço** (obrigatório), **Estado** (obrigatório, lista das 27 UFs) e **Casa espírita que frequenta** (opcional).
-- O campo **Telefone** vira **WhatsApp**, obrigatório. Ele aceita só números de celular brasileiros com DDD, ou seja, 10 ou 11 dígitos depois de tirar a pontuação, e é gravado como foi digitado.
+- O campo **Telefone** vira **WhatsApp**, obrigatório. Ele aceita números brasileiros com DDD: 10 ou 11 dígitos depois de tirar a pontuação, o código do país (+55) e o 0 de discagem à frente. O número é gravado como foi digitado.
 - O perfil do jornalista (`/jornalista/perfil`) passa a editar os mesmos campos.
 - A ficha do jornalista no `/admin/jornalistas` passa a mostrar esses campos.
 - A exportação e a importação do site levam os campos novos.

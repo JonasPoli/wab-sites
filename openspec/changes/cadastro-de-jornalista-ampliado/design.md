@@ -13,7 +13,7 @@ Motivação em `proposal.md`; requisitos em `specs/noticias/spec.md`.
 1. **Colunas novas e WhatsApp em `phone`.** Entram `address` (255), `state` (2) e `spiritist_center` (150), todas anuláveis, por `doctrine:migrations:diff`. O WhatsApp fica em `phone`, porque o dado é o mesmo (um número de contato) e assim não há migração de dado. Só o rótulo muda nas telas. A ficha e a exportação continuam lendo `phone`.
    - **Alternativa descartada:** renomear a coluna para `whatsapp`. Isso exige migration de rename e muda a chave da exportação, sem ganho para quem usa.
 2. **Validação.**
-   - **WhatsApp:** `preg_replace('/\D/', '', …)` precisa dar 10 ou 11 dígitos. O valor é gravado como foi digitado.
+   - **WhatsApp:** `preg_replace('/\D/', '', …)`, sem o `55` à frente quando sobram 12 ou 13 dígitos (código do país, por exemplo "+5516981791110") e sem o `0` à frente quando sobram 11 ou 12 (discagem, por exemplo "016 98179-1110"), precisa dar 10 ou 11 dígitos. O valor é gravado como foi digitado. A regra do código do país foi acrescentada em 10/11/2026, depois que o Jonas não conseguiu salvar "+5516981791110" no perfil.
    - **Estado:** precisa ser uma das 27 UFs, numa constante em `Author::STATES` (sigla → nome), que também monta o `<select>`.
    - **Endereço:** obrigatório, até 255 caracteres.
    - **Casa espírita:** opcional, até 150 caracteres.

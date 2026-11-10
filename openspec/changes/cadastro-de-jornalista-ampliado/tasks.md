@@ -16,6 +16,10 @@
 - [x] 2.3 Ficha no `/admin/jornalistas/{id}` com WhatsApp, endereço, estado e casa espírita. Conferir na ficha do cadastro da 2.1, e que `/autor/{slug}` não mostra nenhum desses dados. (10/11/2026: a ficha `/admin/jornalistas/62` mostra WhatsApp, endereço, "São Paulo" e a casa espírita; `/autor/ana-souza` não tem endereço, estado, WhatsApp nem casa espírita)
 - [x] 2.4 Exportação e importação com as chaves novas. Conferir exportando `noticias.localhost` e lendo o `metadata.json` (as chaves aparecem com os valores da 2.1). (10/11/2026: o ZIP de `noticias.localhost` traz `address`, `state` e `spiritistCenter` nos dois autores preenchidos; a importação lê as mesmas chaves, e um ZIP antigo fica com elas vazias)
 
+## 2b. Correção (10/11/2026)
+
+- [ ] 2.5 Aceitar o WhatsApp com +55 e com o 0 de discagem (design, decisão 2), e mudar a dica do campo para "Com DDD. Ex.: (16) 98179-1110". Conferir com `php -r`: "+5516981791110", "16 98179-1110", "(16) 3333-4444" e "016981791110" aceitos; "1234", "5516" e "+1 415 555 0100" recusados. No perfil local, o mesmo número salva. Publicar com backup do HEAD, `git pull` e `./build.sh` (muda template), e terminar com HTTP 200 nos 8 domínios de cliente e no ajope.
+
 ## 3. Produção
 
 - [x] 3.1 Deploy junto com `fonte-open-sans`, `tipografia-g1-no-tema-noticias` e `avisos-ao-jornalista` (escrita, com aprovação do Jonas): backup (HEAD e dump), `git pull`, `doctrine:migrations:migrate`, `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope. (10/11/2026 19:53 UTC, com a autorização do Jonas ("crie… implemente… publique"): e2e2593 no ar; backup `~/backups/wab-sites-HEAD-antes-20261110-1952.txt` (HEAD 2cdddf5) e `wab-sites-antes-deploy-20261110-1952.sql.gz` (20 tabelas); `git pull`, migration Version20261110194600 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
