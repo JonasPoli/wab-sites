@@ -7,11 +7,13 @@ use App\Entity\Enum\AuthorStatus;
 use App\Entity\User;
 use App\Repository\ArticleRepository;
 use App\Repository\AuthorRepository;
+use App\Service\JournalistNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Handler\UploadHandler;
 
@@ -58,7 +60,7 @@ class AdminAuthorController extends AbstractController
     }
 
     #[Route('/{id}/{action}', name: 'action', requirements: ['id' => '\d+', 'action' => 'aprovar|recusar|suspender'], methods: ['POST'])]
-    public function action(Author $author, string $action, Request $r, EntityManagerInterface $em): Response
+    public function action(Author $author, string $action, Request $r, EntityManagerInterface $em, JournalistNotifier $notifier): Response
     {
         $this->denyUnlessSiteAdmin();
         if (!$this->isCsrfTokenValid('author_' . $action . '_' . $author->getId(), (string) $r->request->get('_token'))) {
@@ -74,13 +76,20 @@ class AdminAuthorController extends AbstractController
 
         /** @var User $reviewer */
         $reviewer = $this->getUser();
+        $previous = $author->getStatus();
         $author->setStatus($to)
             ->setReviewedAt(new \DateTimeImmutable())
             ->setReviewedBy($reviewer)
             ->setUpdatedAt(new \DateTimeImmutable());
         $em->flush();
 
-        $this->addFlash('success', $message);
+        // E-mail ao jornalista; o link de login sai do domínio do site (o pedido do admin chega por ele)
+        $sent = $notifier->statusChanged($author, $previous, $this->generateUrl('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL));
+        if ($sent) {
+            $this->addFlash('success', $message . ' O jornalista recebeu um e-mail de aviso.');
+        } else {
+            $this->addFlash('warning', rtrim($message, '.') . ', mas o e-mail de aviso não pôde ser enviado.');
+        }
         return $this->redirectToRoute('admin_author_show', ['id' => $author->getId()]);
     }
 

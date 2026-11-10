@@ -10,6 +10,8 @@ use App\Entity\PageBlock;
 use App\Entity\ContactMessage;
 use App\Entity\NewsletterSubscriber;
 use App\Entity\User;
+use App\Entity\Enum\AuthorStatus;
+use App\Repository\AuthorRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ContactMessageRepository;
 use App\Repository\HeroBannerRepository;
@@ -59,9 +61,24 @@ class AdminContentController extends AbstractController
         ContactMessageRepository $contacts,
         PageRepository $pages,
         CategoryRepository $cats,
-        NewsletterSubscriberRepository $newsletters
+        NewsletterSubscriberRepository $newsletters,
+        TenantContext $tc,
+        AuthorRepository $authors,
     ): Response {
+        // Quadro "Jornalistas": portal de notícias, só para quem aprova (admin do site ou SuperAdmin)
+        $journalists = null;
+        $user = $this->getUser();
+        if ($tc->getTenant()?->getTheme() === 'noticias' && $user instanceof User
+            && ($user->isSuperAdmin() || ($user->isAdmin() && $user->getTenant() !== null))) {
+            $journalists = [
+                'pending'  => array_slice($authors->findForAdmin(AuthorStatus::Pending), 0, 10),
+                'pendingCount' => count($authors->findForAdmin(AuthorStatus::Pending)),
+                'approved' => count($authors->findForAdmin(AuthorStatus::Approved)),
+            ];
+        }
+
         return $this->render('admin/dashboard.html.twig', [
+            'journalists'     => $journalists,
             'unreadContacts'  => $contacts->countUnread(),
             'pageCount'       => count($pages->findAll()),
             'categoryCount'   => count($cats->findAll()),

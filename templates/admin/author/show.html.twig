@@ -16,7 +16,10 @@
         <table class="at" style="flex:1;min-width:280px">
             <tbody>
                 <tr><th>E-mail (login)</th><td>{{ author.user ? author.user.email : '—' }}</td></tr>
-                <tr><th>Telefone</th><td>{{ author.phone ?? '—' }}</td></tr>
+                <tr><th>WhatsApp</th><td>{{ author.phone ?? '—' }}</td></tr>
+                <tr><th>Endereço</th><td>{{ author.address ?? '—' }}</td></tr>
+                <tr><th>Estado</th><td>{{ author.stateName ?? '—' }}</td></tr>
+                <tr><th>Casa espírita</th><td>{{ author.spiritistCenter ?? '—' }}</td></tr>
                 <tr><th>Registro profissional</th><td>{{ author.professionalRegistration ?? '—' }}</td></tr>
                 <tr><th>Veículo</th><td>{{ author.outlet ?? '—' }}</td></tr>
                 <tr><th>Cidade</th><td>{{ author.city ?? '—' }}</td></tr>

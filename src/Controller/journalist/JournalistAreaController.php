@@ -133,6 +133,23 @@ class JournalistAreaController extends AbstractController
                 if (mb_strlen($bio) > Author::BIO_MAX_LENGTH) {
                     $errors[] = sprintf('A minibio pode ter até %d caracteres.', Author::BIO_MAX_LENGTH);
                 }
+                // Mesmas regras do cadastro: WhatsApp com DDD, endereço e estado obrigatórios
+                $phone = trim((string) $in->get('phone'));
+                $address = trim((string) $in->get('address'));
+                $state = strtoupper(trim((string) $in->get('state')));
+                $center = trim((string) $in->get('spiritistCenter'));
+                if (!Author::isValidWhatsapp($phone)) {
+                    $errors[] = 'Informe o WhatsApp com DDD.';
+                }
+                if ($address === '' || mb_strlen($address) > 255) {
+                    $errors[] = 'Informe o endereço.';
+                }
+                if (!isset(Author::STATES[$state])) {
+                    $errors[] = 'Escolha o estado.';
+                }
+                if (mb_strlen($center) > 150) {
+                    $errors[] = 'O nome da casa espírita pode ter até 150 caracteres.';
+                }
 
                 // Troca de senha só com a senha atual
                 $newPassword = (string) $in->get('newPassword');
@@ -155,7 +172,10 @@ class JournalistAreaController extends AbstractController
                 if (!$errors) {
                     // E-mail, slug e situação não mudam por aqui
                     $author->setName($name)
-                        ->setPhone($this->nullable($in->get('phone')))
+                        ->setPhone($phone)
+                        ->setAddress($address)
+                        ->setState($state)
+                        ->setSpiritistCenter($center !== '' ? $center : null)
                         ->setProfessionalRegistration($this->nullable($in->get('professionalRegistration')))
                         ->setOutlet($this->nullable($in->get('outlet')))
                         ->setCity($this->nullable($in->get('city')))
@@ -179,6 +199,7 @@ class JournalistAreaController extends AbstractController
             'author'  => $author,
             'errors'  => $errors,
             'bio_max' => Author::BIO_MAX_LENGTH,
+            'states'  => Author::STATES,
         ], new Response(status: $errors ? 422 : 200));
     }
 

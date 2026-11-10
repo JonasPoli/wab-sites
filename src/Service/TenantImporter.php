@@ -560,6 +560,9 @@ class TenantImporter
                     ->setProfessionalRegistration($auData['professionalRegistration'] ?? null)
                     ->setOutlet($auData['outlet'] ?? null)
                     ->setCity($auData['city'] ?? null)
+                    ->setAddress($auData['address'] ?? null)
+                    ->setState($auData['state'] ?? null)
+                    ->setSpiritistCenter($auData['spiritistCenter'] ?? null)
                     ->setBio($auData['bio'] ?? null)
                     ->setStatus(AuthorStatus::tryFrom($auData['status'] ?? '') ?? AuthorStatus::Pending)
                     ->setSample((bool) ($auData['sample'] ?? false));

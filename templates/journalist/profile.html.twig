@@ -32,8 +32,27 @@
             <input type="text" id="p-name" name="name" class="ai" value="{{ author.name }}" required maxlength="150">
         </div>
         <div class="af-field">
-            <label for="p-phone">Telefone</label>
-            <input type="text" id="p-phone" name="phone" class="ai" value="{{ author.phone }}" maxlength="40">
+            <label for="p-phone">WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="p-phone" name="phone" class="ai" value="{{ author.phone }}" required maxlength="40" inputmode="tel" placeholder="(00) 00000-0000">
+        </div>
+    </div>
+    <div class="af-field">
+        <label for="p-address">Endereço <span class="req">*</span></label>
+        <input type="text" id="p-address" name="address" class="ai" value="{{ author.address }}" required maxlength="255" placeholder="Rua, número, complemento e bairro">
+    </div>
+    <div class="af-row">
+        <div class="af-field">
+            <label for="p-state">Estado <span class="req">*</span></label>
+            <select id="p-state" name="state" class="as" required>
+                <option value="">Escolha</option>
+                {% for uf, nome in states %}
+                    <option value="{{ uf }}" {{ author.state == uf ? 'selected' }}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="af-field">
+            <label for="p-center">Casa espírita que frequenta</label>
+            <input type="text" id="p-center" name="spiritistCenter" class="ai" value="{{ author.spiritistCenter }}" maxlength="150">
         </div>
     </div>
     <div class="af-row">

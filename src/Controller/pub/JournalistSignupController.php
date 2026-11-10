@@ -23,7 +23,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
  */
 class JournalistSignupController extends AbstractController
 {
-    public const SUCCESS_MESSAGE = 'Cadastro recebido. Você poderá entrar depois que a administração do portal aprovar.';
+    public const SUCCESS_MESSAGE = 'Cadastro recebido! Ele está em análise pela administração do portal. Quando for aprovado, você receberá um e-mail com o link para entrar e publicar.';
     public const CONSENT_TEXT = 'Autorizo o uso destes dados para a análise do meu cadastro e a exibição do meu perfil de autor no portal.';
     private const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
@@ -53,7 +53,10 @@ class JournalistSignupController extends AbstractController
             $data = [
                 'name'                     => trim((string) $in->get('name')),
                 'email'                    => mb_strtolower(trim((string) $in->get('email'))),
-                'phone'                    => trim((string) $in->get('phone')),
+                'phone'                    => trim((string) $in->get('phone')), // WhatsApp
+                'address'                  => trim((string) $in->get('address')),
+                'state'                    => strtoupper(trim((string) $in->get('state'))),
+                'spiritistCenter'          => trim((string) $in->get('spiritistCenter')),
                 'professionalRegistration' => trim((string) $in->get('professionalRegistration')),
                 'outlet'                   => trim((string) $in->get('outlet')),
                 'city'                     => trim((string) $in->get('city')),
@@ -81,6 +84,18 @@ class JournalistSignupController extends AbstractController
                 $errors[] = 'A senha precisa ter pelo menos 8 caracteres.';
             } elseif ($password !== (string) $in->get('passwordConfirm')) {
                 $errors[] = 'A confirmação da senha não confere.';
+            }
+            if (!Author::isValidWhatsapp($data['phone'])) {
+                $errors[] = 'Informe o WhatsApp com DDD.';
+            }
+            if ($data['address'] === '' || mb_strlen($data['address']) > 255) {
+                $errors[] = 'Informe o endereço.';
+            }
+            if (!isset(Author::STATES[$data['state']])) {
+                $errors[] = 'Escolha o estado.';
+            }
+            if (mb_strlen($data['spiritistCenter']) > 150) {
+                $errors[] = 'O nome da casa espírita pode ter até 150 caracteres.';
             }
             if (mb_strlen($data['bio']) > Author::BIO_MAX_LENGTH) {
                 $errors[] = sprintf('A minibio pode ter até %d caracteres.', Author::BIO_MAX_LENGTH);
@@ -126,6 +141,9 @@ class JournalistSignupController extends AbstractController
                         ->setName($data['name'])
                         ->setSlug($slug)
                         ->setPhone($data['phone'] ?: null)
+                        ->setAddress($data['address'] ?: null)
+                        ->setState($data['state'] ?: null)
+                        ->setSpiritistCenter($data['spiritistCenter'] ?: null)
                         ->setProfessionalRegistration($data['professionalRegistration'] ?: null)
                         ->setOutlet($data['outlet'] ?: null)
                         ->setCity($data['city'] ?: null)
@@ -148,6 +166,7 @@ class JournalistSignupController extends AbstractController
             'errors'       => $errors,
             'consent_text' => self::CONSENT_TEXT,
             'bio_max'      => Author::BIO_MAX_LENGTH,
+            'states'       => Author::STATES,
         ], new Response(status: $errors ? 422 : 200));
     }
 }

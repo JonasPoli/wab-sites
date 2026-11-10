@@ -24,6 +24,17 @@ class Author implements TenantAwareInterface
 {
     public const BIO_MAX_LENGTH = 600;
 
+    /** UFs do cadastro (sigla => nome) */
+    public const STATES = [
+        'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas', 'BA' => 'Bahia',
+        'CE' => 'Ceará', 'DF' => 'Distrito Federal', 'ES' => 'Espírito Santo', 'GO' => 'Goiás',
+        'MA' => 'Maranhão', 'MT' => 'Mato Grosso', 'MS' => 'Mato Grosso do Sul', 'MG' => 'Minas Gerais',
+        'PA' => 'Pará', 'PB' => 'Paraíba', 'PR' => 'Paraná', 'PE' => 'Pernambuco', 'PI' => 'Piauí',
+        'RJ' => 'Rio de Janeiro', 'RN' => 'Rio Grande do Norte', 'RS' => 'Rio Grande do Sul',
+        'RO' => 'Rondônia', 'RR' => 'Roraima', 'SC' => 'Santa Catarina', 'SP' => 'São Paulo',
+        'SE' => 'Sergipe', 'TO' => 'Tocantins',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -56,6 +67,18 @@ class Author implements TenantAwareInterface
 
     #[ORM\Column(length: 120, nullable: true)]
     private ?string $city = null;
+
+    /** Endereço (privado: só o painel e o próprio jornalista veem) */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
+
+    /** UF (Author::STATES) */
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $state = null;
+
+    /** Casa espírita que frequenta (privado) */
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $spiritistCenter = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $bio = null;
@@ -123,6 +146,23 @@ class Author implements TenantAwareInterface
 
     public function getCity(): ?string { return $this->city; }
     public function setCity(?string $city): static { $this->city = $city; return $this; }
+
+    public function getAddress(): ?string { return $this->address; }
+    public function setAddress(?string $address): static { $this->address = $address; return $this; }
+
+    public function getState(): ?string { return $this->state; }
+    public function setState(?string $state): static { $this->state = $state; return $this; }
+    public function getStateName(): ?string { return $this->state ? (self::STATES[$this->state] ?? $this->state) : null; }
+
+    public function getSpiritistCenter(): ?string { return $this->spiritistCenter; }
+    public function setSpiritistCenter(?string $spiritistCenter): static { $this->spiritistCenter = $spiritistCenter; return $this; }
+
+    /** WhatsApp (coluna phone): 10 ou 11 dígitos, desconsiderada a pontuação. */
+    public static function isValidWhatsapp(?string $value): bool
+    {
+        $digits = preg_replace('/\D/', '', (string) $value);
+        return strlen($digits) === 10 || strlen($digits) === 11;
+    }
 
     public function getBio(): ?string { return $this->bio; }
     public function setBio(?string $bio): static { $this->bio = $bio; return $this; }

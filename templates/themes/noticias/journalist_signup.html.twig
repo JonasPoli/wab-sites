@@ -6,17 +6,17 @@
 {% block stylesheets %}
 <style>
 .nt-form-wrap { max-width: 720px; margin: 0 auto; padding-top: 32px; }
-.nt-form-wrap h1 { margin: 0; font-size: 32px; color: var(--nt-accent); }
+.nt-form-wrap h1 { margin: 0; font-size: var(--nt-h1-size); line-height: 1.2; font-weight: 700; letter-spacing: -.045em; color: var(--nt-accent); }
 .nt-form-wrap .nt-lead { color: var(--nt-gray); font-size: 16px; margin: 8px 0 24px; }
 .nt-form { background: var(--nt-card); border: 1px solid var(--nt-card-line); border-radius: 12px; padding: 24px; display: grid; gap: 16px; }
 .nt-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .nt-form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--nt-strong); }
 .nt-form .nt-req { color: var(--nt-req); }
-.nt-form input[type=text], .nt-form input[type=email], .nt-form input[type=password], .nt-form input[type=tel], .nt-form textarea, .nt-form input[type=file] {
+.nt-form input[type=text], .nt-form input[type=email], .nt-form input[type=password], .nt-form input[type=tel], .nt-form textarea, .nt-form input[type=file], .nt-form select {
     width: 100%; font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--nt-field-border); border-radius: 8px; background: var(--nt-field-bg); color: var(--nt-ink);
 }
 .nt-form textarea { min-height: 110px; resize: vertical; }
-.nt-form input:focus, .nt-form textarea:focus { border-color: var(--nt-accent); outline: 2px solid rgba(var(--color-primary-rgb), .2); }
+.nt-form input:focus, .nt-form textarea:focus, .nt-form select:focus { border-color: var(--nt-accent); outline: 2px solid rgba(var(--color-primary-rgb), .2); }
 .nt-form__hint { font-size: 12px; color: var(--nt-light); margin-top: 4px; }
 .nt-form__check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--nt-strong); }
 .nt-form__check input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
@@ -61,8 +61,9 @@
                     <p class="nt-form__hint">Será o seu login.</p>
                 </div>
                 <div>
-                    <label for="j-phone">Telefone</label>
-                    <input type="tel" id="j-phone" name="phone" value="{{ data.phone ?? '' }}" autocomplete="tel" maxlength="40">
+                    <label for="j-phone">WhatsApp <span class="nt-req" aria-hidden="true">*</span></label>
+                    <input type="tel" id="j-phone" name="phone" value="{{ data.phone ?? '' }}" required autocomplete="tel" inputmode="tel" maxlength="40" placeholder="(00) 00000-0000">
+                    <p class="nt-form__hint">Com DDD.</p>
                 </div>
             </div>
             <div class="nt-form__row">
@@ -76,6 +77,25 @@
                     <input type="password" id="j-pass2" name="passwordConfirm" required minlength="8" autocomplete="new-password">
                 </div>
             </div>
+            <div>
+                <label for="j-address">Endereço <span class="nt-req" aria-hidden="true">*</span></label>
+                <input type="text" id="j-address" name="address" value="{{ data.address ?? '' }}" required maxlength="255" autocomplete="street-address" placeholder="Rua, número, complemento e bairro">
+            </div>
+            <div class="nt-form__row">
+                <div>
+                    <label for="j-city">Cidade</label>
+                    <input type="text" id="j-city" name="city" value="{{ data.city ?? '' }}" maxlength="120" autocomplete="address-level2">
+                </div>
+                <div>
+                    <label for="j-state">Estado <span class="nt-req" aria-hidden="true">*</span></label>
+                    <select id="j-state" name="state" required autocomplete="address-level1">
+                        <option value="">Escolha</option>
+                        {% for uf, nome in states %}
+                            <option value="{{ uf }}" {{ (data.state ?? '') == uf ? 'selected' }}>{{ nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="nt-form__row">
                 <div>
                     <label for="j-reg">Registro profissional</label>
@@ -86,16 +106,14 @@
                     <input type="text" id="j-outlet" name="outlet" value="{{ data.outlet ?? '' }}" maxlength="150">
                 </div>
             </div>
-            <div class="nt-form__row">
-                <div>
-                    <label for="j-city">Cidade</label>
-                    <input type="text" id="j-city" name="city" value="{{ data.city ?? '' }}" maxlength="120" autocomplete="address-level2">
-                </div>
-                <div>
-                    <label for="j-photo">Foto</label>
-                    <input type="file" id="j-photo" name="photo" accept="image/*">
-                    <p class="nt-form__hint">Opcional. Imagem de até 5 MB.</p>
-                </div>
+            <div>
+                <label for="j-center">Casa espírita que frequenta</label>
+                <input type="text" id="j-center" name="spiritistCenter" value="{{ data.spiritistCenter ?? '' }}" maxlength="150">
+            </div>
+            <div>
+                <label for="j-photo">Foto</label>
+                <input type="file" id="j-photo" name="photo" accept="image/*">
+                <p class="nt-form__hint">Opcional. Imagem de até 5 MB.</p>
             </div>
             <div>
                 <label for="j-bio">Minibio</label>
