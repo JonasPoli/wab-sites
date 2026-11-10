@@ -16,9 +16,12 @@ context: |
   3 pkwy.com.br, 4 cemporcentoexpresso.com.br (100% Expresso, cliente 199, confirmado pelo Jonas em 09/11),
   5 imperiodainformatica.com.br, 6 site.transterraararaquara.com.br (Transterra, cliente 180),
   7 site.petvida.com.br, 8 site.topdrim.com.br (Top Drim, cliente 177) e 9 site.abifer.com.br (Abifer, cliente 1).
+  O tenant 10, ajope.wab.com.br (Associação dos Jornalistas Espíritas, cliente ainda não identificado no sistema WAB),
+  usa o tema noticias. Desde 10/11/2026 ele tem 20 notícias de exemplo, que precisam sair antes da divulgação do portal:
+  bin/console app:conteudo-exemplo ajope.wab.com.br --remover (com backup antes).
   pkwy.com.br, imperiodainformatica.com.br e site.petvida.com.br ainda não têm cliente identificado no sistema
   WAB. O tenant 2 (localhost, sobra das fixtures) não existia mais na noite de 09/11/2026.
-  Todos os tenants reais usam o tema cetec com o Modo Landing Page ligado.
+  Os tenants 1 a 9 usam o tema cetec com o Modo Landing Page ligado; o 10 (ajope) usa o noticias.
   O site principal de vários desses clientes é outro (WordPress no wab2); aqui ficam os subdomínios site.*.
 
   Produção (conferida em 09/11/2026)
@@ -59,7 +62,7 @@ context: |
     liip:imagine:cache:remove, e apaga var/log/* e public/media/cache/* (as miniaturas são refeitas no
     primeiro acesso, o que pesa num servidor de 1 vCPU). Ele escolhe o php84rc antes do php83rc, então no
     servidor o build roda em PHP 8.4 enquanto o site roda em 8.3.
-  - Última migration aplicada em produção: Version20261110015129 (portal-de-noticias, 10/11/2026).
+  - Última migration aplicada em produção: Version20261110184714 (conteudo-de-exemplo, 10/11/2026).
   - Fuso: o pool do PHP 8.3 grava em America/Sao_Paulo (date.timezone do pool); o PHP CLI do servidor está em UTC.
 
 rules:
