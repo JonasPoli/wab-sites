@@ -1,0 +1,22 @@
+{#
+  "Mais lidas": 1 a 5, publicadas nos últimos 7 dias, com pelo menos uma visualização.
+  Variável thumbs: true no fim da notícia (com miniaturas), false na barra lateral.
+#}
+{% set mostReadItems = mostReadItems ?? news_most_read(5) %}
+{% set thumbs = thumbs ?? false %}
+{% if mostReadItems is not empty %}
+<section class="nt-card" aria-labelledby="nt-most-read-title">
+    <h2 class="nt-card__title" id="nt-most-read-title"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Mais <strong>lidas</strong></h2>
+    <ol class="nt-rank{{ thumbs ? ' nt-rank--thumbs' : '' }}">
+        {% for a in mostReadItems %}
+        <li>
+            <span class="nt-rank__n" aria-hidden="true">{{ loop.index }}</span>
+            <a href="{{ path('pub_article_show', {slug: a.slug}) }}">{{ a.title }}</a>
+            {% if thumbs %}
+                {% if a.coverImage %}<img src="{{ ('uploads/article/' ~ a.coverImage)|imagine_filter('news_thumb') }}" alt="" loading="lazy">{% else %}<span></span>{% endif %}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</section>
+{% endif %}

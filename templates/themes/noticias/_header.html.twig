@@ -1,0 +1,104 @@
+{#
+  Cabeçalho do tema noticias. Variável header_section: nome da editoria
+  (página da notícia), mostrada no centro; o logo vai para a esquerda.
+#}
+{% set tenantName = currentTenant ? currentTenant.name : '' %}
+{% set customMenuItems = currentTenant ? (currentTenant.navigationSettings.customMenuItems ?? []) : [] %}
+
+{% macro logo(currentTenant, tenantName) %}
+    {% set dark = currentTenant ? is_dark_color(currentTenant.primaryColor) : true %}
+    {% if currentTenant and dark and currentTenant.darkLogo %}
+        <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ tenantName }}">
+    {% elseif currentTenant and currentTenant.logo %}
+        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ tenantName }}"></span>
+    {% else %}
+        {{ tenantName }}
+    {% endif %}
+{% endmacro %}
+
+<header class="nt-header{{ header_section ? ' nt-header--section' : '' }}">
+    <div class="nt-header__inner">
+        <div class="nt-header__left">
+            <button type="button" class="nt-menu-btn" id="nt-menu-btn" aria-expanded="false" aria-controls="nt-drawer">
+                <i class="bi bi-list" aria-hidden="true"></i> MENU
+            </button>
+            {% if header_section %}
+                <a href="{{ path('pub_home') }}" class="nt-logo" aria-label="Página inicial de {{ tenantName }}">{{ _self.logo(currentTenant, tenantName) }}</a>
+            {% endif %}
+        </div>
+        <div class="nt-header__center">
+            {% if header_section %}
+                <span class="nt-header__section">{{ header_section }}</span>
+            {% else %}
+                <a href="{{ path('pub_home') }}" class="nt-logo" aria-label="Página inicial de {{ tenantName }}">{{ _self.logo(currentTenant, tenantName) }}</a>
+            {% endif %}
+        </div>
+        <div class="nt-header__right"></div>
+    </div>
+</header>
+
+<div class="nt-overlay" id="nt-overlay" hidden></div>
+<aside class="nt-drawer" id="nt-drawer" hidden aria-label="Menu">
+    <div class="nt-drawer__head">
+        <span class="nt-drawer__title">Menu</span>
+        <button type="button" class="nt-drawer__close" id="nt-drawer-close" aria-label="Fechar menu">&times;</button>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="{{ path('pub_home') }}">Início</a></li>
+            <li><a href="{{ path('pub_articles') }}">Últimas notícias</a></li>
+        </ul>
+        {% set menuCats = news_menu_categories() %}
+        {% if menuCats is not empty %}
+        <div class="nt-drawer__sep"></div>
+        <ul>
+            {% for item in menuCats %}
+                <li><a href="{{ path('pub_category', {slug: item.category.slug}) }}">{{ item.category.name }}</a></li>
+                {% for sub in item.children %}
+                    <li class="nt-drawer__sub"><a href="{{ path('pub_category', {slug: sub.slug}) }}">{{ sub.name }}</a></li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% set menuPages = news_menu_pages() %}
+        {% set activeItems = customMenuItems|filter(i => i.active ?? false and i.url ?? false) %}
+        {% if menuPages is not empty or activeItems is not empty %}
+        <div class="nt-drawer__sep"></div>
+        <ul>
+            {% for p in menuPages %}
+                <li><a href="{{ path('pub_page_show', {slug: p.slug}) }}">{{ p.title }}</a></li>
+            {% endfor %}
+            {% for item in activeItems %}
+                <li><a href="{{ item.url }}"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.label }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="nt-drawer__cta"><a href="{{ path('journalist_signup') }}">Seja um autor</a></div>
+    </nav>
+</aside>
+
+<script>
+(function () {
+    var btn = document.getElementById('nt-menu-btn');
+    var drawer = document.getElementById('nt-drawer');
+    var overlay = document.getElementById('nt-overlay');
+    var closeBtn = document.getElementById('nt-drawer-close');
+    if (!btn || !drawer) return;
+    function open() {
+        drawer.hidden = false; overlay.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        var first = drawer.querySelector('nav a'); if (first) first.focus();
+        document.addEventListener('keydown', onKey);
+    }
+    function close() {
+        drawer.hidden = true; overlay.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        document.removeEventListener('keydown', onKey);
+        btn.focus();
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    btn.addEventListener('click', function () { drawer.hidden ? open() : close(); });
+    overlay.addEventListener('click', close);
+    closeBtn.addEventListener('click', close);
+})();
+</script>

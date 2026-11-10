@@ -1,0 +1,25 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{% block title %}{{ page.seoTitle ?? page.title }} | {{ currentTenant.name }}{% endblock %}
+{% block meta_description %}{% if page.seoDescription %}<meta name="description" content="{{ page.seoDescription }}">{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
+
+{% block body %}
+{% if page.showTitle ?? true %}
+<div class="nt-container nt-page">
+    <header class="nt-page-head">
+        {% if page.category %}<p class="nt-crumb"><a href="{{ path('pub_category', {slug: page.category.slug}) }}">{{ page.category.name }}</a></p>{% endif %}
+        <h1>{{ page.title }}</h1>
+    </header>
+</div>
+{% endif %}
+
+{% include 'themes/noticias/_sections.html.twig' with {sections: page.sections} %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .cetec-section.section-has-banner { padding-top: 0 !important; padding-bottom: 0 !important; }
+    .cetec-section:first-of-type { margin-top: 16px; }
+</style>
+{% endblock %}

@@ -40,9 +40,9 @@ Para garantir segurança e impedir o vazamento acidental de dados entre tenants,
 
 ## 🎨 Temas e Branding Dinâmico
 
-O WAB Sites oferece suporte a temas visuais customizáveis por tenant. O sistema inclui dois temas premium completos na pasta `templates/themes/`:
+O WAB Sites oferece suporte a temas visuais customizáveis por tenant, na pasta `templates/themes/`: `cetec` (usado pelos sites de clientes), `moderno`, `wab` e `noticias`. Alguns deles:
 1. **Moderno (`moderno`)**: Design moderno dark-first (mas com seletor claro/escuro integrado e persistência via `localStorage`), baseado na fonte Google Fonts *Outfit* e estilização premium em vidro (glassmorphism).
-2. **Nepe (`nepe`)**: Layout acadêmico e institucional, baseado na fonte *Inter*, com animações suaves de revelação na rolagem (`reveal-up`, `scale-in`).
+2. **Notícias (`noticias`)**: Portal de notícias (só modo claro). Cabeçalho e rodapé na cor primária do site, home em lista com "Leia também" e "Mais lidas", páginas da notícia (`/noticias/{slug}`), da editoria (`/categoria/{slug}`) e do autor (`/autor/{slug}`). As notícias têm cadastro próprio no `/admin` (menu "Notícias"), e jornalistas se candidatam em `/jornalista/cadastro`, são aprovados pelo admin do site em `/admin/jornalistas` e publicam pela área `/jornalista`. As páginas institucionais usam os blocos do tema cetec.
 
 ### Injeção de Variáveis CSS (`TenantExtension`)
 A extensão de Twig `TenantExtension` expõe globals e funções utilitárias que integram as preferências do banco com o visual público:
@@ -98,7 +98,7 @@ Os blocos de conteúdo são filhos diretos das seções e determinam o layout in
 
 ## 🔑 Níveis de Acesso e Permissões (RBAC)
 
-O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` vinculado à entidade `User`. Existem 4 níveis principais de acesso no sistema:
+O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` vinculado à entidade `User`. Existem 5 níveis principais de acesso no sistema:
 
 1. **Super Administrador (Global)**
    * **Critério**: `tenant` nulo no cadastro do usuário e `workGroup` = 0.
@@ -113,6 +113,10 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
 4. **Revisor de Conteúdo**
    * **Critério**: `tenant` vinculado e `workGroup` = 2.
    * **Funções**: Acesso focado na moderação. Pode revisar rascunhos produzidos por editores e autorizar a publicação definitiva.
+5. **Jornalista (portal de notícias)**
+   * **Critério**: `tenant` vinculado e `workGroup` = 3, com perfil de autor (`Author`) aprovado no mesmo site.
+   * **Perfil**: Possui papel `ROLE_JOURNALIST` e não acessa o `/admin`.
+   * **Funções**: Na área `/jornalista`, cria, publica e exclui as próprias notícias e edita o próprio perfil. Nasce do cadastro público em `/jornalista/cadastro` (tema `noticias`) e só entra depois de aprovado pelo admin do site.
 
 ---
 
@@ -158,9 +162,10 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
    php bin/console doctrine:fixtures:load --no-interaction
    ```
    > [!IMPORTANT]
-   > O comando de fixtures criará dois Tenants de desenvolvimento apontando para os hosts locais:
-   > * **Tenant A (Domínio: `127.0.0.1`)**: Configurado com o tema `nepe` e cores institucionais (Azul e Amarelo).
+   > O comando de fixtures apaga o banco local e cria três Tenants de desenvolvimento apontando para os hosts locais:
+   > * **Tenant A (Domínio: `127.0.0.1`)**: Configurado com o tema `wab` e cores institucionais (Azul e Amarelo).
    > * **Tenant B (Domínio: `localhost`)**: Configurado com o tema `moderno` e cores escuras (Verde e Cinza).
+   > * **Portal de notícias (Domínio: `noticias.localhost`)**: Tema `noticias`, "AJoPE — Local", com editorias, cerca de 25 notícias, jornalistas em todas as situações e as páginas "Sobre" e "Todos os blocos" (`src/DataFixtures/PortalNoticiasFixtures.php`). Navegadores e o curl resolvem `*.localhost` para a máquina local.
 
 5. **Iniciar o Servidor Local:**
    Execute a ferramenta de desenvolvimento do Symfony ou o servidor embutido do PHP:
@@ -169,6 +174,7 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
    # ou alternativamente:
    php -S 127.0.0.1:8000 -t public
    ```
+   > Com o servidor embutido do PHP sem script de roteamento, as miniaturas do LiipImagine (`/media/cache/resolve/...jpg`) respondem 404, porque o PHP trata a URL como arquivo estático. Prefira `symfony server:start`.
 
 ### Acessos de Teste
 
@@ -178,6 +184,11 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
 | **Admin local (Tenant A)** | `http://127.0.0.1:8000/admin` | `admin` | `admin123` | Administrador do Site |
 | **Editor (Tenant A)** | `http://127.0.0.1:8000/admin` | `editor` | `editor123` | Escritor de Conteúdo |
 | **Revisor (Tenant A)** | `http://127.0.0.1:8000/admin` | `revisor` | `revisor123` | Moderação |
+| **Admin do portal** | `http://noticias.localhost:8000/admin` | `noticias.admin` | `admin123` | Administrador do Site (aprova jornalistas) |
+| **Editora do portal** | `http://noticias.localhost:8000/admin` | `noticias.editor` | `editor123` | Escritor de Conteúdo |
+| **Revisor do portal** | `http://noticias.localhost:8000/admin` | `noticias.revisor` | `revisor123` | Moderação |
+| **Jornalista aprovada** | `http://noticias.localhost:8000/login` | `jornalista.aprovada@exemplo.com` | `jornalista123` | Jornalista (área `/jornalista`) |
+| **Jornalistas que não entram** | `http://noticias.localhost:8000/login` | `jornalista.pendente@exemplo.com`, `jornalista.recusado@exemplo.com`, `jornalista.suspenso@exemplo.com` | `jornalista123` | Login recusado com a mensagem da situação |
 
 ---
 

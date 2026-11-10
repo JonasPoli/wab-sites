@@ -1,0 +1,13 @@
+{# Paginação por ?pagina=N. Variáveis: page, pages, route, params (sem a página). #}
+{% set params = params ?? {} %}
+{% if pages > 1 %}
+<nav class="nt-pager" aria-label="Paginação">
+    {% if page > 1 %}
+        <a href="{{ path(route, page - 1 > 1 ? params|merge({pagina: page - 1}) : params) }}" rel="prev">← Mais recentes</a>
+    {% else %}<span></span>{% endif %}
+    <span>Página {{ page }} de {{ pages }}</span>
+    {% if page < pages %}
+        <a href="{{ path(route, params|merge({pagina: page + 1})) }}" rel="next">Mais antigas →</a>
+    {% else %}<span></span>{% endif %}
+</nav>
+{% endif %}

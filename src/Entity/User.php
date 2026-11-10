@@ -11,6 +11,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const WORKGROUP_JOURNALIST = 3;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -30,6 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *  0 = Admin (full access to tenant content; or SuperAdmin if tenant is null)
      *  1 = Editor (can create/edit articles)
      *  2 = Reviewer (can approve articles, send comments)
+     *  3 = Jornalista de portal de notícias (só a área /jornalista; ver Author)
      */
     #[ORM\Column(options: ['default' => 0])]
     private int $workGroup = 0;
@@ -69,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool { return $this->workGroup === 0; }
     public function isEditor(): bool { return $this->workGroup === 1; }
     public function isReviewer(): bool { return $this->workGroup === 2; }
+    public function isJournalist(): bool { return $this->workGroup === self::WORKGROUP_JOURNALIST; }
 
     /** @see UserInterface */
     public function getUserIdentifier(): string { return (string) $this->username; }
@@ -90,6 +94,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } elseif ($this->workGroup === 1 || $this->workGroup === 2) {
             $roles[] = 'ROLE_EDITOR';
             $roles[] = 'ROLE_ADMIN'; // editors also see the admin panel
+        } elseif ($this->workGroup === self::WORKGROUP_JOURNALIST && $this->tenant !== null) {
+            // Jornalista de um portal de notícias: só a área /jornalista, nunca o /admin
+            $roles[] = 'ROLE_JOURNALIST';
         }
 
         return array_unique($roles);

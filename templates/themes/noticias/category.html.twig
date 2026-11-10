@@ -1,0 +1,47 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{% block title %}{{ category.name }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
+{% block meta_description %}{% if category.description %}<meta name="description" content="{{ category.description|striptags|slice(0, 160) }}">{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ url('pub_category', page > 1 ? {slug: category.slug, pagina: page} : {slug: category.slug}) }}">{% endblock %}
+{% block header_section %}{{ category.name }}{% endblock %}
+
+{% block body %}
+<div class="nt-container nt-page">
+    <div class="nt-layout">
+        <div class="nt-feed">
+            <header class="nt-page-head">
+                {% if category.parent %}
+                    <p class="nt-crumb"><a href="{{ path('pub_category', {slug: category.parent.slug}) }}">{{ category.parent.name }}</a></p>
+                {% endif %}
+                <h1>{{ category.name }}</h1>
+                {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+            </header>
+            {% for a in articles %}
+                {% include 'themes/noticias/_article_item.html.twig' with {article: a} %}
+            {% else %}
+                {% if category.pages is empty %}<p class="nt-empty">Nenhuma notícia nesta editoria ainda.</p>{% endif %}
+            {% endfor %}
+            {% include 'themes/noticias/_pagination.html.twig' with {route: 'pub_category', params: {slug: category.slug}} %}
+
+            {% if page == 1 and category.pages is not empty %}
+            <section class="nt-card" style="margin-top:28px" aria-labelledby="nt-cat-pages">
+                <h2 class="nt-card__title" id="nt-cat-pages">Páginas</h2>
+                <ul class="nt-featured">
+                    {% for p in category.pages %}
+                        <li><a href="{{ path('pub_page_show', {slug: p.slug}) }}">{{ p.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+        </div>
+        <aside class="nt-sidebar" aria-label="Destaques">
+            {% include 'themes/noticias/_featured.html.twig' %}
+            {% include 'themes/noticias/_most_read.html.twig' %}
+        </aside>
+    </div>
+</div>
+
+{% if page == 1 %}
+    {% include 'themes/noticias/_sections.html.twig' with {sections: category.sections} %}
+{% endif %}
+{% endblock %}

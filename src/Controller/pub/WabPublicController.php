@@ -3,6 +3,8 @@
 namespace App\Controller\pub;
 
 use App\Entity\ContactMessage;
+use App\Repository\ArticleRepository;
+use App\Repository\AuthorRepository;
 use App\Entity\NewsletterSubscriber;
 use App\Repository\CategoryRepository;
 use App\Repository\HeroBannerRepository;
@@ -20,12 +22,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Psr\Log\LoggerInterface;
+use Twig\Environment;
 
 class WabPublicController extends AbstractController
 {
+    /** Robôs e pré-visualizações de link não contam visualização de notícia. */
+    private const BOT_USER_AGENT = '~bot|crawl|spider|slurp|facebookexternalhit|whatsapp|preview~i';
+
     public function __construct(
         private readonly TenantContext $tenantContext,
         private readonly LoggerInterface $logger,
+        private readonly Environment $twig,
     ) {}
 
     private function theme(string $template): string
@@ -35,12 +42,40 @@ class WabPublicController extends AbstractController
         return "themes/{$theme}/{$template}";
     }
 
+    /** Renderiza o template do tema ou responde 404 quando o tema não o tem. */
+    private function renderThemeOr404(string $template, array $parameters = []): Response
+    {
+        $path = $this->theme($template);
+        if (!$this->twig->getLoader()->exists($path)) {
+            throw $this->createNotFoundException('Página não encontrada.');
+        }
+        return $this->render($path, $parameters);
+    }
+
+    private function isNewsTheme(): bool
+    {
+        return $this->tenantContext->getTenant()?->getTheme() === 'noticias';
+    }
+
+    /** Página pedida em ?pagina=N; 404 fora do intervalo. */
+    private function currentPage(Request $request, int $total, int $perPage): array
+    {
+        $raw = $request->query->get('pagina', '1');
+        $page = ctype_digit((string) $raw) ? (int) $raw : 0;
+        $pages = max(1, (int) ceil($total / $perPage));
+        if ($page < 1 || $page > $pages) {
+            throw $this->createNotFoundException('Página não encontrada.');
+        }
+        return [$page, $pages];
+    }
+
     // ── Home ──────────────────────────────────────────────────────────────────
 
     #[Route('/', name: 'pub_home')]
     public function home(
         HeroBannerRepository $banners,
         PageRepository $pages,
+        ArticleRepository $articles,
     ): Response {
         $tenant = $this->tenantContext->getTenant();
 
@@ -48,6 +83,14 @@ class WabPublicController extends AbstractController
         if ($tenant?->getHomePage()) {
             $page = $tenant->getHomePage();
             return $this->render($this->theme('page.html.twig'), ['page' => $page]);
+        }
+
+        // Portal de notícias: as 20 notícias visíveis mais recentes
+        if ($this->isNewsTheme()) {
+            return $this->render($this->theme('home.html.twig'), [
+                'articles' => $articles->findVisiblePage(null, 1, ArticleRepository::PER_PAGE),
+                'hasMore'  => $articles->countVisible() > ArticleRepository::PER_PAGE,
+            ]);
         }
 
         $activeBanners = $banners->findActiveAll();
@@ -85,9 +128,20 @@ class WabPublicController extends AbstractController
     // ── Categoria pública ─────────────────────────────────────────────────────
 
     #[Route('/categoria/{slug}', name: 'pub_category')]
-    public function category(string $slug, CategoryRepository $cats): Response
+    public function category(string $slug, CategoryRepository $cats, Request $request, ArticleRepository $articles): Response
     {
         $cat = $cats->findOneBy(['slug' => $slug]) ?? throw $this->createNotFoundException();
+
+        // Portal de notícias: notícias da editoria (principal ou outras) e das subcategorias
+        if ($this->isNewsTheme()) {
+            [$page, $pages] = $this->currentPage($request, $articles->countVisible($cat), ArticleRepository::PER_PAGE);
+            return $this->render($this->theme('category.html.twig'), [
+                'category' => $cat,
+                'articles' => $articles->findVisiblePage($cat, $page),
+                'page'     => $page,
+                'pages'    => $pages,
+            ]);
+        }
         // Renderiza como page se tiver seções, senão lista de páginas
         if ($cat->getSections()->count() > 0) {
             // Use category sections in page-like template
@@ -205,17 +259,60 @@ class WabPublicController extends AbstractController
     // ── Notícias / Artigos ───────────────────────────────────────────────────
 
     #[Route('/noticias', name: 'pub_articles')]
-    public function articles(): Response
+    public function articles(Request $request, ArticleRepository $articles): Response
     {
+        if (!$this->isNewsTheme()) {
+            return $this->renderThemeOr404('articles.html.twig', ['articles' => []]);
+        }
+
+        [$page, $pages] = $this->currentPage($request, $articles->countVisible(), ArticleRepository::PER_PAGE);
         return $this->render($this->theme('articles.html.twig'), [
-            'articles' => [],
+            'articles' => $articles->findVisiblePage(null, $page),
+            'page'     => $page,
+            'pages'    => $pages,
         ]);
     }
 
     #[Route('/noticias/{slug}', name: 'pub_article_show')]
-    public function articleShow(string $slug): Response
+    public function articleShow(string $slug, Request $request, ArticleRepository $articles): Response
     {
-        throw $this->createNotFoundException('Notícia não encontrada.');
+        if (!$this->isNewsTheme()) {
+            throw $this->createNotFoundException('Notícia não encontrada.');
+        }
+
+        // Só notícia publicada, com data no passado, do site do domínio (filtro de tenant)
+        $article = $articles->findOneVisibleBySlug($slug) ?? throw $this->createNotFoundException('Notícia não encontrada.');
+
+        $userAgent = trim((string) $request->headers->get('User-Agent'));
+        if ($userAgent !== '' && !preg_match(self::BOT_USER_AGENT, $userAgent)) {
+            $articles->incrementViews($article);
+        }
+
+        return $this->render($this->theme('article.html.twig'), [
+            'article' => $article,
+            'next'    => $articles->findNextOlder($article),
+        ]);
+    }
+
+    // ── Autor (jornalista) ───────────────────────────────────────────────────
+
+    #[Route('/autor/{slug}', name: 'pub_author')]
+    public function author(string $slug, Request $request, AuthorRepository $authors, ArticleRepository $articles): Response
+    {
+        if (!$this->isNewsTheme()) {
+            throw $this->createNotFoundException('Autor não encontrado.');
+        }
+
+        // Só autor aprovado do site do domínio
+        $author = $authors->findOneApprovedBySlug($slug) ?? throw $this->createNotFoundException('Autor não encontrado.');
+        [$page, $pages] = $this->currentPage($request, $articles->countVisibleByAuthor($author), ArticleRepository::PER_PAGE);
+
+        return $this->render($this->theme('author.html.twig'), [
+            'author'   => $author,
+            'articles' => $articles->findVisibleByAuthor($author, $page),
+            'page'     => $page,
+            'pages'    => $pages,
+        ]);
     }
 
     // ── Vídeos ───────────────────────────────────────────────────────────────
@@ -223,7 +320,7 @@ class WabPublicController extends AbstractController
     #[Route('/videos', name: 'pub_videos')]
     public function videos(): Response
     {
-        return $this->render($this->theme('videos.html.twig'), [
+        return $this->renderThemeOr404('videos.html.twig', [
             'videos' => [],
         ]);
     }
@@ -239,7 +336,7 @@ class WabPublicController extends AbstractController
     #[Route('/estudos', name: 'pub_studies')]
     public function studies(): Response
     {
-        return $this->render($this->theme('studies.html.twig'), [
+        return $this->renderThemeOr404('studies.html.twig', [
             'studies' => [],
         ]);
     }

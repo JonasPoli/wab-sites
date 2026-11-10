@@ -2,6 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Article;
+use App\Entity\Author;
+use App\Entity\Enum\ArticleStatus;
+use App\Entity\Enum\AuthorStatus;
 use App\Entity\Tenant;
 use App\Entity\User;
 use App\Entity\Category;
@@ -242,6 +246,7 @@ class TenantImporter
             $this->em->persist($tenant);
 
             // ── 2. Users ──────────────────────────────────────────────────
+            $userMap = []; // username exportado → User novo (autores do portal)
             foreach ($data['users'] ?? [] as $uData) {
                 $originalUsername = $uData['username'];
                 $resolvedUsername = $resolutions['users'][$originalUsername]['username'] ?? $originalUsername;
@@ -256,6 +261,7 @@ class TenantImporter
                 $user->setPassword($uData['password']); // Preserve hashed password
                 $user->setTenant($tenant);
                 $this->em->persist($user);
+                $userMap[$originalUsername] = $user;
             }
 
             // ── 3. Categories (2-pass for parent hierarchy) ───────────────
@@ -535,6 +541,74 @@ class TenantImporter
             }
             $this->logger->info('[TenantImporter] Assinantes de newsletter importados.', ['count' => $subscribersImported]);
 
+            // ── 13. Portal de notícias: autores e notícias ───────────────
+            $authorMap = [];
+            foreach ($data['authors'] ?? [] as $auData) {
+                $authorUser = $userMap[$auData['user_username'] ?? ''] ?? null;
+                if (!$authorUser) {
+                    $this->logger->warning('[TenantImporter] Autor sem usuário no pacote; ignorado.', ['slug' => $auData['slug'] ?? null]);
+                    continue;
+                }
+                $author = (new Author())
+                    ->setTenant($tenant)
+                    ->setUser($authorUser)
+                    ->setName($auData['name'] ?? '')
+                    ->setSlug($auData['slug'] ?? '')
+                    ->setPhone($auData['phone'] ?? null)
+                    ->setProfessionalRegistration($auData['professionalRegistration'] ?? null)
+                    ->setOutlet($auData['outlet'] ?? null)
+                    ->setCity($auData['city'] ?? null)
+                    ->setBio($auData['bio'] ?? null)
+                    ->setStatus(AuthorStatus::tryFrom($auData['status'] ?? '') ?? AuthorStatus::Pending);
+                foreach (['consentAt' => 'setConsentAt', 'createdAt' => 'setCreatedAt', 'updatedAt' => 'setUpdatedAt'] as $key => $setter) {
+                    if (!empty($auData[$key])) {
+                        $author->$setter(new \DateTimeImmutable($auData[$key]));
+                    }
+                }
+                if (!empty($auData['reviewedAt'])) {
+                    $author->setReviewedAt(new \DateTimeImmutable($auData['reviewedAt']));
+                }
+                if (!empty($auData['photo'])) {
+                    $author->setPhoto($auData['photo']);
+                    $this->relocateMediaFile($tempWorkDir, 'author_photo', $auData['photo']);
+                }
+                $this->em->persist($author);
+                $authorMap[$auData['id']] = $author;
+            }
+
+            foreach ($data['articles'] ?? [] as $arData) {
+                $article = (new Article())
+                    ->setTenant($tenant)
+                    ->setTitle($arData['title'] ?? '')
+                    ->setSlug($arData['slug'] ?? '')
+                    ->setKicker($arData['kicker'] ?? null)
+                    ->setSummary($arData['summary'] ?? null)
+                    ->setBody($arData['body'] ?? null)
+                    ->setCategory($categoryMap[$arData['category_id'] ?? 0] ?? null)
+                    ->setCategories(array_values(array_filter(array_map(fn ($id) => $categoryMap[$id] ?? null, $arData['category_ids'] ?? []))))
+                    ->setAuthor($authorMap[$arData['author_id'] ?? 0] ?? null)
+                    ->setCoverCaption($arData['coverCaption'] ?? null)
+                    ->setCoverCredit($arData['coverCredit'] ?? null)
+                    ->setStatus(ArticleStatus::tryFrom($arData['status'] ?? '') ?? ArticleStatus::Draft)
+                    ->setRelatedLinks($arData['relatedLinks'] ?? [])
+                    ->setFeatured((bool) ($arData['featured'] ?? false))
+                    ->setViewCount(0);
+                foreach (['publishedAt' => 'setPublishedAt', 'createdAt' => 'setCreatedAt', 'updatedAt' => 'setUpdatedAt'] as $key => $setter) {
+                    if (!empty($arData[$key])) {
+                        $article->$setter(new \DateTimeImmutable($arData[$key]));
+                    }
+                }
+                if (!empty($arData['coverImage'])) {
+                    $article->setCoverImage($arData['coverImage']);
+                    $this->relocateMediaFile($tempWorkDir, 'article_image', $arData['coverImage']);
+                }
+                $this->em->persist($article);
+            }
+            $this->logger->info('[TenantImporter] Autores e notícias importados.', [
+                'authors'  => count($authorMap),
+                'articles' => count($data['articles'] ?? []),
+            ]);
+
             // ── Final flush + commit ──────────────────────────────────────
             $this->em->flush();
             $this->em->commit();
@@ -636,6 +710,8 @@ class TenantImporter
             'partner_logo'       => 'partner_logo',
             'team_member_image'  => 'team_member_image',
             'hero_banner'        => 'hero',
+            'article_image'      => 'article',
+            'author_photo'       => 'author',
         ];
 
         return $map[$mapping] ?? $mapping;

@@ -1,0 +1,7 @@
+{# Linha "Por <nome>, <veículo>"; link para a página do autor só quando ele está aprovado. #}
+{% set author = article.author %}
+{% if author %}
+<p class="nt-byline">
+    Por {% if author.approved %}<a href="{{ path('pub_author', {slug: author.slug}) }}">{{ author.name }}</a>{% else %}{{ author.name }}{% endif %}{% if author.outlet %}, {{ author.outlet }}{% endif %}
+</p>
+{% endif %}

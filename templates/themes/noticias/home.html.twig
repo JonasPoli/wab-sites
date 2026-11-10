@@ -1,0 +1,26 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{% block title %}{{ currentTenant.seoTitle ?? currentTenant.name }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ url('pub_home') }}">{% endblock %}
+
+{% block body %}
+<div class="nt-container nt-page">
+    <h1 class="nt-sr-only">Últimas notícias — {{ currentTenant.name }}</h1>
+    <div class="nt-layout">
+        <div class="nt-feed">
+            {% for a in articles %}
+                {% include 'themes/noticias/_article_item.html.twig' with {article: a, lead: loop.first} %}
+            {% else %}
+                <p class="nt-empty">Nenhuma notícia publicada ainda.</p>
+            {% endfor %}
+            {% if hasMore %}
+                <a class="nt-more" href="{{ path('pub_articles', {pagina: 2}) }}">Mais notícias</a>
+            {% endif %}
+        </div>
+        <aside class="nt-sidebar" aria-label="Destaques">
+            {% include 'themes/noticias/_featured.html.twig' %}
+            {% include 'themes/noticias/_most_read.html.twig' with {thumbs: false} %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}{{ author.name }}{% endblock %}{% block page_title %}Jornalista{% endblock %}
+{% block body %}
+{% set tz = 'America/Sao_Paulo' %}
+{% set st = author.status.value %}
+<div class="ph">
+    <h1>{{ author.name }} <span class="badge {{ author.status.badgeClass }}">{{ author.status.label }}</span></h1>
+    <a href="{{ path('admin_author_index') }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a>
+</div>
+
+<div class="card">
+    <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
+        {% if author.photo %}
+            <img src="{{ asset('uploads/author/' ~ author.photo) }}" alt="Foto de {{ author.name }}" style="width:120px;height:120px;border-radius:50%;object-fit:cover">
+        {% endif %}
+        <table class="at" style="flex:1;min-width:280px">
+            <tbody>
+                <tr><th>E-mail (login)</th><td>{{ author.user ? author.user.email : '—' }}</td></tr>
+                <tr><th>Telefone</th><td>{{ author.phone ?? '—' }}</td></tr>
+                <tr><th>Registro profissional</th><td>{{ author.professionalRegistration ?? '—' }}</td></tr>
+                <tr><th>Veículo</th><td>{{ author.outlet ?? '—' }}</td></tr>
+                <tr><th>Cidade</th><td>{{ author.city ?? '—' }}</td></tr>
+                <tr><th>Minibio</th><td style="white-space:pre-line">{{ author.bio ?? '—' }}</td></tr>
+                <tr><th>Cadastro</th><td>{{ author.createdAt|date('d/m/Y H\\hi', tz) }} · aceite em {{ author.consentAt|date('d/m/Y H\\hi', tz) }}</td></tr>
+                <tr><th>Última decisão</th><td>{% if author.reviewedAt %}{{ author.reviewedAt|date('d/m/Y H\\hi', tz) }}{% if author.reviewedBy %} por {{ author.reviewedBy.name }}{% endif %}{% else %}—{% endif %}</td></tr>
+                <tr><th>Notícias</th><td>{{ articlesCount }}</td></tr>
+                {% if author.approved %}<tr><th>Página pública</th><td><a href="{{ path('pub_author', {slug: author.slug}) }}" target="_blank" style="text-decoration:underline">/autor/{{ author.slug }}</a></td></tr>{% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="af-actions" style="margin-top:1.5rem">
+        {% if st in ['pendente', 'suspenso'] %}
+        <form method="post" action="{{ path('admin_author_action', {id: author.id, action: 'aprovar'}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('author_aprovar_' ~ author.id) }}">
+            <button class="btn btn-s"><sl-icon name="check-lg"></sl-icon> {{ st == 'suspenso' ? 'Reativar' : 'Aprovar' }}</button>
+        </form>
+        {% endif %}
+        {% if st == 'pendente' %}
+        <form method="post" action="{{ path('admin_author_action', {id: author.id, action: 'recusar'}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('author_recusar_' ~ author.id) }}">
+            <button class="btn btn-g"><sl-icon name="x-lg"></sl-icon> Recusar</button>
+        </form>
+        {% endif %}
+        {% if st == 'aprovado' %}
+        <form method="post" action="{{ path('admin_author_action', {id: author.id, action: 'suspender'}) }}" onsubmit="return confirm('Suspender o acesso deste jornalista? As notícias publicadas continuam no ar.')">
+            <input type="hidden" name="_token" value="{{ csrf_token('author_suspender_' ~ author.id) }}">
+            <button class="btn btn-g"><sl-icon name="pause-fill"></sl-icon> Suspender</button>
+        </form>
+        {% endif %}
+        {% if st in ['pendente', 'recusado'] %}
+        <form method="post" action="{{ path('admin_author_delete', {id: author.id}) }}" onsubmit="return confirm('Excluir este candidato e o usuário dele? O e-mail fica livre para um novo cadastro.')" style="margin-left:auto">
+            <input type="hidden" name="_token" value="{{ csrf_token('author_delete_' ~ author.id) }}">
+            <button class="btn btn-d"><sl-icon name="trash-fill"></sl-icon> Excluir candidato</button>
+        </form>
+        {% endif %}
+    </div>
+    {% if st == 'aprovado' %}<p class="af-hint" style="margin-top:.75rem">Suspender corta o acesso à área do jornalista na próxima requisição; as notícias dele continuam no ar.</p>{% endif %}
+</div>
+{% endblock %}

@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Article;
+use App\Entity\Author;
 use App\Entity\Tenant;
 use App\Entity\User;
 use App\Entity\Category;
@@ -73,6 +75,8 @@ class TenantExporter
             'contact_form_fields'  => $this->serializeContactFormFields($tenant),
             'contact_messages'     => $this->serializeContactMessages($tenant),
             'newsletter_subscribers' => $this->serializeNewsletterSubscribers($tenant),
+            'authors'              => $this->serializeAuthors($tenant),
+            'articles'             => $this->serializeArticles($tenant),
         ];
 
         $this->logger->info('[TenantExporter] Metadados serializados com sucesso.', [
@@ -86,6 +90,8 @@ class TenantExporter
             'contact_form_fields_count'    => count($data['contact_form_fields']),
             'contact_messages_count'       => count($data['contact_messages']),
             'newsletter_subscribers_count' => count($data['newsletter_subscribers']),
+            'authors_count'                => count($data['authors']),
+            'articles_count'               => count($data['articles']),
         ]);
 
         // 3. Write metadata.json to zip
@@ -446,6 +452,63 @@ class TenantExporter
         return $serialized;
     }
 
+    /** Jornalistas do portal; o usuário é referenciado pelo username exportado em 'users'. */
+    private function serializeAuthors(Tenant $t): array
+    {
+        $serialized = [];
+        foreach ($this->em->getRepository(Author::class)->findBy(['tenant' => $t]) as $a) {
+            $serialized[] = [
+                'id'                       => $a->getId(),
+                'user_username'            => $a->getUser()?->getUsername(),
+                'name'                     => $a->getName(),
+                'slug'                     => $a->getSlug(),
+                'phone'                    => $a->getPhone(),
+                'professionalRegistration' => $a->getProfessionalRegistration(),
+                'outlet'                   => $a->getOutlet(),
+                'city'                     => $a->getCity(),
+                'bio'                      => $a->getBio(),
+                'photo'                    => $a->getPhoto(),
+                'status'                   => $a->getStatus()->value,
+                'consentAt'                => $a->getConsentAt()->format(\DateTimeInterface::ATOM),
+                'reviewedAt'               => $a->getReviewedAt()?->format(\DateTimeInterface::ATOM),
+                'createdAt'                => $a->getCreatedAt()->format(\DateTimeInterface::ATOM),
+                'updatedAt'                => $a->getUpdatedAt()->format(\DateTimeInterface::ATOM),
+            ];
+        }
+        $this->logger->info('[TenantExporter] Autores serializados.', ['count' => count($serialized)]);
+        return $serialized;
+    }
+
+    /** Notícias do portal (as visualizações não vão: a importação começa do zero). */
+    private function serializeArticles(Tenant $t): array
+    {
+        $serialized = [];
+        foreach ($this->em->getRepository(Article::class)->findBy(['tenant' => $t]) as $a) {
+            $serialized[] = [
+                'id'           => $a->getId(),
+                'title'        => $a->getTitle(),
+                'slug'         => $a->getSlug(),
+                'kicker'       => $a->getKicker(),
+                'summary'      => $a->getSummary(),
+                'body'         => $a->getBody(),
+                'category_id'  => $a->getCategory()?->getId(),
+                'category_ids' => array_values(array_map(fn (Category $c) => $c->getId(), $a->getCategories()->toArray())),
+                'author_id'    => $a->getAuthor()?->getId(),
+                'coverImage'   => $a->getCoverImage(),
+                'coverCaption' => $a->getCoverCaption(),
+                'coverCredit'  => $a->getCoverCredit(),
+                'status'       => $a->getStatus()->value,
+                'publishedAt'  => $a->getPublishedAt()->format(\DateTimeInterface::ATOM),
+                'relatedLinks' => $a->getRelatedLinks(),
+                'featured'     => $a->isFeatured(),
+                'createdAt'    => $a->getCreatedAt()->format(\DateTimeInterface::ATOM),
+                'updatedAt'    => $a->getUpdatedAt()->format(\DateTimeInterface::ATOM),
+            ];
+        }
+        $this->logger->info('[TenantExporter] Notícias serializadas.', ['count' => count($serialized)]);
+        return $serialized;
+    }
+
     // ─────────────────────────────────────────────────────────────
     // Media file collection
     // ─────────────────────────────────────────────────────────────
@@ -495,6 +558,14 @@ class TenantExporter
         // 5. HeroBanner background images
         foreach ($data['hero_banners'] as $hb) {
             $this->addMediaFile($zip, 'hero_banner', $hb['backgroundImage']);
+        }
+
+        // 6. Portal de notícias: fotos dos autores e capas das notícias
+        foreach ($data['authors'] ?? [] as $au) {
+            $this->addMediaFile($zip, 'author_photo', $au['photo']);
+        }
+        foreach ($data['articles'] ?? [] as $ar) {
+            $this->addMediaFile($zip, 'article_image', $ar['coverImage']);
         }
     }
 
@@ -566,6 +637,8 @@ class TenantExporter
             'partner_logo'       => 'partner_logo',
             'team_member_image'  => 'team_member_image',
             'hero_banner'        => 'hero',
+            'article_image'      => 'article',
+            'author_photo'       => 'author',
         ];
 
         return $map[$mapping] ?? $mapping;

@@ -1,0 +1,16 @@
+{# Área do jornalista: visual do painel com um menu próprio (Minhas notícias e Meu perfil). #}
+{% extends 'admin/wab_base.html.twig' %}
+
+{% block sidebar_home_url %}{{ path('journalist_area') }}{% endblock %}
+
+{% block sidebar_nav %}
+    <div class="nav-sec">Autor</div>
+    <a href="{{ path('journalist_area') }}" class="nl {% if '/jornalista/perfil' not in app.request.pathInfo %}on{% endif %}">
+        <sl-icon name="newspaper"></sl-icon> Minhas notícias
+    </a>
+    <a href="{{ path('journalist_profile') }}" class="nl {% if '/jornalista/perfil' in app.request.pathInfo %}on{% endif %}">
+        <sl-icon name="person-fill"></sl-icon> Meu perfil
+    </a>
+{% endblock %}
+
+{% block user_role %}Jornalista{% endblock %}

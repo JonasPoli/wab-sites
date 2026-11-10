@@ -214,6 +214,29 @@ class SuperAdminController extends AbstractController
             if ($this->deletePhysicalFile($projectDir, 'team_member_image', $tm->getImage())) $filesDeleted++;
         }
 
+        // Portal de notícias: capas das notícias e fotos dos jornalistas do tenant.
+        // Consulta explícita por tenant (vale com ou sem o filtro do domínio). Um arquivo
+        // que outro tenant também usa (ex.: site importado de um ZIP) fica no disco.
+        $conn = $em->getConnection();
+        $portalFiles = [
+            'article_image' => $conn->fetchFirstColumn('SELECT DISTINCT cover_image FROM article WHERE tenant_id = ? AND cover_image IS NOT NULL', [$tenant->getId()]),
+            'author_photo'  => $conn->fetchFirstColumn('SELECT DISTINCT photo FROM author WHERE tenant_id = ? AND photo IS NOT NULL', [$tenant->getId()]),
+        ];
+        $portalSharedSql = [
+            'article_image' => 'SELECT COUNT(*) FROM article WHERE cover_image = ? AND tenant_id <> ?',
+            'author_photo'  => 'SELECT COUNT(*) FROM author WHERE photo = ? AND tenant_id <> ?',
+        ];
+        $articlesCount = (int) $conn->fetchOne('SELECT COUNT(*) FROM article WHERE tenant_id = ?', [$tenant->getId()]);
+        $authorsCount = (int) $conn->fetchOne('SELECT COUNT(*) FROM author WHERE tenant_id = ?', [$tenant->getId()]);
+        foreach ($portalFiles as $mapping => $filenames) {
+            foreach ($filenames as $filename) {
+                if ((int) $conn->fetchOne($portalSharedSql[$mapping], [$filename, $tenant->getId()]) === 0
+                    && $this->deletePhysicalFile($projectDir, $mapping, $filename)) {
+                    $filesDeleted++;
+                }
+            }
+        }
+
         // 3. Sequenced Database Deletion inside a transaction
         $em->beginTransaction();
         try {
@@ -330,6 +353,10 @@ class SuperAdminController extends AbstractController
                 $filesDeleted
             );
 
+            if ($articlesCount || $authorsCount) {
+                // Notícias e jornalistas saem pelo ON DELETE CASCADE do tenant e dos usuários
+                $summaryMsg .= sprintf(' Portal de notícias: %d notícias e %d jornalistas.', $articlesCount, $authorsCount);
+            }
             $this->addFlash('success', $summaryMsg);
         } catch (\Exception $e) {
             $em->rollback();
@@ -359,6 +386,8 @@ class SuperAdminController extends AbstractController
             'partner_logo' => 'partner_logo',
             'team_member_image' => 'team_member_image',
             'hero_banner' => 'hero',
+            'article_image' => 'article',
+            'author_photo' => 'author',
         ];
 
         $folder = $map[$mapping] ?? $mapping;
@@ -582,6 +611,10 @@ class SuperAdminController extends AbstractController
     ): Response {
         $user = new User();
         if ($request->isMethod('POST')) {
+            if (!$this->isValidWorkGroup($request)) {
+                $this->addFlash('error', 'Função inválida: escolha Admin, Editor, Revisor ou Jornalista.');
+                return $this->redirectToRoute('superadmin_user_new');
+            }
             $this->populateUserFromRequest($user, $request, $em, $hasher, $tenants);
             $em->persist($user);
             $em->flush();
@@ -603,6 +636,10 @@ class SuperAdminController extends AbstractController
         TenantRepository $tenants,
     ): Response {
         if ($request->isMethod('POST')) {
+            if (!$this->isValidWorkGroup($request)) {
+                $this->addFlash('error', 'Função inválida: escolha Admin, Editor, Revisor ou Jornalista.');
+                return $this->redirectToRoute('superadmin_user_edit', ['id' => $user->getId()]);
+            }
             $this->populateUserFromRequest($user, $request, $em, $hasher, $tenants);
             $em->flush();
             $this->addFlash('success', 'Usuário atualizado.');
@@ -724,6 +761,13 @@ class SuperAdminController extends AbstractController
             ];
         }
         $tenant->setFontSettings($fontSettings);
+    }
+
+    /** workGroup aceito: 0 admin, 1 editor, 2 revisor, 3 jornalista (User::WORKGROUP_JOURNALIST). */
+    private function isValidWorkGroup(Request $r): bool
+    {
+        $raw = (string) $r->request->get('workGroup', '0');
+        return ctype_digit($raw) && in_array((int) $raw, [0, 1, 2, User::WORKGROUP_JOURNALIST], true);
     }
 
     private function populateUserFromRequest(

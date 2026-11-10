@@ -1,0 +1,26 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{% block title %}Últimas notícias{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ url('pub_articles', page > 1 ? {pagina: page} : {}) }}">{% endblock %}
+
+{% block body %}
+<div class="nt-container nt-page">
+    <div class="nt-layout">
+        <div class="nt-feed">
+            <header class="nt-page-head">
+                <h1>Últimas notícias</h1>
+            </header>
+            {% for a in articles %}
+                {% include 'themes/noticias/_article_item.html.twig' with {article: a} %}
+            {% else %}
+                <p class="nt-empty">Nenhuma notícia publicada ainda.</p>
+            {% endfor %}
+            {% include 'themes/noticias/_pagination.html.twig' with {route: 'pub_articles'} %}
+        </div>
+        <aside class="nt-sidebar" aria-label="Destaques">
+            {% include 'themes/noticias/_featured.html.twig' %}
+            {% include 'themes/noticias/_most_read.html.twig' %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

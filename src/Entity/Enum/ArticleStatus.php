@@ -2,27 +2,26 @@
 
 namespace App\Entity\Enum;
 
+/** Situação de uma notícia do portal (tema noticias). */
 enum ArticleStatus: string
 {
-    case Draft     = 'draft';
-    case Pending   = 'pending';
-    case Published = 'published';
+    case Draft     = 'rascunho';
+    case Published = 'publicada';
 
     public function label(): string
     {
         return match ($this) {
             self::Draft     => 'Rascunho',
-            self::Pending   => 'Aguardando aprovação',
-            self::Published => 'Publicado',
+            self::Published => 'Publicada',
         };
     }
 
-    public function badgeColor(): string
+    /** Classe do badge no painel (admin/wab_base.html.twig). */
+    public function badgeClass(): string
     {
         return match ($this) {
-            self::Draft     => 'neutral',
-            self::Pending   => 'warning',
-            self::Published => 'success',
+            self::Draft     => 'bg-neu',
+            self::Published => 'bg-ok',
         };
     }
 }

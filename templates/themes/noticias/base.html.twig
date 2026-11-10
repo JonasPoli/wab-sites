@@ -1,0 +1,165 @@
+{#
+  Tema "noticias" — portal de notícias. Só modo claro (nunca põe .dark no <html>).
+  Cabeçalho e rodapé na cor primária do site; a identidade (logo, cores e fontes) vem do tenant.
+  Os blocos das páginas institucionais vêm do tema cetec (themes/noticias/_block.html.twig),
+  por isso este base também carrega app.css, Swiper, AOS e os ícones que eles usam.
+#}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ currentTenant ? currentTenant.name : 'Notícias' }}{% endblock %}</title>
+    {% block meta_description %}
+        {% if currentTenant and currentTenant.seoDescription %}<meta name="description" content="{{ currentTenant.seoDescription }}">{% endif %}
+    {% endblock %}
+    {% block og_tags %}
+    <meta property="og:site_name" content="{{ currentTenant ? currentTenant.name : '' }}">
+    <meta property="og:type" content="website">
+    {% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+    {% block canonical %}{% endblock %}
+    {% block robots %}<meta name="robots" content="index, follow">{% endblock %}
+    {% if currentTenant and currentTenant.favicon %}
+        <link rel="icon" href="{{ asset('uploads/tenant/favicon/' ~ currentTenant.favicon) }}">
+    {% endif %}
+
+    {{ tenant_css_vars()|raw }}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+
+    <style>
+    /* ── Tokens (os blocos do cetec também usam estes) ── */
+    :root {
+        --font-headline: 'Open Sans', system-ui, sans-serif;
+        --font-body: 'Open Sans', system-ui, sans-serif;
+        --radius: 10px;
+        --radius-lg: 20px;
+        --bg: #ffffff;
+        --bg-alt: #f7f7f7;
+        --bg-card: #ffffff;
+        --bg-glass: rgba(255,255,255,.95);
+        --text: #1f1f1f;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --nt-page-bg: #f7f7f7;
+        --nt-ink: #1f1f1f;
+        --nt-gray: #555;
+        --nt-light: #6b7280;
+        --nt-line: #dcdcdc;
+        --nt-on-primary: var(--topbar-text, #ffffff);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: var(--font-body); background: var(--nt-page-bg); color: var(--nt-ink); line-height: 1.5; overflow-x: hidden; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .nt-container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+    .nt-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .nt-skip { position: absolute; left: 8px; top: -60px; background: #fff; color: #000; padding: 8px 12px; border-radius: 6px; z-index: 1000; }
+    .nt-skip:focus { top: 8px; }
+    :focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+
+    /* Blocos do cetec com fundo escuro próprio (ex.: newsletter): o título na cor
+       primária some quando ela é escura, como o azul-marinho da AJoPE. */
+    .bg-cetec-dark .text-cetec-primary { color: #ffffff; }
+
+    /* Seção escura dos blocos do cetec */
+    .mp-section-dark { --bg:#0d0f1a; --bg-alt:#131625; --bg-card:#181c30; --text:#f1f5f9; --text-muted:#94a3b8; --border:rgba(255,255,255,.08); color: var(--text); background-color: var(--bg-alt); }
+
+    /* Avisos */
+    .flash { padding: 1rem 1.25rem; border-radius: var(--radius); margin: 1rem 0; font-weight: 600; }
+    .flash-success { background: #e7f6ec; color: #14532d; border: 1px solid #bbe5c8; }
+    .flash-error { background: #fdecec; color: #7f1d1d; border: 1px solid #f5c2c2; }
+
+    /* ── Cabeçalho ── */
+    .nt-header { background: var(--color-primary); color: var(--nt-on-primary); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+    .nt-header__inner { max-width: 1240px; margin: 0 auto; padding: 0 16px; height: 64px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+    .nt-header__left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .nt-header__right { display: flex; justify-content: flex-end; }
+    .nt-menu-btn { display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit; font: 700 13px/1 var(--font-body); letter-spacing: .04em; cursor: pointer; padding: 10px 8px; border-radius: 6px; }
+    .nt-menu-btn:hover { background: rgba(255,255,255,.12); }
+    .nt-menu-btn .bi { font-size: 22px; }
+    .nt-logo { display: inline-flex; align-items: center; text-decoration: none; color: inherit; font-weight: 800; font-size: 20px; }
+    .nt-logo img { height: 44px; width: auto; }
+    .nt-logo--pill { background: #fff; border-radius: 10px; padding: 3px 8px; }
+    .nt-logo--pill img { height: 40px; }
+    .nt-header__section { font-size: 22px; font-weight: 300; text-transform: uppercase; letter-spacing: .03em; color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nt-header--section .nt-header__inner { grid-template-columns: auto 1fr auto; }
+    .nt-header--section .nt-header__center { text-align: center; min-width: 0; }
+    .nt-header--section .nt-logo img { height: 36px; }
+
+    /* ── Menu lateral ── */
+    .nt-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 90; }
+    .nt-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 86vw); background: #fff; color: var(--nt-ink); z-index: 100; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2); padding: 8px 0 24px; }
+    .nt-drawer[hidden], .nt-overlay[hidden] { display: none; }
+    .nt-drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 12px; border-bottom: 1px solid var(--border); }
+    .nt-drawer__title { font-weight: 800; font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--color-primary); }
+    .nt-drawer__close { background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: var(--nt-gray); padding: 4px 8px; border-radius: 6px; }
+    .nt-drawer nav ul { list-style: none; margin: 0; padding: 0; }
+    .nt-drawer nav a { display: block; padding: 11px 20px; text-decoration: none; color: var(--nt-ink); font-weight: 600; font-size: 15px; }
+    .nt-drawer nav a:hover { background: var(--bg-alt); color: var(--color-primary); }
+    .nt-drawer nav .nt-drawer__sub a { padding-left: 36px; font-weight: 400; font-size: 14px; color: var(--nt-gray); }
+    .nt-drawer__sep { border-top: 1px solid var(--border); margin: 8px 0; }
+    .nt-drawer__cta { margin: 16px 20px 0; }
+    .nt-drawer__cta a { display: block; text-align: center; background: var(--color-primary); color: var(--nt-on-primary); border-radius: 8px; padding: 10px; font-weight: 700; text-decoration: none; }
+
+    /* ── Rodapé ── */
+    .nt-footer { background: var(--color-primary); color: var(--nt-on-primary); margin-top: 64px; }
+    .nt-footer a { color: inherit; text-decoration: none; }
+    .nt-footer a:hover { text-decoration: underline; }
+    .nt-footer__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 0 16px; flex-wrap: wrap; }
+    .nt-footer__brand { display: flex; align-items: center; gap: 20px; }
+    .nt-footer__social { display: flex; gap: 14px; font-size: 18px; }
+    .nt-footer__bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0 24px; font-size: 12px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,.15); }
+    .nt-footer__links { display: flex; flex-wrap: wrap; gap: 0; list-style: none; margin: 0; padding: 0; }
+    .nt-footer__links li + li::before { content: '|'; opacity: .5; margin: 0 8px; }
+    </style>
+    {% include 'themes/noticias/_news_styles.html.twig' %}
+    {% block stylesheets %}{% endblock %}
+
+    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ currentTenant.googleAnalyticsId|e('js') }}');
+    </script>
+    {% endif %}
+</head>
+<body>
+    <a class="nt-skip" href="#conteudo">Pular para o conteúdo</a>
+
+    {% include 'themes/noticias/_header.html.twig' with {header_section: block('header_section') is defined ? block('header_section')|trim : ''} %}
+
+    <main id="conteudo">
+        {% for msg in app.flashes('success') %}
+            <div class="nt-container"><div class="flash flash-success" role="status">{{ msg }}</div></div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="nt-container"><div class="flash flash-error" role="alert">{{ msg }}</div></div>
+        {% endfor %}
+        {% block body %}{% endblock %}
+    </main>
+
+    {% include 'themes/noticias/_footer.html.twig' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () { if (typeof AOS !== 'undefined') { AOS.init({ duration: 700, once: true, offset: 60 }); } }, 100);
+    });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

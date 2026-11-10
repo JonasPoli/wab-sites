@@ -1,0 +1,25 @@
+{# Item da lista de notícias. Variáveis: article, lead (destaque: imagem maior e linha fina). #}
+{% set lead = lead ?? false %}
+{% set url = path('pub_article_show', {slug: article.slug}) %}
+<article class="nt-item{{ lead ? ' nt-item--lead' : '' }}{{ article.coverImage ? '' : ' nt-item--nocover' }}">
+    {% if article.coverImage %}
+    <a class="nt-item__img" href="{{ url }}" tabindex="-1" aria-hidden="true">
+        <img src="{{ ('uploads/article/' ~ article.coverImage)|imagine_filter(lead ? 'hero_banner_mobile' : 'news_thumb') }}" alt="" loading="{{ lead ? 'eager' : 'lazy' }}">
+    </a>
+    {% endif %}
+    <div class="nt-item__body">
+        {% if article.kicker %}<p class="nt-kicker">{{ article.kicker }}</p>{% endif %}
+        <h2 class="nt-item__title"><a href="{{ url }}">{{ article.title }}</a></h2>
+        {% if lead and article.summary %}<p class="nt-item__summary">{{ article.summary }}</p>{% endif %}
+        {% if article.relatedLinks is not empty %}
+        <ul class="nt-related">
+            {% for link in article.relatedLinks %}
+                <li><a href="{{ link.url }}"{% if link.url starts with 'http' or link.url starts with '//' %} rel="noopener"{% endif %}>{{ link.label }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <p class="nt-meta">
+            <time datetime="{{ article.publishedAt|date('c') }}">{{ article.publishedAt|relative_time }}</time>{% if article.category %} — Em {{ article.category.name }}{% endif %}
+        </p>
+    </div>
+</article>

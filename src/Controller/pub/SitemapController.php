@@ -2,6 +2,7 @@
 
 namespace App\Controller\pub;
 
+use App\Repository\ArticleRepository;
 use App\Repository\PageRepository;
 use App\Service\TenantContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +16,7 @@ class SitemapController extends AbstractController
     public function __construct(
         private readonly TenantContext $tenantContext,
         private readonly PageRepository $pageRepository,
+        private readonly ArticleRepository $articleRepository,
     ) {}
 
     #[Route('/sitemap.xml', name: 'pub_sitemap', defaults: ['_format' => 'xml'])]
@@ -48,6 +50,18 @@ class SitemapController extends AbstractController
                 'priority'   => '0.8',
                 'lastmod'    => $page->getUpdatedAt()?->format('Y-m-d') ?? date('Y-m-d'),
             ];
+        }
+
+        // Portal de notícias: uma URL por notícia visível (publicada e com data no passado)
+        if ($tenant?->getTheme() === 'noticias') {
+            foreach ($this->articleRepository->findAllVisible() as $article) {
+                $urls[] = [
+                    'loc'        => $baseUrl . '/noticias/' . rawurlencode($article->getSlug()),
+                    'changefreq' => 'weekly',
+                    'priority'   => '0.7',
+                    'lastmod'    => $article->getUpdatedAt()->format('Y-m-d'),
+                ];
+            }
         }
 
         $xml = $this->renderSitemap($urls);

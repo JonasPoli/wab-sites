@@ -157,10 +157,11 @@
 {% endif %}
 
 <aside class="sb" id="sidebar">
-    <a href="{{ path('admin_dash') }}" class="sb-logo">
+    <a href="{% block sidebar_home_url %}{{ path('admin_dash') }}{% endblock %}" class="sb-logo">
         <div class="logo-dot">W</div> WAB Sites
     </a>
     <nav class="nav" aria-label="Admin">
+        {% block sidebar_nav %}
         <div class="nav-sec">Conteúdo</div>
         <a href="{{ path('admin_dash') }}" class="nl {% if app.request.pathInfo == '/admin' %}on{% endif %}">
             <sl-icon name="grid-fill"></sl-icon> Dashboard
@@ -171,6 +172,18 @@
         <a href="{{ path('admin_page_index') }}" class="nl {% if '/admin/page' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="file-text-fill"></sl-icon> Páginas
         </a>
+        {% if currentTenant and currentTenant.theme == 'noticias' %}
+        <a href="{{ path('admin_article_index') }}" class="nl {% if '/admin/noticias' in app.request.pathInfo %}on{% endif %}">
+            <sl-icon name="newspaper"></sl-icon> Notícias
+        </a>
+        {% if app.user and app.user.workGroup == 0 %}
+        {% set pendingAuthors = news_pending_authors() %}
+        <a href="{{ path('admin_author_index') }}" class="nl {% if '/admin/jornalistas' in app.request.pathInfo %}on{% endif %}">
+            <sl-icon name="person-badge-fill"></sl-icon> Jornalistas
+            {% if pendingAuthors > 0 %}<span class="nb" title="Candidatos pendentes">{{ pendingAuthors }}</span>{% endif %}
+        </a>
+        {% endif %}
+        {% endif %}
         <div class="nav-sec">Comunicação</div>
         <a href="{{ path('admin_contact_index') }}" class="nl {% if '/admin/contact' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="envelope-fill"></sl-icon> Contato
@@ -203,12 +216,13 @@
             <sl-icon name="person-fill-x"></sl-icon> Sair da impersonação
         </a>
         {% endif %}
+        {% endblock %}
     </nav>
     <div class="sb-user">
         <div class="av">{{ app.user ? app.user.name|first|upper : '?' }}</div>
         <div>
             <div class="av-name">{{ app.user ? app.user.name : '' }}</div>
-            <div class="av-role">{% if app.user %}{{ app.user.workGroup == 0 ? 'Admin' : 'Editor' }}{% endif %}</div>
+            <div class="av-role">{% block user_role %}{% if app.user %}{{ app.user.workGroup == 0 ? 'Admin' : 'Editor' }}{% endif %}{% endblock %}</div>
         </div>
         <a href="{{ path('app_logout') }}" class="av-logout" title="Sair"><sl-icon name="box-arrow-right" style="font-size:1.1rem"></sl-icon></a>
     </div>

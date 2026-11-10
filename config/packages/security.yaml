@@ -15,6 +15,8 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            # Checkers encadeados (tag security.user_checker.main), ex.: App\Security\JournalistStatusChecker
+            user_checker: security.user_checker.chain.main
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -28,6 +30,8 @@ security:
                 parameter: _switch_user
 
     access_control:
+        - { path: ^/jornalista/cadastro, roles: PUBLIC_ACCESS }
+        - { path: ^/jornalista, roles: ROLE_JOURNALIST }
         - { path: ^/superadmin, roles: ROLE_SUPER_ADMIN }
         - { path: ^/admin,      roles: ROLE_ADMIN }
 

@@ -15,6 +15,12 @@ liip_imagine:
             format: webp
             filters:
                 thumbnail: { size: [400, 220], mode: outbound }
+        # Miniaturas do portal de notícias ("Leia também", "Mais lidas", foto do autor)
+        news_square:
+            quality: 80
+            format: webp
+            filters:
+                thumbnail: { size: [160, 160], mode: outbound }
         product_list:
             quality: 80
             format: webp

@@ -1,0 +1,8 @@
+{% extends 'journalist/base.html.twig' %}
+{% block title %}Nova notícia{% endblock %}{% block page_title %}Nova notícia{% endblock %}
+{% block body %}
+<div class="ph"><h1>Nova notícia</h1><a href="{{ path('journalist_area') }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a></div>
+<div class="card">
+    {% include 'admin/article/_form.html.twig' with {staff: false, action: path('journalist_article_new'), cancel_path: path('journalist_area')} %}
+</div>
+{% endblock %}

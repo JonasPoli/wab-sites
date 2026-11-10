@@ -1,0 +1,31 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Jornalistas{% endblock %}{% block page_title %}Jornalistas{% endblock %}
+{% block body %}
+{% set tz = 'America/Sao_Paulo' %}
+<div class="ph"><h1>Jornalistas</h1></div>
+
+<div class="ta" style="margin-bottom:1rem;flex-wrap:wrap" role="navigation" aria-label="Filtrar por situação">
+    <a href="{{ path('admin_author_index') }}" class="btn btn-sm {{ status is null ? 'btn-p' : 'btn-g' }}">Todos</a>
+    {% for s in statuses %}
+        <a href="{{ path('admin_author_index', {situacao: s.value}) }}" class="btn btn-sm {{ status == s ? 'btn-p' : 'btn-g' }}">{{ s.label }}</a>
+    {% endfor %}
+</div>
+
+<div class="card"><div class="tw"><table class="at">
+    <thead><tr><th>Nome</th><th>E-mail</th><th>Veículo</th><th>Situação</th><th>Cadastro</th><th></th></tr></thead>
+    <tbody>
+    {% for a in authors %}
+    <tr>
+        <td style="font-weight:600">{{ a.name }}</td>
+        <td>{{ a.user ? a.user.email : '—' }}</td>
+        <td>{{ a.outlet ?? '—' }}</td>
+        <td><span class="badge {{ a.status.badgeClass }}">{{ a.status.label }}</span></td>
+        <td style="white-space:nowrap">{{ a.createdAt|date('d/m/Y H\\hi', tz) }}</td>
+        <td><a href="{{ path('admin_author_show', {id: a.id}) }}" class="btn btn-g btn-sm"><sl-icon name="eye-fill"></sl-icon> Ver ficha</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Nenhum jornalista{{ status ? ' com esta situação' : '' }}. Os candidatos se cadastram em <a href="{{ path('journalist_signup') }}" target="_blank" style="text-decoration:underline">/jornalista/cadastro</a>.</td></tr>
+    {% endfor %}
+    </tbody>
+</table></div></div>
+{% endblock %}

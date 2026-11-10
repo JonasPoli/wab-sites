@@ -1,0 +1,161 @@
+{#
+  Formulário de notícia, compartilhado pelo painel (/admin/noticias) e pela área
+  do jornalista (/jornalista). Variáveis:
+    article     — a notícia
+    errors      — lista de mensagens de erro
+    categories  — categorias raiz do site (com children)
+    authors     — autores para o seletor (só no painel)
+    staff       — true no painel: mostra slug, autor e "Leia também"
+    action      — URL do POST
+    cancel_path — URL do botão Cancelar
+#}
+{% set tz = 'America/Sao_Paulo' %}
+{% set otherIds = article.categories|map(c => c.id) %}
+
+{% if errors is not empty %}
+<div class="al al-err" role="alert">
+    <sl-icon name="x-circle-fill"></sl-icon>
+    <div>{% for e in errors %}<div>{{ e }}</div>{% endfor %}</div>
+</div>
+{% endif %}
+
+<form action="{{ action }}" method="post" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="_token" value="{{ csrf_token('article_form') }}">
+
+    <div class="af-row">
+        <div class="af-field">
+            <label for="a-title">Título <span class="req">*</span></label>
+            <input type="text" id="a-title" name="title" class="ai" value="{{ article.title }}" required maxlength="255">
+        </div>
+        {% if staff %}
+        <div class="af-field">
+            <label for="a-slug">Slug</label>
+            <input type="text" id="a-slug" name="slug" class="ai" value="{{ article.slug }}" placeholder="gerado a partir do título">
+            <p class="af-hint">Endereço: /noticias/<em>slug</em>. Se já existir no site, recebe -2, -3…</p>
+        </div>
+        {% else %}
+        <div class="af-field">
+            <label for="a-kicker">Chapéu</label>
+            <input type="text" id="a-kicker" name="kicker" class="ai" value="{{ article.kicker }}" maxlength="120" placeholder="Ex.: Eleições na AJoPE">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="af-row">
+        {% if staff %}
+        <div class="af-field">
+            <label for="a-kicker">Chapéu</label>
+            <input type="text" id="a-kicker" name="kicker" class="ai" value="{{ article.kicker }}" maxlength="120" placeholder="Ex.: Eleições na AJoPE">
+        </div>
+        {% endif %}
+        <div class="af-field">
+            <label for="a-category">Editoria principal</label>
+            <select id="a-category" name="categoryId" class="as">
+                <option value="">— Sem editoria —</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {{ article.category and article.category.id == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                    {% for sub in cat.children %}
+                    <option value="{{ sub.id }}" {{ article.category and article.category.id == sub.id ? 'selected' }}>— {{ sub.name }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+            <p class="af-hint">Aparece em "Em …" na lista e no cabeçalho da notícia.</p>
+        </div>
+    </div>
+
+    <div class="af-field">
+        <label for="a-summary">Linha fina</label>
+        <textarea id="a-summary" name="summary" class="ate" rows="2" style="min-height:70px">{{ article.summary }}</textarea>
+    </div>
+
+    {% if categories is not empty %}
+    <div class="af-field">
+        <label>Outras categorias</label>
+        <div class="af-group af-group--inline">
+            {% for cat in categories %}
+                <label class="af-check"><input type="checkbox" name="categoryIds[]" value="{{ cat.id }}" {{ cat.id in otherIds ? 'checked' }}> {{ cat.name }}</label>
+                {% for sub in cat.children %}
+                <label class="af-check"><input type="checkbox" name="categoryIds[]" value="{{ sub.id }}" {{ sub.id in otherIds ? 'checked' }}> {{ cat.name }} › {{ sub.name }}</label>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <p class="af-hint">A notícia também aparece na página dessas categorias. A editoria principal é obrigatória quando alguma estiver marcada.</p>
+    </div>
+    {% endif %}
+
+    <div class="af-row">
+        {% if staff %}
+        <div class="af-field">
+            <label for="a-author">Autor</label>
+            <select id="a-author" name="authorId" class="as">
+                <option value="">— Sem autor —</option>
+                {% for au in authors %}
+                <option value="{{ au.id }}" {{ article.author and article.author.id == au.id ? 'selected' }}>{{ au.name }}{{ au.approved ? '' : ' (' ~ au.status.label|lower ~ ')' }}</option>
+                {% endfor %}
+            </select>
+            <p class="af-hint">Só jornalistas aprovados. A linha "Por" some quando não há autor.</p>
+        </div>
+        {% endif %}
+        <div class="af-field">
+            <label for="a-published">Data e hora de publicação (Brasília)</label>
+            <input type="datetime-local" id="a-published" name="publishedAt" class="ai" value="{{ article.publishedAt|date('Y-m-d\\TH:i', tz) }}">
+            <p class="af-hint">Com data futura, a notícia publicada só aparece a partir desse horário.</p>
+        </div>
+        <div class="af-field">
+            <label for="a-status">Situação</label>
+            <select id="a-status" name="status" class="as">
+                <option value="rascunho" {{ article.status.value == 'rascunho' ? 'selected' }}>Rascunho</option>
+                <option value="publicada" {{ article.status.value == 'publicada' ? 'selected' }}>Publicada</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label for="a-cover">Imagem de capa</label>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                {% if article.coverImage %}
+                    <img src="{{ asset('uploads/article/' ~ article.coverImage) }}" alt="Capa atual" style="height:64px;border-radius:8px;object-fit:cover;max-width:120px">
+                {% endif %}
+                <input type="file" id="a-cover" name="coverImageFile" accept="image/*" class="ai" style="flex:1">
+            </div>
+        </div>
+        <div class="af-field">
+            <label for="a-caption">Legenda da foto</label>
+            <input type="text" id="a-caption" name="coverCaption" class="ai" value="{{ article.coverCaption }}" maxlength="255">
+        </div>
+        <div class="af-field">
+            <label for="a-credit">Crédito da foto</label>
+            <input type="text" id="a-credit" name="coverCredit" class="ai" value="{{ article.coverCredit }}" maxlength="255" placeholder="Ex.: Divulgação">
+        </div>
+    </div>
+
+    <div class="af-field">
+        <label>Texto</label>
+        {% include 'admin/_rich_editor.html.twig' with {field_id: 'article-body', field_name: 'body', content: article.body, height: 380} %}
+    </div>
+
+    <div class="af-field">
+        <label>Links relacionados (até 3)</label>
+        {% set links = article.relatedLinks %}
+        {% for i in 0..2 %}
+        <div class="af-row" style="margin-bottom:.5rem">
+            <input type="text" name="relatedLinks[{{ i }}][label]" class="ai" value="{{ links[i].label ?? '' }}" placeholder="Rótulo, ex.: Veja a pauta" aria-label="Rótulo do link {{ i + 1 }}">
+            <input type="text" name="relatedLinks[{{ i }}][url]" class="ai" value="{{ links[i].url ?? '' }}" placeholder="URL, ex.: exemplo.com.br/pauta" aria-label="URL do link {{ i + 1 }}">
+        </div>
+        {% endfor %}
+        <p class="af-hint">Aparecem com marcador abaixo do título na lista. Sem rótulo ou sem URL, a linha é ignorada.</p>
+    </div>
+
+    {% if staff %}
+    <label class="af-check">
+        <input type="checkbox" name="featured" value="1" {{ article.featured ? 'checked' }}>
+        Mostrar no quadro "Leia também" da home
+    </label>
+    {% endif %}
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ cancel_path }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>

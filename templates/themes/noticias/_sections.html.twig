@@ -1,0 +1,91 @@
+{#
+  Seções ativas de uma página ou categoria no tema noticias (variável: sections).
+  Mesmo laço do tema cetec (fundos, seção escura, fundos alternados e título em duas partes).
+#}
+{# ── Page Sections ── #}
+{% set undefinedSectionCount = 0 %}
+{% for section in sections %}{% if section.active %}
+
+    {# Detect if the section contains a banner block #}
+    {% set hasBanner = false %}
+    {% for block in section.blocks %}
+        {% if block.type == 'banner' %}
+            {% set hasBanner = true %}
+        {% endif %}
+    {% endfor %}
+
+    {# ── Background Style Construction ── #}
+    {% set sectionStyle = '' %}
+    {% set sectionClass = 'cetec-section py-16 border-b border-gray-100 dark:border-white/5 relative' %}
+    {% if hasBanner %}
+        {% set sectionClass = sectionClass ~ ' section-has-banner' %}
+    {% endif %}
+    {% set isDark = false %}
+    {% if section.bgType in ['image', 'video', 'gradient'] %}
+        {% set isDark = true %}
+    {% elseif section.bgType == 'color' and section.bgColor %}
+        {% set isDark = is_dark_color(section.bgColor) %}
+    {% endif %}
+
+    {% if isDark %}
+        {% set sectionClass = sectionClass ~ ' mp-section-dark text-white' %}
+    {% endif %}
+
+    {% set bgNotDefined = (section.bgType == 'none' or section.bgType is empty or (section.bgType == 'color' and not section.bgColor)) %}
+    {% if bgNotDefined %}
+        {% set undefinedSectionCount = undefinedSectionCount + 1 %}
+        {% if undefinedSectionCount % 2 == 1 %}
+            {% set sectionClass = sectionClass ~ ' auto-bg-a' %}
+        {% else %}
+            {% set sectionClass = sectionClass ~ ' auto-bg-b' %}
+        {% endif %}
+    {% endif %}
+
+    {% if section.bgType == 'color' and section.bgColor %}
+        {% set sectionStyle = 'background-color:' ~ section.bgColor %}
+    {% elseif section.bgType == 'gradient' and section.bgGradient %}
+        {% set sectionStyle = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+    {% elseif section.bgType in ['image', 'video'] %}
+        {% set sectionStyle = 'position:relative;overflow:hidden' %}
+    {% endif %}
+
+    <section id="section-{{ section.id }}" class="{{ sectionClass }}" style="{{ sectionStyle }}">
+        {# Background Image layer #}
+        {% if section.bgType == 'image' and section.bgImage %}
+            <div class="absolute inset-0 bg-cover bg-center pointer-events-none" 
+                 style="background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}'); background-position:{{ section.bgImagePosition }}; opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;"></div>
+        {% endif %}
+        
+        {# Background Video layer #}
+        {% if section.bgType == 'video' and section.bgVideo %}
+            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none" style="z-index:0">
+                <source src="{{ asset('uploads/section/video/' ~ section.bgVideo) }}" type="video/mp4">
+            </video>
+            {% if section.bgColor %}
+                <div class="absolute inset-0 pointer-events-none" style="background:{{ section.bgColor }}; opacity:.5; z-index:1"></div>
+            {% endif %}
+        {% endif %}
+
+        <div class="container mx-auto px-4 relative z-10">
+            {# Two-tone Section Title #}
+            {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
+                <div class="flex flex-wrap justify-center mb-12 rounded-lg overflow-hidden text-center max-w-2xl mx-auto shadow-md">
+                    {% if section.titlePart1 %}
+                        <span class="bg-cetec-dark text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart1 }}</span>
+                    {% endif %}
+                    {% if section.titlePart2 %}
+                        <span class="bg-cetec-secondary text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart2 }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Blocks Renderer #}
+            <div class="space-y-12">
+                {% for block in section.blocks %}
+                    {% include 'themes/noticias/_block.html.twig' %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+{% endif %}{% endfor %}

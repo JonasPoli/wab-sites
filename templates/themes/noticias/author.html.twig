@@ -1,0 +1,35 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{% block title %}{{ author.name }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
+{% block meta_description %}{% if author.bio %}<meta name="description" content="{{ author.bio|striptags|slice(0, 160) }}">{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ url('pub_author', page > 1 ? {slug: author.slug, pagina: page} : {slug: author.slug}) }}">{% endblock %}
+
+{% block body %}
+<div class="nt-container nt-page">
+    <div class="nt-layout">
+        <div class="nt-feed">
+            <header class="nt-author{{ author.photo ? '' : ' nt-author--nophoto' }}">
+                {% if author.photo %}
+                    <img src="{{ ('uploads/author/' ~ author.photo)|imagine_filter('news_square') }}" alt="Foto de {{ author.name }}">
+                {% endif %}
+                <div>
+                    <h1>{{ author.name }}</h1>
+                    {% if author.outlet or author.city %}
+                        <p class="nt-author__meta">{{ [author.outlet, author.city]|filter(v => v)|join(' · ') }}</p>
+                    {% endif %}
+                    {% if author.bio %}<p class="nt-author__bio">{{ author.bio }}</p>{% endif %}
+                </div>
+            </header>
+            {% for a in articles %}
+                {% include 'themes/noticias/_article_item.html.twig' with {article: a} %}
+            {% else %}
+                <p class="nt-empty">Nenhuma notícia publicada por {{ author.name }} ainda.</p>
+            {% endfor %}
+            {% include 'themes/noticias/_pagination.html.twig' with {route: 'pub_author', params: {slug: author.slug}} %}
+        </div>
+        <aside class="nt-sidebar" aria-label="Destaques">
+            {% include 'themes/noticias/_most_read.html.twig' %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

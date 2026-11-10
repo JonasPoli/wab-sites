@@ -1,0 +1,82 @@
+{% extends 'journalist/base.html.twig' %}
+{% block title %}Meu perfil{% endblock %}{% block page_title %}Meu perfil{% endblock %}
+{% block body %}
+<div class="ph">
+    <h1>Meu perfil</h1>
+    <a href="{{ path('pub_author', {slug: author.slug}) }}" target="_blank" class="btn btn-g"><sl-icon name="box-arrow-up-right"></sl-icon> Ver minha página</a>
+</div>
+
+{% if errors is not empty %}
+<div class="al al-err" role="alert"><sl-icon name="x-circle-fill"></sl-icon><div>{% for e in errors %}<div>{{ e }}</div>{% endfor %}</div></div>
+{% endif %}
+
+<div class="card">
+<form method="post" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="_token" value="{{ csrf_token('journalist_profile') }}">
+
+    <div class="af-row">
+        <div class="af-field">
+            <label>E-mail (login)</label>
+            <input type="text" class="ai" value="{{ app.user.email }}" disabled>
+            <p class="af-hint">O e-mail e o endereço da sua página não mudam por aqui.</p>
+        </div>
+        <div class="af-field">
+            <label>Situação</label>
+            <div><span class="badge {{ author.status.badgeClass }}">{{ author.status.label }}</span></div>
+        </div>
+    </div>
+
+    <div class="af-row">
+        <div class="af-field">
+            <label for="p-name">Nome <span class="req">*</span></label>
+            <input type="text" id="p-name" name="name" class="ai" value="{{ author.name }}" required maxlength="150">
+        </div>
+        <div class="af-field">
+            <label for="p-phone">Telefone</label>
+            <input type="text" id="p-phone" name="phone" class="ai" value="{{ author.phone }}" maxlength="40">
+        </div>
+    </div>
+    <div class="af-row">
+        <div class="af-field">
+            <label for="p-reg">Registro profissional</label>
+            <input type="text" id="p-reg" name="professionalRegistration" class="ai" value="{{ author.professionalRegistration }}" maxlength="60">
+        </div>
+        <div class="af-field">
+            <label for="p-outlet">Veículo onde atua</label>
+            <input type="text" id="p-outlet" name="outlet" class="ai" value="{{ author.outlet }}" maxlength="150">
+        </div>
+    </div>
+    <div class="af-row">
+        <div class="af-field">
+            <label for="p-city">Cidade</label>
+            <input type="text" id="p-city" name="city" class="ai" value="{{ author.city }}" maxlength="120">
+        </div>
+        <div class="af-field">
+            <label for="p-photo">Foto</label>
+            <div style="display:flex;align-items:center;gap:1rem">
+                {% if author.photo %}<img src="{{ asset('uploads/author/' ~ author.photo) }}" alt="Foto atual" style="width:56px;height:56px;border-radius:50%;object-fit:cover">{% endif %}
+                <input type="file" id="p-photo" name="photo" accept="image/*" class="ai" style="flex:1">
+            </div>
+        </div>
+    </div>
+    <div class="af-field">
+        <label for="p-bio">Minibio</label>
+        <textarea id="p-bio" name="bio" class="ate" maxlength="{{ bio_max }}">{{ author.bio }}</textarea>
+        <p class="af-hint">Até {{ bio_max }} caracteres.</p>
+    </div>
+
+    <details>
+        <summary style="cursor:pointer;font-weight:600;color:var(--muted);font-size:.85rem">Trocar a senha</summary>
+        <div class="af-row" style="margin-top:1rem">
+            <div class="af-field"><label for="p-cur">Senha atual</label><input type="password" id="p-cur" name="currentPassword" class="ai" autocomplete="current-password"></div>
+            <div class="af-field"><label for="p-new">Nova senha</label><input type="password" id="p-new" name="newPassword" class="ai" minlength="8" autocomplete="new-password"></div>
+            <div class="af-field"><label for="p-new2">Confirme a nova senha</label><input type="password" id="p-new2" name="newPasswordConfirm" class="ai" minlength="8" autocomplete="new-password"></div>
+        </div>
+    </details>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+    </div>
+</form>
+</div>
+{% endblock %}

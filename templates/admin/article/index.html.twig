@@ -1,0 +1,49 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Notícias{% endblock %}{% block page_title %}Notícias{% endblock %}
+{% block body %}
+{% set tz = 'America/Sao_Paulo' %}
+<div class="ph">
+    <h1>Notícias <span class="badge bg-neu">{{ total }}</span></h1>
+    <a href="{{ path('admin_article_new') }}" class="btn btn-p"><sl-icon name="plus-lg"></sl-icon> Nova notícia</a>
+</div>
+<div class="card"><div class="tw"><table class="at">
+    <thead><tr><th>Título</th><th>Editoria</th><th>Autor</th><th>Situação</th><th>Publicação</th><th title="Visualizações">Visualizações</th><th></th></tr></thead>
+    <tbody>
+    {% for a in articles %}
+    <tr>
+        <td style="font-weight:600;max-width:380px">
+            {{ a.title }}
+            {% if a.featured %}<span class="badge bg-inf" title="Leia também">Leia também</span>{% endif %}
+        </td>
+        <td>{% if a.category %}<span class="badge bg-inf">{{ a.category.name }}</span>{% else %}<span style="color:var(--muted)">—</span>{% endif %}</td>
+        <td>{{ a.author ? a.author.name : '—' }}</td>
+        <td>
+            <span class="badge {{ a.status.badgeClass }}">{{ a.status.label }}</span>
+            {% if a.published and not a.visible %}<span class="badge bg-warn">Agendada</span>{% endif %}
+        </td>
+        <td style="white-space:nowrap">{{ a.publishedAt|date('d/m/Y H\\hi', tz) }}</td>
+        <td>{{ a.viewCount }}</td>
+        <td><div class="ta">
+            {% if a.visible %}
+            <a href="{{ path('pub_article_show', {slug: a.slug}) }}" target="_blank" class="btn btn-g btn-sm" title="Ver no site"><sl-icon name="box-arrow-up-right"></sl-icon></a>
+            {% endif %}
+            <a href="{{ path('admin_article_edit', {id: a.id}) }}" class="btn btn-g btn-sm" title="Editar"><sl-icon name="pencil-fill"></sl-icon></a>
+            <form action="{{ path('admin_article_delete', {id: a.id}) }}" method="post" onsubmit="return confirm('Excluir esta notícia?')" style="display:inline">
+                <input type="hidden" name="_token" value="{{ csrf_token('del_article_' ~ a.id) }}">
+                <button class="btn btn-d btn-sm" title="Excluir"><sl-icon name="trash-fill"></sl-icon></button>
+            </form>
+        </div></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">Nenhuma notícia.</td></tr>
+    {% endfor %}
+    </tbody>
+</table></div></div>
+{% if pages > 1 %}
+<div class="ta" style="margin-top:1rem;justify-content:center">
+    {% if page > 1 %}<a class="btn btn-g btn-sm" href="{{ path('admin_article_index', {pagina: page - 1}) }}">← Anteriores</a>{% endif %}
+    <span style="color:var(--muted);align-self:center">Página {{ page }} de {{ pages }}</span>
+    {% if page < pages %}<a class="btn btn-g btn-sm" href="{{ path('admin_article_index', {pagina: page + 1}) }}">Seguintes →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

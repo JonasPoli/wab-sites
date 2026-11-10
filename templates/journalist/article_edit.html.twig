@@ -1,0 +1,16 @@
+{% extends 'journalist/base.html.twig' %}
+{% block title %}Editar notícia{% endblock %}{% block page_title %}Editar notícia{% endblock %}
+{% block body %}
+<div class="ph">
+    <h1>Editar notícia</h1>
+    <div class="ta">
+        {% if article.visible %}
+        <a href="{{ path('pub_article_show', {slug: article.slug}) }}" target="_blank" class="btn btn-g"><sl-icon name="box-arrow-up-right"></sl-icon> Ver no site</a>
+        {% endif %}
+        <a href="{{ path('journalist_area') }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a>
+    </div>
+</div>
+<div class="card">
+    {% include 'admin/article/_form.html.twig' with {staff: false, action: path('journalist_article_edit', {id: article.id}), cancel_path: path('journalist_area')} %}
+</div>
+{% endblock %}
