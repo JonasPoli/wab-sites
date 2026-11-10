@@ -86,9 +86,9 @@ Alternativa considerada: ligar o filtro com o id do tenant do registro editado. 
 
 `editorIndex`, `editorNew` e `editorDelete` passam a usar o tenant do `TenantContext`. Para quem não é SuperAdmin, ele é igual ao tenant do usuário (decisões 1 e 2); para o SuperAdmin, corrige o caso atual em que editores eram gravados sem tenant. `editorNew` aceita só `workGroup` 1 ou 2 (outro valor vira 1); `editorDelete` só apaga usuário com `workGroup` 1 ou 2 do tenant do domínio.
 
-### 8. Usuário id 19 deixa de ser SuperAdmin
+### 8. Usuário id 19 continua SuperAdmin
 
-Com o login restrito, um SuperAdmin continua entrando em todos os sites e no `/superadmin`. O usuário id 19 tem o nome da Pet Vida e hoje é SuperAdmin só porque está sem tenant. A correção é de dado, não de código: com aprovação do Jonas, editar o usuário no `/superadmin`, escolher o tenant 7 e manter `workGroup` 0 (admin do site), ou o valor que o Jonas indicar. Feita pelo formulário, sem SQL, com backup antes e conferência depois (tasks). Deve ir ao ar junto com o deploy, ou antes dele.
+O usuário id 19 tem o nome da Pet Vida e é SuperAdmin porque está sem tenant. Em 09/11/2026 o Jonas confirmou que isso é intencional. Com o login restrito, ele continua entrando em todos os sites e no `/superadmin`, como qualquer SuperAdmin. Nenhuma correção de dado.
 
 ### Como o isolamento fica garantido
 
@@ -113,7 +113,7 @@ Com o login restrito, um SuperAdmin continua entrando em todos os sites e no `/s
 ## Migration Plan
 
 1. Implementar e conferir em `127.0.0.1` e `localhost` com as fixtures (dois tenants, sessões separadas por host).
-2. Produção, com aprovação do Jonas (escrita): anotar o commit atual e fazer backup do banco; corrigir o usuário id 19 (decisão 8); `git pull` e `bin/console cache:clear` (só PHP e configuração; se algum template mudar, `./build.sh`); sem migration.
+2. Produção, com aprovação do Jonas (escrita): anotar o commit atual e fazer backup do banco; `git pull` e `bin/console cache:clear` (só PHP e configuração; se algum template mudar, `./build.sh`); sem migration.
 3. Conferência: HTTP 200 dos 8 domínios, `/login` 200, `/membro/<slug-inexistente>` 404, `/superadmin` redireciona para o login, e o Jonas abre a edição de um tenant pelo domínio de outro e vê a lista de páginas (sem salvar).
 4. Volta: `git checkout <commit anotado>` e `cache:clear`. Não há dado a desfazer.
 
