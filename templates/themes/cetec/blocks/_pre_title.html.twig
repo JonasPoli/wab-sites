@@ -1,0 +1,14 @@
+{#
+  Pré-título do bloco (block.preTitle). Até 40 caracteres: a pílula de rótulo curto de sempre.
+  Acima disso (frase longa): destaque legível, sem caixa alta e com espaço interno
+  (pre-titulo-longo-nos-blocos). Usado pelos blocos do cetec, que o tema noticias também usa.
+#}
+{% if text|length > 40 %}
+            <span class="inline-block max-w-3xl bg-cetec-secondary/20 text-cetec-primary dark:text-white px-5 py-3 rounded-xl text-sm md:text-base font-semibold leading-relaxed mb-4">
+                {{ text }}
+            </span>
+{% else %}
+            <span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                {{ text }}
+            </span>
+{% endif %}

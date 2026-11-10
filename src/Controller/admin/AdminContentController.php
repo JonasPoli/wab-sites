@@ -467,6 +467,7 @@ class AdminContentController extends AbstractController
         $section->setTitlePart2($r->request->get('titlePart2') ?: null);
         $section->setActive((bool) $r->request->get('active'));
         $section->setShowInMenu((bool) $r->request->get('showInMenu'));
+        $section->setShowTitle((bool) $r->request->get('showTitle'));
         
         // Background type and cleanups
         $bgType = $r->request->get('bgType', 'none');

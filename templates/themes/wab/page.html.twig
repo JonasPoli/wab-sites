@@ -102,7 +102,7 @@
 
     <div class="container" style="position:relative;z-index:2">
         {# Two-part colored title #}
-        {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
+        {% if (currentTenant.showSectionTitles ?? true) and section.showTitle and (section.titlePart1 or section.titlePart2) %}
         <div class="section-two-tone-title reveal-up">
             {% if section.titlePart1 %}
                 <span class="title-secondary">{{ section.titlePart1 }}</span>

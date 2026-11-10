@@ -67,7 +67,7 @@
     {% endif %}
 
     <div class="container" style="position:relative;z-index:2">
-        {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
+        {% if (currentTenant.showSectionTitles ?? true) and section.showTitle and (section.titlePart1 or section.titlePart2) %}
         <div class="mp-two-tone">
             {% if section.titlePart1 %}<span class="mp-t1">{{ section.titlePart1 }}</span>{% endif %}
             {% if section.titlePart2 %}<span class="mp-t2">{{ section.titlePart2 }}</span>{% endif %}

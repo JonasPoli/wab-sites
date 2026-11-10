@@ -1,0 +1,10 @@
+# Tarefas: titulo-da-secao-opcional
+
+- [x] 1.1 Criar o campo `showTitle` e a migration (só o `ADD show_title`, com padrão 1). Aplicar no local e conferir que as seções existentes ficaram com 1. (10/11/2026: `Version20261110205446` só com `ADD show_title TINYINT(1) DEFAULT 1 NOT NULL`; as 18 seções locais ficaram com 1)
+- [x] 1.2 Pôr a caixa no `new` e no `edit`, gravar no `populateSection()` e mostrar o selo na lista. Conferir pelo `/admin` local: desmarcar e salvar grava 0, e ao reabrir a caixa vem desmarcada; seção nova nasce marcada; a lista mostra "título oculto". (10/11/2026, Playwright como `admin` de `127.0.0.1`: seção 80 desmarcada e salva → `show_title` 0, e ao reabrir a caixa vem desmarcada; seção nova (82) nasce marcada e grava 1; a lista da página mostra o selo "título oculto")
+- [x] 1.3 Condição `section.showTitle` nos sete templates. Conferir: (10/11/2026: `/p/teste-secao` local sem o "Quem | Somos" e com o bloco; os `_header` (menu) não mudaram; com a caixa marcada, o HTML de uma página no wab, no moderno, no noticias (`/p/sobre`) e no cetec (`localhost` trocado por script e devolvido) ficou igual ao de antes, a menos do id da barra do Symfony e do token CSRF)
+  - a página local com a seção desmarcada fica sem o título e com os blocos;
+  - o menu do Modo Landing Page continua com a seção;
+  - o HTML de uma página de cada tema (cetec, moderno, wab, noticias) com a caixa marcada fica igual ao de antes.
+- [x] 1.4 Duplicação, exportação e importação com o campo. Conferir duplicando uma seção desmarcada (a cópia vem desmarcada) e lendo o `metadata.json` exportado. (10/11/2026: duplicar a seção 80 pelo painel criou a 83, também com 0, porque o `DuplicatorService` usa `clone`; o `metadata.json` exportado de `127.0.0.1` traz `showTitle` false na "Quem" e true na "Nova")
+- [ ] 2.1 Produção (escrita, com aprovação do Jonas): backup (HEAD e dump), `git pull`, migration e `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope. A seção 77 do ajope continua com o título até o Jonas desmarcar.

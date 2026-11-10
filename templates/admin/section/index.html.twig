@@ -42,6 +42,7 @@
                 {% if section.titlePart1 and section.titlePart2 %} / {% endif %}
                 {% if section.titlePart2 %}<span style="color:var(--primary)">{{ section.titlePart2 }}</span>{% endif %}
                 {% if not section.titlePart1 and not section.titlePart2 %}<span style="color:var(--muted)">(sem título)</span>{% endif %}
+                {% if not section.showTitle and (section.titlePart1 or section.titlePart2) %}<span class="badge bg-neu" title="O título não aparece na página">título oculto</span>{% endif %}
             </div>
             <div style="font-size:.78rem;color:var(--muted)">{{ section.blocks|length }} bloco(s)</div>
         </div>

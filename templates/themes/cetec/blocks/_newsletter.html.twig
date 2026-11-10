@@ -5,7 +5,7 @@
     
     <div class="relative z-10 {{ has_blurbs ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center' : 'max-w-2xl mx-auto text-center' }}">
         <div class="{{ not has_blurbs ? 'flex flex-col items-center' : '' }}">
-            {% if block.preTitle %}<span class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ block.preTitle }}</span>{% endif %}
+            {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
             {% if block.title %}<h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-cetec-primary">{{ block.title }}</h2>{% endif %}
             {% if block.text %}<p class="text-gray-300 text-sm md:text-base mb-8 leading-relaxed {{ has_blurbs ? 'max-w-lg' : 'max-w-2xl mx-auto' }}">{{ block.text }}</p>{% endif %}
             

@@ -160,7 +160,7 @@
 
         <div class="container mx-auto px-4 relative z-10">
             {# Two-tone Section Title #}
-            {% if (currentTenant.showSectionTitles ?? true) and (section.titlePart1 or section.titlePart2) %}
+            {% if (currentTenant.showSectionTitles ?? true) and section.showTitle and (section.titlePart1 or section.titlePart2) %}
                 <div class="flex flex-wrap justify-center mb-12 rounded-lg overflow-hidden text-center max-w-2xl mx-auto shadow-md">
                     {% if section.titlePart1 %}
                         <span class="bg-cetec-dark text-white px-6 py-2.5 font-extrabold text-lg flex-1 md:flex-none">{{ section.titlePart1 }}</span>

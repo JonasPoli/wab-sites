@@ -45,6 +45,10 @@ class PageSection
     #[ORM\Column(options: ['default' => true])]
     private bool $showInMenu = true;
 
+    /** Mostrar o título em duas cores (titlePart1/titlePart2) na página; o menu não depende disto */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $showTitle = true;
+
     // ── Background ────────────────────────────────────────────────────────────
 
     /** none | color | gradient | image | video */
@@ -115,6 +119,10 @@ class PageSection
 
     public function isActive(): bool { return $this->active; }
     public function setActive(bool $active): static { $this->active = $active; return $this; }
+
+    public function isShowTitle(): bool { return $this->showTitle; }
+    public function getShowTitle(): bool { return $this->showTitle; }
+    public function setShowTitle(bool $showTitle): static { $this->showTitle = $showTitle; return $this; }
 
     public function isShowInMenu(): bool { return $this->showInMenu; }
     public function getShowInMenu(): bool { return $this->showInMenu; }
