@@ -117,8 +117,9 @@
                 {% if article.coverImage %}
                     <img src="{{ asset('uploads/article/' ~ article.coverImage) }}" alt="Capa atual" style="height:64px;border-radius:8px;object-fit:cover;max-width:120px">
                 {% endif %}
-                <input type="file" id="a-cover" name="coverImageFile" accept="image/*" class="ai" style="flex:1">
+                <input type="file" id="a-cover" name="coverImageFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="ai" style="flex:1">
             </div>
+            <p class="af-hint" style="margin-top:.3rem">JPG ou PNG.</p>
         </div>
         <div class="af-field">
             <label for="a-caption">Legenda da foto</label>
@@ -133,6 +134,12 @@
     <div class="af-field">
         <label>Texto</label>
         {% include 'admin/_rich_editor.html.twig' with {field_id: 'article-body', field_name: 'body', content: article.body, height: 380} %}
+    </div>
+
+    <div class="af-field">
+        <label for="a-video">Vídeo do YouTube (link)</label>
+        <input type="url" id="a-video" name="videoUrl" class="ai" value="{{ article.videoUrl }}" maxlength="255" inputmode="url" placeholder="https://youtu.be/…">
+        <p class="af-hint" style="margin-top:.3rem">Opcional. Cole o link do vídeo no YouTube; ele aparece no fim do texto da notícia.</p>
     </div>
 
     <div class="af-field">

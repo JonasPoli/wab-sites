@@ -12,6 +12,7 @@ use App\Service\ArticleFormHandler;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\ImageFormats;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,7 +114,7 @@ class JournalistAreaController extends AbstractController
     }
 
     #[Route('/perfil', name: 'journalist_profile', methods: ['GET', 'POST'])]
-    public function profile(Request $r, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
+    public function profile(Request $r, EntityManagerInterface $em, UserPasswordHasherInterface $hasher, ImageFormats $imageFormats): Response
     {
         $author = $this->currentAuthor();
         /** @var User $user */
@@ -164,8 +165,11 @@ class JournalistAreaController extends AbstractController
                 }
 
                 $photo = $r->files->get('photo');
-                if ($photo instanceof UploadedFile && (!$photo->isValid() || !str_starts_with((string) $photo->getMimeType(), 'image/') || $photo->getSize() > 5 * 1024 * 1024)) {
+                if ($photo instanceof UploadedFile && (!$photo->isValid() || $photo->getSize() > 5 * 1024 * 1024)) {
                     $errors[] = 'A foto precisa ser uma imagem de até 5 MB.';
+                    $photo = null;
+                } elseif ($photo instanceof UploadedFile && !$imageFormats->acceptsUpload($photo)) {
+                    $errors[] = ImageFormats::UPLOAD_MESSAGE;
                     $photo = null;
                 }
 

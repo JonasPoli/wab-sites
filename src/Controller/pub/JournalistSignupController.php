@@ -6,6 +6,7 @@ use App\Entity\Author;
 use App\Entity\User;
 use App\Repository\AuthorRepository;
 use App\Repository\UserRepository;
+use App\Service\ImageFormats;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,6 +40,7 @@ class JournalistSignupController extends AbstractController
         AuthorRepository $authors,
         UserPasswordHasherInterface $hasher,
         SluggerInterface $slugger,
+        ImageFormats $imageFormats,
     ): Response {
         $tenant = $this->tenantContext->getTenant();
         if ($tenant?->getTheme() !== 'noticias') {
@@ -105,8 +107,11 @@ class JournalistSignupController extends AbstractController
             }
             $photo = $r->files->get('photo');
             if ($photo instanceof UploadedFile) {
-                if (!$photo->isValid() || !str_starts_with((string) $photo->getMimeType(), 'image/') || $photo->getSize() > self::MAX_PHOTO_BYTES) {
+                if (!$photo->isValid() || $photo->getSize() > self::MAX_PHOTO_BYTES) {
                     $errors[] = 'A foto precisa ser uma imagem de até 5 MB.';
+                    $photo = null;
+                } elseif (!$imageFormats->acceptsUpload($photo)) {
+                    $errors[] = ImageFormats::UPLOAD_MESSAGE;
                     $photo = null;
                 }
             } else {

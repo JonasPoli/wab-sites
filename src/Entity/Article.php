@@ -95,6 +95,10 @@ class Article implements TenantAwareInterface
     #[ORM\Column(type: Types::JSON)]
     private array $relatedLinks = [];
 
+    /** Vídeo do YouTube, gravado como https://www.youtube.com/watch?v=<id> (player no fim da notícia) */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $videoUrl = null;
+
     /** Marcada para o quadro "Leia também" (só a equipe do painel altera) */
     #[ORM\Column(options: ['default' => false])]
     private bool $featured = false;
@@ -205,6 +209,42 @@ class Article implements TenantAwareInterface
     {
         $this->relatedLinks = array_slice(array_values($relatedLinks), 0, self::MAX_RELATED_LINKS);
         return $this;
+    }
+
+    public function getVideoUrl(): ?string { return $this->videoUrl; }
+    public function setVideoUrl(?string $videoUrl): static { $this->videoUrl = $videoUrl; return $this; }
+
+    /** Id do vídeo do YouTube gravado (para o player), ou null. */
+    public function getVideoId(): ?string { return self::youtubeId($this->videoUrl); }
+
+    /**
+     * Id (11 caracteres) de um link de vídeo do YouTube: watch?v=, youtu.be/, /shorts/, /live/
+     * e /embed/, com ou sem www. e m.; link sem esquema ganha https://. Outro link: null.
+     */
+    public static function youtubeId(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+        if (!preg_match('~^[a-z][a-z0-9+.-]*://~i', $url)) {
+            $url = 'https://' . $url;
+        }
+        $parts = parse_url($url);
+        $host = strtolower($parts['host'] ?? '');
+        $path = $parts['path'] ?? '';
+        $id = null;
+        if ($host === 'youtu.be') {
+            $id = explode('/', trim($path, '/'))[0] ?? null;
+        } elseif (in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'www.youtube-nocookie.com', 'youtube-nocookie.com'], true)) {
+            if (rtrim($path, '/') === '/watch') {
+                parse_str($parts['query'] ?? '', $query);
+                $id = is_string($query['v'] ?? null) ? $query['v'] : null;
+            } elseif (preg_match('~^/(?:shorts|live|embed)/([^/]+)~', $path, $m)) {
+                $id = $m[1];
+            }
+        }
+        return ($id !== null && preg_match('/^[A-Za-z0-9_-]{11}$/', $id)) ? $id : null;
     }
 
     public function isFeatured(): bool { return $this->featured; }

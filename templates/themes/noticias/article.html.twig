@@ -49,6 +49,12 @@
         <div class="nt-body">{{ article.body|raw }}</div>
         {% endif %}
 
+        {% if article.videoId %}
+        <figure class="nt-video">
+            <iframe src="https://www.youtube-nocookie.com/embed/{{ article.videoId|e('url') }}" title="Vídeo: {{ article.title }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </figure>
+        {% endif %}
+
         <p class="nt-article__end">
             {{ article.publishedAt|date('j', tz) }} de {{ months[article.publishedAt|date('n', tz) - 1] }} de {{ article.publishedAt|date('Y', tz) }} às {{ article.publishedAt|date('H:i', tz) }}
         </p>

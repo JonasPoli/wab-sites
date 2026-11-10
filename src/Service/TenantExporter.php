@@ -506,6 +506,7 @@ class TenantExporter
                 'publishedAt'  => $a->getPublishedAt()->format(\DateTimeInterface::ATOM),
                 'relatedLinks' => $a->getRelatedLinks(),
                 'featured'     => $a->isFeatured(),
+                'videoUrl'     => $a->getVideoUrl(),
                 'createdAt'    => $a->getCreatedAt()->format(\DateTimeInterface::ATOM),
                 'updatedAt'    => $a->getUpdatedAt()->format(\DateTimeInterface::ATOM),
                 'sample'       => $a->isSample(),

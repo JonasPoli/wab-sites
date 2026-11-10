@@ -10,7 +10,7 @@
         <div class="nt-feed">
             <header class="nt-author{{ author.photo ? '' : ' nt-author--nophoto' }}">
                 {% if author.photo %}
-                    <img src="{{ ('uploads/author/' ~ author.photo)|imagine_filter('news_square') }}" alt="Foto de {{ author.name }}">
+                    <img src="{{ ('uploads/author/' ~ author.photo)|news_image('news_square') }}" alt="Foto de {{ author.name }}">
                 {% endif %}
                 <div>
                     <h1>{{ author.name }}</h1>

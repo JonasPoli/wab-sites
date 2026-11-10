@@ -75,7 +75,7 @@
             <label for="p-photo">Foto</label>
             <div style="display:flex;align-items:center;gap:1rem">
                 {% if author.photo %}<img src="{{ asset('uploads/author/' ~ author.photo) }}" alt="Foto atual" style="width:56px;height:56px;border-radius:50%;object-fit:cover">{% endif %}
-                <input type="file" id="p-photo" name="photo" accept="image/*" class="ai" style="flex:1">
+                <input type="file" id="p-photo" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="ai" style="flex:1">
             </div>
         </div>
     </div>

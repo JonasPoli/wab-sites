@@ -12,10 +12,9 @@ Hoje o envio da capa (`/admin` e área do jornalista) e da foto do jornalista (c
 
 ## What Changes
 
-- **No envio, só os formatos que o servidor converte.** A capa da notícia e a foto do jornalista passam a aceitar só os formatos que o PHP do servidor consegue abrir: hoje JPG, PNG, WebP e GIF.
-  - Um formato fora da lista (AVIF, HEIC, BMP, SVG…) volta com "A imagem precisa ser JPG, PNG, WebP ou GIF." e não é gravado.
-  - O seletor de arquivo passa a sugerir esses formatos.
-  - Se um dia o servidor ganhar suporte a AVIF, ele entra na lista sem mudar o código.
+- **No envio, só JPG e PNG** (decisão do Jonas em 10/11/2026: "só permita o upload de png, jpeg, jpg"). A capa da notícia e a foto do jornalista passam a aceitar só arquivos com a extensão `.jpg`, `.jpeg` ou `.png` (maiúsculas ou minúsculas) e com o conteúdo JPEG ou PNG.
+  - Qualquer outro formato (AVIF, HEIC, WebP, GIF, BMP, SVG…) volta com "A imagem precisa ser JPG ou PNG." e não é gravado.
+  - O seletor de arquivo passa a sugerir só esses formatos.
 - **Imagem já gravada que o servidor não converte:** em vez da miniatura, o tema mostra o arquivo original, com o mesmo recorte por CSS. Isso vale para a lista de notícias (home, editoria, `/noticias`, página do autor), "Mais lidas", "Leia também" e a foto do autor. A capa AVIF que já está no ar volta a aparecer sem nenhuma troca de arquivo.
 
 ## Capabilities

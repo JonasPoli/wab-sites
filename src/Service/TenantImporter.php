@@ -598,6 +598,7 @@ class TenantImporter
                     ->setStatus(ArticleStatus::tryFrom($arData['status'] ?? '') ?? ArticleStatus::Draft)
                     ->setRelatedLinks($arData['relatedLinks'] ?? [])
                     ->setFeatured((bool) ($arData['featured'] ?? false))
+                    ->setVideoUrl($arData['videoUrl'] ?? null)
                     ->setViewCount(0)
                     ->setSample((bool) ($arData['sample'] ?? false));
                 foreach (['publishedAt' => 'setPublishedAt', 'createdAt' => 'setCreatedAt', 'updatedAt' => 'setUpdatedAt'] as $key => $setter) {

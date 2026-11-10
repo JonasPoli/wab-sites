@@ -13,7 +13,7 @@
             <span class="nt-rank__n" aria-hidden="true">{{ loop.index }}</span>
             <a href="{{ path('pub_article_show', {slug: a.slug}) }}">{{ a.title }}</a>
             {% if thumbs %}
-                {% if a.coverImage %}<img src="{{ ('uploads/article/' ~ a.coverImage)|imagine_filter('news_thumb') }}" alt="" loading="lazy">{% else %}<span></span>{% endif %}
+                {% if a.coverImage %}<img src="{{ ('uploads/article/' ~ a.coverImage)|news_image('news_thumb') }}" alt="" loading="lazy">{% else %}<span></span>{% endif %}
             {% endif %}
         </li>
         {% endfor %}

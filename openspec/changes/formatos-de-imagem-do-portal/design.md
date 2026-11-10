@@ -21,22 +21,24 @@ Motivação em `proposal.md`; requisitos em `specs/noticias/spec.md`.
 
 ## Decisions
 
-1. **`App\Service\ImageFormats`.**
-   - O mapa tipo MIME → (bit do `imagetypes()`, rótulo) é este: `image/jpeg` → `IMG_JPG`, "JPG"; `image/png` → `IMG_PNG`, "PNG"; `image/webp` → `IMG_WEBP`, "WebP"; `image/gif` → `IMG_GIF`, "GIF"; `image/avif` → `IMG_AVIF`, "AVIF".
-   - Um formato é aceito se o bit estiver em `imagetypes()` e não estiver desligado no parâmetro `app.image_formats.disabled`, que vem da variável de ambiente `IMAGE_FORMATS_DISABLED` (padrão vazio). Esse parâmetro serve para reproduzir no Mac o servidor sem AVIF.
-   - Métodos:
-     - `acceptsMime(string)`;
-     - `acceptsFile(string $path)`, que lê o MIME com `finfo`;
-     - `acceptAttribute()` (`image/jpeg,image/png,…`);
-     - `label()` ("JPG, PNG, WebP ou GIF").
-   - **Alternativa descartada:** lista fixa no código. Ela ficaria errada no Mac (com AVIF) ou no servidor, se ele ganhar AVIF.
-2. **Validação no envio.** O tipo MIME vem de `$file->getMimeType()`, que lê o conteúdo e não a extensão.
-   - A capa é conferida no `ArticleFormHandler::apply()`.
-   - A foto do jornalista, no cadastro e no perfil.
-   - O erro é "A imagem precisa ser <label>.".
-   - Os `<input type="file">` desses três formulários passam a ter `accept="<acceptAttribute()>"`.
+1. **`App\Service\ImageFormats`**, com duas perguntas separadas:
+   - **Envio (lista fixa, decisão do Jonas em 10/11/2026):** `acceptsUpload(UploadedFile)` só aceita a extensão do nome original em `jpg`, `jpeg` ou `png` (sem diferenciar maiúsculas) e o MIME lido do conteúdo (`getMimeType()`) em `image/jpeg` ou `image/png`. Também expõe `ACCEPT_ATTRIBUTE` (`.jpg,.jpeg,.png,image/jpeg,image/png`) e a mensagem "A imagem precisa ser JPG ou PNG.".
+   - **Miniatura (o que o GD do servidor abre):** `canThumbnail(string $path)` lê o MIME do arquivo gravado com `finfo` e confere o bit correspondente em `imagetypes()`:
+     - `image/jpeg` → `IMG_JPG`;
+     - `image/png` → `IMG_PNG`;
+     - `image/webp` → `IMG_WEBP`;
+     - `image/gif` → `IMG_GIF`;
+     - `image/avif` → `IMG_AVIF`.
+
+     O formato também não pode estar no parâmetro `app.image_formats.disabled`, que vem da variável `IMAGE_FORMATS_DISABLED` (padrão vazio). Ela serve para reproduzir no Mac, que tem AVIF, o servidor sem AVIF.
+   - **Alternativa descartada:** usar a mesma lista nas duas perguntas. As capas antigas em WebP ou GIF continuam virando miniatura normalmente, e só o envio fica restrito.
+2. **Validação no envio** com `acceptsUpload()`:
+   - a capa, no `ArticleFormHandler::apply()`;
+   - a foto do jornalista, no cadastro e no perfil.
+
+   O erro é "A imagem precisa ser JPG ou PNG.". Os `<input type="file">` desses três formulários passam a ter `accept=".jpg,.jpeg,.png,image/jpeg,image/png"`.
 3. **Filtro Twig `news_image(caminho, filtro)`.**
-   - Se o arquivo em `public/<caminho>` existe e `acceptsFile()` diz que o servidor o abre, devolve o mesmo que `imagine_filter(filtro)`; senão, devolve `asset(caminho)`.
+   - Se o arquivo em `public/<caminho>` existe e `canThumbnail()` diz que o servidor o abre, devolve o mesmo que `imagine_filter(filtro)`; senão, devolve `asset(caminho)`.
    - O resultado é guardado num array por requisição, porque cada arquivo aparece mais de uma vez na página.
    - Os quatro usos do tema passam a usar o filtro.
    - O CSS já fixa a proporção e o `object-fit: cover` dessas imagens (`.nt-item__img img`, `.nt-rank img`, `.nt-featured img`, `.nt-author img`). Por isso o original aparece no mesmo tamanho e recorte.
@@ -46,7 +48,7 @@ Motivação em `proposal.md`; requisitos em `specs/noticias/spec.md`.
 ## Risks / Trade-offs
 
 - **[Original maior que a miniatura]** No caso raro de um formato não suportado, a lista baixa o arquivo inteiro. Hoje isso é um arquivo de 26 KB.
-- **[HEIC de iPhone]** O Safari envia HEIC às vezes. Ele passa a ser recusado com a mensagem, e a pessoa reenvia em JPG.
+- **[HEIC de iPhone e WebP]** O Safari às vezes envia HEIC, e alguns sites salvam imagens em WebP. Os dois passam a ser recusados com a mensagem, e a pessoa reenvia em JPG ou PNG.
 
 ## Migration Plan
 

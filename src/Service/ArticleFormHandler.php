@@ -30,6 +30,7 @@ class ArticleFormHandler
         private readonly AuthorRepository $authors,
         private readonly ArticleBodySanitizer $sanitizer,
         private readonly SluggerInterface $slugger,
+        private readonly ImageFormats $imageFormats,
     ) {}
 
     /**
@@ -90,10 +91,25 @@ class ArticleFormHandler
         $article->setCoverCredit($this->nullable($in->get('coverCredit')));
         $file = $r->files->get('coverImageFile');
         if ($file instanceof UploadedFile && $file->isValid()) {
-            $article->setCoverImageFile($file);
+            // Só JPG e PNG: o servidor não gera miniatura de AVIF (e o Jonas limitou a esses dois)
+            if ($this->imageFormats->acceptsUpload($file)) {
+                $article->setCoverImageFile($file);
+            } else {
+                $errors[] = ImageFormats::UPLOAD_MESSAGE;
+            }
         }
 
         $article->setRelatedLinks($this->normalizeLinks($in->all('relatedLinks')));
+
+        // Vídeo do YouTube: gravado num formato só; vazio tira o vídeo
+        $video = trim((string) $in->get('videoUrl'));
+        if ($video === '') {
+            $article->setVideoUrl(null);
+        } elseif ($id = Article::youtubeId($video)) {
+            $article->setVideoUrl('https://www.youtube.com/watch?v=' . $id);
+        } else {
+            $errors[] = 'Informe um link de vídeo do YouTube (youtube.com ou youtu.be).';
+        }
 
         if ($staff) {
             $article->setFeatured((bool) $in->get('featured'));

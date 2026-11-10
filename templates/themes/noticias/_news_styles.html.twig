@@ -85,6 +85,10 @@
 .nt-body .ql-align-center { text-align: center; }
 .nt-body .ql-align-right { text-align: right; }
 .nt-body .ql-align-justify { text-align: justify; }
+/* Vídeo do YouTube no fim do texto (largura da coluna, 16:9) */
+.nt-video { margin: 28px 0 32px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: var(--nt-img-ph); }
+.nt-video iframe { display: block; width: 100%; height: 100%; border: 0; }
+.nt-body + .nt-video { margin-top: 0; } /* o último parágrafo do texto já deixa 32 px */
 .nt-article__end { margin: 32px 0 0; padding-top: 20px; border-top: 1px solid var(--nt-line); font-size: 13px; color: var(--nt-light); }
 .nt-next { display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--nt-line); font-size: 14px; }
 .nt-next__label { color: var(--nt-light); }
