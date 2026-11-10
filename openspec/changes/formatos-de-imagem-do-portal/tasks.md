@@ -23,9 +23,9 @@
 
 ## 4. Produção
 
-- [ ] 4.1 Backup (escrita no servidor, com aprovação do Jonas): HEAD em `~/backups/`. Não há mudança no banco.
-- [ ] 4.2 Deploy (escrita, com aprovação do Jonas): `git pull` e `./build.sh` com `nice`; HTTP 200 nos 8 domínios de cliente e no ajope.
-- [ ] 4.3 Conferência (leitura): https://ajope.wab.com.br/autor/jonas-ernesto-poli mostra a capa `fhc-roda-viva-….avif` pelo endereço original, com 200; nenhuma página do ajope aponta para a miniatura desse arquivo.
+- [x] 4.1 Backup (escrita no servidor, com aprovação do Jonas): HEAD em `~/backups/`. Não há mudança no banco. (10/11/2026 20:44 UTC, com a autorização do Jonas ("ok, pode fazer"): HEAD dcebe3d em `~/backups/wab-sites-HEAD-antes-20261110-2044.txt` e dump `wab-sites-antes-deploy-20261110-2044.sql.gz` (20 tabelas); o dump foi feito por causa da migration do vídeo, no mesmo deploy)
+- [x] 4.2 Deploy (escrita, com aprovação do Jonas): `git pull` e `./build.sh` com `nice`; HTTP 200 nos 8 domínios de cliente e no ajope. (10/11/2026 20:45 UTC: cc18e2b no ar; `git pull`, migration Version20261110204105 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
+- [x] 4.3 Conferência (leitura): https://ajope.wab.com.br/autor/jonas-ernesto-poli mostra a capa `fhc-roda-viva-….avif` pelo endereço original, com 200; nenhuma página do ajope aponta para a miniatura desse arquivo. (10/11/2026: `/autor/jonas-ernesto-poli` 200, com a capa em `src="/uploads/article/fhc-roda-viva-6af37f209913d032366716.avif"`, que responde 200 `image/avif` (26.560 B); nenhuma miniatura desse arquivo na home nem em `/noticias`; o cadastro de jornalista com `accept=".jpg,.jpeg,.png,image/jpeg,image/png"` e "JPG ou PNG de até 5 MB")
 
 ## Workflow follow-up
 

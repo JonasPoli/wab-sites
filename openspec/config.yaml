@@ -62,7 +62,8 @@ context: |
     liip:imagine:cache:remove, e apaga var/log/* e public/media/cache/* (as miniaturas são refeitas no
     primeiro acesso, o que pesa num servidor de 1 vCPU). Ele escolhe o php84rc antes do php83rc, então no
     servidor o build roda em PHP 8.4 enquanto o site roda em 8.3.
-  - Última migration aplicada em produção: Version20261110194600 (cadastro-de-jornalista-ampliado, 10/11/2026).
+  - Última migration aplicada em produção: Version20261110204105 (video-do-youtube-na-noticia, 10/11/2026).
+  - O PHP do servidor (8.3 e 8.4) tem GD sem AVIF e não tem Imagick nem conversor de imagem (convert, vips, ffmpeg): capa e foto do portal só aceitam JPG ou PNG.
   - Fuso: o pool do PHP 8.3 grava em America/Sao_Paulo (date.timezone do pool); o PHP CLI do servidor está em UTC.
 
 rules:

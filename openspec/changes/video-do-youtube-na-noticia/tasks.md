@@ -25,9 +25,9 @@
 
 ## 4. Produção
 
-- [ ] 4.1 Backup (escrita no servidor, com aprovação do Jonas): HEAD e dump do banco em `~/backups/`.
-- [ ] 4.2 Deploy (escrita, com aprovação do Jonas): `git pull`, `doctrine:migrations:migrate` e `./build.sh` com `nice`; HTTP 200 nos 8 domínios de cliente e no ajope.
-- [ ] 4.3 Conferência (leitura): `/jornalista/noticias/new` do ajope redireciona para o login (sem sessão); o Jonas cria uma notícia com vídeo e confere o player.
+- [x] 4.1 Backup (escrita no servidor, com aprovação do Jonas): HEAD e dump do banco em `~/backups/`. (10/11/2026 20:44 UTC, com a autorização do Jonas ("ok, pode fazer"): HEAD dcebe3d em `~/backups/wab-sites-HEAD-antes-20261110-2044.txt` e dump `wab-sites-antes-deploy-20261110-2044.sql.gz` (20 tabelas))
+- [x] 4.2 Deploy (escrita, com aprovação do Jonas): `git pull`, `doctrine:migrations:migrate` e `./build.sh` com `nice`; HTTP 200 nos 8 domínios de cliente e no ajope. (10/11/2026 20:45 UTC: cc18e2b no ar; `git pull`, migration Version20261110204105 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
+- [ ] 4.3 Conferência (leitura): `/jornalista/noticias/new` do ajope redireciona para o login (sem sessão); o Jonas cria uma notícia com vídeo e confere o player. (10/11/2026: `/jornalista/noticias/new` do ajope sem sessão → 302 para `/login`. Pendente: o Jonas criar uma notícia com vídeo e conferir o player)
 
 ## Workflow follow-up
 
