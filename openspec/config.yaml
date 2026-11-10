@@ -45,8 +45,11 @@ context: |
     e mensagens de contato: não copiar nem exibir.
   - Nunca apagar tenant por SQL: user.tenant_id é ON DELETE SET NULL, e usuário sem tenant com workGroup 0
     vira SuperAdmin. Excluir só pelo /superadmin, que apaga os usuários antes.
-  - O filtro de tenant do domínio continua ligado no /superadmin. Exportar, excluir ou trocar a home de um
-    tenant deve ser feito com o /superadmin aberto no domínio desse mesmo tenant.
+  - Desde 10/11/2026 (isolamento-entre-sites) o /superadmin roda sem o filtro de tenant do domínio: editar,
+    exportar, excluir e trocar a home de um tenant dá o mesmo resultado em qualquer domínio de tenant, e toda
+    consulta nova do /superadmin a entidade com tenant precisa dizer o tenant. O login do painel só vale no
+    domínio do site do usuário (TenantUserChecker e TenantAccessVoter); os SuperAdmins (sem tenant e workGroup 0,
+    ids 1 e 19) entram em todos.
 
   Deploy
   - Local: git push origin main. No servidor, como runcloud, em ~/webapps/app-wab-sites: git pull; depois
@@ -56,7 +59,8 @@ context: |
     liip:imagine:cache:remove, e apaga var/log/* e public/media/cache/* (as miniaturas são refeitas no
     primeiro acesso, o que pesa num servidor de 1 vCPU). Ele escolhe o php84rc antes do php83rc, então no
     servidor o build roda em PHP 8.4 enquanto o site roda em 8.3.
-  - Última migration aplicada em produção: Version20261006170000.
+  - Última migration aplicada em produção: Version20261110015129 (portal-de-noticias, 10/11/2026).
+  - Fuso: o pool do PHP 8.3 grava em America/Sao_Paulo (date.timezone do pool); o PHP CLI do servidor está em UTC.
 
 rules:
   design:
