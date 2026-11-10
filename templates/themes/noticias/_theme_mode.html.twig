@@ -1,0 +1,58 @@
+{#
+  Modo de aparência do tema noticias: Claro (padrão), Escuro ou Automático (segue o sistema).
+  A escolha fica em localStorage['wab-theme'] ('light', 'dark' ou 'auto'), a mesma chave dos temas
+  cetec e moderno; o modo vira data-theme e a classe .dark no <html> (os blocos do cetec usam a classe).
+    part 'head': antes do CSS, aplica o modo guardado sem piscar a versão clara.
+    part 'foot': botão #nt-mode-btn do cabeçalho e acompanhamento do sistema no Automático.
+#}
+{% if part == 'head' %}
+<script>
+(function () {
+    var mode = 'light';
+    try { mode = localStorage.getItem('wab-theme') || 'light'; } catch (e) {}
+    if (mode !== 'dark' && mode !== 'auto') { mode = 'light'; }
+    var dark = mode === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : mode === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', dark);
+})();
+</script>
+{% else %}
+<script>
+(function () {
+    var MODES = ['light', 'dark', 'auto'];
+    var LABELS = { light: 'Claro', dark: 'Escuro', auto: 'Automático' };
+    var ICONS = { light: 'bi-sun', dark: 'bi-moon-stars', auto: 'bi-circle-half' };
+    var system = window.matchMedia('(prefers-color-scheme: dark)');
+    var btn = document.getElementById('nt-mode-btn');
+
+    function saved() {
+        var mode = 'light';
+        try { mode = localStorage.getItem('wab-theme') || 'light'; } catch (e) {}
+        return MODES.indexOf(mode) >= 0 ? mode : 'light';
+    }
+    function apply(mode) {
+        var dark = mode === 'auto' ? system.matches : mode === 'dark';
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', dark);
+        if (!btn) { return; }
+        var next = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+        var label = 'Aparência: ' + LABELS[mode] + '. Mudar para ' + LABELS[next];
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
+        btn.querySelector('i').className = 'bi ' + ICONS[mode];
+        btn.querySelector('.nt-mode-btn__label').textContent = LABELS[mode];
+    }
+
+    if (btn) {
+        btn.addEventListener('click', function () {
+            var next = MODES[(MODES.indexOf(saved()) + 1) % MODES.length];
+            try { localStorage.setItem('wab-theme', next); } catch (e) {}
+            apply(next);
+        });
+    }
+    // No Automático, a página acompanha o sistema sem recarregar
+    system.addEventListener('change', function () { if (saved() === 'auto') { apply('auto'); } });
+    apply(saved());
+})();
+</script>
+{% endif %}

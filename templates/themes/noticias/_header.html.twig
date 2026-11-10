@@ -33,7 +33,12 @@
                 <a href="{{ path('pub_home') }}" class="nt-logo" aria-label="Página inicial de {{ tenantName }}">{{ _self.logo(currentTenant, tenantName) }}</a>
             {% endif %}
         </div>
-        <div class="nt-header__right"></div>
+        <div class="nt-header__right">
+            {# Rótulo e ícone iniciais do Claro; _theme_mode.html.twig acerta o modo guardado #}
+            <button type="button" class="nt-mode-btn" id="nt-mode-btn" aria-label="Aparência: Claro. Mudar para Escuro" title="Aparência: Claro. Mudar para Escuro">
+                <i class="bi bi-sun" aria-hidden="true"></i><span class="nt-mode-btn__label">Claro</span>
+            </button>
+        </div>
     </div>
 </header>
 

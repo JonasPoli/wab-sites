@@ -6,26 +6,27 @@
 {% block stylesheets %}
 <style>
 .nt-form-wrap { max-width: 720px; margin: 0 auto; padding-top: 32px; }
-.nt-form-wrap h1 { margin: 0; font-size: 32px; color: var(--color-primary); }
+.nt-form-wrap h1 { margin: 0; font-size: 32px; color: var(--nt-accent); }
 .nt-form-wrap .nt-lead { color: var(--nt-gray); font-size: 16px; margin: 8px 0 24px; }
-.nt-form { background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 24px; display: grid; gap: 16px; }
+.nt-form { background: var(--nt-card); border: 1px solid var(--nt-card-line); border-radius: 12px; padding: 24px; display: grid; gap: 16px; }
 .nt-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.nt-form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333; }
-.nt-form .nt-req { color: #b91c1c; }
+.nt-form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--nt-strong); }
+.nt-form .nt-req { color: var(--nt-req); }
 .nt-form input[type=text], .nt-form input[type=email], .nt-form input[type=password], .nt-form input[type=tel], .nt-form textarea, .nt-form input[type=file] {
-    width: 100%; font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid #cfcfcf; border-radius: 8px; background: #fff; color: var(--nt-ink);
+    width: 100%; font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--nt-field-border); border-radius: 8px; background: var(--nt-field-bg); color: var(--nt-ink);
 }
 .nt-form textarea { min-height: 110px; resize: vertical; }
-.nt-form input:focus, .nt-form textarea:focus { border-color: var(--color-primary); outline: 2px solid rgba(var(--color-primary-rgb), .2); }
+.nt-form input:focus, .nt-form textarea:focus { border-color: var(--nt-accent); outline: 2px solid rgba(var(--color-primary-rgb), .2); }
 .nt-form__hint { font-size: 12px; color: var(--nt-light); margin-top: 4px; }
-.nt-form__check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: #333; }
+.nt-form__check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--nt-strong); }
 .nt-form__check input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
 .nt-form__hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-.nt-form button { justify-self: start; background: var(--color-primary); color: var(--nt-on-primary); border: 0; border-radius: 8px; padding: 12px 22px; font: 700 15px var(--font-body); cursor: pointer; }
+.nt-form button { justify-self: start; background: var(--nt-bar); color: var(--nt-on-bar); border: 0; border-radius: 8px; padding: 12px 22px; font: 700 15px var(--font-body); cursor: pointer; }
 .nt-form-errors { background: #fdecec; border: 1px solid #f5c2c2; color: #7f1d1d; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+[data-theme="dark"] .nt-form-errors { background: rgba(239,68,68,.12); border-color: rgba(252,165,165,.3); color: #fca5a5; }
 .nt-form-errors ul { margin: 0; padding-left: 18px; }
 .nt-form-login { margin-top: 16px; font-size: 14px; color: var(--nt-gray); }
-.nt-form-login a { color: var(--color-primary); font-weight: 700; }
+.nt-form-login a { color: var(--nt-accent); font-weight: 700; }
 @media (max-width: 640px) { .nt-form__row { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}

@@ -1,6 +1,9 @@
 {#
-  Tema "noticias" — portal de notícias. Só modo claro (nunca põe .dark no <html>).
-  Cabeçalho e rodapé na cor primária do site; a identidade (logo, cores e fontes) vem do tenant.
+  Tema "noticias" — portal de notícias. Modos Claro (padrão), Escuro e Automático, escolhidos
+  pelo visitante (_theme_mode.html.twig: data-theme e classe .dark no <html>, localStorage 'wab-theme').
+  As cores ficam nos tokens abaixo, com os valores do escuro em [data-theme="dark"]; templates do
+  tema não usam cor fixa. Cabeçalho e rodapé ficam na cor primária do modo claro nos dois modos
+  (--nt-bar); títulos e links usam --nt-accent. A identidade (logo, cores e fontes) vem do tenant.
   Os blocos das páginas institucionais vêm do tema cetec (themes/noticias/_block.html.twig),
   por isso este base também carrega app.css, Swiper, AOS e os ícones que eles usam.
 #}
@@ -25,6 +28,7 @@
     {% endif %}
 
     {{ tenant_css_vars()|raw }}
+    {% include 'themes/noticias/_theme_mode.html.twig' with {part: 'head'} %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,9 +39,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 
+    {% set hexColor = '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i' %}
+    {% set ntPrimary = currentTenant and (currentTenant.primaryColor ?? '') matches hexColor ? currentTenant.primaryColor : '#0044cc' %}
+    {% set ntPrimaryDark = currentTenant and (currentTenant.primaryColorDark ?? '') matches hexColor ? currentTenant.primaryColorDark : '#3b82f6' %}
+    {% set ntBgDark1 = currentTenant and (currentTenant.bgColorDark1 ?? '') matches hexColor ? currentTenant.bgColorDark1 : '#0d0f1a' %}
+    {% set ntBgDark2 = currentTenant and (currentTenant.bgColorDark2 ?? '') matches hexColor ? currentTenant.bgColorDark2 : '#131625' %}
+    {# No escuro, títulos e links só ficam na primária do modo escuro se ela tiver 4,5:1 com os dois fundos #}
+    {% set ntAccentDarkOk = contrast_ratio(ntPrimaryDark, ntBgDark1) >= 4.5 and contrast_ratio(ntPrimaryDark, ntBgDark2) >= 4.5 %}
     <style>
     /* ── Tokens (os blocos do cetec também usam estes) ── */
     :root {
+        color-scheme: light;
         --font-headline: 'Open Sans', system-ui, sans-serif;
         --font-body: 'Open Sans', system-ui, sans-serif;
         --radius: 10px;
@@ -54,7 +66,50 @@
         --nt-gray: #555;
         --nt-light: #6b7280;
         --nt-line: #dcdcdc;
-        --nt-on-primary: var(--topbar-text, #ffffff);
+        /* Barra da marca (cabeçalho, rodapé, botão do menu): primária do modo claro nos dois modos */
+        --nt-bar: {{ ntPrimary }};
+        --nt-on-bar: {{ is_dark_color(ntPrimary) ? '#ffffff' : '#1f2937' }};
+        --nt-on-primary: var(--nt-on-bar);
+        /* Títulos, links e números de destaque */
+        --nt-accent: var(--color-primary);
+        --nt-card: #ffffff;
+        --nt-card-line: #e6e6e6;
+        --nt-card-sep: #ececec;
+        --nt-strong: #333;
+        --nt-text-2: #3f3f3f;
+        --nt-title: #111;
+        --nt-quote: #444;
+        --nt-field-bg: #ffffff;
+        --nt-field-border: #cfcfcf;
+        --nt-img-ph: #e5e7eb;
+        --nt-req: #b91c1c;
+    }
+    [data-theme="dark"] {
+        color-scheme: dark;
+        --bg: {{ ntBgDark1 }};
+        --bg-alt: {{ ntBgDark2 }};
+        --bg-card: {{ ntBgDark2 }};
+        --bg-glass: rgba(13,15,26,.95);
+        --text: #e5e7eb;
+        --text-muted: #94a3b8;
+        --border: rgba(255,255,255,.12);
+        --nt-page-bg: {{ ntBgDark1 }};
+        --nt-ink: #e5e7eb;
+        --nt-gray: #cbd5e1;
+        --nt-light: #94a3b8;
+        --nt-line: rgba(255,255,255,.12);
+        --nt-accent: {{ ntAccentDarkOk ? 'var(--color-primary)' : 'var(--nt-ink)' }};
+        --nt-card: {{ ntBgDark2 }};
+        --nt-card-line: rgba(255,255,255,.10);
+        --nt-card-sep: rgba(255,255,255,.08);
+        --nt-strong: #e2e8f0;
+        --nt-text-2: #cbd5e1;
+        --nt-title: #f8fafc;
+        --nt-quote: #cbd5e1;
+        --nt-field-bg: {{ ntBgDark2 }};
+        --nt-field-border: rgba(255,255,255,.2);
+        --nt-img-ph: #1e2236;
+        --nt-req: #fca5a5;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
@@ -64,6 +119,7 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
     .nt-container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
     .nt-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    /* Cores fixas de propósito: link "Pular para o conteúdo", pílula branca do logo, seção escura do cetec e avisos (com variante escura) */
     .nt-skip { position: absolute; left: 8px; top: -60px; background: #fff; color: #000; padding: 8px 12px; border-radius: 6px; z-index: 1000; }
     .nt-skip:focus { top: 8px; }
     :focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
@@ -79,15 +135,21 @@
     .flash { padding: 1rem 1.25rem; border-radius: var(--radius); margin: 1rem 0; font-weight: 600; }
     .flash-success { background: #e7f6ec; color: #14532d; border: 1px solid #bbe5c8; }
     .flash-error { background: #fdecec; color: #7f1d1d; border: 1px solid #f5c2c2; }
+    [data-theme="dark"] .flash-success { background: rgba(34,197,94,.12); color: #86efac; border-color: rgba(134,239,172,.3); }
+    [data-theme="dark"] .flash-error { background: rgba(239,68,68,.12); color: #fca5a5; border-color: rgba(252,165,165,.3); }
 
     /* ── Cabeçalho ── */
-    .nt-header { background: var(--color-primary); color: var(--nt-on-primary); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+    .nt-header { background: var(--nt-bar); color: var(--nt-on-bar); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
     .nt-header__inner { max-width: 1240px; margin: 0 auto; padding: 0 16px; height: 64px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
     .nt-header__left { display: flex; align-items: center; gap: 16px; min-width: 0; }
     .nt-header__right { display: flex; justify-content: flex-end; }
     .nt-menu-btn { display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit; font: 700 13px/1 var(--font-body); letter-spacing: .04em; cursor: pointer; padding: 10px 8px; border-radius: 6px; }
     .nt-menu-btn:hover { background: rgba(255,255,255,.12); }
     .nt-menu-btn .bi { font-size: 22px; }
+    .nt-mode-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: inherit; font: 600 13px/1 var(--font-body); cursor: pointer; padding: 10px 8px; border-radius: 6px; }
+    .nt-mode-btn:hover { background: rgba(255,255,255,.12); }
+    .nt-mode-btn .bi { font-size: 18px; }
+    @media (max-width: 767px) { .nt-mode-btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; } }
     .nt-logo { display: inline-flex; align-items: center; text-decoration: none; color: inherit; font-weight: 800; font-size: 20px; }
     .nt-logo img { height: 44px; width: auto; }
     .nt-logo--pill { background: #fff; border-radius: 10px; padding: 3px 8px; }
@@ -99,21 +161,21 @@
 
     /* ── Menu lateral ── */
     .nt-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 90; }
-    .nt-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 86vw); background: #fff; color: var(--nt-ink); z-index: 100; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2); padding: 8px 0 24px; }
+    .nt-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 86vw); background: var(--nt-card); color: var(--nt-ink); z-index: 100; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2); padding: 8px 0 24px; }
     .nt-drawer[hidden], .nt-overlay[hidden] { display: none; }
     .nt-drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 12px; border-bottom: 1px solid var(--border); }
-    .nt-drawer__title { font-weight: 800; font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--color-primary); }
+    .nt-drawer__title { font-weight: 800; font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--nt-accent); }
     .nt-drawer__close { background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: var(--nt-gray); padding: 4px 8px; border-radius: 6px; }
     .nt-drawer nav ul { list-style: none; margin: 0; padding: 0; }
     .nt-drawer nav a { display: block; padding: 11px 20px; text-decoration: none; color: var(--nt-ink); font-weight: 600; font-size: 15px; }
-    .nt-drawer nav a:hover { background: var(--bg-alt); color: var(--color-primary); }
+    .nt-drawer nav a:hover { background: var(--bg-alt); color: var(--nt-accent); }
     .nt-drawer nav .nt-drawer__sub a { padding-left: 36px; font-weight: 400; font-size: 14px; color: var(--nt-gray); }
     .nt-drawer__sep { border-top: 1px solid var(--border); margin: 8px 0; }
     .nt-drawer__cta { margin: 16px 20px 0; }
-    .nt-drawer__cta a { display: block; text-align: center; background: var(--color-primary); color: var(--nt-on-primary); border-radius: 8px; padding: 10px; font-weight: 700; text-decoration: none; }
+    .nt-drawer__cta a { display: block; text-align: center; background: var(--nt-bar); color: var(--nt-on-bar); border-radius: 8px; padding: 10px; font-weight: 700; text-decoration: none; }
 
     /* ── Rodapé ── */
-    .nt-footer { background: var(--color-primary); color: var(--nt-on-primary); margin-top: 64px; }
+    .nt-footer { background: var(--nt-bar); color: var(--nt-on-bar); margin-top: 64px; }
     .nt-footer a { color: inherit; text-decoration: none; }
     .nt-footer a:hover { text-decoration: underline; }
     .nt-footer__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 0 16px; flex-wrap: wrap; }
@@ -152,6 +214,7 @@
     </main>
 
     {% include 'themes/noticias/_footer.html.twig' %}
+    {% include 'themes/noticias/_theme_mode.html.twig' with {part: 'foot'} %}
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
