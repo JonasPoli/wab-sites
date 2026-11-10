@@ -400,6 +400,7 @@ final class NewsSampleGenerator implements SampleContentGeneratorInterface
     {
         $e = fn (string $s) => htmlspecialchars($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         [$quote, $who] = $item['q'];
+        $quote = rtrim($quote, '.'); // “... atrás”, diz Fulano. (sem o ponto antes das aspas)
         $html = '<p>' . $e($item['p'][0]) . '</p>';
         if ($i % 2 === 0) {
             $html .= '<blockquote>“' . $e($quote) . '”, diz ' . $e($who) . '.</blockquote>';

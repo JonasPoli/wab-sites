@@ -18,9 +18,9 @@
 
 ## 3. Produção
 
-- [ ] 3.1 Deploy junto com os outros changes (ver `cadastro-de-jornalista-ampliado` 3.1).
-- [ ] 3.2 Conferência no ajope (leitura): o `/admin` mostra o quadro (a conferir com o Jonas logado), e `/jornalista/cadastro` responde 200.
-- [ ] 3.3 Teste de ponta a ponta em produção, com o OK do Jonas, porque manda e-mail de verdade: cadastro de teste com um e-mail da WAB, aprovação pelo `/admin`, chegada do e-mail com o link, login e exclusão do cadastro de teste.
+- [x] 3.1 Deploy junto com os outros changes (ver `cadastro-de-jornalista-ampliado` 3.1). (10/11/2026 19:53 UTC, com a autorização do Jonas ("crie… implemente… publique"): e2e2593 no ar; backup `~/backups/wab-sites-HEAD-antes-20261110-1952.txt` (HEAD 2cdddf5) e `wab-sites-antes-deploy-20261110-1952.sql.gz` (20 tabelas); `git pull`, migration Version20261110194600 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
+- [ ] 3.2 Conferência no ajope (leitura): o `/admin` mostra o quadro (a conferir com o Jonas logado), e `/jornalista/cadastro` responde 200. (10/11/2026: `/jornalista/cadastro` e `/login` do ajope 200; o quadro do `/admin` pede login de admin do site, e o Jonas confere)
+- [ ] 3.3 Teste de ponta a ponta em produção, com o OK do Jonas, porque manda e-mail de verdade: cadastro de teste com um e-mail da WAB, aprovação pelo `/admin`, chegada do e-mail com o link, login e exclusão do cadastro de teste. (pendente: manda e-mail de verdade; depende do OK do Jonas e de um e-mail da WAB para o teste)
 
 ## Workflow follow-up
 

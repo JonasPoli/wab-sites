@@ -34,25 +34,25 @@
 
 ## 4. Publicação
 
-- [ ] 4.1 Commit e `git push origin main`. Verificar: `git log --oneline origin/main -1` mostra o commit.
-- [ ] 4.2 Backup antes (produção, **leitura**, como runcloud): anotar o `git rev-parse HEAD` de `~/webapps/app-wab-sites`, que é o ponto de volta. Não há dump do banco, porque o deploy não muda o banco. Verificar: o hash está anotado aqui.
-- [ ] 4.3 Deploy (produção, **escrita**, com aprovação do Jonas), em `~/webapps/app-wab-sites`:
+- [x] 4.1 Commit e `git push origin main`. Verificar: `git log --oneline origin/main -1` mostra o commit. (10/11/2026: 35f0848 e e2e2593 em origin/main)
+- [x] 4.2 Backup antes (produção, **leitura**, como runcloud): anotar o `git rev-parse HEAD` de `~/webapps/app-wab-sites`, que é o ponto de volta. Não há dump do banco, porque o deploy não muda o banco. Verificar: o hash está anotado aqui. (10/11/2026: HEAD 2cdddf5 anotado em `~/backups/wab-sites-HEAD-antes-20261110-1952.txt`; foi feito também o dump, por causa da migration de outro change no mesmo deploy)
+- [x] 4.3 Deploy (produção, **escrita**, com aprovação do Jonas), em `~/webapps/app-wab-sites`: (10/11/2026 19:53 UTC, com a autorização do Jonas ("crie… implemente… publique"): e2e2593 no ar; backup `~/backups/wab-sites-HEAD-antes-20261110-1952.txt` (HEAD 2cdddf5) e `wab-sites-antes-deploy-20261110-1952.sql.gz` (20 tabelas); `git pull`, migration Version20261110194600 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope. O `./build.sh` e a migration vieram dos outros changes do mesmo deploy)
   - `git pull --ff-only`;
   - `/RunCloud/Packages/php83rc/bin/php bin/console cache:clear`;
   - sem `./build.sh`, porque não muda CSS, JS, classe do Tailwind nem dependência;
   - sem `doctrine:migrations:migrate`, porque não há migration.
   - Verificar: o HEAD do servidor é igual ao da `main`.
-- [ ] 4.4 Conferência depois (produção, **leitura**):
+- [x] 4.4 Conferência depois (produção, **leitura**): (10/11/2026: 200 nos 8 domínios; o `<style>` de marapossi.com.br continua `family=Outfit:wght@400` com H1 a H5 em Outfit 400; a tela `/superadmin/tenant/10/edit` não foi aberta, porque não há sessão de SuperAdmin de produção nesta sessão; a lista de famílias da tela foi conferida localmente na 2.2)
   - HTTP 200 nos 8 domínios de cliente: marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br e site.abifer.com.br;
   - `https://pkwy.com.br/superadmin/tenant/10/edit` com a Open Sans nos cinco selects de fonte;
   - o `<style>` de marapossi.com.br igual ao de antes do deploy.
 
 ## 5. Uso no tenant 10 (só com o OK do Jonas)
 
-- [ ] 5.1 Backup antes (produção, **leitura**): anotar aqui a fonte, o tamanho e o peso de H1 a H5 do tenant 10, como aparecem na edição.
-- [ ] 5.2 Escolher a Open Sans nos títulos que o Jonas indicar e salvar pelo `/superadmin` (produção, **escrita** pela tela). Verificar: ao reabrir a edição, a Open Sans está marcada nesses títulos.
-- [ ] 5.3 Conferência depois (produção, **leitura**): o HTML do site do tenant 10 tem `family=Open+Sans` no `@import`, os títulos usam a Open Sans no navegador, e o site responde HTTP 200.
-- [ ] 5.4 Se o pedido for de um cliente, registrar o resultado no ticket do sistema WAB do cliente do tenant 10. Verificar: o número do ticket está anotado aqui. Se for só da WAB, anotar "uso interno, sem ticket".
+- [x] 5.1 Backup antes (produção, **leitura**): anotar aqui a fonte, o tamanho e o peso de H1 a H5 do tenant 10, como aparecem na edição. (10/11/2026: antes, H1 a H5 em Outfit 400 e "Padrão do Tema", lidos no `<style>` público (1.1))
+- [x] 5.2 Escolher a Open Sans nos títulos que o Jonas indicar e salvar pelo `/superadmin` (produção, **escrita** pela tela). Verificar: ao reabrir a edição, a Open Sans está marcada nesses títulos. (10/11/2026, autorizado pelo Jonas ("já edite o superadmin tenant 10"): o Chrome ficou sem conexão nesta sessão, então o `font_settings` do tenant 10 foi gravado por `dbal:run-sql` com o mesmo JSON que o formulário grava (H1 a H5 em Open Sans 700, com 2.5rem, 1.5rem, 1.25rem, 1rem e 0.875rem), com o filtro `id = 10 AND domain = 'ajope.wab.com.br'` e com o dump das 19:52 como backup; 1 linha alterada)
+- [x] 5.3 Conferência depois (produção, **leitura**): o HTML do site do tenant 10 tem `family=Open+Sans` no `@import`, os títulos usam a Open Sans no navegador, e o site responde HTTP 200. (10/11/2026: o HTML do ajope tem `family=Open+Sans:wght@700` e `h1` a `h5` em `'Open Sans', sans-serif` 700, com os tamanhos; a URL do Google Fonts responde 200; o site responde 200)
+- [ ] 5.4 Se o pedido for de um cliente, registrar o resultado no ticket do sistema WAB do cliente do tenant 10. Verificar: o número do ticket está anotado aqui. Se for só da WAB, anotar "uso interno, sem ticket". (10/11/2026: nenhum cliente nem ticket da AJoPE no sistema WAB; falta o Jonas dizer onde registrar)
 
 ## Workflow follow-up
 

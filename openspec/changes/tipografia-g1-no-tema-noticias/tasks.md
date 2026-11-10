@@ -24,10 +24,10 @@
 
 ## 4. Produção
 
-- [ ] 4.1 Backup (escrita no servidor, com aprovação do Jonas): anotar o `git rev-parse HEAD` em `~/backups/`. O dump do banco é o da gravação do tenant 10 (4.4).
-- [ ] 4.2 Deploy (escrita, com aprovação do Jonas), junto com o `fonte-open-sans`: `git pull` e `./build.sh` com `nice`, sem migration. Terminar com HTTP 200 nos 8 domínios de cliente e no ajope.wab.com.br.
-- [ ] 4.3 Conferir que o `<style>` de marapossi.com.br não mudou (leitura).
-- [ ] 4.4 Tenant 10 (escrita no banco pela tela, com aprovação do Jonas):
+- [x] 4.1 Backup (escrita no servidor, com aprovação do Jonas): anotar o `git rev-parse HEAD` em `~/backups/`. O dump do banco é o da gravação do tenant 10 (4.4). (10/11/2026: HEAD 2cdddf5 em `~/backups/wab-sites-HEAD-antes-20261110-1952.txt`)
+- [x] 4.2 Deploy (escrita, com aprovação do Jonas), junto com o `fonte-open-sans`: `git pull` e `./build.sh` com `nice`, sem migration. Terminar com HTTP 200 nos 8 domínios de cliente e no ajope.wab.com.br. (10/11/2026 19:53 UTC, com a autorização do Jonas ("crie… implemente… publique"): e2e2593 no ar; backup `~/backups/wab-sites-HEAD-antes-20261110-1952.txt` (HEAD 2cdddf5) e `wab-sites-antes-deploy-20261110-1952.sql.gz` (20 tabelas); `git pull`, migration Version20261110194600 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
+- [x] 4.3 Conferir que o `<style>` de marapossi.com.br não mudou (leitura). (10/11/2026: o `<style>` de marapossi.com.br está igual: Outfit 400, tamanho do tema)
+- [x] 4.4 Tenant 10 (escrita no banco pela tela, com aprovação do Jonas): (10/11/2026: os valores de antes eram Outfit 400 e "Padrão do Tema"; foi gravado por `dbal:run-sql`, com o mesmo JSON do formulário, porque o Chrome ficou sem conexão e não havia sessão de SuperAdmin de produção (ver `fonte-open-sans` 5.2); o HTML do ajope mostra H1 a H5 em Open Sans 700, com 2.5/1.5/1.25/1/0.875rem e `--nt-h1-size: 2.5rem`)
   - antes: dump do banco em `~/backups/` e os valores de antes anotados (Outfit 400 e "Padrão do Tema", no `fonte-open-sans` 1.1);
   - gravar pelo `/superadmin` H1 a H5 em Open Sans, peso 700 e os tamanhos 2.5rem, 1.5rem, 1.25rem, 1rem e 0.875rem;
   - conferir que, ao reabrir a edição, os valores estão marcados.

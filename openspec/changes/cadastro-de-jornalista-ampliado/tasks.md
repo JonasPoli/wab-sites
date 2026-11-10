@@ -18,8 +18,8 @@
 
 ## 3. Produção
 
-- [ ] 3.1 Deploy junto com `fonte-open-sans`, `tipografia-g1-no-tema-noticias` e `avisos-ao-jornalista` (escrita, com aprovação do Jonas): backup (HEAD e dump), `git pull`, `doctrine:migrations:migrate`, `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope.
-- [ ] 3.2 Conferir no ajope (leitura): `/jornalista/cadastro` com os campos novos, e `/autor/livia-andrade` sem dados privados.
+- [x] 3.1 Deploy junto com `fonte-open-sans`, `tipografia-g1-no-tema-noticias` e `avisos-ao-jornalista` (escrita, com aprovação do Jonas): backup (HEAD e dump), `git pull`, `doctrine:migrations:migrate`, `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope. (10/11/2026 19:53 UTC, com a autorização do Jonas ("crie… implemente… publique"): e2e2593 no ar; backup `~/backups/wab-sites-HEAD-antes-20261110-1952.txt` (HEAD 2cdddf5) e `wab-sites-antes-deploy-20261110-1952.sql.gz` (20 tabelas); `git pull`, migration Version20261110194600 e `./build.sh` com nice; HTTP 200 nos 8 domínios de cliente e no ajope)
+- [x] 3.2 Conferir no ajope (leitura): `/jornalista/cadastro` com os campos novos, e `/autor/livia-andrade` sem dados privados. (10/11/2026: `/jornalista/cadastro` do ajope 200, com `phone`, `address`, `state` e `spiritistCenter`; `/autor/livia-andrade` sem endereço, WhatsApp nem casa espírita)
 
 ## Workflow follow-up
 
