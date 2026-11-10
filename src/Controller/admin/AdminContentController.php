@@ -316,11 +316,25 @@ class AdminContentController extends AbstractController
     #[Route('/newsletter/export.csv', name: 'newsletter_export')]
     public function newsletterExport(NewsletterSubscriberRepository $repo): \Symfony\Component\HttpFoundation\Response
     {
+        // Inscritos do site do domínio (NewsletterSubscriber passa pelo tenant_filter)
         $rows = $repo->findAll();
-        $csv  = "id,email,data\n";
+
+        // Célula que começa com = + - @ ganha um apóstrofo, para a planilha não executar fórmula
+        $cell = static fn (string $v): string => preg_match('/^[=+\-@]/', $v) ? "'" . $v : $v;
+
+        $out = fopen('php://temp', 'r+');
+        fputcsv($out, ['id', 'email', 'data'], ',', '"', '');
         foreach ($rows as $s) {
-            $csv .= sprintf("%d,%s,%s\n", $s->getId(), $s->getEmail(), $s->getCreatedAt()->format('Y-m-d H:i'));
+            fputcsv($out, [
+                (string) $s->getId(),
+                $cell((string) $s->getEmail()),
+                $s->getSubscribedAt()->format('Y-m-d H:i'),
+            ], ',', '"', '');
         }
+        rewind($out);
+        $csv = stream_get_contents($out);
+        fclose($out);
+
         return new \Symfony\Component\HttpFoundation\Response($csv, 200, [
             'Content-Type'        => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="newsletter.csv"',
