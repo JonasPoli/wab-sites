@@ -1,0 +1,20 @@
+{# Chaves do reCAPTCHA v3 do formulário de contato (recaptcha-no-contato). A secret key nunca volta para a tela. #}
+<h3 style="margin: 2rem 0 1rem; color: var(--text)">reCAPTCHA (formulário de contato)</h3>
+<div class="af-row">
+    <div class="af-field">
+        <label for="recaptchaSiteKey">Site key (chave do site)</label>
+        <input type="text" id="recaptchaSiteKey" name="recaptchaSiteKey" class="ai" value="{{ tenant ? tenant.recaptchaSiteKey : '' }}" maxlength="100" autocomplete="off" style="font-family: monospace">
+    </div>
+    <div class="af-field">
+        <label for="recaptchaSecretKey">Secret key (chave secreta)
+            {% if tenant and tenant.recaptchaSecretKey %}<span class="badge bg-ok" style="margin-left:.4rem">configurada</span>{% endif %}
+        </label>
+        <input type="password" id="recaptchaSecretKey" name="recaptchaSecretKey" class="ai" value="" maxlength="100" autocomplete="new-password" placeholder="{{ tenant and tenant.recaptchaSecretKey ? 'Em branco mantém a atual' : '' }}" style="font-family: monospace">
+    </div>
+</div>
+<p class="af-hint">Chave v3 criada no console do reCAPTCHA para o domínio do site. Com as duas chaves, o contato só é gravado com o token do Google (nota mínima em <code>RECAPTCHA_SCORE_MIN</code>); sem elas, o contato funciona como antes.</p>
+{% if tenant and (tenant.recaptchaSiteKey or tenant.recaptchaSecretKey) %}
+<label style="display:flex;align-items:center;gap:.6rem;margin:.75rem 0 1.5rem;cursor:pointer">
+    <input type="checkbox" name="recaptchaRemove" value="1" style="width:18px;height:18px;accent-color:var(--primary)"> Remover as chaves do reCAPTCHA
+</label>
+{% endif %}

@@ -722,6 +722,17 @@ class SuperAdminController extends AbstractController
         $tenant->setOgImage($r->request->get('ogImage') ?: null);
         $tenant->setGoogleAnalyticsId($r->request->get('googleAnalyticsId') ?: null);
 
+        // reCAPTCHA: a secret key só muda quando vem preenchida; a caixa remove as duas
+        if ($r->request->get('recaptchaRemove') === '1') {
+            $tenant->setRecaptchaSiteKey(null)->setRecaptchaSecretKey(null);
+        } else {
+            $tenant->setRecaptchaSiteKey(trim((string) $r->request->get('recaptchaSiteKey')) ?: null);
+            $secret = trim((string) $r->request->get('recaptchaSecretKey'));
+            if ($secret !== '') {
+                $tenant->setRecaptchaSecretKey($secret);
+            }
+        }
+
         // Contact
         $tenant->setContactEmail($r->request->get('contactEmail') ?: null);
         $tenant->setPhone($r->request->get('phone') ?: null);

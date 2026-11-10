@@ -1,0 +1,58 @@
+{#
+  reCAPTCHA v3 do formulário de contato (recaptcha-no-contato), só com as duas chaves do site.
+  O script do Google só carrega quando o visitante entra num formulário que posta em /contato;
+  o token é pedido no envio (vence em 2 minutos). Sem o script em 8 s, envia sem token e o
+  servidor decide. Incluído dentro de cada formulário de contato dos temas.
+#}
+{% if currentTenant and currentTenant.hasRecaptcha %}
+<input type="hidden" name="g-recaptcha-response" value="">
+<p class="wab-recaptcha-aviso" style="margin:12px 0 0;font-size:12px;line-height:1.5;opacity:.75">
+    Este site é protegido pelo reCAPTCHA, e se aplicam a
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">Política de Privacidade</a> e os
+    <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">Termos de Serviço</a> do Google.
+</p>
+<style>.grecaptcha-badge { visibility: hidden !important; }</style>
+<script>
+(function () {
+    if (window.__wabRecaptcha) { return; }
+    window.__wabRecaptcha = true;
+    var KEY = '{{ currentTenant.recaptchaSiteKey|e('js') }}';
+    var loading = null;
+    function load() {
+        if (!loading) {
+            loading = new Promise(function (resolve, reject) {
+                var s = document.createElement('script');
+                s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(KEY);
+                s.async = true;
+                s.onload = function () { window.grecaptcha ? window.grecaptcha.ready(resolve) : reject(); };
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
+        return loading;
+    }
+    function contactForm(el) {
+        var f = el && el.closest ? el.closest('form') : null;
+        return f && /\/contato$/.test(f.getAttribute('action') || '') ? f : null;
+    }
+    document.addEventListener('focusin', function (e) { if (contactForm(e.target)) { load().catch(function () {}); } });
+    document.addEventListener('submit', function (e) {
+        var f = contactForm(e.target);
+        if (!f || f.dataset.recaptchaSent) { return; }
+        e.preventDefault();
+        var done = false;
+        function send(token) {
+            if (done) { return; }
+            done = true;
+            var input = f.querySelector('input[name="g-recaptcha-response"]');
+            if (input && token) { input.value = token; }
+            f.dataset.recaptchaSent = '1';
+            f.submit();
+        }
+        setTimeout(function () { send(null); }, 8000);
+        load().then(function () { return window.grecaptcha.execute(KEY, { action: 'contato' }); })
+            .then(send, function () { send(null); });
+    }, true);
+})();
+</script>
+{% endif %}

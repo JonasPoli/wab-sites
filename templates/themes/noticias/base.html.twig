@@ -159,6 +159,19 @@
     .nt-mode-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: inherit; font: 600 13px/1 var(--font-body); cursor: pointer; padding: 10px 8px; border-radius: 6px; }
     .nt-mode-btn:hover { background: rgba(255,255,255,.12); }
     .nt-mode-btn .bi { font-size: 18px; }
+    .nt-header__right { align-items: center; gap: 4px; }
+    .nt-search-btn { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: inherit; cursor: pointer; padding: 10px; border-radius: 6px; font-size: 18px; line-height: 1; }
+    .nt-search-btn:hover, .nt-search-btn[aria-expanded="true"] { background: rgba(255,255,255,.12); }
+    .nt-search { position: sticky; top: 64px; z-index: 49; background: var(--nt-card); border-bottom: 1px solid var(--nt-line); box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 12px 0; }
+    .nt-search[hidden] { display: none; }
+    .nt-search-form { display: flex; gap: 8px; align-items: stretch; }
+    .nt-search-form input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 10px 14px; border: 1px solid var(--nt-field-border); border-radius: 8px; background: var(--nt-field-bg); color: var(--nt-ink); }
+    .nt-search-form input:focus { outline: 2px solid var(--nt-accent); outline-offset: 0; border-color: var(--nt-accent); }
+    .nt-search-form button { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 8px; padding: 0 16px; background: var(--nt-bar); color: var(--nt-on-bar); font: 700 14px/1 var(--font-body); cursor: pointer; }
+    .nt-search-form--drawer { margin: 8px 16px 12px; }
+    .nt-search-form--drawer input { font-size: 15px; padding: 8px 12px; }
+    .nt-search-form--drawer button { padding: 0 12px; }
+    @media (max-width: 767px) { .nt-search-form button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; } .nt-search-form button { padding: 0 14px; } }
     @media (max-width: 767px) { .nt-mode-btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; } }
     .nt-logo { display: inline-flex; align-items: center; text-decoration: none; color: inherit; font-weight: 800; font-size: 20px; }
     .nt-logo img { height: 44px; width: auto; }

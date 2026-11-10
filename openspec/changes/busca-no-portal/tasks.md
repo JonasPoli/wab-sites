@@ -1,0 +1,25 @@
+# Tarefas: busca-no-portal
+
+- [x] 1.1 Consultas `searchVisible`, `countSearchVisible` e `searchByTitle` e rota `/busca`. Conferir em `noticias.localhost`: (10/11/2026, `noticias.localhost`: "mutirao pracas" e "MUTIRÃO" acham as 2 notícias de mutirão; "festival" acha 1; "teatros" não traz nada no portal 1 e traz a notícia do `noticias2.localhost` lá; "xyzw" mostra "Nenhuma notícia encontrada para “xyzw”."; sem `q` e com "a" só o campo; notícias agendadas ("Agendada…", "Assembleia… estatuto") e o rascunho não aparecem; `?pagina=99` → 404; `127.0.0.1/busca` → 404)
+  - "mutirao pracas" acha "Mutirão recupera praças…";
+  - "festival" só traz notícias do site;
+  - "xyzw" mostra a mensagem sem resultado;
+  - `/busca` sem `q` mostra só o campo;
+  - uma notícia agendada com a palavra não aparece;
+  - `?pagina=99` responde 404;
+  - em `127.0.0.1`, `/busca?q=teste` responde 404.
+- [x] 1.2 Template de resultados com o quadro "Páginas", a paginação com `q` e o `noindex`. Conferir: (10/11/2026: "sobre" traz "Sobre a AJoPE" no quadro Páginas, e "todos blocos" traz "Todos os blocos"; `noindex, follow`; o sitemap não tem `/busca`)
+  - a busca "sobre" traz a página "Sobre a AJoPE" no quadro;
+  - a página tem `noindex, follow`;
+  - o `/sitemap.xml` não tem `/busca`.
+- [x] 1.3 Lupa no cabeçalho e campo no menu lateral. Conferir no navegador, a 1280 e a 390 px, nos modos claro e escuro: (10/11/2026, Playwright a 1280 e a 390 px, nos modos claro e escuro: a lupa abre o campo com o foco e `aria-expanded=true`; Enter → `/busca?q=festival`; Esc fecha; o campo do menu lateral → `/busca?q=mutirão`; logo centralizado (640 e 195 px); sem rolagem lateral)
+  - a lupa abre o campo com o foco;
+  - Enter leva a `/busca?q=…`;
+  - `Esc` fecha;
+  - o campo do menu lateral também busca;
+  - o logo continua centralizado;
+  - a página não rola para o lado.
+- [ ] 2.1 Produção (escrita, com aprovação do Jonas), junto com os outros changes pendentes:
+  - deploy com `./build.sh`;
+  - HTTP 200 nos 8 domínios de cliente e no ajope;
+  - `https://ajope.wab.com.br/busca?q=festival` com resultados.

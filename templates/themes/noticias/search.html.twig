@@ -1,0 +1,53 @@
+{% extends 'themes/noticias/base.html.twig' %}
+
+{# Busca do portal (busca-no-portal). Variáveis: term, searched, total, articles, pages_found, page, pages. #}
+{% block title %}{{ searched ? 'Busca: ' ~ term : 'Busca' }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
+
+{% block body %}
+<div class="nt-container nt-page">
+    <div class="nt-layout">
+        <div class="nt-feed">
+            <header class="nt-page-head">
+                <h1>Busca</h1>
+                <form class="nt-search-form nt-search-form--page" action="{{ path('pub_search') }}" method="get" role="search">
+                    <label for="nt-search-page" class="nt-sr-only">Buscar notícias</label>
+                    <input type="search" id="nt-search-page" name="q" value="{{ term }}" maxlength="100" placeholder="O que você procura?" {{ searched ? '' : 'autofocus' }}>
+                    <button type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>Buscar</span></button>
+                </form>
+                {% if searched %}
+                    <p class="nt-search-count">
+                        {% if total > 0 %}
+                            {{ total }} resultado{{ total == 1 ? '' : 's' }} para “{{ term }}”
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </header>
+
+            {% if pages_found is not empty %}
+                <section class="nt-card nt-search-pages" aria-labelledby="nt-search-pages-title">
+                    <h2 class="nt-card__title" id="nt-search-pages-title">Páginas</h2>
+                    <ul>
+                        {% for p in pages_found %}
+                            <li><a href="{{ path('pub_page_show', {slug: p.slug}) }}">{{ p.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+
+            {% if searched %}
+                {% for a in articles %}
+                    {% include 'themes/noticias/_article_item.html.twig' with {article: a} %}
+                {% else %}
+                    <p class="nt-empty">Nenhuma notícia encontrada para “{{ term }}”.</p>
+                {% endfor %}
+                {% include 'themes/noticias/_pagination.html.twig' with {route: 'pub_search', params: {q: term}} %}
+            {% endif %}
+        </div>
+        <aside class="nt-sidebar" aria-label="Destaques">
+            {% include 'themes/noticias/_featured.html.twig' %}
+            {% include 'themes/noticias/_most_read.html.twig' %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

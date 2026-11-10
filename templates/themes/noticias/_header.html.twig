@@ -34,6 +34,9 @@
             {% endif %}
         </div>
         <div class="nt-header__right">
+            <button type="button" class="nt-search-btn" id="nt-search-btn" aria-label="Buscar" title="Buscar" aria-expanded="false" aria-controls="nt-search">
+                <i class="bi bi-search" aria-hidden="true"></i>
+            </button>
             {# Rótulo e ícone iniciais do Claro; _theme_mode.html.twig acerta o modo guardado #}
             <button type="button" class="nt-mode-btn" id="nt-mode-btn" aria-label="Aparência: Claro. Mudar para Escuro" title="Aparência: Claro. Mudar para Escuro">
                 <i class="bi bi-sun" aria-hidden="true"></i><span class="nt-mode-btn__label">Claro</span>
@@ -41,6 +44,13 @@
         </div>
     </div>
 </header>
+<div class="nt-search" id="nt-search" hidden>
+    <form class="nt-container nt-search-form" action="{{ path('pub_search') }}" method="get" role="search">
+        <label for="nt-search-input" class="nt-sr-only">Buscar notícias</label>
+        <input type="search" id="nt-search-input" name="q" maxlength="100" placeholder="O que você procura?" value="{{ app.request.attributes.get('_route') == 'pub_search' ? app.request.query.get('q') : '' }}">
+        <button type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>Buscar</span></button>
+    </form>
+</div>
 
 <div class="nt-overlay" id="nt-overlay" hidden></div>
 <aside class="nt-drawer" id="nt-drawer" hidden aria-label="Menu">
@@ -48,6 +58,11 @@
         <span class="nt-drawer__title">Menu</span>
         <button type="button" class="nt-drawer__close" id="nt-drawer-close" aria-label="Fechar menu">&times;</button>
     </div>
+    <form class="nt-search-form nt-search-form--drawer" action="{{ path('pub_search') }}" method="get" role="search">
+        <label for="nt-search-drawer" class="nt-sr-only">Buscar notícias</label>
+        <input type="search" id="nt-search-drawer" name="q" maxlength="100" placeholder="Buscar notícias">
+        <button type="submit" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>
+    </form>
     <nav>
         <ul>
             <li><a href="{{ path('pub_home') }}">Início</a></li>
@@ -103,6 +118,18 @@
     }
     function onKey(e) { if (e.key === 'Escape') close(); }
     btn.addEventListener('click', function () { drawer.hidden ? open() : close(); });
+
+    // Busca: a lupa mostra e esconde o campo abaixo da barra; Esc fecha
+    var sBtn = document.getElementById('nt-search-btn');
+    var sBox = document.getElementById('nt-search');
+    if (sBtn && sBox) {
+        var sInput = sBox.querySelector('input');
+        function sClose() { sBox.hidden = true; sBtn.setAttribute('aria-expanded', 'false'); }
+        sBtn.addEventListener('click', function () {
+            if (sBox.hidden) { sBox.hidden = false; sBtn.setAttribute('aria-expanded', 'true'); sInput.focus(); } else { sClose(); }
+        });
+        sBox.addEventListener('keydown', function (e) { if (e.key === 'Escape') { sClose(); sBtn.focus(); } });
+    }
     overlay.addEventListener('click', close);
     closeBtn.addEventListener('click', close);
 })();

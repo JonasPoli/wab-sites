@@ -35,6 +35,7 @@
             <div class="af-field"><label>Background 1 (Modo Escuro)</label><input type="color" name="bgColorDark1" value="#0d0f1a" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
             <div class="af-field"><label>Background 2 (Modo Escuro)</label><input type="color" name="bgColorDark2" value="#131625" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:none"></div>
         </div>
+        {% include 'superadmin/tenant/_recaptcha_fields.html.twig' with {tenant: null} %}
         <div class="af-actions"><button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Criar Tenant</button><a href="{{ path('superadmin_dash') }}" class="btn btn-g">Cancelar</a></div>
     </form>
 </div>

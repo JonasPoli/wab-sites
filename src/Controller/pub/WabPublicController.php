@@ -11,6 +11,7 @@ use App\Repository\HeroBannerRepository;
 use App\Repository\NewsletterSubscriberRepository;
 use App\Repository\PageRepository;
 use App\Repository\PageBlockTeamMemberRepository;
+use App\Service\RecaptchaVerifier;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -196,6 +197,7 @@ class WabPublicController extends AbstractController
         EntityManagerInterface $em,
         MailerInterface $mailer,
         ParameterBagInterface $parameters,
+        RecaptchaVerifier $recaptcha,
     ): Response
     {
         $redirect = $this->redirectToRoute('pub_home', ['_fragment' => 'contato']);
@@ -216,6 +218,18 @@ class WabPublicController extends AbstractController
         }
 
         $tenant = $this->tenantContext->requireTenant();
+
+        // reCAPTCHA v3 com as chaves do site do domínio (recaptcha-no-contato)
+        if ($tenant->hasRecaptcha()) {
+            $result = $recaptcha->verify($tenant, (string) $request->request->get('g-recaptcha-response'), 'contato', $request->getClientIp());
+            if ($result === RecaptchaVerifier::REJECTED) {
+                $this->addFlash('error', 'Não foi possível confirmar o envio. Tente de novo em alguns segundos.');
+                return $redirect;
+            }
+            // UNAVAILABLE: o Google não respondeu direito; o contato segue como antes (o serviço já registrou no log)
+        } else {
+            $this->logger->warning('reCAPTCHA: contato aceito sem conferência, site sem chave.', ['domain' => $tenant->getDomain()]);
+        }
 
         $contact = new ContactMessage();
         $contact->setTenant($tenant);
@@ -269,6 +283,35 @@ class WabPublicController extends AbstractController
         [$page, $pages] = $this->currentPage($request, $articles->countVisible(), ArticleRepository::PER_PAGE);
         return $this->render($this->theme('articles.html.twig'), [
             'articles' => $articles->findVisiblePage(null, $page),
+            'page'     => $page,
+            'pages'    => $pages,
+        ]);
+    }
+
+    /** Busca do portal (tema noticias): notícias visíveis e páginas pelo título. */
+    #[Route('/busca', name: 'pub_search', methods: ['GET'])]
+    public function search(Request $request, ArticleRepository $articles, PageRepository $pageRepository): Response
+    {
+        if (!$this->isNewsTheme()) {
+            throw $this->createNotFoundException('Página não encontrada.');
+        }
+
+        $term = trim(mb_substr((string) $request->query->get('q', ''), 0, 100));
+        $words = array_values(array_filter(
+            preg_split('/\s+/u', $term) ?: [],
+            fn (string $w) => mb_strlen($w) >= 2,
+        ));
+        $words = array_slice($words, 0, 5);
+
+        $total = $words ? $articles->countSearchVisible($words) : 0;
+        [$page, $pages] = $this->currentPage($request, $total, ArticleRepository::PER_PAGE);
+
+        return $this->render($this->theme('search.html.twig'), [
+            'term'     => $term,
+            'searched' => $words !== [],
+            'total'    => $total,
+            'articles' => $words ? $articles->searchVisible($words, $page) : [],
+            'pages_found' => $words ? $pageRepository->searchByTitle($words) : [],
             'page'     => $page,
             'pages'    => $pages,
         ]);

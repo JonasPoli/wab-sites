@@ -34,6 +34,48 @@ class ArticleRepository extends ServiceEntityRepository
             ->setParameter('visibleNow', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE);
     }
 
+    /**
+     * Busca do portal: notícias visíveis com todas as palavras no título, chapéu, linha fina
+     * ou texto (o LIKE da collation ignora maiúsculas e acentos); título que casa vem primeiro.
+     *
+     * @param list<string> $words
+     * @return Article[]
+     */
+    public function searchVisible(array $words, int $page = 1, int $perPage = self::PER_PAGE): array
+    {
+        $qb = $this->searchQueryBuilder($words);
+        $titleHit = [];
+        foreach (array_keys($words) as $i) {
+            $titleHit[] = "a.title LIKE :w$i";
+        }
+        return $qb
+            ->addSelect('CASE WHEN ' . implode(' OR ', $titleHit) . ' THEN 0 ELSE 1 END AS HIDDEN titleFirst')
+            ->orderBy('titleFirst', 'ASC')
+            ->addOrderBy('a.publishedAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @param list<string> $words */
+    public function countSearchVisible(array $words): int
+    {
+        return (int) $this->searchQueryBuilder($words)->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    /** @param list<string> $words */
+    private function searchQueryBuilder(array $words): QueryBuilder
+    {
+        $qb = $this->visibleQueryBuilder();
+        foreach (array_values($words) as $i => $word) {
+            $qb->andWhere("(a.title LIKE :w$i OR a.kicker LIKE :w$i OR a.summary LIKE :w$i OR a.body LIKE :w$i)")
+                ->setParameter("w$i", '%' . addcslashes($word, '%_\\') . '%');
+        }
+        return $qb;
+    }
+
     private function orderNewestFirst(QueryBuilder $qb, string $alias = 'a'): QueryBuilder
     {
         return $qb->orderBy("$alias.publishedAt", 'DESC')->addOrderBy("$alias.id", 'DESC');

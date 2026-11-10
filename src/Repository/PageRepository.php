@@ -23,6 +23,21 @@ class PageRepository extends ServiceEntityRepository
      *
      * @return Page[]
      */
+    /**
+     * Busca do portal: páginas com todas as palavras no título, em ordem alfabética.
+     *
+     * @param list<string> $words
+     * @return Page[]
+     */
+    public function searchByTitle(array $words, int $limit = 5): array
+    {
+        $qb = $this->createQueryBuilder('p')->orderBy('p.title', 'ASC')->setMaxResults($limit);
+        foreach (array_values($words) as $i => $word) {
+            $qb->andWhere("p.title LIKE :w$i")->setParameter("w$i", '%' . addcslashes($word, '%_\\') . '%');
+        }
+        return $qb->getQuery()->getResult();
+    }
+
     public function findLatestInCategory(Category $category, int $limit): array
     {
         return $this->createQueryBuilder('p')

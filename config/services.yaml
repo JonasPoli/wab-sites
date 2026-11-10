@@ -8,6 +8,7 @@ parameters:
     emailContactTo: '%env(resolve:EMAIL_CONTACT_TO)%'
     # Formatos que não viram miniatura mesmo que o GD abra (ex.: "avif"), para reproduzir o servidor no teste local
     app.image_formats.disabled: '%env(default::IMAGE_FORMATS_DISABLED)%'
+    app.recaptcha.score_min: '%env(float:RECAPTCHA_SCORE_MIN)%'
 
 services:
     _defaults:

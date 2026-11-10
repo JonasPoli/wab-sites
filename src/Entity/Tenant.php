@@ -146,6 +146,14 @@ class Tenant
     #[ORM\Column(options: ['default' => true])]
     private bool $showSectionTitles = true;
 
+    /** reCAPTCHA v3 do formulário de contato (por site; cadastrado no /superadmin) */
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $recaptchaSiteKey = null;
+
+    /** Nunca aparece na tela depois de gravada nem vai na exportação */
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $recaptchaSecretKey = null;
+
     #[ORM\Column(options: ['default' => false])]
     private bool $landingPageMode = false;
 
@@ -333,6 +341,13 @@ class Tenant
         return $this;
     }
 
+    public function getRecaptchaSiteKey(): ?string { return $this->recaptchaSiteKey; }
+    public function setRecaptchaSiteKey(?string $key): static { $this->recaptchaSiteKey = $key; return $this; }
+    public function getRecaptchaSecretKey(): ?string { return $this->recaptchaSecretKey; }
+    public function setRecaptchaSecretKey(?string $key): static { $this->recaptchaSecretKey = $key; return $this; }
+    /** As duas chaves preenchidas: o contato passa pela conferência do reCAPTCHA */
+    public function hasRecaptcha(): bool { return (bool) $this->recaptchaSiteKey && (bool) $this->recaptchaSecretKey; }
+
     public function isShowSectionTitles(): bool
     {
         return $this->showSectionTitles;
@@ -428,6 +443,8 @@ class Tenant
             'darkLogo'           => $this->darkLogo,
             'homePageId'         => $this->homePage?->getId(),
             'googleAnalyticsId'  => $this->googleAnalyticsId,
+            // Só a site key: a secret key nunca sai do servidor
+            'recaptchaSiteKey'   => $this->recaptchaSiteKey,
             'updatedAt'          => $this->updatedAt,
             // File objects intentionally excluded — not serializable
         ];
@@ -474,6 +491,7 @@ class Tenant
         $this->newsletterEnabled = $data['newsletterEnabled'] ?? true;
         $this->darkLogo          = $data['darkLogo'] ?? null;
         $this->googleAnalyticsId = $data['googleAnalyticsId'] ?? null;
+        $this->recaptchaSiteKey = $data['recaptchaSiteKey'] ?? null;
         $this->updatedAt         = $data['updatedAt'];
         $this->logoFile          = null;
         $this->darkLogoFile      = null;
