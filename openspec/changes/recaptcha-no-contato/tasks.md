@@ -47,13 +47,13 @@
 
 ## 5. Publicação
 
-- [ ] 5.1 Commit e `git push origin main`. Verificar: `git log --oneline origin/main -1` mostra o commit.
-- [ ] 5.2 Backup antes (leitura, depois cópia no servidor, como runcloud):
+- [x] 5.1 Commit e `git push origin main`. Verificar: `git log --oneline origin/main -1` mostra o commit. (10/11/2026: 1ec2bc7 em origin/main)
+- [x] 5.2 Backup antes (leitura, depois cópia no servidor, como runcloud): (10/11/2026 21:22 UTC: HEAD cc18e2b em `~/backups/wab-sites-HEAD-antes-20261110-2122.txt` e dump `~/backups/wab-sites-antes-deploy-20261110-2122.sql.gz` (chmod 600, com nice, 20 tabelas))
   - anotar o `git rev-parse HEAD` de `~/webapps/app-wab-sites`;
   - fazer o dump do banco fora do docroot (`~/backups`, chmod 600), com `nice`.
   - Verificar: o arquivo existe e tem tamanho maior que zero.
-- [ ] 5.3 Deploy (escrita, com aprovação do Jonas): `git pull --ff-only`, `/RunCloud/Packages/php83rc/bin/php bin/console doctrine:migrations:migrate --no-interaction` e `cache:clear`. Verificar: `doctrine:migrations:status` sem pendência e o HEAD igual ao da `main`.
-- [ ] 5.4 Conferência depois:
+- [x] 5.3 Deploy (escrita, com aprovação do Jonas): `git pull --ff-only`, `/RunCloud/Packages/php83rc/bin/php bin/console doctrine:migrations:migrate --no-interaction` e `cache:clear`. Verificar: `doctrine:migrations:status` sem pendência e o HEAD igual ao da `main`. (10/11/2026 21:22 UTC, com a autorização do Jonas ("pode fazer"): HEAD cc18e2b em `~/backups/wab-sites-HEAD-antes-20261110-2122.txt` e dump `wab-sites-antes-deploy-20261110-2122.sql.gz` (20 tabelas); `git pull` até 1ec2bc7, migrations Version20261110205446 e Version20261110210740 e `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope; foi usado o `./build.sh` em vez do `cache:clear`, porque mudaram templates de outros changes no mesmo deploy)
+- [ ] 5.4 Conferência depois: (10/11/2026: HTTP 200 nos 8 domínios e nenhum `recaptcha` no HTML das 8 homes. Pendente: o Jonas ver no `/superadmin` os 8 marcados "sem reCAPTCHA", porque não há sessão de SuperAdmin de produção nesta sessão)
   - HTTP 200 nos 8 domínios de cliente;
   - painel do `/superadmin` com os 8 marcados "sem reCAPTCHA";
   - nenhum `recaptcha` no HTML das homes.

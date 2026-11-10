@@ -19,7 +19,7 @@
   - o campo do menu lateral também busca;
   - o logo continua centralizado;
   - a página não rola para o lado.
-- [ ] 2.1 Produção (escrita, com aprovação do Jonas), junto com os outros changes pendentes:
+- [x] 2.1 Produção (escrita, com aprovação do Jonas), junto com os outros changes pendentes: (10/11/2026 21:22 UTC, com a autorização do Jonas ("pode fazer"): HEAD cc18e2b em `~/backups/wab-sites-HEAD-antes-20261110-2122.txt` e dump `wab-sites-antes-deploy-20261110-2122.sql.gz` (20 tabelas); `git pull` até 1ec2bc7, migrations Version20261110205446 e Version20261110210740 e `./build.sh`; HTTP 200 nos 8 domínios de cliente e no ajope. https://ajope.wab.com.br/busca?q=mutirao → "1 resultado"; "festival" → "Nenhuma notícia encontrada para “festival”." (nenhuma das 20 notícias do ajope tem a palavra); `noindex, follow`; lupa no cabeçalho; `marapossi.com.br/busca` → 404)
   - deploy com `./build.sh`;
   - HTTP 200 nos 8 domínios de cliente e no ajope;
   - `https://ajope.wab.com.br/busca?q=festival` com resultados.
