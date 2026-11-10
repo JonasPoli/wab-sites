@@ -44,6 +44,12 @@
     {% set ntPrimaryDark = currentTenant and (currentTenant.primaryColorDark ?? '') matches hexColor ? currentTenant.primaryColorDark : '#3b82f6' %}
     {% set ntBgDark1 = currentTenant and (currentTenant.bgColorDark1 ?? '') matches hexColor ? currentTenant.bgColorDark1 : '#0d0f1a' %}
     {% set ntBgDark2 = currentTenant and (currentTenant.bgColorDark2 ?? '') matches hexColor ? currentTenant.bgColorDark2 : '#131625' %}
+    {# Tamanho dos títulos (edição do tenant, H1 a H3); sem valor válido, os do g1 #}
+    {% set cssSize = '/^\\d+(\\.\\d+)?(px|rem|em)$/' %}
+    {% set fs = currentTenant ? (currentTenant.fontSettings ?? {}) : {} %}
+    {% set ntH1 = (fs.h1.size ?? '') matches cssSize ? fs.h1.size : '2.5rem' %}
+    {% set ntH2 = (fs.h2.size ?? '') matches cssSize ? fs.h2.size : '1.5rem' %}
+    {% set ntH3 = (fs.h3.size ?? '') matches cssSize ? fs.h3.size : '1.25rem' %}
     {# No escuro, títulos e links só ficam na primária do modo escuro se ela tiver 4,5:1 com os dois fundos #}
     {% set ntAccentDarkOk = contrast_ratio(ntPrimaryDark, ntBgDark1) >= 4.5 and contrast_ratio(ntPrimaryDark, ntBgDark2) >= 4.5 %}
     <style>
@@ -83,6 +89,10 @@
         --nt-field-border: #cfcfcf;
         --nt-img-ph: #e5e7eb;
         --nt-req: #b91c1c;
+        /* Tamanho dos títulos: H1, H2 e H3 da edição do tenant (padrão: medidas do g1) */
+        --nt-h1-size: {{ ntH1 }};
+        --nt-h2-size: {{ ntH2 }};
+        --nt-h3-size: {{ ntH3 }};
     }
     [data-theme="dark"] {
         color-scheme: dark;
@@ -154,7 +164,7 @@
     .nt-logo img { height: 44px; width: auto; }
     .nt-logo--pill { background: #fff; border-radius: 10px; padding: 3px 8px; }
     .nt-logo--pill img { height: 40px; }
-    .nt-header__section { font-size: 22px; font-weight: 300; text-transform: uppercase; letter-spacing: .03em; color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nt-header__section { font-size: 32px; line-height: 1.2; font-weight: 300; text-transform: uppercase; letter-spacing: -1px; color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nt-header--section .nt-header__inner { grid-template-columns: auto 1fr auto; }
     .nt-header--section .nt-header__center { text-align: center; min-width: 0; }
     .nt-header--section .nt-logo img { height: 36px; }

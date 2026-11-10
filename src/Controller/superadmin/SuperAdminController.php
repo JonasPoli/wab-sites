@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\TenantRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
+use App\Service\HeadingFonts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -77,8 +78,9 @@ class SuperAdminController extends AbstractController
         $pages = $pageRepo->findBy(['tenant' => $tenant], ['position' => 'ASC', 'title' => 'ASC']);
 
         return $this->render('superadmin/tenant/edit.html.twig', [
-            'tenant' => $tenant,
-            'pages'  => $pages,
+            'tenant'       => $tenant,
+            'pages'        => $pages,
+            'fontFamilies' => HeadingFonts::choices(),
         ]);
     }
 
@@ -770,7 +772,8 @@ class SuperAdminController extends AbstractController
         $fontSettings = [];
         for ($i = 1; $i <= 5; $i++) {
             $fontSettings['h' . $i] = [
-                'font'   => (string) $r->request->get('h' . $i . '_font', 'Outfit'),
+                // Só famílias do catálogo; qualquer outra vira Outfit
+                'font'   => HeadingFonts::normalize((string) $r->request->get('h' . $i . '_font', HeadingFonts::DEFAULT)),
                 'size'   => (string) $r->request->get('h' . $i . '_size', ''),
                 'weight' => (string) $r->request->get('h' . $i . '_weight', '400'),
             ];

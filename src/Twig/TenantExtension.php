@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Service\HeadingFonts;
 use App\Repository\CategoryRepository;
 use App\Repository\PageRepository;
 use App\Service\TenantContext;
@@ -96,13 +97,14 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         for ($i = 1; $i <= 5; $i++) {
             $hKey = 'h' . $i;
             if (isset($fontSettings[$hKey])) {
-                $font = $fontSettings[$hKey]['font'] ?? 'Outfit';
-                $weight = $fontSettings[$hKey]['weight'] ?? '400';
-                
+                // Família fora do catálogo vira Outfit; peso fora da faixa da família vira o mais próximo
+                $font = HeadingFonts::normalize($fontSettings[$hKey]['font'] ?? null);
+                $weight = HeadingFonts::clampWeight($font, $fontSettings[$hKey]['weight'] ?? '400');
+
                 if (!isset($fontGroups[$font])) {
                     $fontGroups[$font] = [];
                 }
-                $fontGroups[$font][] = (int)$weight;
+                $fontGroups[$font][] = $weight;
             } else {
                 $fontGroups['Outfit'][] = 400;
                 $fontGroups['Outfit'][] = 700;
@@ -135,11 +137,11 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         for ($i = 1; $i <= 5; $i++) {
             $hKey = 'h' . $i;
             if (isset($fontSettings[$hKey])) {
-                $font = $fontSettings[$hKey]['font'] ?? 'Outfit';
-                $weight = $fontSettings[$hKey]['weight'] ?? '400';
+                $font = HeadingFonts::normalize($fontSettings[$hKey]['font'] ?? null);
+                $weight = HeadingFonts::clampWeight($font, $fontSettings[$hKey]['weight'] ?? '400');
                 $size = $fontSettings[$hKey]['size'] ?? '';
-                
-                $fallback = ($font === 'Playfair Display') ? 'serif' : 'sans-serif';
+
+                $fallback = HeadingFonts::fallback($font);
                 $fontEscaped = htmlspecialchars($font);
                 
                 $rules = [];

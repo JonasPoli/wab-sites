@@ -599,14 +599,10 @@
 
         <h3 style="margin-bottom: 1.5rem; color: var(--text)">Configurações de Tipografia dos Títulos (H1 a H5)</h3>
         
+        <p class="af-hint" style="margin: -1rem 0 1.5rem;">A Open Sans tem pesos de 300 a 800 e a Playfair Display de 400 a 900. Fora disso, o site usa o peso mais próximo.</p>
+
         {% set fontSettings = tenant.fontSettings %}
-        {% set fontFamilies = {
-            'Inter': 'Inter (Moderna, Geométrica)',
-            'Roboto': 'Roboto (Neutra, Legível)',
-            'Playfair Display': 'Playfair Display (Elegante, Serifa)',
-            'Montserrat': 'Montserrat (Expressiva, Geométrica)',
-            'Outfit': 'Outfit (Contemporânea, Original do Tema)'
-        } %}
+        {# fontFamilies vem de App\Service\HeadingFonts::choices() (SuperAdminController::tenantEdit) #}
         {% set fontWeights = {
             '300': '300 (Light)',
             '400': '400 (Regular)',
