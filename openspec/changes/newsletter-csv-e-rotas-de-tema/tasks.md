@@ -15,9 +15,9 @@ Conferência em `http://127.0.0.1:8000` (tenant A das fixtures, tema wab) e `htt
 
 ## 3. Produção
 
-- [ ] 3.1 Backup (leitura, antes da escrita): anotar `git rev-parse HEAD` do webapp para a volta. O deploy não grava no banco.
-- [ ] 3.2 Deploy (escrita, com aprovação do Jonas): `git push origin main` local; no servidor, como runcloud, `git pull` e `./build.sh` (mudou template do painel); sem migration. Conferir HTTP 200 em `/` dos 8 domínios de cliente (marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br).
-- [ ] 3.3 Conferência (leitura): `/videos` e `/estudos` com 404 e `/noticias` com 200 nos 8 domínios; o Jonas baixa o CSV em `marapossi.com.br/admin/newsletter` e `pkwy.com.br/admin/newsletter` e confere 3 linhas em cada, sem colar o conteúdo em lugar nenhum.
+- [x] 3.1 Backup (leitura, antes da escrita): anotar `git rev-parse HEAD` do webapp para a volta. O deploy não grava no banco. (10/11/2026 14:35 UTC: HEAD f089e6b anotado em `~/backups/wab-sites-HEAD-antes-20261110-1435.txt`; o dump do portal-de-noticias também cobre este deploy)
+- [x] 3.2 Deploy (escrita, com aprovação do Jonas): `git push origin main` local; no servidor, como runcloud, `git pull` e `./build.sh` (mudou template do painel); sem migration. Conferir HTTP 200 em `/` dos 8 domínios de cliente (marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br). (10/11/2026 14:37 UTC, junto com os outros dois changes: git pull e `./build.sh`; HTTP 200 em `/` nos 8 domínios)
+- [ ] 3.3 Conferência (leitura): `/videos` e `/estudos` com 404 e `/noticias` com 200 nos 8 domínios; o Jonas baixa o CSV em `marapossi.com.br/admin/newsletter` e `pkwy.com.br/admin/newsletter` e confere 3 linhas em cada, sem colar o conteúdo em lugar nenhum. (10/11/2026: `/videos` e `/estudos` 404 "Página não encontrada." (antes do deploy eram 500) e `/noticias` 200 nos 8 domínios. Pendente: o Jonas baixar o CSV em marapossi.com.br e pkwy.com.br (o banco tem 3 inscritos em cada))
 
 ## Workflow follow-up
 
