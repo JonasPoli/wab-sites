@@ -1,17 +1,52 @@
 {% extends 'admin/wab_base.html.twig' %}
 {% block title %}Contato{% endblock %}{% block page_title %}Mensagens de Contato{% endblock %}
 {% block body %}
-<div class="ph"><h1>Mensagens de Contato</h1></div>
+{% set motivos = {
+    'isca': 'Campo invisível preenchido',
+    'tempo': 'Enviado antes do tempo mínimo',
+    'limite_ip': 'Envios demais do mesmo IP',
+    'conteudo': 'Mensagem com cara de spam'
+} %}
+<div class="ph"><h1>{{ bloqueados ? 'Mensagens bloqueadas' : 'Mensagens de Contato' }}</h1></div>
+
+<div class="card" style="margin-bottom:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:1rem">
+    {% if bloqueados %}
+        <span style="color:var(--muted)">Estas mensagens foram barradas pelo antispam: nenhuma delas foi enviada por e-mail.</span>
+        <a class="btn btn-s btn-sm" href="{{ path('admin_contact_index') }}">Ver mensagens recebidas</a>
+    {% else %}
+        <span style="color:var(--muted)">
+            {% if totalBloqueados > 0 %}
+                O antispam já barrou {{ totalBloqueados }} mensagem{{ totalBloqueados > 1 ? 's' : '' }} neste site.
+            {% else %}
+                O antispam ainda não barrou nenhuma mensagem neste site.
+            {% endif %}
+        </span>
+        {% if totalBloqueados > 0 %}
+            <a class="btn btn-s btn-sm" href="{{ path('admin_contact_index', {bloqueados: 1}) }}">Ver bloqueadas ({{ totalBloqueados }})</a>
+        {% endif %}
+    {% endif %}
+</div>
+
 <div class="card"><div class="tw"><table class="at">
-    <thead><tr><th>Nome</th><th>E-mail</th><th>Mensagem</th><th>Data</th><th>Status</th><th></th></tr></thead>
+    <thead><tr>
+        <th>Nome</th><th>E-mail</th><th>Mensagem</th><th>Site</th><th>Data</th>
+        <th>{{ bloqueados ? 'Motivo' : 'Status' }}</th><th></th>
+    </tr></thead>
     <tbody>
     {% for m in messages %}
     <tr style="{{ not m.isRead ? 'background:rgba(79,110,247,.05)' : '' }}">
         <td style="font-weight:{{ not m.isRead ? '700' : '400' }}">{{ m.senderName }}</td>
         <td><a href="mailto:{{ m.senderEmail }}" style="color:var(--primary)">{{ m.senderEmail }}</a></td>
         <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.message }}</td>
+        <td style="color:var(--muted)">{{ m.sourceDomain ?: '—' }}</td>
         <td>{{ m.createdAt|date('d/m/Y H:i') }}</td>
-        <td><span class="badge {{ m.isRead ? 'bg-neu' : 'bg-inf' }}">{{ m.isRead ? 'Lida' : 'Nova' }}</span></td>
+        <td>
+            {% if m.spamReason %}
+                <span class="badge bg-neu" title="{{ m.spamReason }}">{{ motivos[m.spamReason]|default(m.spamReason) }}</span>
+            {% else %}
+                <span class="badge {{ m.isRead ? 'bg-neu' : 'bg-inf' }}">{{ m.isRead ? 'Lida' : 'Nova' }}</span>
+            {% endif %}
+        </td>
         <td><div class="ta">
             {% if not m.isRead %}
             <form action="{{ path('admin_contact_read', {id: m.id}) }}" method="post">
@@ -24,7 +59,7 @@
             </form>
         </div></td>
     </tr>
-    {% else %}<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Nenhuma mensagem.</td></tr>{% endfor %}
+    {% else %}<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">{{ bloqueados ? 'Nenhuma mensagem bloqueada.' : 'Nenhuma mensagem.' }}</td></tr>{% endfor %}
     </tbody>
 </table></div></div>
 {% endblock %}

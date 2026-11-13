@@ -300,9 +300,16 @@ class AdminContentController extends AbstractController
     // ── ContactMessage ────────────────────────────────────────────────────────
 
     #[Route('/contact', name: 'contact_index')]
-    public function contactIndex(ContactMessageRepository $repo): Response
+    public function contactIndex(ContactMessageRepository $repo, Request $r): Response
     {
-        return $this->render('admin/contact/index.html.twig', ['messages' => $repo->findBy([], ['createdAt' => 'DESC'])]);
+        // Por padrão só os contatos aceitos; ?bloqueados=1 mostra o que o antispam barrou.
+        $bloqueados = $r->query->getBoolean('bloqueados');
+
+        return $this->render('admin/contact/index.html.twig', [
+            'messages' => $repo->findBySituacao($bloqueados),
+            'bloqueados' => $bloqueados,
+            'totalBloqueados' => $repo->countBlocked(),
+        ]);
     }
 
     #[Route('/contact/{id}/read', name: 'contact_read', methods: ['POST'])]
@@ -316,11 +323,12 @@ class AdminContentController extends AbstractController
     #[Route('/contact/{id}/delete', name: 'contact_delete', methods: ['POST'])]
     public function contactDelete(ContactMessage $msg, Request $r, EntityManagerInterface $em): Response
     {
+        $bloqueado = $msg->isBlocked();
         if ($this->isCsrfTokenValid('del_contact_' . $msg->getId(), (string) $r->request->get('_token'))) {
             $em->remove($msg);
             $em->flush();
         }
-        return $this->redirectToRoute('admin_contact_index');
+        return $this->redirectToRoute('admin_contact_index', $bloqueado ? ['bloqueados' => 1] : []);
     }
 
     // ── Newsletter ────────────────────────────────────────────────────────────

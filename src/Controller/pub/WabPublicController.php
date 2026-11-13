@@ -11,6 +11,7 @@ use App\Repository\HeroBannerRepository;
 use App\Repository\NewsletterSubscriberRepository;
 use App\Repository\PageRepository;
 use App\Repository\PageBlockTeamMemberRepository;
+use App\Service\ContatoAntispam;
 use App\Service\RecaptchaVerifier;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
@@ -198,6 +199,7 @@ class WabPublicController extends AbstractController
         MailerInterface $mailer,
         ParameterBagInterface $parameters,
         RecaptchaVerifier $recaptcha,
+        ContatoAntispam $antispam,
     ): Response
     {
         $redirect = $this->redirectToRoute('pub_home', ['_fragment' => 'contato']);
@@ -218,6 +220,28 @@ class WabPublicController extends AbstractController
         }
 
         $tenant = $this->tenantContext->requireTenant();
+        $sourceDomain = $request->getHost();
+
+        // Antispam de todos os sites, sem chave de terceiro (antispam-no-contato). Vem antes do
+        // reCAPTCHA porque é local: não faz sentido pagar uma chamada ao Google por um envio que
+        // a isca já reprovou. O bloqueado é gravado com o motivo, não gera e-mail, e o visitante
+        // recebe a mesma resposta do sucesso, para o robô não descobrir qual regra o pegou.
+        $motivo = $antispam->verificar($tenant, $request, $name, $message);
+        if ($motivo !== null) {
+            $bloqueado = new ContactMessage();
+            $bloqueado->setTenant($tenant);
+            $bloqueado->setSenderName($name);
+            $bloqueado->setSenderEmail($email);
+            $bloqueado->setMessage($message);
+            $bloqueado->setSourceDomain($sourceDomain);
+            $bloqueado->setSpamReason($motivo);
+            $bloqueado->setIsRead(true);
+            $em->persist($bloqueado);
+            $em->flush();
+
+            $this->addFlash('success', 'Mensagem enviada com sucesso!');
+            return $redirect;
+        }
 
         // reCAPTCHA v3 com as chaves do site do domínio (recaptcha-no-contato)
         if ($tenant->hasRecaptcha()) {
@@ -236,8 +260,11 @@ class WabPublicController extends AbstractController
         $contact->setSenderName($name);
         $contact->setSenderEmail($email);
         $contact->setMessage($message);
+        $contact->setSourceDomain($sourceDomain);
         $em->persist($contact);
         $em->flush();
+
+        $antispam->registrarAceito($request->getClientIp());
 
         // Enviar e-mail de contato usando o Symfony Mailer integrado ao Wmailer
         try {
@@ -250,6 +277,7 @@ class WabPublicController extends AbstractController
                 'message' => $message,
                 'submitted_at' => new \DateTimeImmutable('now'),
                 'tenant' => $tenant,
+                'source_domain' => $sourceDomain,
             ];
 
             $emailMessage = (new TemplatedEmail())

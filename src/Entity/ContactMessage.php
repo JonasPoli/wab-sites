@@ -41,6 +41,14 @@ class ContactMessage implements TenantAwareInterface
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $extraData = null;
 
+    /** Motivo do bloqueio do antispam (isca, tempo, limite_ip, conteudo); nulo = contato aceito */
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $spamReason = null;
+
+    /** Domínio de onde o envio saiu (host do request) */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $sourceDomain = null;
+
 
     public function __construct()
     {
@@ -71,4 +79,12 @@ class ContactMessage implements TenantAwareInterface
 
     public function getExtraData(): ?array { return $this->extraData; }
     public function setExtraData(?array $extraData): static { $this->extraData = $extraData; return $this; }
+
+    public function getSpamReason(): ?string { return $this->spamReason; }
+    public function setSpamReason(?string $spamReason): static { $this->spamReason = $spamReason; return $this; }
+
+    public function isBlocked(): bool { return $this->spamReason !== null; }
+
+    public function getSourceDomain(): ?string { return $this->sourceDomain; }
+    public function setSourceDomain(?string $sourceDomain): static { $this->sourceDomain = $sourceDomain; return $this; }
 }

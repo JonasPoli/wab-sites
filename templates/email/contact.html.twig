@@ -145,6 +145,12 @@
                         <td class="label">Data/Hora</td>
                         <td class="value">{{ submitted_at|date('d/m/Y \\à\\s H:i:s') }}</td>
                     </tr>
+                    {% if source_domain is defined and source_domain %}
+                    <tr>
+                        <td class="label">Site de origem</td>
+                        <td class="value">{{ source_domain }}</td>
+                    </tr>
+                    {% endif %}
                 </table>
                 
                 <div class="message-box">

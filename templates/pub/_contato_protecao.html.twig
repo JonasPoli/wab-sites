@@ -1,9 +1,22 @@
 {#
-  reCAPTCHA v3 do formulário de contato (recaptcha-no-contato), só com as duas chaves do site.
-  O script do Google só carrega quando o visitante entra num formulário que posta em /contato;
-  o token é pedido no envio (vence em 2 minutos). Sem o script em 8 s, envia sem token e o
-  servidor decide. Incluído dentro de cada formulário de contato dos temas.
+  Proteção do formulário de contato. Incluído dentro de cada formulário de contato dos temas.
+
+  1. Antispam de todos os sites (antispam-no-contato), sem chave de terceiro: o campo isca, que
+     só robô preenche, e o campo com a hora em que a página foi montada, assinada pelo servidor.
+     Os dois ficam fora da tela, fora do Tab e fora dos leitores de tela.
+  2. reCAPTCHA v3 (recaptcha-no-contato), só nos sites com as duas chaves. O script do Google só
+     carrega quando o visitante entra num formulário que posta em /contato; o token é pedido no
+     envio (vence em 2 minutos). Sem o script em 8 s, envia sem token e o servidor decide.
 #}
+{% set wabProtecao = contato_antispam() %}
+{# Campo isca: input de texto de verdade (robô ignora display:none e type=hidden), jogado fora da
+   tela. Sem id, porque a mesma página pode ter mais de um formulário de contato. #}
+<label aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0;overflow:hidden">
+    Não preencha este campo
+    <input type="text" name="{{ wabProtecao.isca }}" value="" tabindex="-1" autocomplete="off">
+</label>
+<input type="hidden" name="{{ wabProtecao.hora }}" value="{{ wabProtecao.valorHora }}">
+
 {% if currentTenant and currentTenant.hasRecaptcha %}
 <input type="hidden" name="g-recaptcha-response" value="">
 <p class="wab-recaptcha-aviso" style="margin:12px 0 0;font-size:12px;line-height:1.5;opacity:.75">
