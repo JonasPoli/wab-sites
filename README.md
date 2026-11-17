@@ -197,11 +197,18 @@ As páginas públicas não baixam CSS, fonte nem JavaScript de fora do domínio:
   o ícone que o cliente escolhe no painel passa pelo filtro `icone_do_painel`, que traduz a
   classe gravada (`fa-solid fa-building`) para o nome do Iconify. Ícone que não está no
   repositório não é desenhado e fica no log.
-* **Fontes** ficam em `assets/fonts`, com `font-display: swap` em `assets/styles/fontes.css`.
+* **Fontes** ficam em `assets/fonts`, com `font-display: swap`. As regras `@font-face` moram
+  dentro do `assets/styles/app.css`, entre as marcas que o `app:fontes:sincronizar` reescreve:
+  cada folha de estilo a mais bloqueia a renderização, e o PageSpeed apontava 580 ms só nisso.
+  Só a família do título é pré-carregada.
 * **Carrossel** (Swiper) está em `assets/bibliotecas/swiper` e só é carregado na página que
   tem carrossel, decidido no servidor por `usa_carrossel()`.
 * **Animação de entrada** usa `assets/animacoes.js` com `IntersectionObserver`, lendo os
   mesmos atributos `data-aos` de antes; a biblioteca AOS saiu.
+* **Mídia adiada** (`assets/imagens-adiadas.js`): num carrossel os slides ficam empilhados no
+  mesmo ponto da tela, então o `loading="lazy"` do navegador não segura nada — só o primeiro
+  slide vem com `src` e os outros guardam o endereço em `data-adiada`. O iframe do mapa, que
+  puxa ~330 KB do Google, entra quando chega a 400 px da tela.
 
 ```bash
 # depois de cadastrar ícone novo no painel, antes do deploy

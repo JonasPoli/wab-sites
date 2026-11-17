@@ -111,30 +111,49 @@ final class SincronizarFontesCommand extends Command
             return Command::FAILURE;
         }
 
-        $cabecalho = <<<CSS
-            /*
-             * Fontes do catálogo (App\\Service\\HeadingFonts) servidas pelo próprio domínio.
-             *
-             * GERADO por `php bin/console app:fontes:sincronizar` — não edite à mão.
-             * `font-display: swap` garante que o texto apareça numa fonte de reserva
-             * enquanto a definitiva carrega, em vez de ficar invisível.
-             */
+        if (!$this->gravarNoAppCss(implode("\n", $regras))) {
+            $io->error('Não achei o bloco das fontes em assets/styles/app.css.');
 
-            CSS;
-
-        file_put_contents(
-            $this->projectDir . '/assets/styles/fontes.css',
-            $cabecalho . "\n" . implode("\n", $regras) . "\n",
-        );
+            return Command::FAILURE;
+        }
 
         $io->success(sprintf(
-            '%d arquivo(s) baixado(s), %d reaproveitado(s), %d regra(s) em assets/styles/fontes.css.',
+            '%d arquivo(s) baixado(s), %d reaproveitado(s), %d regra(s) em assets/styles/app.css.',
             $baixados,
             $reaproveitados,
             count($regras),
         ));
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Reescreve só as regras `@font-face` dentro do `app.css`, entre as marcas de início e
+     * fim, sem tocar no resto. As fontes ficam ali, e não num arquivo próprio, porque cada
+     * folha de estilo a mais bloqueia a renderização.
+     */
+    private function gravarNoAppCss(string $regras): bool
+    {
+        $caminho = $this->projectDir . '/assets/styles/app.css';
+        $css = @file_get_contents($caminho);
+        if ($css === false) {
+            return false;
+        }
+
+        $inicio = '/* --- inicio das fontes (app:fontes:sincronizar) --- */';
+        $fim = '/* --- fim das fontes --- */';
+
+        $posInicio = strpos($css, $inicio);
+        $posFim = strpos($css, $fim);
+        if ($posInicio === false || $posFim === false || $posFim < $posInicio) {
+            return false;
+        }
+
+        $novo = substr($css, 0, $posInicio)
+            . $inicio . "\n" . $regras . "\n"
+            . substr($css, $posFim);
+
+        return file_put_contents($caminho, $novo) !== false;
     }
 
     private function cssDoGoogle(string $familia): ?string
