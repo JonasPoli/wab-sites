@@ -175,4 +175,54 @@ final class ColorContrast
 
         return [$canal($h + 1 / 3), $canal($h), $canal($h - 1 / 3)];
     }
+
+    /**
+     * A cor ajustada até ficar legível sobre TODOS os fundos informados.
+     *
+     * Existe porque o tema usa a cor da marca como texto em mais de um fundo: a página
+     * branca, a faixa alternada e as "pílulas" com 30% da cor sobre o fundo. Ajustar só
+     * para o branco deixava a pílula reprovando no contraste.
+     *
+     * @param list<string|null> $fundos
+     */
+    public static function legivelSobreVarios(?string $cor, array $fundos, float $minimo = 4.5): ?string
+    {
+        $resultado = self::toHex(self::toRgb($cor));
+        if ($resultado === null) {
+            return null;
+        }
+
+        foreach (array_filter($fundos) as $fundo) {
+            if (self::ratio($resultado, $fundo) >= $minimo) {
+                continue;
+            }
+            $ajustada = self::legivelSobre($resultado, $fundo, $minimo);
+            if ($ajustada !== null) {
+                $resultado = $ajustada;
+            }
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * A cor que aparece quando `$frente` é desenhada com `$alfa` de opacidade sobre `$fundo`.
+     * É o que o navegador mostra numa classe como `bg-cetec-secondary/30`.
+     */
+    public static function mistura(?string $frente, ?string $fundo, float $alfa): ?string
+    {
+        $f = self::toRgb($frente);
+        $b = self::toRgb($fundo);
+        if ($f === null || $b === null) {
+            return null;
+        }
+
+        $alfa = max(0.0, min(1.0, $alfa));
+
+        return self::toHex([
+            (int) round($f[0] * $alfa + $b[0] * (1 - $alfa)),
+            (int) round($f[1] * $alfa + $b[1] * (1 - $alfa)),
+            (int) round($f[2] * $alfa + $b[2] * (1 - $alfa)),
+        ]);
+    }
 }

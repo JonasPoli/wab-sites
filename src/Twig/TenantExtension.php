@@ -215,10 +215,25 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         //
         // Preenchimento sólido continua usando `--color-primary`, a cor exata do cliente;
         // quem precisa de contraste ali é o texto por cima, que usa `--color-on-primary`.
-        $primaryText = ColorContrast::legivelSobre($primary, $bgColorLight1) ?? $primary;
-        $secondaryText = ColorContrast::legivelSobre($secondary, $bgColorLight1) ?? $secondary;
-        $primaryTextDark = ColorContrast::legivelSobre($primaryDark, $bgColorDark1) ?? $primaryDark;
-        $secondaryTextDark = ColorContrast::legivelSobre($secondaryDark, $bgColorDark1) ?? $secondaryDark;
+        // Os fundos em que o tema desenha texto com a cor da marca: a página, a faixa
+        // alternada e as "pílulas", que são a cor com 30% de opacidade sobre a página.
+        $fundosClaros = array_filter([
+            $bgColorLight1,
+            $bgColorLight2,
+            ColorContrast::mistura($secondary, $bgColorLight1, 0.30),
+            ColorContrast::mistura($primary, $bgColorLight1, 0.30),
+        ]);
+        $fundosEscuros = array_filter([
+            $bgColorDark1,
+            $bgColorDark2,
+            ColorContrast::mistura($secondaryDark, $bgColorDark1, 0.30),
+            ColorContrast::mistura($primaryDark, $bgColorDark1, 0.30),
+        ]);
+
+        $primaryText = ColorContrast::legivelSobreVarios($primary, $fundosClaros) ?? $primary;
+        $secondaryText = ColorContrast::legivelSobreVarios($secondary, $fundosClaros) ?? $secondary;
+        $primaryTextDark = ColorContrast::legivelSobreVarios($primaryDark, $fundosEscuros) ?? $primaryDark;
+        $secondaryTextDark = ColorContrast::legivelSobreVarios($secondaryDark, $fundosEscuros) ?? $secondaryDark;
 
         $onPrimary = ColorContrast::tintaSobre($primary);
         $onSecondary = ColorContrast::tintaSobre($secondary);
