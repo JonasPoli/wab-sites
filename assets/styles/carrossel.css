@@ -1,0 +1,50 @@
+/*
+ * Ajustes do carrossel (Swiper) nas páginas públicas.
+ *
+ * Carregado junto do Swiper, só nas páginas que têm carrossel.
+ *
+ * Alvo de toque: o marcador de página do Swiper vem com 10x10 px, abaixo dos 24x24 px
+ * que o WCAG 2.2 pede (`target-size` do Lighthouse). Aqui a área clicável vai a 24x24 px
+ * sem mudar o desenho: o `background-clip: content-box` faz a cor pintar só a caixa de
+ * conteúdo, então o ponto continua com 10 px e o espaço em volta é só área de toque.
+ */
+
+.swiper-pagination-bullet {
+    width: 24px;
+    height: 24px;
+    padding: 7px;
+    box-sizing: border-box;
+    background-clip: content-box;
+    border-radius: 50%;
+    opacity: 0.55;
+    transition: opacity 0.2s;
+}
+
+.swiper-pagination-bullet:hover,
+.swiper-pagination-bullet:focus-visible {
+    opacity: 0.85;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1;
+}
+
+/* Com o alvo maior, o espaço entre marcadores já vem do próprio preenchimento. */
+.swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet,
+.swiper-pagination-horizontal.swiper-pagination-bullets .swiper-pagination-bullet {
+    margin: 0;
+}
+
+/* As setas do Swiper também precisam de alvo e de foco visível pelo teclado. */
+.swiper-button-next,
+.swiper-button-prev {
+    width: 44px;
+    height: 44px;
+}
+
+.swiper-button-next:focus-visible,
+.swiper-button-prev:focus-visible,
+.swiper-pagination-bullet:focus-visible {
+    outline: 3px solid var(--color-secondary, #ffaa00);
+    outline-offset: 2px;
+}

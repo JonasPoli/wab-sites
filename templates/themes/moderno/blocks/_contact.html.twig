@@ -128,7 +128,8 @@
         {% if tenant.mapsEmbedUrl %}
         <div class="moderno-contact-map" data-aos="zoom-in">
             <iframe 
-                src="{{ tenant.mapsEmbedUrl }}" 
+                src="{{ tenant.mapsEmbedUrl }}"
+                title="Localização de {{ tenant.name }} no mapa" 
                 width="100%" 
                 height="380" 
                 style="border:0; border-radius: var(--radius, 12px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" 

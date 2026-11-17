@@ -4,7 +4,10 @@ namespace App\Twig;
 
 /**
  * Contraste entre duas cores pela fórmula do WCAG 2.x (luminância relativa).
- * Usado pelo tema noticias para decidir a cor dos títulos no modo escuro.
+ *
+ * O tema noticias usa para decidir a cor dos títulos no modo escuro; o
+ * `tenant_css_vars()` usa para gerar a variante legível da cor do cliente
+ * (ver `legivelSobre()`).
  */
 final class ColorContrast
 {
@@ -37,5 +40,139 @@ final class ColorContrast
         return 0.2126 * $channel(substr($hex, 0, 2))
              + 0.7152 * $channel(substr($hex, 2, 2))
              + 0.0722 * $channel(substr($hex, 4, 2));
+    }
+
+    /**
+     * A mesma cor, escurecida ou clareada só o quanto baste para chegar ao contraste
+     * mínimo sobre o fundo informado. O matiz e a saturação não mudam: a cor da marca
+     * continua reconhecível, só fica legível.
+     *
+     * Usada no texto (títulos, links, rótulos). Preenchimento sólido continua com a cor
+     * exata que o cliente escolheu — ali quem precisa de contraste é o texto por cima.
+     *
+     * Devolve a cor original quando ela já tem contraste, e null para cor inválida.
+     */
+    public static function legivelSobre(?string $cor, ?string $fundo, float $minimo = 4.5): ?string
+    {
+        $rgb = self::toRgb($cor);
+        $luzFundo = self::luminance($fundo);
+        if ($rgb === null || $luzFundo === null) {
+            return self::toHex($rgb);
+        }
+
+        if (self::ratio(self::toHex($rgb), $fundo) >= $minimo) {
+            return self::toHex($rgb);
+        }
+
+        // Fundo claro pede cor mais escura; fundo escuro, mais clara.
+        $paraEscuro = $luzFundo > 0.18;
+        [$h, $s, $l] = self::rgbToHsl($rgb);
+
+        // 100 passos de 1% de luminosidade: o bastante para qualquer cor do catálogo
+        for ($i = 1; $i <= 100; ++$i) {
+            $novoL = $paraEscuro ? $l - $i / 100 : $l + $i / 100;
+            if ($novoL < 0 || $novoL > 1) {
+                break;
+            }
+            $candidata = self::toHex(self::hslToRgb($h, $s, $novoL));
+            if ($candidata !== null && self::ratio($candidata, $fundo) >= $minimo) {
+                return $candidata;
+            }
+        }
+
+        // Não deu com o mesmo matiz: preto ou branco, o que contrastar mais
+        return $paraEscuro ? '#000000' : '#ffffff';
+    }
+
+    /** Preto ou branco, o que for mais legível sobre a cor informada. */
+    public static function tintaSobre(?string $fundo): string
+    {
+        return self::ratio('#000000', $fundo) >= self::ratio('#ffffff', $fundo) ? '#1a1a1a' : '#ffffff';
+    }
+
+    /** @return array{0: int, 1: int, 2: int}|null */
+    private static function toRgb(?string $hex): ?array
+    {
+        $hex = ltrim(trim((string) $hex), '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if (strlen($hex) !== 6 || !ctype_xdigit($hex)) {
+            return null;
+        }
+
+        return [
+            (int) hexdec(substr($hex, 0, 2)),
+            (int) hexdec(substr($hex, 2, 2)),
+            (int) hexdec(substr($hex, 4, 2)),
+        ];
+    }
+
+    /** @param array{0: int, 1: int, 2: int}|null $rgb */
+    private static function toHex(?array $rgb): ?string
+    {
+        if ($rgb === null) {
+            return null;
+        }
+
+        return sprintf('#%02x%02x%02x', max(0, min(255, $rgb[0])), max(0, min(255, $rgb[1])), max(0, min(255, $rgb[2])));
+    }
+
+    /**
+     * @param array{0: int, 1: int, 2: int} $rgb
+     *
+     * @return array{0: float, 1: float, 2: float} matiz (0-1), saturação (0-1), luminosidade (0-1)
+     */
+    private static function rgbToHsl(array $rgb): array
+    {
+        [$r, $g, $b] = [$rgb[0] / 255, $rgb[1] / 255, $rgb[2] / 255];
+        $max = max($r, $g, $b);
+        $min = min($r, $g, $b);
+        $l = ($max + $min) / 2;
+
+        if ($max === $min) {
+            return [0.0, 0.0, $l];
+        }
+
+        $d = $max - $min;
+        $s = $l > 0.5 ? $d / (2 - $max - $min) : $d / ($max + $min);
+
+        $h = match ($max) {
+            $r => (($g - $b) / $d) + ($g < $b ? 6 : 0),
+            $g => (($b - $r) / $d) + 2,
+            default => (($r - $g) / $d) + 4,
+        };
+
+        return [$h / 6, $s, $l];
+    }
+
+    /** @return array{0: int, 1: int, 2: int} */
+    private static function hslToRgb(float $h, float $s, float $l): array
+    {
+        if ($s === 0.0) {
+            $v = (int) round($l * 255);
+
+            return [$v, $v, $v];
+        }
+
+        $q = $l < 0.5 ? $l * (1 + $s) : $l + $s - $l * $s;
+        $p = 2 * $l - $q;
+
+        $canal = static function (float $t) use ($p, $q): int {
+            $t = fmod($t + 1, 1);
+            if ($t < 1 / 6) {
+                $v = $p + ($q - $p) * 6 * $t;
+            } elseif ($t < 1 / 2) {
+                $v = $q;
+            } elseif ($t < 2 / 3) {
+                $v = $p + ($q - $p) * (2 / 3 - $t) * 6;
+            } else {
+                $v = $p;
+            }
+
+            return (int) round($v * 255);
+        };
+
+        return [$canal($h + 1 / 3), $canal($h), $canal($h - 1 / 3)];
     }
 }

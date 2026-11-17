@@ -205,6 +205,26 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         $topBarEnabled = $navSettings['topBarEnabled'] ?? false;
         $topBarHeight = $topBarEnabled ? '40px' : '0px';
 
+        // Variante legível da cor da marca, para TEXTO.
+        //
+        // A cor que o cliente escolhe costuma ser pensada para preenchimento, não para
+        // letra: o verde #7abd2f tem 2,3:1 sobre branco, bem abaixo do mínimo de 4,5:1 do
+        // WCAG AA, e era o que reprovava `color-contrast` nos sites do tema cetec. Aqui ela
+        // é escurecida (ou clareada, no modo escuro) só o quanto baste, mantendo matiz e
+        // saturação: a marca continua reconhecível e o texto fica legível.
+        //
+        // Preenchimento sólido continua usando `--color-primary`, a cor exata do cliente;
+        // quem precisa de contraste ali é o texto por cima, que usa `--color-on-primary`.
+        $primaryText = ColorContrast::legivelSobre($primary, $bgColorLight1) ?? $primary;
+        $secondaryText = ColorContrast::legivelSobre($secondary, $bgColorLight1) ?? $secondary;
+        $primaryTextDark = ColorContrast::legivelSobre($primaryDark, $bgColorDark1) ?? $primaryDark;
+        $secondaryTextDark = ColorContrast::legivelSobre($secondaryDark, $bgColorDark1) ?? $secondaryDark;
+
+        $onPrimary = ColorContrast::tintaSobre($primary);
+        $onSecondary = ColorContrast::tintaSobre($secondary);
+        $onPrimaryDark = ColorContrast::tintaSobre($primaryDark);
+        $onSecondaryDark = ColorContrast::tintaSobre($secondaryDark);
+
         return <<<HTML
 <style>
 {$importString}
@@ -213,6 +233,12 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
   --color-secondary: {$secondary};
   --color-primary-rgb: {$this->hexToRgb($primary)};
   --color-secondary-rgb: {$this->hexToRgb($secondary)};
+  --color-primary-text: {$primaryText};
+  --color-secondary-text: {$secondaryText};
+  --color-primary-text-rgb: {$this->hexToRgb($primaryText)};
+  --color-secondary-text-rgb: {$this->hexToRgb($secondaryText)};
+  --color-on-primary: {$onPrimary};
+  --color-on-secondary: {$onSecondary};
   --topbar-height: {$topBarHeight};
   --topbar-text: {$topbarText};
   --topbar-border: {$topbarBorder};
@@ -223,6 +249,12 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
   --color-secondary: {$secondaryDark};
   --color-primary-rgb: {$this->hexToRgb($primaryDark)};
   --color-secondary-rgb: {$this->hexToRgb($secondaryDark)};
+  --color-primary-text: {$primaryTextDark};
+  --color-secondary-text: {$secondaryTextDark};
+  --color-primary-text-rgb: {$this->hexToRgb($primaryTextDark)};
+  --color-secondary-text-rgb: {$this->hexToRgb($secondaryTextDark)};
+  --color-on-primary: {$onPrimaryDark};
+  --color-on-secondary: {$onSecondaryDark};
   --topbar-text: {$topbarTextDark};
   --topbar-border: {$topbarBorderDark};
 }

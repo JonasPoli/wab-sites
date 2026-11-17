@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="{{ asset('styles/animacoes.css') }}">
     {% if usaCarrossel %}
         <link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/carrossel.css') }}">
     {% endif %}
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 
@@ -133,7 +134,7 @@
 
     /* Blocos do cetec com fundo escuro próprio (ex.: newsletter): o título na cor
        primária some quando ela é escura, como o azul-marinho da AJoPE. */
-    .bg-cetec-dark .text-cetec-primary { color: #ffffff; }
+    .bg-cetec-dark .text-cetec-primary-text { color: #ffffff; }
 
     /* Seção escura dos blocos do cetec */
     .mp-section-dark { --bg:#0d0f1a; --bg-alt:#131625; --bg-card:#181c30; --text:#f1f5f9; --text-muted:#94a3b8; --border:rgba(255,255,255,.08); color: var(--text); background-color: var(--bg-alt); }

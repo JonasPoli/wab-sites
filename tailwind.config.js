@@ -17,6 +17,12 @@ module.exports = {
             DEFAULT:'#0769a1',
             light: '#1679b1',
         },
+        // Variante legível da cor da marca, só para TEXTO (contraste WCAG AA).
+        // Preenchimento continua em cetec-primary / cetec-secondary, a cor exata do cliente.
+        'cetec-primary-text': 'rgba(var(--color-primary-text-rgb), <alpha-value>)',
+        'cetec-secondary-text': 'rgba(var(--color-secondary-text-rgb), <alpha-value>)',
+        'on-primary': 'var(--color-on-primary)',
+        'on-secondary': 'var(--color-on-secondary)',
         'cetec-orange': 'rgba(var(--color-secondary-rgb), <alpha-value>)',
         'cetec-orange-text': 'rgba(var(--color-secondary-rgb), <alpha-value>)',
         'cetec-primary': 'rgba(var(--color-primary-rgb), <alpha-value>)',

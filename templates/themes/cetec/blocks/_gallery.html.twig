@@ -3,9 +3,9 @@
 <div class="wab-block my-16" data-aos="fade-up">
     <div class="text-center max-w-3xl mx-auto mb-10">
         {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
         <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
-        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
     <div class="wab-gallery relative overflow-hidden rounded-2xl shadow-xl border border-gray-100 dark:border-white/5" id="gallery-{{ block.id }}">
@@ -23,8 +23,8 @@
         </div>
         
         {% if images|length > 1 %}
-        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', -1)">{{ ux_icon('fa6-solid:chevron-left', {'aria-hidden': 'true'}) }}</button>
-        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', 1)">{{ ux_icon('fa6-solid:chevron-right', {'aria-hidden': 'true'}) }}</button>
+        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" aria-label="Imagem anterior" onclick="slideGallery('{{ block.id }}', -1)">{{ ux_icon('fa6-solid:chevron-left', {'aria-hidden': 'true'}) }}</button>
+        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" aria-label="Próxima imagem" onclick="slideGallery('{{ block.id }}', 1)">{{ ux_icon('fa6-solid:chevron-right', {'aria-hidden': 'true'}) }}</button>
         
         <div class="wg-dots flex justify-center gap-2 mt-6">
             {% for img in images %}
@@ -36,7 +36,7 @@
 </div>
 
 <div class="wab-lightbox fixed inset-0 bg-black/95 hidden items-center justify-center z-[9999] cursor-zoom-out" id="lb-{{ block.id }}" onclick="closeLightbox('{{ block.id }}')">
-    <button onclick="closeLightbox('{{ block.id }}')" class="fixed top-6 right-6 bg-transparent border-0 text-white text-4xl cursor-pointer hover:text-cetec-secondary transition-colors">&times;</button>
+    <button onclick="closeLightbox('{{ block.id }}')" class="fixed top-6 right-6 bg-transparent border-0 text-white text-4xl cursor-pointer hover:text-cetec-secondary-text transition-colors">&times;</button>
     <img id="lb-img-{{ block.id }}" src="" class="max-w-[90vw] max-h-[85vh] rounded-2xl border-4 border-white/10 shadow-2xl">
 </div>
 

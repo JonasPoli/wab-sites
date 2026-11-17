@@ -46,9 +46,9 @@
 <div class="wab-block my-16">
     <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
         {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
-        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary">{{ block.title }}</h2>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
         <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
-        {% if block.text %}<p class="text-gray-500 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
     </div>
     
     {% if has_items %}
@@ -66,12 +66,12 @@
                  data-aos-delay="{{ delay }}">
         {% endif %}
             {% if it.icon %}
-            <div class="w-14 h-14 bg-cetec-secondary/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
+            <div class="w-14 h-14 bg-cetec-secondary/10 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary-text mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                 {{ it.icon|icone_do_painel('') }}
             </div>
             {% endif %}
-            <h3 class="text-lg font-bold mb-2 text-cetec-primary group-hover:text-cetec-secondary transition-colors">{{ it.title }}</h3>
-            {% if it.text %}<p class="text-gray-500 dark:text-gray-400 text-xs md:text-sm leading-relaxed">{{ it.text }}</p>{% endif %}
+            <h3 class="text-lg font-bold mb-2 text-cetec-primary-text group-hover:text-cetec-secondary-text transition-colors">{{ it.title }}</h3>
+            {% if it.text %}<p class="text-gray-600 dark:text-gray-400 text-xs md:text-sm leading-relaxed">{{ it.text }}</p>{% endif %}
         {% if it.url %}
             </a>
         {% else %}

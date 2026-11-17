@@ -65,13 +65,13 @@
         <div data-aos="fade-up" data-aos-delay="100">
             <h4 class="footer-title">Links Rápidos</h4>
             <ul class="space-y-4 text-gray-400 text-sm">
-                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Início</a></li>
+                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-secondary-text transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Início</a></li>
                 {% if footerPages is defined %}
                     {% for page in footerPages %}
-                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} {{ page.title }}</a></li>
+                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-secondary-text transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} {{ page.title }}</a></li>
                     {% endfor %}
                 {% endif %}
-                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Contato</a></li>
+                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary-text transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Contato</a></li>
             </ul>
         </div>
 
@@ -81,19 +81,19 @@
             <ul class="space-y-4 text-gray-400 text-sm">
                 {% if currentTenant and currentTenant.address %}
                     <li class="flex gap-3">
-                        {{ ux_icon('bi:geo-alt', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
+                        {{ ux_icon('bi:geo-alt', {class: 'text-cetec-secondary-text text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <span>{{ currentTenant.address }}</span>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.contactEmail %}
                     <li class="flex gap-3">
-                        {{ ux_icon('bi:envelope', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
+                        {{ ux_icon('bi:envelope', {class: 'text-cetec-secondary-text text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <a href="mailto:{{ currentTenant.contactEmail }}" class="hover:underline text-gray-400">{{ currentTenant.contactEmail }}</a>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.phone %}
                     <li class="flex gap-3">
-                        {{ ux_icon('bi:telephone', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
+                        {{ ux_icon('bi:telephone', {class: 'text-cetec-secondary-text text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <a href="tel:{{ currentTenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" class="hover:underline text-gray-400">{{ currentTenant.phone }}</a>
                     </li>
                 {% endif %}
@@ -108,7 +108,7 @@
             <a href="#" class="text-gray-500 hover:text-white transition-all">Termos de Uso</a>
             <a href="#" class="text-gray-500 hover:text-white transition-all">Políticas de Privacidade</a>
         </div>
-        <p>Desenvolvido por <a href="https://wab.com.br" target="_blank" class="text-gray-400 underline hover:text-white transition-all">wab.com.br</a></p>
+        <p>Desenvolvido por <a href="https://wab.com.br" target="_blank" class="text-gray-200 underline underline-offset-2 hover:text-white transition-all">wab.com.br</a></p>
     </div>
 </footer>
 

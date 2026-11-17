@@ -6,7 +6,7 @@
     <div class="relative z-10 {{ has_blurbs ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center' : 'max-w-2xl mx-auto text-center' }}">
         <div class="{{ not has_blurbs ? 'flex flex-col items-center' : '' }}">
             {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
-            {% if block.title %}<h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-cetec-primary">{{ block.title }}</h2>{% endif %}
+            {% if block.title %}<h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
             {% if block.text %}<p class="text-gray-300 text-sm md:text-base mb-8 leading-relaxed {{ has_blurbs ? 'max-w-lg' : 'max-w-2xl mx-auto' }}">{{ block.text }}</p>{% endif %}
             
             <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="flex flex-col sm:flex-row gap-4 w-full {{ not has_blurbs ? 'max-w-xl justify-center' : '' }}">
@@ -25,13 +25,13 @@
             {% for b in blorbs %}{% if b.title %}
             <div class="flex gap-4 items-start group">
                 {% if b.icon %}
-                <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl flex-shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary-text text-xl flex-shrink-0 shadow-md group-hover:scale-110 transition-transform">
                     {{ b.icon|icone_do_painel('') }}
                 </div>
                 {% endif %}
                 <div class="text-left">
-                    <h3 class="font-bold text-lg text-white mb-1 group-hover:text-cetec-secondary transition-colors">{{ b.title }}</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">{{ b.text }}</p>
+                    <h3 class="font-bold text-lg text-white mb-1 group-hover:text-cetec-secondary-text transition-colors">{{ b.title }}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">{{ b.text }}</p>
                 </div>
             </div>
             {% endif %}{% endfor %}
