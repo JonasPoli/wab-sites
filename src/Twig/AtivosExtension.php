@@ -28,6 +28,7 @@ final class AtivosExtension extends AbstractExtension
     {
         return [
             new TwigFunction('usa_carrossel', $this->usaCarrossel(...)),
+            new TwigFunction('imagem_do_lcp', $this->imagemDoLcp(...)),
         ];
     }
 
@@ -48,6 +49,78 @@ final class AtivosExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * O arquivo da imagem que provavelmente forma o maior elemento visível da página,
+     * para o `<head>` pré-carregá-la.
+     *
+     * Sem isto, o navegador só descobre a imagem depois de ler o HTML até o bloco, e o LCP
+     * atrasa — era o que segurava o desempenho entre 96 e 99 nos sites com banner no topo.
+     * A ordem segue a do próprio template: banner do topo, fundo da primeira seção e, por
+     * último, a primeira imagem de conteúdo.
+     *
+     * @param array<string, mixed> $contexto o `_context` do template
+     */
+    public function imagemDoLcp(array $contexto = []): ?string
+    {
+        $banners = $contexto['banners'] ?? null;
+        if (is_iterable($banners)) {
+            foreach ($banners as $banner) {
+                if (method_exists($banner, 'getBackgroundImage') && $banner->getBackgroundImage()) {
+                    return 'uploads/hero/' . $banner->getBackgroundImage();
+                }
+            }
+        }
+
+        foreach (['page', 'category'] as $chave) {
+            $alvo = $contexto[$chave] ?? null;
+            if (!$alvo instanceof Page && !$alvo instanceof Category) {
+                continue;
+            }
+
+            foreach ($alvo->getSections() as $secao) {
+                if (method_exists($secao, 'isActive') && !$secao->isActive()) {
+                    continue;
+                }
+
+                foreach ($secao->getBlocks() as $bloco) {
+                    $tipo = $bloco->getType();
+                    $tipo = $tipo instanceof \BackedEnum ? (string) $tipo->value : (string) $tipo;
+                    if ($tipo !== 'banner') {
+                        continue;
+                    }
+
+                    // O bloco de banner guarda os banners no JSON de configuração; só quando
+                    // essa lista está vazia é que o template cai na imagem do próprio bloco.
+                    $config = $bloco->getConfig() ?? [];
+                    foreach ($config['banners'] ?? [] as $banner) {
+                        if (($banner['active'] ?? '1') === '1' && !empty($banner['image'])) {
+                            return 'uploads/page_block/' . $banner['image'];
+                        }
+                    }
+
+                    if ($bloco->getImage()) {
+                        return 'uploads/page_block/' . $bloco->getImage();
+                    }
+                }
+
+                if ($secao->getBgType() === 'image' && $secao->getBgImage()) {
+                    return 'uploads/section/bg/' . $secao->getBgImage();
+                }
+
+                foreach ($secao->getBlocks() as $bloco) {
+                    if ($bloco->getImage()) {
+                        return 'uploads/page_block/' . $bloco->getImage();
+                    }
+                }
+
+                // Só a primeira seção conta: o que vem depois não é o maior elemento visível.
+                break;
+            }
+        }
+
+        return null;
     }
 
     private function temBlocoDeCarrossel(Page|Category $alvo): bool

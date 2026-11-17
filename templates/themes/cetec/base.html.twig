@@ -19,6 +19,16 @@
        carregado na página que tem carrossel. #}
     {% set usaCarrossel = usa_carrossel(_context) %}
 
+    {# Pré-carga da imagem do maior elemento visível (LCP). Sem ela, o navegador só
+       descobre a imagem do banner depois de ler o HTML até o bloco. O srcset e o sizes
+       são os mesmos da <img>, senão o navegador baixa a imagem duas vezes. #}
+    {% set arquivoDoLcp = imagem_do_lcp(_context) %}
+    {% if arquivoDoLcp %}
+        <link rel="preload" as="image" fetchpriority="high"
+              imagesrcset="{{ arquivoDoLcp|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}"
+              imagesizes="100vw">
+    {% endif %}
+
     <link rel="stylesheet" href="{{ asset('styles/fontes.css') }}">
     {% for arquivo in tenant_fontes() %}
         <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ asset(arquivo) }}">

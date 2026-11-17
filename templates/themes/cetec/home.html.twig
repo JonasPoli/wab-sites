@@ -15,8 +15,8 @@
                             {% if b.backgroundImage %}
                                 {% set heroArquivo = 'uploads/hero/' ~ b.backgroundImage %}
                                 <picture>
-                                    <source media="(max-width: 767px)" srcset="{{ heroArquivo|thumb('banner_mobile') }}" width="768" height="560">
                                     <img {{ heroArquivo|thumb_attrs('banner_desktop') }}
+                                         srcset="{{ heroArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw"
                                          alt="{{ b.title|striptags }}"
                                          class="absolute inset-0 w-full h-full object-cover object-center opacity-40 transition-transform duration-[6s] scale-100"
                                          fetchpriority="{{ loop.first ? 'high' : 'low' }}"

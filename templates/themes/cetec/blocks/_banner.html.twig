@@ -53,7 +53,9 @@
         <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
             {# Background image #}
             {% if b.image %}
-                <img {{ ('uploads/page_block/' ~ b.image)|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
+                {% set bannerArquivo = 'uploads/page_block/' ~ b.image %}
+                <img {{ bannerArquivo|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
+                     srcset="{{ bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw"
                      class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;transition:transform .5s ease"
                      fetchpriority="high" decoding="async">
             {% else %}
@@ -106,7 +108,9 @@
                     <div class="swiper-slide" style="position:relative;display:flex;align-items:center;box-sizing:border-box;">
                         {# Background image #}
                         {% if b.image %}
-                            <img {{ ('uploads/page_block/' ~ b.image)|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
+                            {% set bannerArquivo = 'uploads/page_block/' ~ b.image %}
+                            <img {{ bannerArquivo|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
+                                 srcset="{{ bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw"
                                  class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;"
                                  fetchpriority="{{ loop.first ? 'high' : 'low' }}" loading="{{ loop.first ? 'eager' : 'lazy' }}" decoding="async">
                         {% else %}

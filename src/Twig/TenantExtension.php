@@ -217,23 +217,29 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         // quem precisa de contraste ali é o texto por cima, que usa `--color-on-primary`.
         // Os fundos em que o tema desenha texto com a cor da marca: a página, a faixa
         // alternada e as "pílulas", que são a cor com 30% de opacidade sobre a página.
-        $fundosClaros = array_filter([
-            $bgColorLight1,
-            $bgColorLight2,
-            ColorContrast::mistura($secondary, $bgColorLight1, 0.30),
-            ColorContrast::mistura($primary, $bgColorLight1, 0.30),
-        ]);
-        $fundosEscuros = array_filter([
-            $bgColorDark1,
-            $bgColorDark2,
-            ColorContrast::mistura($secondaryDark, $bgColorDark1, 0.30),
-            ColorContrast::mistura($primaryDark, $bgColorDark1, 0.30),
-        ]);
+        // A pílula aparece tanto sobre a faixa clara 1 quanto sobre a 2, então as duas
+        // misturas entram na conta. A margem de 4,6 (acima dos 4,5 do WCAG AA) absorve a
+        // diferença de arredondamento entre a mistura calculada aqui e a que o navegador
+        // pinta — sem ela, o contraste ficava em 4,31 e o axe reprovava por pouco.
+        $misturas = [];
+        foreach ([$bgColorLight1, $bgColorLight2] as $fundo) {
+            $misturas[] = ColorContrast::mistura($secondary, $fundo, 0.30);
+            $misturas[] = ColorContrast::mistura($primary, $fundo, 0.30);
+        }
+        $fundosClaros = array_filter(array_merge([$bgColorLight1, $bgColorLight2], $misturas));
 
-        $primaryText = ColorContrast::legivelSobreVarios($primary, $fundosClaros) ?? $primary;
-        $secondaryText = ColorContrast::legivelSobreVarios($secondary, $fundosClaros) ?? $secondary;
-        $primaryTextDark = ColorContrast::legivelSobreVarios($primaryDark, $fundosEscuros) ?? $primaryDark;
-        $secondaryTextDark = ColorContrast::legivelSobreVarios($secondaryDark, $fundosEscuros) ?? $secondaryDark;
+        $misturasEscuras = [];
+        foreach ([$bgColorDark1, $bgColorDark2] as $fundo) {
+            $misturasEscuras[] = ColorContrast::mistura($secondaryDark, $fundo, 0.30);
+            $misturasEscuras[] = ColorContrast::mistura($primaryDark, $fundo, 0.30);
+        }
+        $fundosEscuros = array_filter(array_merge([$bgColorDark1, $bgColorDark2], $misturasEscuras));
+
+        $minimo = 4.6;
+        $primaryText = ColorContrast::legivelSobreVarios($primary, $fundosClaros, $minimo) ?? $primary;
+        $secondaryText = ColorContrast::legivelSobreVarios($secondary, $fundosClaros, $minimo) ?? $secondary;
+        $primaryTextDark = ColorContrast::legivelSobreVarios($primaryDark, $fundosEscuros, $minimo) ?? $primaryDark;
+        $secondaryTextDark = ColorContrast::legivelSobreVarios($secondaryDark, $fundosEscuros, $minimo) ?? $secondaryDark;
 
         $onPrimary = ColorContrast::tintaSobre($primary);
         $onSecondary = ColorContrast::tintaSobre($secondary);
