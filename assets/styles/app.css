@@ -944,3 +944,15 @@ html.sem-js [data-aos] {
     outline: 3px solid var(--color-secondary, #ffaa00);
     outline-offset: 2px;
 }
+
+
+/* ===== Mínimo do carrossel (crítico) =====
+   O CSS do Swiper é grande e bloqueava a renderização em 430 ms nas páginas com
+   carrossel. Estas poucas regras bastam para o primeiro slide aparecer no lugar
+   certo; o resto do Swiper entra sem bloquear, pelo media="print" do <link>.
+   Sem isto, os slides apareceriam empilhados até o CSS chegar (deslocamento de layout).
+   ========================================= */
+.swiper { overflow: hidden; position: relative; z-index: 1; margin-left: auto; margin-right: auto; }
+.swiper-wrapper { display: flex; position: relative; width: 100%; height: 100%; z-index: 1; box-sizing: content-box; }
+.swiper-slide { flex-shrink: 0; width: 100%; height: 100%; position: relative; }
+.swiper-horizontal > .swiper-wrapper { flex-direction: row; }

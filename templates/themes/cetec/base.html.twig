@@ -37,7 +37,11 @@
         <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ asset(arquivo) }}">
     {% endfor %}
     {% if usaCarrossel %}
-        <link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}">
+        {# O mínimo para o primeiro slide já está no app.css; o resto do Swiper entra
+           sem bloquear a renderização. #}
+        <link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}"
+              media="print" onload="this.media='all';this.onload=null">
+        <noscript><link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}"></noscript>
     {% endif %}
 
     {# Apply theme BEFORE paint to prevent flash #}
