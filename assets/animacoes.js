@@ -1,7 +1,10 @@
 /*
  * Animações de entrada: substitui a biblioteca AOS lendo os mesmos atributos `data-aos`.
  *
- * Um IntersectionObserver só; nada é baixado de fora do domínio. Ver assets/styles/animacoes.css.
+ * O conteúdo NÃO nasce invisível. Esconder tudo em CSS deixava o topo da página em branco
+ * até este script rodar — no banner isso dava 1,85 s de "atraso na renderização do
+ * elemento" no PageSpeed. Aqui só é escondido o que está fora da tela, que o visitante
+ * não vê mesmo; o que já está à vista aparece sem animação nenhuma.
  */
 (function () {
     'use strict';
@@ -11,9 +14,12 @@
         return;
     }
 
-    var menosMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        || typeof IntersectionObserver === 'undefined') {
+        return; // sem esconder nada: tudo já está visível
+    }
 
-    function mostrar(elemento) {
+    function revelar(elemento) {
         var atraso = parseInt(elemento.getAttribute('data-aos-delay') || '0', 10);
         var duracao = parseInt(elemento.getAttribute('data-aos-duration') || '0', 10);
         if (atraso) {
@@ -23,12 +29,7 @@
             elemento.style.setProperty('--aos-duracao', duracao + 'ms');
         }
         elemento.classList.add('aos-visivel');
-    }
-
-    // Sem suporte ao observador, ou com movimento reduzido, o conteúdo aparece direto
-    if (menosMovimento || typeof IntersectionObserver === 'undefined') {
-        Array.prototype.forEach.call(alvos, mostrar);
-        return;
+        elemento.classList.remove('aos-oculto');
     }
 
     var observador = new IntersectionObserver(function (entradas) {
@@ -36,18 +37,18 @@
             if (!entrada.isIntersecting) {
                 return;
             }
-            mostrar(entrada.target);
+            revelar(entrada.target);
             observador.unobserve(entrada.target);
         });
     }, { rootMargin: '0px 0px -60px 0px', threshold: 0.05 });
 
+    var altura = window.innerHeight;
     Array.prototype.forEach.call(alvos, function (elemento) {
-        // O que já está visível na abertura aparece sem esperar rolagem
         var caixa = elemento.getBoundingClientRect();
-        if (caixa.top < window.innerHeight && caixa.bottom > 0) {
-            mostrar(elemento);
-            return;
+        if (caixa.top < altura && caixa.bottom > 0) {
+            return; // já está à vista: fica como está, sem piscar
         }
+        elemento.classList.add('aos-oculto');
         observador.observe(elemento);
     });
 })();
