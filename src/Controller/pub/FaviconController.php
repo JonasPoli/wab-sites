@@ -7,7 +7,6 @@ namespace App\Controller\pub;
 use App\Service\TenantContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -34,12 +33,14 @@ final class FaviconController extends AbstractController
 
         if ($favicon !== null && $favicon !== '') {
             $arquivo = $this->projectDir . '/public/uploads/tenant/favicon/' . $favicon;
-            if (is_file($arquivo)) {
-                $resposta = new BinaryFileResponse($arquivo);
-                $resposta->setPublic();
-                $resposta->setMaxAge(86400);
-
-                return $resposta;
+            // Arquivo lido e devolvido inteiro, não por BinaryFileResponse: o favicon tem
+            // poucos KB e, atrás do Nginx do RunCloud, a resposta binária quebrava com 500.
+            $conteudo = is_file($arquivo) ? @file_get_contents($arquivo) : false;
+            if ($conteudo !== false) {
+                return new Response($conteudo, Response::HTTP_OK, [
+                    'Content-Type' => $this->tipo($arquivo),
+                    'Cache-Control' => 'public, max-age=86400',
+                ]);
             }
         }
 
@@ -47,5 +48,13 @@ final class FaviconController extends AbstractController
         return new Response('', Response::HTTP_NO_CONTENT, [
             'Cache-Control' => 'public, max-age=86400',
         ]);
+    }
+
+    /** Tipo lido do conteúdo, não da extensão: o arquivo enviado costuma ser PNG com nome .ico. */
+    private function tipo(string $arquivo): string
+    {
+        $mime = @(new \finfo(\FILEINFO_MIME_TYPE))->file($arquivo);
+
+        return is_string($mime) && str_starts_with($mime, 'image/') ? $mime : 'image/x-icon';
     }
 }
