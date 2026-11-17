@@ -198,7 +198,11 @@
               imagesizes="100vw">
     {% endif %}
     <link rel="stylesheet" href="{{ asset('styles/fontes.css') }}">
-    {% for arquivo in tenant_fontes() %}
+    {# Só a família do título é pré-carregada. Todas elas têm `font-display: swap`, então o
+       texto já aparece na fonte de reserva; pré-carregar duas ou três ao mesmo tempo só
+       tirava banda da imagem do topo — num site com duas famílias eram 79 KB na frente da
+       imagem do LCP. As demais carregam na ordem normal. #}
+    {% for arquivo in tenant_fontes()|slice(0, 1) %}
         <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ asset(arquivo) }}">
     {% endfor %}
     <link rel="stylesheet" href="{{ asset('styles/animacoes.css') }}">
