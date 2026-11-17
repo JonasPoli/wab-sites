@@ -1,5 +1,5 @@
 /*
- * Imagens que só carregam depois que a página terminou de abrir.
+ * Mídia que só carrega quando faz falta: imagens de carrossel e o mapa.
  *
  * Por que existe: num carrossel, todos os slides ficam empilhados no mesmo lugar da tela,
  * então o navegador considera todos visíveis e o `loading="lazy"` não segura nada — numa
@@ -37,6 +37,37 @@
         agendar();
     } else {
         window.addEventListener('load', agendar, { once: true });
+    }
+
+    /*
+     * Mapa: o iframe do Google Maps puxa cerca de 330 KB de JavaScript de terceiro, e o
+     * `loading="lazy"` do navegador o solta cedo demais numa tela alta — ele disputava
+     * banda com a imagem do topo. Aqui ele entra quando chega perto da tela, então quem
+     * rola até o mapa continua vendo o mapa, sem clicar em nada.
+     */
+    var mapas = document.querySelectorAll('iframe[data-adiada]');
+    if (mapas.length) {
+        var carregar = function (quadro) {
+            quadro.setAttribute('src', quadro.getAttribute('data-adiada'));
+            quadro.removeAttribute('data-adiada');
+        };
+
+        if (typeof IntersectionObserver === 'undefined') {
+            Array.prototype.forEach.call(mapas, carregar);
+        } else {
+            var vigia = new IntersectionObserver(function (entradas) {
+                entradas.forEach(function (entrada) {
+                    if (entrada.isIntersecting) {
+                        carregar(entrada.target);
+                        vigia.unobserve(entrada.target);
+                    }
+                });
+            }, { rootMargin: '400px' });
+
+            Array.prototype.forEach.call(mapas, function (quadro) {
+                vigia.observe(quadro);
+            });
+        }
     }
 
     // Se o visitante mexer no carrossel antes disso, as imagens entram na hora.

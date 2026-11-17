@@ -351,7 +351,7 @@
             <!-- Mapa Embed -->
             {% if currentTenant and currentTenant.mapsEmbedUrl %}
             <div class="mt-16 rounded-3xl overflow-hidden shadow-2xl h-96 border-4 border-white dark:border-cetec-dark" data-aos="zoom-in">
-                <iframe src="{{ currentTenant.mapsEmbedUrl }}"
+                <iframe data-adiada="{{ currentTenant.mapsEmbedUrl }}"
                         title="Localização do {{ currentTenant.name }} no Google Maps"
                         class="w-full h-full" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
