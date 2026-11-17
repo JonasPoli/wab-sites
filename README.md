@@ -27,7 +27,7 @@ sequenceDiagram
 No ciclo de vida de cada requisição Symfony, o listener `TenantSubscriber` atua de forma precoce (`KernelEvents::REQUEST`, prioridade 100):
 1. Captura o host do cabeçalho da requisição através de `$request->getHost()`.
 2. Consulta o banco buscando a entidade correspondente em `TenantRepository::findByDomain()`.
-3. Caso o domínio não esteja cadastrado, retorna uma resposta amigável informando **"Domínio não configurado"** (HTTP 404).
+3. Caso o domínio não esteja cadastrado, retorna uma resposta amigável informando **"Domínio não configurado"** (HTTP 404). A única rota que passa mesmo assim é `/robots.txt`, que responde proibindo o rastreamento do domínio inteiro — um 404 ali seria lido pelo buscador como "não há robots.txt, pode rastrear".
 4. Sendo localizado, injeta o objeto no `TenantContext` (um serviço com escopo de request) e ativa o filtro SQL do Doctrine.
 
 ### 2. Filtro Automático de Consultas (`TenantFilter`)
