@@ -363,8 +363,8 @@
 
 {% block javascripts %}
 <script>
-    // Inicializa o Swiper após todos os scripts carregar
-    window.addEventListener('DOMContentLoaded', function() {
+    // 'swiper:pronto' vem do assets/carrossel.js, que carrega o Swiper depois do load.
+    document.addEventListener('swiper:pronto', function() {
         if (typeof Swiper !== 'undefined') {
             new Swiper(".heroSwiper", {
                 loop: true,

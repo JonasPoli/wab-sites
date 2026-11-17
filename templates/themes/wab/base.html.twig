@@ -283,7 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
     {# Carrossel só onde há carrossel; animação de entrada sem biblioteca #}
     {% if usaCarrossel %}
-        <script src="{{ asset('bibliotecas/swiper/swiper-bundle.min.js') }}" defer></script>
+        {# O Swiper entra depois do load, pelo assets/carrossel.js; os blocos esperam
+           o evento 'swiper:pronto'. O primeiro slide já aparece sem ele. #}
+        <script src="{{ asset('carrossel.js') }}" defer
+                data-swiper="{{ asset('bibliotecas/swiper/swiper-bundle.min.js') }}"></script>
     {% endif %}
     <script src="{{ asset('animacoes.js') }}" defer></script>
     <script src="{{ asset('imagens-adiadas.js') }}" defer></script>

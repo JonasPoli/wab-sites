@@ -4,7 +4,7 @@
         <!-- Logo -->
         <a href="{{ path('pub_home') }}" class="flex items-center">
             {% if currentTenant and currentTenant.logo %}
-                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" fetchpriority="high" decoding="async">
+                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" decoding="async">
                 {% if currentTenant.darkLogo %}
                     <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
                 {% else %}

@@ -20,8 +20,11 @@ use Twig\TwigFunction;
  */
 final class AtivosExtension extends AbstractExtension
 {
-    /** Tipos de bloco que sempre montam carrossel. O `banner` tem regra própria: só com mais de um. */
-    private const BLOCOS_COM_CARROSSEL = ['gallery', 'testimonials', 'partner_logos'];
+    /**
+     * Só o bloco de banner usa o Swiper, e apenas com mais de um banner — galeria,
+     * depoimentos e logos de parceiros têm JavaScript próprio no tema.
+     */
+    private const BLOCOS_COM_CARROSSEL = [];
 
     #[\Override]
     public function getFunctions(): array
