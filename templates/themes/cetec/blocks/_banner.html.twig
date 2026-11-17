@@ -109,10 +109,21 @@
                         {# Background image #}
                         {% if b.image %}
                             {% set bannerArquivo = 'uploads/page_block/' ~ b.image %}
-                            <img {{ bannerArquivo|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
-                                 srcset="{{ bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw"
-                                 class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;"
-                                 fetchpriority="{{ loop.first ? 'high' : 'low' }}" loading="{{ loop.first ? 'eager' : 'lazy' }}" decoding="async">
+                            {% set bannerSrcset = bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) %}
+                            {% set bannerMedidas = thumb_size(bannerArquivo, 'banner_desktop') %}
+                            {# Num carrossel os slides ficam empilhados no mesmo ponto da tela, então o
+                               navegador trata todos como visíveis e o loading="lazy" não segura nada.
+                               Só o primeiro slide vem com src; os outros são promovidos pelo
+                               assets/imagens-adiadas.js depois que a página abre. #}
+                            <img {% if loop.first %}{{ bannerArquivo|thumb_attrs('banner_desktop') }}
+                                 srcset="{{ bannerSrcset }}" sizes="100vw"
+                                 fetchpriority="high" decoding="async"
+                                 {% else %}width="{{ bannerMedidas[0] }}" height="{{ bannerMedidas[1] }}"
+                                 data-adiada="{{ bannerArquivo|thumb('banner_desktop') }}"
+                                 data-adiada-srcset="{{ bannerSrcset }}"
+                                 loading="lazy" decoding="async"
+                                 {% endif %}alt="" aria-hidden="true"
+                                 class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;">
                         {% else %}
                             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0" data-aos="fade" data-aos-duration="1000"></div>
                         {% endif %}

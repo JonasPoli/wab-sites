@@ -84,6 +84,35 @@ miniaturas, que já estava configurada no projeto.
   `@import` dentro de um `<style>` em linha.
 - `/favicon.ico` respondia 404 em todos os domínios.
 
+## O que foi feito
+
+Ver a change `seo-e-performance-dos-sites` no OpenSpec e a seção
+"SEO e desempenho das páginas públicas" do `README.md`.
+
+### Peso de imagem da home, depois
+
+| Domínio | Antes | Depois | Redução |
+|---|---|---|---|
+| site.abifer.com.br | 17,9 MB | 1,19 MB | 93% |
+| site.topdrim.com.br | 15,6 MB | 0,45 MB | 97% |
+| cemporcentoexpresso.com.br | 13,2 MB | 0,75 MB | 94% |
+| site.petvida.com.br | 8,1 MB | 0,58 MB | 93% |
+| pkwy.com.br | 7,3 MB | 0,24 MB | 97% |
+| marapossi.com.br | 5,9 MB | 0,48 MB | 92% |
+| site.transterraararaquara.com.br | 4,5 MB | 0,36 MB | 92% |
+| imperiodainformatica.com.br | 3,9 MB | 0,34 MB | 91% |
+| ajope.wab.com.br | 0,2 MB | 0,19 MB | — |
+
+Nenhum arquivo isolado passa de 150 KB, contra os 2 a 3 MB de antes.
+
+### O que ficou de fora
+
+O cache de 1 ano em `/assets` e `/media/cache` no Nginx: o usuário `runcloud` não tem
+`sudo` e não lê `/etc/nginx-rc/conf.d/`. O trecho pronto está em
+`docs/nginx-cache-dos-estaticos.md`, para o painel do RunCloud. A auditoria
+`uses-long-cache-ttl` tem peso 0 na nota de desempenho, então isso não trava o 100 —
+melhora quem volta ao site.
+
 ## Como medir de novo
 
 ```bash
