@@ -45,3 +45,5 @@ public/images/newsImage/*
 public/uploads/
 public/uploads/*
 .DS_Store
+# Medições do sh/medir-pagespeed.sh (JSON grande do Lighthouse; o resumo fica em docs/)
+/sh/*.json
