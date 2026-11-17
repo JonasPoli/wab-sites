@@ -21,6 +21,14 @@ for d in $DOMS; do
   for ff in mobile desktop; do
     i=$((i+1))
     out="$DIR/$PREFIX-$d-$ff.json"
+    # Aquecimento: o servidor tem 1 vCPU e, logo depois de um build, a primeira
+    # resposta leva mais de um segundo só para compilar o template. Medir assim não
+    # mede o site, mede o cache frio. Duas visitas antes de cada execução, e um
+    # respiro entre elas para não medir o servidor saturado pela medição anterior.
+    curl -s -o /dev/null -m 30 "https://$d/" || true
+    sleep 2
+    curl -s -o /dev/null -m 30 "https://$d/" || true
+    sleep 3
     if [ "$ff" = "desktop" ]; then
       EMU="--preset=desktop"
     else
