@@ -25,6 +25,7 @@ Os 9 sites em produção perdem posição no Google por dois motivos medidos em 
 
 ### Modified Capabilities
 
+- `isolamento-por-dominio`: a requirement "Domínio não cadastrado" ganha uma exceção — `/robots.txt` segue para o controller mesmo sem tenant, para responder proibindo o rastreamento em vez de 404.
 - `construtor-de-paginas`: a requirement do `/sitemap.xml` muda — hoje ela manda listar a home e uma URL `/p/<slug>` por página do tenant; passa a excluir rascunhos e a página usada como home, a incluir as categorias e, no tema `noticias`, as editorias e os autores, e a usar `lastmod` com a data real de alteração.
 
 ## Impact

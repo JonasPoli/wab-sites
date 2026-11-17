@@ -48,6 +48,14 @@ class TenantSubscriber implements EventSubscriberInterface
         $tenant = $this->tenantRepository->findByDomain($host);
 
         if ($tenant === null) {
+            // O /robots.txt segue para o controller mesmo sem tenant: ali ele responde
+            // proibindo o rastreamento do domínio inteiro, que é o certo para um domínio
+            // que aponta para o servidor sem ser site (ex.: site.wab.com.br). Um 404 aqui
+            // o buscador leria como "não há robots.txt, pode rastrear".
+            if ($request->getPathInfo() === '/robots.txt') {
+                return;
+            }
+
             // No tenant for this domain — return a friendly 404
             $event->setResponse(new Response(
                 sprintf('<h1>Domínio não configurado</h1><p>O domínio <strong>%s</strong> não está registrado nesta plataforma.</p>', htmlspecialchars($host)),
