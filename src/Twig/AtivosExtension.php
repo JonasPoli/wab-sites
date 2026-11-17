@@ -20,8 +20,8 @@ use Twig\TwigFunction;
  */
 final class AtivosExtension extends AbstractExtension
 {
-    /** Tipos de bloco que montam carrossel no tema. */
-    private const BLOCOS_COM_CARROSSEL = ['banner', 'gallery', 'testimonials', 'partner_logos'];
+    /** Tipos de bloco que sempre montam carrossel. O `banner` tem regra própria: só com mais de um. */
+    private const BLOCOS_COM_CARROSSEL = ['gallery', 'testimonials', 'partner_logos'];
 
     #[\Override]
     public function getFunctions(): array
@@ -132,6 +132,17 @@ final class AtivosExtension extends AbstractExtension
             foreach ($secao->getBlocks() as $bloco) {
                 $tipo = $bloco->getType();
                 $tipo = $tipo instanceof \BackedEnum ? (string) $tipo->value : (string) $tipo;
+
+                // Um banner só não vira carrossel: o template desenha a imagem direto.
+                // Carregar o Swiper nesse caso custava 4,5 KB de CSS bloqueante e 40 KB
+                // de JavaScript à toa — e banner único é o caso da maioria das páginas.
+                if ($tipo === 'banner') {
+                    if ($this->quantosBanners($bloco) > 1) {
+                        return true;
+                    }
+                    continue;
+                }
+
                 if (in_array($tipo, self::BLOCOS_COM_CARROSSEL, true)) {
                     return true;
                 }
@@ -139,5 +150,25 @@ final class AtivosExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    /** Quantos banners ativos o bloco tem; sem lista na configuração, vale a imagem do bloco. */
+    private function quantosBanners(object $bloco): int
+    {
+        $config = method_exists($bloco, 'getConfig') ? ($bloco->getConfig() ?? []) : [];
+        $lista = $config['banners'] ?? null;
+
+        if (is_array($lista) && $lista !== []) {
+            $ativos = 0;
+            foreach ($lista as $banner) {
+                if (($banner['active'] ?? '1') === '1') {
+                    ++$ativos;
+                }
+            }
+
+            return $ativos;
+        }
+
+        return $bloco->getTitle() ? 1 : 0;
     }
 }
