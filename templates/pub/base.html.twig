@@ -3,8 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-        <title>{% block title %}TickePix - Sistema de Ingressos{% endblock %}</title>
-        <link rel="icon" href="">
+        <title>{% block title %}{{ currentTenant ? currentTenant.name : 'Acesso' }}{% endblock %}</title>
+        {# Página de acesso não entra em buscador: o robots.txt já proíbe, e a meta
+           vale para quem chegar por link direto. #}
+        <meta name="robots" content="noindex, nofollow">
+        {% if currentTenant and currentTenant.favicon %}
+            <link rel="icon" href="{{ ('uploads/tenant/favicon/' ~ currentTenant.favicon)|thumb('favicon_site') }}" sizes="64x64">
+        {% endif %}
 
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
