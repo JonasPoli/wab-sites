@@ -1,12 +1,6 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ member.name }} | {{ currentTenant ? currentTenant.name : '' }}{% endblock %}
 
-{% block meta_description %}
-{% if member.summary %}
-<meta name="description" content="{{ member.summary|striptags|slice(0,160) }}">
-{% endif %}
-{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -281,7 +275,7 @@
 <div class="container">
 
     <a href="javascript:history.back()" class="profile-back">
-        <i class="fa-solid fa-arrow-left"></i> Voltar
+        {{ ux_icon('fa6-solid:arrow-left', {'aria-hidden': 'true'}) }} Voltar
     </a>
 
     {# ── Cabeçalho exclusivo para impressão (oculto em tela) ── #}
@@ -303,7 +297,7 @@
                 {% if member.image %}
                     <img src="{{ vich_uploader_asset(member, 'imageFile') }}" alt="{{ member.name }}">
                 {% else %}
-                    <div class="profile-photo-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="profile-photo-placeholder">{{ ux_icon('fa6-solid:user-tie', {'aria-hidden': 'true'}) }}</div>
                 {% endif %}
             </div>
             <div class="profile-sidebar-body">
@@ -312,19 +306,19 @@
                 <div class="sidebar-section">
                     <div class="sidebar-label">Contato</div>
                     {% if member.email %}
-                    <a href="mailto:{{ member.email }}" class="sidebar-contact-item"><i class="fa-solid fa-envelope"></i> {{ member.email }}</a>
+                    <a href="mailto:{{ member.email }}" class="sidebar-contact-item">{{ ux_icon('fa6-solid:envelope', {'aria-hidden': 'true'}) }} {{ member.email }}</a>
                     {% endif %}
                     {% if member.phone %}
-                    <a href="tel:{{ member.phone }}" class="sidebar-contact-item"><i class="fa-solid fa-phone"></i> {{ member.phone }}</a>
+                    <a href="tel:{{ member.phone }}" class="sidebar-contact-item">{{ ux_icon('fa6-solid:phone', {'aria-hidden': 'true'}) }} {{ member.phone }}</a>
                     {% endif %}
                     {% if member.address %}
-                    <div class="sidebar-contact-item"><i class="fa-solid fa-location-dot"></i> {{ member.address }}</div>
+                    <div class="sidebar-contact-item">{{ ux_icon('fa6-solid:location-dot', {'aria-hidden': 'true'}) }} {{ member.address }}</div>
                     {% endif %}
                     {% if member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
                     <div class="sidebar-social-row">
-                        {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="sidebar-social-btn li"><i class="fa-brands fa-linkedin-in"></i></a>{% endif %}
-                        {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="sidebar-social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
-                        {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="sidebar-social-btn ig"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                        {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="sidebar-social-btn li">{{ ux_icon('fa6-brands:linkedin-in', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                        {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="sidebar-social-btn fb">{{ ux_icon('fa6-brands:facebook-f', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                        {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="sidebar-social-btn ig">{{ ux_icon('fa6-brands:instagram', {'aria-hidden': 'true'}) }}</a>{% endif %}
                     </div>
                     {% endif %}
                 </div>
@@ -347,7 +341,7 @@
 
             <div class="profile-actions">
                 <button type="button" class="profile-btn profile-btn-pdf" onclick="window.print()">
-                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                    {{ ux_icon('fa6-solid:file-pdf', {'aria-hidden': 'true'}) }} Baixar PDF
                 </button>
             </div>
 

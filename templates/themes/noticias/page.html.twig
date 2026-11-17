@@ -1,8 +1,5 @@
 {% extends 'themes/noticias/base.html.twig' %}
 
-{% block title %}{{ page.seoTitle ?? page.title }} | {{ currentTenant.name }}{% endblock %}
-{% block meta_description %}{% if page.seoDescription %}<meta name="description" content="{{ page.seoDescription }}">{% endif %}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
 
 {% block body %}
 {% if page.showTitle ?? true %}

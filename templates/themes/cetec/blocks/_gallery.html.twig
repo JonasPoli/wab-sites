@@ -12,7 +12,7 @@
         <div class="wg-track flex transition-transform duration-[400ms] cubic-bezier(0.34, 1.56, 0.64, 1)">
             {% for img in images %}
             <div class="wg-slide min-w-full cursor-zoom-in group relative" onclick="openLightbox('{{ block.id }}', {{ loop.index0 }})">
-                <img src="{{ asset('uploads/page_block_gallery/' ~ img.filename) }}" alt="{{ img.caption }}" loading="lazy" class="w-full aspect-[16/9] object-cover rounded-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                <img {{ ('uploads/page_block_gallery/' ~ img.filename)|thumb_attrs('galeria') }} alt="{{ img.caption }}" loading="lazy" decoding="async" class="w-full aspect-[16/9] object-cover rounded-2xl transition-transform duration-500 group-hover:scale-[1.02]">
                 {% if img.caption %}
                 <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-2xl">
                     <p class="text-white text-sm md:text-base font-semibold">{{ img.caption }}</p>
@@ -23,8 +23,8 @@
         </div>
         
         {% if images|length > 1 %}
-        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', -1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="wg-btn wg-prev absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', -1)">{{ ux_icon('fa6-solid:chevron-left', {'aria-hidden': 'true'}) }}</button>
+        <button class="wg-btn wg-next absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-cetec-dark/90 hover:bg-cetec-secondary hover:text-white text-cetec-dark dark:text-white w-12 h-12 rounded-full flex items-center justify-center border border-gray-200 dark:border-white/10 shadow-lg cursor-pointer transition-all duration-300 z-10" onclick="slideGallery('{{ block.id }}', 1)">{{ ux_icon('fa6-solid:chevron-right', {'aria-hidden': 'true'}) }}</button>
         
         <div class="wg-dots flex justify-center gap-2 mt-6">
             {% for img in images %}

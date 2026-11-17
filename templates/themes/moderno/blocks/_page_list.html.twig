@@ -11,7 +11,7 @@
             {% if page.coverImage %}
             <div class="wpl-img" style="background-image:url('{{ asset('uploads/page_cover/' ~ page.coverImage) }}')"></div>
             {% else %}
-            <div class="wpl-img wpl-img-placeholder"><i class="fa-solid fa-file-alt"></i></div>
+            <div class="wpl-img wpl-img-placeholder">{{ ux_icon('fa6-solid:file-lines', {'aria-hidden': 'true'}) }}</div>
             {% endif %}
             <div class="wpl-body">
                 <h3 class="wpl-title">{{ page.title }}</h3>

@@ -7,13 +7,13 @@
     <div class="wab-testimonials">
         {% for t in testimonials %}
         <div class="t-card">
-            <div class="t-stars">{% for s in 1..t.rating %}<i class="fa-solid fa-star"></i>{% endfor %}{% if t.rating < 5 %}{% for s in (t.rating+1)..5 %}<i class="fa-regular fa-star"></i>{% endfor %}{% endif %}</div>
+            <div class="t-stars">{% for s in 1..t.rating %}{{ ux_icon('fa6-solid:star', {'aria-hidden': 'true'}) }}{% endfor %}{% if t.rating < 5 %}{% for s in (t.rating+1)..5 %}{{ ux_icon('fa6-regular:star', {'aria-hidden': 'true'}) }}{% endfor %}{% endif %}</div>
             <p class="t-text">"{{ t.text }}"</p>
             <div class="t-author">
                 {% if t.avatar %}
                     <img src="{{ asset('uploads/testimonial_avatar/' ~ t.avatar) }}" alt="{{ t.name }}" class="t-avatar" loading="lazy">
                 {% else %}
-                    <div class="t-avatar t-avatar-ph"><i class="fa-solid fa-user"></i></div>
+                    <div class="t-avatar t-avatar-ph">{{ ux_icon('fa6-solid:user', {'aria-hidden': 'true'}) }}</div>
                 {% endif %}
                 <div>
                     <div class="t-name">{{ t.name }}</div>

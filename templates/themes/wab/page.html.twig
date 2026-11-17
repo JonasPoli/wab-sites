@@ -1,20 +1,8 @@
 {% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
 
-{% block meta_description %}
-{% if page.seoDescription %}
-<meta name="description" content="{{ page.seoDescription }}">
-{% endif %}
-{% endblock %}
 
-{% block og_tags %}
-{{ parent() }}
-<meta property="og:type" content="website">
-<meta property="og:title" content="{{ page.seoTitle ?? page.title }}">
-{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
 
 {% block body %}
 <script type="application/ld+json">

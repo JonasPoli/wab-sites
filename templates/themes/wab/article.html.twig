@@ -1,28 +1,9 @@
 {% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}{{ article.seoTitle ?? article.title }}{% endblock %}
 
-{% block meta_description %}
-{% if article.seoDescription %}
-<meta name="description" content="{{ article.seoDescription }}">
-{% endif %}
-{% endblock %}
 
-{% block og_tags %}
-{{ parent() }}
-<meta property="og:type"  content="article">
-<meta property="og:title" content="{{ article.seoTitle ?? article.title }}">
-{% if article.seoDescription %}<meta property="og:description" content="{{ article.seoDescription }}">{% endif %}
-{% if article.image %}<meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/uploads/article/{{ article.image }}">{% endif %}
-{% endblock %}
 
-{% block canonical %}
-{% if article.canonicalUrl %}<link rel="canonical" href="{{ article.canonicalUrl }}">{% endif %}
-{% endblock %}
 
-{% block robots %}
-{% if article.isNoIndex %}<meta name="robots" content="noindex">{% endif %}
-{% endblock %}
 
 {% block body %}
 <script type="application/ld+json">

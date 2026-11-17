@@ -17,10 +17,15 @@ use Twig\TwigFunction;
  */
 class TenantExtension extends AbstractExtension implements GlobalsInterface
 {
+    /** @var list<string> famílias que o site aberto usa, preenchida pelo getCssVars() */
+    private array $familiasEmUso = [];
+
     public function __construct(
         private readonly TenantContext $tenantContext,
         private readonly PageRepository $pageRepository,
         private readonly CategoryRepository $categoryRepository,
+        #[\Symfony\Component\DependencyInjection\Attribute\Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir = '',
     ) {}
 
     #[\Override]
@@ -48,6 +53,7 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('is_dark_color', $this->isDarkColor(...)),
             new TwigFunction('contrast_ratio', ColorContrast::ratio(...)),
             new TwigFunction('latest_pages', $this->getLatestPages(...)),
+            new TwigFunction('tenant_fontes', $this->getFamiliasEmUso(...)),
         ];
     }
 
@@ -55,6 +61,51 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
     public function getLatestPages(?\App\Entity\Category $category, ?int $limit = null): array
     {
         return $category ? $this->pageRepository->findLatestInCategory($category, $limit ?: 3) : [];
+    }
+
+    /**
+     * Arquivos de fonte que o site aberto precisa pré-carregar: só o subconjunto `latin`
+     * das famílias que ele usa nos títulos, e não as seis do catálogo. Caminho relativo
+     * ao `assets/`, para o tema passar ao `asset()`.
+     *
+     * Pré-carregar arquivo que a página não usa é desperdício e o Lighthouse aponta,
+     * então aqui só entra arquivo que existe mesmo em `assets/fonts`.
+     *
+     * @return list<string>
+     */
+    public function getFamiliasEmUso(): array
+    {
+        if ($this->familiasEmUso === []) {
+            $this->getCssVars();
+        }
+
+        $arquivos = [];
+        foreach ($this->familiasEmUso as $familia) {
+            $prefixo = strtolower(str_replace(' ', '-', $familia));
+            $candidatos = glob($this->projectDir . '/assets/fonts/' . $prefixo . '-latin-*-normal.woff2') ?: [];
+
+            // Variável (um arquivo para todos os pesos) vence; senão, o peso 400
+            $escolhido = null;
+            foreach ($candidatos as $caminho) {
+                $nome = basename($caminho);
+                if (str_contains($nome, '-latin-ext-')) {
+                    continue;
+                }
+                if (str_contains($nome, '100-900')) {
+                    $escolhido = $nome;
+                    break;
+                }
+                if ($escolhido === null || str_contains($nome, '-400-')) {
+                    $escolhido = $nome;
+                }
+            }
+
+            if ($escolhido !== null) {
+                $arquivos[] = 'fonts/' . $escolhido;
+            }
+        }
+
+        return array_values(array_unique($arquivos));
     }
 
     public function getTenant(): ?\App\Entity\Tenant
@@ -115,23 +166,14 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
             $fontGroups['Outfit'] = [300, 400, 500, 600, 700, 800, 900];
         }
 
-        $familiesParts = [];
-        foreach ($fontGroups as $family => $weights) {
-            $uniqueWeights = array_unique($weights);
-            sort($uniqueWeights);
-            $formattedFamily = str_replace(' ', '+', $family);
-            if (!empty($uniqueWeights)) {
-                $familiesParts[] = "family={$formattedFamily}:wght@" . implode(';', $uniqueWeights);
-            } else {
-                $familiesParts[] = "family={$formattedFamily}";
-            }
-        }
-
+        // As famílias são servidas pelo próprio domínio (assets/styles/fontes.css, gerado
+        // por `app:fontes:sincronizar`), carregado no <head> dos temas. Aqui ficou só a
+        // lista de quem este site usa, para o tema pré-carregar as certas.
+        // Antes havia aqui um `@import url('https://fonts.googleapis.com/css2?…')` dentro
+        // do <style> em linha: o navegador só descobria a fonte depois de ler o CSS, não
+        // dava para pré-carregar e o `display=optional` trocava a fonte depois da pintura.
+        $this->familiasEmUso = array_keys($fontGroups);
         $importString = '';
-        if (!empty($familiesParts)) {
-            $queryString = implode('&', $familiesParts) . '&display=optional';
-            $importString = "@import url('https://fonts.googleapis.com/css2?{$queryString}');";
-        }
 
         $cssRules = "";
         for ($i = 1; $i <= 5; $i++) {

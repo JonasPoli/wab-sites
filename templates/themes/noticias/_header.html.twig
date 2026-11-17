@@ -8,9 +8,9 @@
 {% macro logo(currentTenant, tenantName) %}
     {% set dark = currentTenant ? is_dark_color(currentTenant.primaryColor) : true %}
     {% if currentTenant and dark and currentTenant.darkLogo %}
-        <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ tenantName }}">
+        <img {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" fetchpriority="high" decoding="async">
     {% elseif currentTenant and currentTenant.logo %}
-        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ tenantName }}"></span>
+        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" fetchpriority="high" decoding="async"></span>
     {% else %}
         {{ tenantName }}
     {% endif %}
@@ -20,7 +20,7 @@
     <div class="nt-header__inner">
         <div class="nt-header__left">
             <button type="button" class="nt-menu-btn" id="nt-menu-btn" aria-expanded="false" aria-controls="nt-drawer">
-                <i class="bi bi-list" aria-hidden="true"></i> MENU
+                {{ ux_icon('bi:list', {'aria-hidden': 'true'}) }} MENU
             </button>
             {% if header_section %}
                 <a href="{{ path('pub_home') }}" class="nt-logo" aria-label="Página inicial de {{ tenantName }}">{{ _self.logo(currentTenant, tenantName) }}</a>
@@ -35,11 +35,15 @@
         </div>
         <div class="nt-header__right">
             <button type="button" class="nt-search-btn" id="nt-search-btn" aria-label="Buscar" title="Buscar" aria-expanded="false" aria-controls="nt-search">
-                <i class="bi bi-search" aria-hidden="true"></i>
+                {{ ux_icon('bi:search', {'aria-hidden': 'true'}) }}
             </button>
             {# Rótulo e ícone iniciais do Claro; _theme_mode.html.twig acerta o modo guardado #}
             <button type="button" class="nt-mode-btn" id="nt-mode-btn" aria-label="Aparência: Claro. Mudar para Escuro" title="Aparência: Claro. Mudar para Escuro">
-                <i class="bi bi-sun" aria-hidden="true"></i><span class="nt-mode-btn__label">Claro</span>
+                {# Os três ícones vêm no HTML; o script mostra o do modo atual (antes ele trocava a classe de um <i>, que não existe mais com SVG embutido) #}
+                {{ ux_icon('bi:sun', {'aria-hidden': 'true', 'data-modo': 'light'}) }}
+                {{ ux_icon('bi:moon-stars', {'aria-hidden': 'true', 'data-modo': 'dark', 'hidden': 'hidden'}) }}
+                {{ ux_icon('bi:circle-half', {'aria-hidden': 'true', 'data-modo': 'auto', 'hidden': 'hidden'}) }}
+                <span class="nt-mode-btn__label">Claro</span>
             </button>
         </div>
     </div>
@@ -48,7 +52,7 @@
     <form class="nt-container nt-search-form" action="{{ path('pub_search') }}" method="get" role="search">
         <label for="nt-search-input" class="nt-sr-only">Buscar notícias</label>
         <input type="search" id="nt-search-input" name="q" maxlength="100" placeholder="O que você procura?" value="{{ app.request.attributes.get('_route') == 'pub_search' ? app.request.query.get('q') : '' }}">
-        <button type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>Buscar</span></button>
+        <button type="submit">{{ ux_icon('bi:search', {'aria-hidden': 'true'}) }}<span>Buscar</span></button>
     </form>
 </div>
 
@@ -61,7 +65,7 @@
     <form class="nt-search-form nt-search-form--drawer" action="{{ path('pub_search') }}" method="get" role="search">
         <label for="nt-search-drawer" class="nt-sr-only">Buscar notícias</label>
         <input type="search" id="nt-search-drawer" name="q" maxlength="100" placeholder="Buscar notícias">
-        <button type="submit" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>
+        <button type="submit" aria-label="Buscar">{{ ux_icon('bi:search', {'aria-hidden': 'true'}) }}</button>
     </form>
     <nav>
         <ul>

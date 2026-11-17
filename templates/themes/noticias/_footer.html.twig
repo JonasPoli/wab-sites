@@ -6,9 +6,9 @@
             <div class="nt-footer__brand">
                 <a href="{{ path('pub_home') }}" class="nt-logo" aria-label="Página inicial de {{ tenantName }}">
                     {% if currentTenant and dark and currentTenant.darkLogo %}
-                        <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ tenantName }}" style="height:40px">
+                        <img {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" style="height:40px;width:auto" loading="lazy" decoding="async">
                     {% elseif currentTenant and currentTenant.logo %}
-                        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ tenantName }}" style="height:36px"></span>
+                        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" style="height:36px;width:auto" loading="lazy" decoding="async"></span>
                     {% else %}
                         {{ tenantName }}
                     {% endif %}
@@ -16,11 +16,11 @@
                 <a href="{{ path('pub_articles') }}">últimas notícias</a>
             </div>
             <div class="nt-footer__social">
-                {% if currentTenant and currentTenant.facebookLink %}<a href="{{ currentTenant.facebookLink }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>{% endif %}
-                {% if currentTenant and currentTenant.instagramLink %}<a href="{{ currentTenant.instagramLink }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>{% endif %}
-                {% if currentTenant and currentTenant.youtubeLink %}<a href="{{ currentTenant.youtubeLink }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>{% endif %}
-                {% if currentTenant and currentTenant.linkedinLink %}<a href="{{ currentTenant.linkedinLink }}" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>{% endif %}
-                {% if currentTenant and currentTenant.whatsappLink %}<a href="{{ currentTenant.whatsappLink }}" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>{% endif %}
+                {% if currentTenant and currentTenant.facebookLink %}<a href="{{ currentTenant.facebookLink }}" target="_blank" rel="noopener" aria-label="Facebook">{{ ux_icon('fa6-brands:facebook', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                {% if currentTenant and currentTenant.instagramLink %}<a href="{{ currentTenant.instagramLink }}" target="_blank" rel="noopener" aria-label="Instagram">{{ ux_icon('fa6-brands:instagram', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                {% if currentTenant and currentTenant.youtubeLink %}<a href="{{ currentTenant.youtubeLink }}" target="_blank" rel="noopener" aria-label="YouTube">{{ ux_icon('fa6-brands:youtube', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                {% if currentTenant and currentTenant.linkedinLink %}<a href="{{ currentTenant.linkedinLink }}" target="_blank" rel="noopener" aria-label="LinkedIn">{{ ux_icon('fa6-brands:linkedin', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                {% if currentTenant and currentTenant.whatsappLink %}<a href="{{ currentTenant.whatsappLink }}" target="_blank" rel="noopener" aria-label="WhatsApp">{{ ux_icon('fa6-brands:whatsapp', {'aria-hidden': 'true'}) }}</a>{% endif %}
             </div>
         </div>
         <div class="nt-footer__bottom">

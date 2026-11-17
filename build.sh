@@ -62,4 +62,11 @@ rm -rf var/log/*
 # 6. Limpar Cache do Liip Imagine
 $PHP_BIN bin/console liip:imagine:cache:remove
 
+# 7. Gerar as miniaturas de novo
+# Sem isto, o HTML sai com /media/cache/resolve/..., que responde 302 antes de servir a
+# imagem — a cadeia de redirecionamento que derruba o LCP. Os passos 2 e 6 acabam de
+# apagar tudo, então as miniaturas precisam voltar aqui, e não no acesso do visitante.
+echo -e "${GREEN}--> Gerando as miniaturas das imagens...${NC}"
+$PHP_BIN bin/console app:miniaturas:aquecer
+
 echo -e "${BLUE}==> Concluído com sucesso!${NC}"

@@ -1,8 +1,5 @@
 {% extends 'themes/noticias/base.html.twig' %}
 
-{% block title %}{{ author.name }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
-{% block meta_description %}{% if author.bio %}<meta name="description" content="{{ author.bio|striptags|slice(0, 160) }}">{% endif %}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ url('pub_author', page > 1 ? {slug: author.slug, pagina: page} : {slug: author.slug}) }}">{% endblock %}
 
 {% block body %}
 <div class="nt-container nt-page">
@@ -10,7 +7,7 @@
         <div class="nt-feed">
             <header class="nt-author{{ author.photo ? '' : ' nt-author--nophoto' }}">
                 {% if author.photo %}
-                    <img src="{{ ('uploads/author/' ~ author.photo)|news_image('news_square') }}" alt="Foto de {{ author.name }}">
+                    <img {{ ('uploads/author/' ~ author.photo)|thumb_attrs('news_square') }} alt="Foto de {{ author.name }}" loading="lazy" decoding="async">
                 {% endif %}
                 <div>
                     <h1>{{ author.name }}</h1>

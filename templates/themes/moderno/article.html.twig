@@ -1,9 +1,4 @@
 {% extends 'themes/moderno/base.html.twig' %}
-{% block title %}{{ article.seoTitle ?? article.title }}{% endblock %}
-{% block meta_description %}{% if article.seoDescription %}<meta name="description" content="{{ article.seoDescription }}">{% endif %}{% endblock %}
-{% block og_tags %}{{ parent() }}<meta property="og:type" content="article"><meta property="og:title" content="{{ article.seoTitle ?? article.title }}">{% if article.image %}<meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/uploads/article/{{ article.image }}">{% endif %}{% endblock %}
-{% block canonical %}{% if article.canonicalUrl %}<link rel="canonical" href="{{ article.canonicalUrl }}">{% endif %}{% endblock %}
-{% block robots %}{% if article.isNoIndex %}<meta name="robots" content="noindex">{% endif %}{% endblock %}
 {% block body %}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle","headline":{{ article.title|json_encode|raw }},"datePublished":"{{ article.publishedAt|date('c') }}"}</script>
 {% if article.image %}<div class="ma-hero" style="background-image:url('/uploads/article/{{ article.image }}')"><div class="ma-hero-overlay"></div></div>{% endif %}

@@ -4,7 +4,7 @@
 <article class="nt-item{{ lead ? ' nt-item--lead' : '' }}{{ article.coverImage ? '' : ' nt-item--nocover' }}">
     {% if article.coverImage %}
     <a class="nt-item__img" href="{{ url }}" tabindex="-1" aria-hidden="true">
-        <img src="{{ ('uploads/article/' ~ article.coverImage)|news_image(lead ? 'hero_banner_mobile' : 'news_thumb') }}" alt="" loading="{{ lead ? 'eager' : 'lazy' }}">
+        <img {{ ('uploads/article/' ~ article.coverImage)|thumb_attrs(lead ? 'hero_banner_mobile' : 'news_thumb') }} alt="" loading="{{ lead ? 'eager' : 'lazy' }}" decoding="async"{% if lead %} fetchpriority="high"{% endif %}>
     </a>
     {% endif %}
     <div class="nt-item__body">

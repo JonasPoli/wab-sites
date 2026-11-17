@@ -1,10 +1,6 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ currentTenant ? currentTenant.name : 'CETEC' }}{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="{{ currentTenant.seoDescription ?? (currentTenant ? currentTenant.name : 'CETEC - Escola de Ensino Técnico') }}">
-{% endblock %}
 
 {% block body %}
 
@@ -17,12 +13,17 @@
                     {% for b in banners %}
                         <div class="swiper-slide relative flex items-center bg-black">
                             {% if b.backgroundImage %}
-                                <img src="/uploads/hero/{{ b.backgroundImage }}"
-                                     alt="{{ b.title }}"
-                                     class="absolute inset-0 w-full h-full object-cover object-center opacity-40 transition-transform duration-[6s] scale-100 swiper-lazy"
-                                     fetchpriority="{{ loop.first ? 'high' : 'low' }}"
-                                     loading="{{ loop.first ? 'eager' : 'lazy' }}"
-                                     data-aos="fade" data-aos-duration="1000">
+                                {% set heroArquivo = 'uploads/hero/' ~ b.backgroundImage %}
+                                <picture>
+                                    <source media="(max-width: 767px)" srcset="{{ heroArquivo|thumb('banner_mobile') }}" width="768" height="560">
+                                    <img {{ heroArquivo|thumb_attrs('banner_desktop') }}
+                                         alt="{{ b.title|striptags }}"
+                                         class="absolute inset-0 w-full h-full object-cover object-center opacity-40 transition-transform duration-[6s] scale-100"
+                                         fetchpriority="{{ loop.first ? 'high' : 'low' }}"
+                                         loading="{{ loop.first ? 'eager' : 'lazy' }}"
+                                         decoding="{{ loop.first ? 'sync' : 'async' }}"
+                                         {% if not loop.first %}data-aos="fade" data-aos-duration="1000"{% endif %}>
+                                </picture>
                             {% else %}
                                 <div class="absolute inset-0 bg-gradient-to-tr from-cetec-dark via-[#2b1f1a] to-cetec-dark opacity-80" data-aos="fade" data-aos-duration="1000"></div>
                             {% endif %}
@@ -86,21 +87,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="100">
                 <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
-                    <i class="bi bi-clock-history"></i>
+                    {{ ux_icon('bi:clock-history', {'aria-hidden': 'true'}) }}
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-cetec-primary">20+ Anos de Tradição</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Somos referência regional em ensino técnico profissionalizante com qualidade comprovada.</p>
             </div>
             <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="200">
                 <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
-                    <i class="bi bi-award"></i>
+                    {{ ux_icon('bi:award', {'aria-hidden': 'true'}) }}
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-cetec-primary">Autorizado pelo MEC</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Cursos totalmente credenciados e reconhecidos pelos conselhos profissionais nacionais.</p>
             </div>
             <div class="bg-white dark:bg-cetec-dark p-6 rounded-2xl shadow-lg hover:shadow-2xl flex flex-col items-center text-center border border-gray-100 dark:border-white/5 group hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="300">
                 <div class="w-14 h-14 bg-cetec-secondary/15 rounded-2xl flex items-center justify-center text-2xl text-cetec-secondary mb-4 group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
-                    <i class="bi bi-geo-alt"></i>
+                    {{ ux_icon('bi:geo-alt', {'aria-hidden': 'true'}) }}
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-cetec-primary">Unidades Regionais</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Estrategicamente localizadas em Araraquara, Jaboticabal e Catanduva para melhor atendê-lo.</p>
@@ -137,9 +138,9 @@
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-14 h-14 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-3xl text-cetec-secondary group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                             {% if cat.icon %}
-                                <i class="{{ cat.icon }}"></i>
+                                {{ cat.icon|icone_do_painel('') }}
                             {% else %}
-                                <i class="bi bi-journal-bookmark-fill"></i>
+                                {{ ux_icon('bi:journal-bookmark-fill', {'aria-hidden': 'true'}) }}
                             {% endif %}
                         </div>
                         <div>
@@ -153,7 +154,7 @@
                         {{ cat.description ?? 'Explore nossas opções de cursos profissionalizantes de alta performance nesta categoria.' }}
                     </p>
                     <span class="flex items-center gap-2 text-cetec-secondary font-bold text-sm group-hover:gap-4 transition-all">
-                        Ver cursos e detalhes <i class="bi bi-arrow-right"></i>
+                        Ver cursos e detalhes {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
                     </span>
                 </a>
                 {% endfor %}
@@ -173,7 +174,7 @@
                     <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-cetec-secondary/5 rounded-full blur-3xl"></div>
                     <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-cetec-dark bg-gray-50">
                         {% if currentTenant.aboutImage %}
-                            <img src="{{ asset('uploads/tenant/about/' ~ currentTenant.aboutImage) }}" alt="Sobre o {{ currentTenant.name }}" class="w-full h-auto object-cover max-h-[480px]">
+                            <img {{ ('uploads/tenant/about/' ~ currentTenant.aboutImage)|thumb_attrs('conteudo_largo') }} alt="Sobre o {{ currentTenant.name }}" class="w-full h-auto object-cover max-h-[480px]" loading="lazy" decoding="async">
                         {% else %}
                             <div class="w-full h-64 bg-gray-100 flex items-center justify-center">
                                 <span class="text-4xl font-bold uppercase text-gray-300">{{ currentTenant.name }}</span>
@@ -200,16 +201,16 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Formação focada no mercado
+                            {{ ux_icon('bi:patch-check', {class: 'text-cetec-secondary text-xl', 'aria-hidden': 'true'}) }} Formação focada no mercado
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Laboratórios altamente equipados
+                            {{ ux_icon('bi:patch-check', {class: 'text-cetec-secondary text-xl', 'aria-hidden': 'true'}) }} Laboratórios altamente equipados
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Professores atuantes e experientes
+                            {{ ux_icon('bi:patch-check', {class: 'text-cetec-secondary text-xl', 'aria-hidden': 'true'}) }} Professores atuantes e experientes
                         </div>
                         <div class="flex items-center gap-3 font-semibold text-sm">
-                            <i class="bi bi-patch-check text-cetec-secondary text-xl"></i> Diploma com validade nacional
+                            {{ ux_icon('bi:patch-check', {class: 'text-cetec-secondary text-xl', 'aria-hidden': 'true'}) }} Diploma com validade nacional
                         </div>
                     </div>
                 </div>
@@ -233,7 +234,7 @@
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="100">
                     <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">1</div>
                     <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-people-fill"></i></div>
+                        <div class="text-cetec-secondary text-4xl mb-4">{{ ux_icon('bi:people-fill', {'aria-hidden': 'true'}) }}</div>
                         <h3 class="text-xl font-bold mb-3 text-cetec-primary">Docentes Altamente Qualificados</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Nossos professores não apenas ministram aulas teóricas, mas trazem a vivência de mercado de grandes hospitais e indústrias parceiras."</p>
                     </div>
@@ -242,7 +243,7 @@
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="200">
                     <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">2</div>
                     <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-briefcase-fill"></i></div>
+                        <div class="text-cetec-secondary text-4xl mb-4">{{ ux_icon('bi:briefcase-fill', {'aria-hidden': 'true'}) }}</div>
                         <h3 class="text-xl font-bold mb-3 text-cetec-primary">Grade Focada em Empregabilidade</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Nossos currículos são atualizados continuamente de acordo com o que os contratantes buscam, garantindo uma rápida inserção no mercado."</p>
                     </div>
@@ -251,7 +252,7 @@
                 <div class="relative group h-full" data-aos="fade-up" data-aos-delay="300">
                     <div class="absolute -top-6 -left-6 text-7xl font-black text-white/5 group-hover:text-cetec-secondary/15 transition-all pointer-events-none">3</div>
                     <div class="bg-white/5 p-8 rounded-2xl border border-white/10 group-hover:border-cetec-secondary/50 transition-all backdrop-blur-sm h-full flex flex-col">
-                        <div class="text-cetec-secondary text-4xl mb-4"><i class="bi bi-building-fill-gear"></i></div>
+                        <div class="text-cetec-secondary text-4xl mb-4">{{ ux_icon('bi:building-fill-gear', {'aria-hidden': 'true'}) }}</div>
                         <h3 class="text-xl font-bold mb-3 text-cetec-primary">Estrutura Prática Completa</h3>
                         <p class="text-gray-400 leading-relaxed text-sm italic flex-1">"Laboratórios modernos com simuladores reais, que trazem segurança total ao estudante no momento de exercer o estágio profissionalizante."</p>
                     </div>
@@ -274,7 +275,7 @@
                         {% if currentTenant and currentTenant.phone %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
                             <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
-                                <i class="bi bi-telephone"></i>
+                                {{ ux_icon('bi:telephone', {'aria-hidden': 'true'}) }}
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">Telefone</h3>
@@ -286,7 +287,7 @@
                         {% if currentTenant and currentTenant.whatsappLink %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
                             <div class="w-12 h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center text-[#25D366] text-xl group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-sm">
-                                <i class="bi bi-whatsapp"></i>
+                                {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }}
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">WhatsApp</h3>
@@ -298,7 +299,7 @@
                         {% if currentTenant and currentTenant.contactEmail %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
                             <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
-                                <i class="bi bi-envelope"></i>
+                                {{ ux_icon('bi:envelope', {'aria-hidden': 'true'}) }}
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">E-mail</h3>
@@ -310,7 +311,7 @@
                         {% if currentTenant and currentTenant.address %}
                         <div class="flex gap-4 group hover:translate-x-1 transition-transform">
                             <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all shadow-sm">
-                                <i class="bi bi-geo-alt"></i>
+                                {{ ux_icon('bi:geo-alt', {'aria-hidden': 'true'}) }}
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-400 uppercase">Endereço</h3>

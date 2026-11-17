@@ -19,7 +19,7 @@
             ] %}
             {% for b in blorbs %}{% if b.title %}
             <div class="nl-blorb">
-                {% if b.icon %}<div class="nl-blorb-icon"><i class="{{ b.icon }}"></i></div>{% endif %}
+                {% if b.icon %}<div class="nl-blorb-icon">{{ b.icon|icone_do_painel('') }}</div>{% endif %}
                 <div><div class="nl-blorb-title">{{ b.title }}</div><div class="nl-blorb-text">{{ b.text }}</div></div>
             </div>
             {% endif %}{% endfor %}

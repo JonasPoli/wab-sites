@@ -1,12 +1,10 @@
 {% extends 'themes/moderno/base.html.twig' %}
-{% block title %}{{ category.name }}{% endblock %}
-{% block meta_description %}{% if category.description %}<meta name="description" content="{{ category.description|striptags|slice(0,160) }}">{% endif %}{% endblock %}
 
 {% block body %}
 <div class="mp-hero">
     <div class="container">
         {% if category.parent %}<span class="section-label"><span class="glow-dot"></span>{{ category.parent.name }}</span>{% endif %}
-        {% if category.icon %}<div style="font-size:2.5rem;color:var(--color-secondary);margin-bottom:.75rem"><i class="{{ category.icon }}"></i></div>{% endif %}
+        {% if category.icon %}<div style="font-size:2.5rem;color:var(--color-secondary);margin-bottom:.75rem">{{ category.icon|icone_do_painel('') }}</div>{% endif %}
         <h1 class="mp-hero-title">{{ category.name }}</h1>
         {% if category.description %}<p style="color:var(--text-muted);max-width:600px;margin:.75rem auto 0">{{ category.description }}</p>{% endif %}
     </div>
@@ -20,7 +18,7 @@
         <div class="wab-subcats">
             {% for sub in category.children %}
             <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="subcat-card">
-                {% if sub.icon %}<div class="subcat-icon"><i class="{{ sub.icon }}"></i></div>{% endif %}
+                {% if sub.icon %}<div class="subcat-icon">{{ sub.icon|icone_do_painel('') }}</div>{% endif %}
                 <h3 class="subcat-title">{{ sub.name }}</h3>
                 {% if sub.description %}<p class="subcat-desc">{{ sub.description|slice(0,100) }}</p>{% endif %}
             </a>
@@ -41,7 +39,7 @@
             {% for page in category.pages %}
             <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="wpl-card">
                 {% if page.coverImage %}<div class="wpl-img" style="background-image:url('{{ asset('uploads/page_cover/' ~ page.coverImage) }}')"></div>
-                {% else %}<div class="wpl-img wpl-img-placeholder"><i class="fa-solid fa-file-alt"></i></div>{% endif %}
+                {% else %}<div class="wpl-img wpl-img-placeholder">{{ ux_icon('fa6-solid:file-lines', {'aria-hidden': 'true'}) }}</div>{% endif %}
                 <div class="wpl-body">
                     <h3 class="wpl-title">{{ page.title }}</h3>
                     {% if page.seoDescription %}<p class="wpl-desc">{{ page.seoDescription|slice(0,120) }}…</p>{% endif %}

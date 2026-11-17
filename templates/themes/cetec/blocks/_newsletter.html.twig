@@ -26,7 +26,7 @@
             <div class="flex gap-4 items-start group">
                 {% if b.icon %}
                 <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-xl flex-shrink-0 shadow-md group-hover:scale-110 transition-transform">
-                    <i class="{{ b.icon }}"></i>
+                    {{ b.icon|icone_do_painel('') }}
                 </div>
                 {% endif %}
                 <div class="text-left">

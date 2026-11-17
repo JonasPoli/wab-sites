@@ -1,10 +1,6 @@
 {% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}Vídeos — {{ currentTenant ? currentTenant.name : 'WAB' }}{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="Assista todos os vídeos, materiais e referências do {{ currentTenant ? currentTenant.name : 'WAB' }}.">
-{% endblock %}
 
 {% block body %}
 {% set active_categories = [] %}

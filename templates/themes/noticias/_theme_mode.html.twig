@@ -21,7 +21,6 @@
 (function () {
     var MODES = ['light', 'dark', 'auto'];
     var LABELS = { light: 'Claro', dark: 'Escuro', auto: 'Automático' };
-    var ICONS = { light: 'bi-sun', dark: 'bi-moon-stars', auto: 'bi-circle-half' };
     var system = window.matchMedia('(prefers-color-scheme: dark)');
     var btn = document.getElementById('nt-mode-btn');
 
@@ -39,8 +38,11 @@
         var label = 'Aparência: ' + LABELS[mode] + '. Mudar para ' + LABELS[next];
         btn.setAttribute('aria-label', label);
         btn.title = label;
-        btn.querySelector('i').className = 'bi ' + ICONS[mode];
-        btn.querySelector('.nt-mode-btn__label').textContent = LABELS[mode];
+        btn.querySelectorAll('[data-modo]').forEach(function (icone) {
+            icone.hidden = icone.getAttribute('data-modo') !== mode;
+        });
+        var rotulo = btn.querySelector('.nt-mode-btn__label');
+        if (rotulo) { rotulo.textContent = LABELS[mode]; }
     }
 
     if (btn) {

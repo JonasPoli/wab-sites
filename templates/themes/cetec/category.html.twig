@@ -1,12 +1,6 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ category.name }}{% endblock %}
 
-{% block meta_description %}
-{% if category.description %}
-<meta name="description" content="{{ category.description|striptags|slice(0,160) }}">
-{% endif %}
-{% endblock %}
 
 {% block body %}
 
@@ -18,13 +12,13 @@
     <div class="container mx-auto px-4 relative z-10">
         {% if category.parent %}
             <a href="{{ path('pub_category', {slug: category.parent.slug}) }}" class="inline-block bg-cetec-secondary/30 text-cetec-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 hover:bg-cetec-secondary/40 transition-all">
-                <i class="bi bi-chevron-left"></i> {{ category.parent.name }}
+                {{ ux_icon('bi:chevron-left', {'aria-hidden': 'true'}) }} {{ category.parent.name }}
             </a>
         {% endif %}
         
         {% if category.icon %}
             <div class="text-cetec-secondary text-4xl mb-3">
-                <i class="{{ category.icon }}"></i>
+                {{ category.icon|icone_do_painel('') }}
             </div>
         {% endif %}
         
@@ -51,9 +45,9 @@
                 <div class="flex items-center gap-4 mb-3">
                     <div class="w-12 h-12 bg-cetec-secondary/15 rounded-xl flex items-center justify-center text-cetec-secondary text-2xl group-hover:bg-cetec-secondary group-hover:text-cetec-dark transition-all duration-300">
                         {% if sub.icon %}
-                            <i class="{{ sub.icon }}"></i>
+                            {{ sub.icon|icone_do_painel('') }}
                         {% else %}
-                            <i class="bi bi-tag-fill"></i>
+                            {{ ux_icon('bi:tag-fill', {'aria-hidden': 'true'}) }}
                         {% endif %}
                     </div>
                     <h3 class="text-lg font-bold group-hover:text-cetec-secondary transition-colors">{{ sub.name }}</h3>
@@ -80,12 +74,12 @@
             <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="bg-white dark:bg-cetec-dark rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-white/5 flex flex-col group">
                 {% if page.coverImage %}
                     <div class="h-48 overflow-hidden relative">
-                        <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img {{ ('uploads/page_cover/' ~ page.coverImage)|thumb_attrs('capa_pagina') }} alt="{{ page.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                     </div>
                 {% else %}
                     <div class="h-48 bg-cetec-secondary/5 dark:bg-cetec-dark/80 flex items-center justify-center text-5xl text-cetec-secondary/40">
-                        <i class="bi bi-file-earmark-text"></i>
+                        {{ ux_icon('bi:file-earmark-text', {'aria-hidden': 'true'}) }}
                     </div>
                 {% endif %}
                 <div class="p-6 flex-1 flex flex-col justify-between">
@@ -96,7 +90,7 @@
                         {% endif %}
                     </div>
                     <span class="text-cetec-secondary font-bold text-sm flex items-center gap-2 mt-auto">
-                        Saiba mais <i class="bi bi-arrow-right"></i>
+                        Saiba mais {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
                     </span>
                 </div>
             </a>
@@ -144,8 +138,14 @@
     <section class="{{ sectionClass }}" style="{{ sectionStyle }}">
         {# Background Image layer #}
         {% if section.bgType == 'image' and section.bgImage %}
-            <div class="absolute inset-0 bg-cover bg-center pointer-events-none" 
-                 style="background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}'); background-position:{{ section.bgImagePosition }}; opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;"></div>
+            {% set fundoArquivo = 'uploads/section/bg/' ~ section.bgImage %}
+            <picture class="absolute inset-0 pointer-events-none" style="opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;">
+                <source media="(max-width: 767px)" srcset="{{ fundoArquivo|thumb('fundo_secao_mobile') }}">
+                <img {{ fundoArquivo|thumb_attrs('fundo_secao') }} alt="" aria-hidden="true"
+                     class="absolute inset-0 w-full h-full object-cover"
+                     style="object-position:{{ section.bgImagePosition }};"
+                     loading="lazy" decoding="async">
+            </picture>
         {% endif %}
         
         {# Background Video layer #}

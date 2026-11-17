@@ -14,8 +14,8 @@
             {% endfor %}
         </div>
         {% if images|length > 1 %}
-        <button class="wg-btn wg-prev" onclick="slideGallery('{{ block.id }}',-1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="wg-btn wg-next" onclick="slideGallery('{{ block.id }}',1)"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="wg-btn wg-prev" onclick="slideGallery('{{ block.id }}',-1)">{{ ux_icon('fa6-solid:chevron-left', {'aria-hidden': 'true'}) }}</button>
+        <button class="wg-btn wg-next" onclick="slideGallery('{{ block.id }}',1)">{{ ux_icon('fa6-solid:chevron-right', {'aria-hidden': 'true'}) }}</button>
         <div class="wg-dots">{% for img in images %}<span class="wg-dot {{ loop.first ? 'active' : '' }}" onclick="goSlide('{{ block.id }}',{{ loop.index0 }})"></span>{% endfor %}</div>
         {% endif %}
     </div>

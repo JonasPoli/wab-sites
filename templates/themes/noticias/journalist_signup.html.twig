@@ -1,7 +1,10 @@
 {% extends 'themes/noticias/base.html.twig' %}
 
-{% block title %}Seja um autor | {{ currentTenant.name }}{% endblock %}
-{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
+{# Formulário de cadastro: fora do índice. #}
+{% set seo_robots = 'noindex, follow' %}
+{% set seo_title = 'Seja um jornalista' %}
+{% set seo_description = 'Cadastre-se como jornalista do portal: preencha seus dados, aguarde a análise da equipe e publique suas notícias.' %}
+
 
 {% block stylesheets %}
 <style>

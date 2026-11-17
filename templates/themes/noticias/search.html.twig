@@ -1,8 +1,10 @@
 {% extends 'themes/noticias/base.html.twig' %}
 
+{# Resultado de busca não tem valor para o buscador: fora do índice. #}
+{% set seo_robots = 'noindex, follow' %}
+{% set seo_title = searched is defined and term ? 'Busca: ' ~ term : 'Busca' %}
+
 {# Busca do portal (busca-no-portal). Variáveis: term, searched, total, articles, pages_found, page, pages. #}
-{% block title %}{{ searched ? 'Busca: ' ~ term : 'Busca' }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
-{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block body %}
 <div class="nt-container nt-page">
@@ -13,7 +15,7 @@
                 <form class="nt-search-form nt-search-form--page" action="{{ path('pub_search') }}" method="get" role="search">
                     <label for="nt-search-page" class="nt-sr-only">Buscar notícias</label>
                     <input type="search" id="nt-search-page" name="q" value="{{ term }}" maxlength="100" placeholder="O que você procura?" {{ searched ? '' : 'autofocus' }}>
-                    <button type="submit"><i class="bi bi-search" aria-hidden="true"></i><span>Buscar</span></button>
+                    <button type="submit">{{ ux_icon('bi:search', {'aria-hidden': 'true'}) }}<span>Buscar</span></button>
                 </form>
                 {% if searched %}
                     <p class="nt-search-count">

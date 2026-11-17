@@ -1,6 +1,5 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ article is defined ? article.title : 'Notícia' }} - {{ currentTenant ? currentTenant.name : 'CETEC' }}{% endblock %}
 
 {% block body %}
 
@@ -9,7 +8,7 @@
     <div class="container mx-auto px-4 max-w-4xl">
         <!-- Back to list -->
         <a href="{{ path('pub_articles') }}" class="inline-flex items-center gap-2 text-cetec-secondary font-bold text-sm mb-6 hover:gap-3 transition-all">
-            <i class="bi bi-arrow-left"></i> Voltar para notícias
+            {{ ux_icon('bi:arrow-left', {'aria-hidden': 'true'}) }} Voltar para notícias
         </a>
         
         <!-- Header -->
@@ -23,9 +22,9 @@
                 {{ article.title }}
             </h1>
             <div class="flex flex-wrap items-center gap-4 text-xs text-gray-400 font-semibold border-b border-gray-100 dark:border-white/5 pb-6">
-                <span><i class="bi bi-calendar3"></i> Publicado em {{ article.publishedAt|date('d/m/Y') }}</span>
+                <span>{{ ux_icon('bi:calendar3', {'aria-hidden': 'true'}) }} Publicado em {{ article.publishedAt|date('d/m/Y') }}</span>
                 {% if article.author %}
-                    <span><i class="bi bi-person"></i> Por {{ article.author }}</span>
+                    <span>{{ ux_icon('bi:person', {'aria-hidden': 'true'}) }} Por {{ article.author }}</span>
                 {% endif %}
             </div>
         </header>
@@ -33,7 +32,7 @@
         <!-- Featured Image -->
         {% if article.image %}
             <div class="rounded-3xl overflow-hidden shadow-xl mb-10 border border-gray-100 dark:border-white/5">
-                <img src="/uploads/article/{{ article.image }}" alt="{{ article.title }}" class="w-full h-auto object-cover max-h-[480px]">
+                <img {{ ('uploads/article/' ~ article.image)|thumb_attrs('capa_noticia') }} alt="{{ article.title }}" class="w-full h-auto object-cover max-h-[480px]" fetchpriority="high" decoding="async">
             </div>
         {% endif %}
         
@@ -45,7 +44,7 @@
 </article>
 {% else %}
 <div class="py-24 text-center">
-    <div class="text-cetec-secondary text-5xl mb-4"><i class="bi bi-newspaper"></i></div>
+    <div class="text-cetec-secondary text-5xl mb-4">{{ ux_icon('bi:newspaper', {'aria-hidden': 'true'}) }}</div>
     <h2 class="text-2xl font-bold mb-2">Notícia não encontrada</h2>
     <p class="text-gray-500 mb-6">A publicação que você procura não está disponível.</p>
     <a href="{{ path('pub_home') }}" class="bg-cetec-secondary text-cetec-dark px-6 py-2.5 rounded-md font-bold hover:brightness-90 transition-colors">Voltar ao Início</a>

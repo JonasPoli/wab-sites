@@ -1,12 +1,6 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ member.name }} | {{ currentTenant ? currentTenant.name : '' }}{% endblock %}
 
-{% block meta_description %}
-{% if member.summary %}
-<meta name="description" content="{{ member.summary|striptags|slice(0,160) }}">
-{% endif %}
-{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -174,12 +168,12 @@
         {% if member.image %}
         <img src="{{ vich_uploader_asset(member, 'imageFile') }}" alt="{{ member.name }}">
         {% else %}
-        <div class="profile-hero-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+        <div class="profile-hero-img-placeholder">{{ ux_icon('fa6-solid:user-tie', {'aria-hidden': 'true'}) }}</div>
         {% endif %}
     </div>
     <div class="profile-hero-text-side">
         <a href="javascript:history.back()" class="profile-back-hero">
-            <i class="fa-solid fa-arrow-left"></i> Voltar
+            {{ ux_icon('fa6-solid:arrow-left', {'aria-hidden': 'true'}) }} Voltar
         </a>
         {% if member.role %}
         <div class="profile-hero-type">{{ member.role }}</div>
@@ -187,7 +181,7 @@
         <h1 class="profile-hero-name">{{ member.name }}</h1>
         <div>
             <button type="button" class="profile-action-btn profile-action-btn-outline" onclick="window.print()">
-                <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                {{ ux_icon('fa6-solid:file-pdf', {'aria-hidden': 'true'}) }} Baixar PDF
             </button>
         </div>
     </div>
@@ -207,7 +201,7 @@
 
         {% if member.experience or member.bio %}
         <div class="profile-content-card" data-aos="fade-up" data-aos-delay="100">
-            <div class="profile-section-badge"><i class="fa-solid fa-briefcase"></i> Experiência</div>
+            <div class="profile-section-badge">{{ ux_icon('fa6-solid:briefcase', {'aria-hidden': 'true'}) }} Experiência</div>
             <div class="profile-experience-text">
                 {% if member.experience %}{{ member.experience|raw }}{% else %}{{ member.bio|nl2br }}{% endif %}
             </div>
@@ -221,14 +215,14 @@
             {% if has_contact %}
             <div class="profile-info-section">
                 <div class="info-section-title">Contato</div>
-                {% if member.email %}<a href="mailto:{{ member.email }}" class="info-item"><i class="fa-solid fa-envelope"></i> {{ member.email }}</a>{% endif %}
-                {% if member.phone %}<a href="tel:{{ member.phone }}" class="info-item"><i class="fa-solid fa-phone"></i> {{ member.phone }}</a>{% endif %}
-                {% if member.address %}<div class="info-item"><i class="fa-solid fa-location-dot"></i> {{ member.address }}</div>{% endif %}
+                {% if member.email %}<a href="mailto:{{ member.email }}" class="info-item">{{ ux_icon('fa6-solid:envelope', {'aria-hidden': 'true'}) }} {{ member.email }}</a>{% endif %}
+                {% if member.phone %}<a href="tel:{{ member.phone }}" class="info-item">{{ ux_icon('fa6-solid:phone', {'aria-hidden': 'true'}) }} {{ member.phone }}</a>{% endif %}
+                {% if member.address %}<div class="info-item">{{ ux_icon('fa6-solid:location-dot', {'aria-hidden': 'true'}) }} {{ member.address }}</div>{% endif %}
                 {% if member.linkedinUrl or member.facebookUrl or member.instagramUrl %}
                 <div class="info-socials">
-                    {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="info-social-btn li"><i class="fa-brands fa-linkedin-in"></i></a>{% endif %}
-                    {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="info-social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
-                    {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="info-social-btn ig"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                    {% if member.linkedinUrl %}<a href="{{ member.linkedinUrl }}" target="_blank" class="info-social-btn li">{{ ux_icon('fa6-brands:linkedin-in', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                    {% if member.facebookUrl %}<a href="{{ member.facebookUrl }}" target="_blank" class="info-social-btn fb">{{ ux_icon('fa6-brands:facebook-f', {'aria-hidden': 'true'}) }}</a>{% endif %}
+                    {% if member.instagramUrl %}<a href="{{ member.instagramUrl }}" target="_blank" class="info-social-btn ig">{{ ux_icon('fa6-brands:instagram', {'aria-hidden': 'true'}) }}</a>{% endif %}
                 </div>
                 {% endif %}
             </div>

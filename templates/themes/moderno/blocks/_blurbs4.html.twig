@@ -72,7 +72,7 @@
         {% endif %}
             {% if it.icon %}
             <div class="b4-icon">
-                <i class="{{ it.icon }}"></i>
+                {{ it.icon|icone_do_painel('') }}
             </div>
             {% endif %}
             <div class="b4-content">

@@ -58,7 +58,7 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}<span style="margin-right:.3rem">{{ item.icon|icone_do_painel('') }}</span>{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
@@ -86,13 +86,13 @@
                                 {% if has_active_children %}
                                 <div class="nav-dropdown">
                                     <a href="#" class="nav-link nav-link--has-children" aria-haspopup="true">
-                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                        {% if showMenuIcons and cat.icon %}<span style="margin-right:.3rem">{{ cat.icon|icone_do_painel('') }}</span>{% endif %}
                                         {{ cat.name }} <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
                                     </a>
                                     <div class="nav-dropdown__panel">
                                         {% for sub in active_children %}
                                         <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="nav-dropdown__item">
-                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                            {% if showMenuIcons and sub.icon %}<span style="margin-right:.3rem">{{ sub.icon|icone_do_painel('') }}</span>{% endif %}
                                             {{ sub.name }}
                                         </a>
                                         {% endfor %}
@@ -100,7 +100,7 @@
                                 </div>
                                 {% else %}
                                 <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
-                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                    {% if showMenuIcons and cat.icon %}<span style="margin-right:.3rem">{{ cat.icon|icone_do_painel('') }}</span>{% endif %}
                                     {{ cat.name }}
                                 </a>
                                 {% endif %}
@@ -111,7 +111,7 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}<span style="margin-right:.3rem">{{ item.icon|icone_do_painel('') }}</span>{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
@@ -120,7 +120,7 @@
                 <a href="{{ path('pub_home') }}#contato" class="nav-link">Contato</a>
             {% endif %}
             <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema">
-                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+                {{ ux_icon('fa6-solid:circle-half-stroke', {'aria-hidden': 'true'}) }} Auto
             </button>
         </nav>
 

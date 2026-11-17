@@ -1,7 +1,4 @@
 {% extends 'themes/moderno/base.html.twig' %}
-{% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
-{% block meta_description %}{% if page.seoDescription %}<meta name="description" content="{{ page.seoDescription }}">{% endif %}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
 
 {% block body %}
 

@@ -380,7 +380,7 @@
             {% endif %}
         </a>
         <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema">
-            <i class="fa-solid fa-circle-half-stroke"></i> Auto
+            {{ ux_icon('fa6-solid:circle-half-stroke', {'aria-hidden': 'true'}) }} Auto
         </button>
     </div>
 </header>
@@ -409,11 +409,11 @@
 
         <div class="err-actions">
             <a href="{{ path('pub_home') }}" class="btn btn-primary" id="btn-voltar-inicio">
-                <i class="fa-solid fa-house"></i>
+                {{ ux_icon('fa6-solid:house', {'aria-hidden': 'true'}) }}
                 Voltar ao início
             </a>
             <button onclick="history.back()" class="btn btn-ghost" id="btn-pagina-anterior">
-                <i class="fa-solid fa-arrow-left"></i>
+                {{ ux_icon('fa6-solid:arrow-left', {'aria-hidden': 'true'}) }}
                 Página anterior
             </button>
         </div>
@@ -426,10 +426,10 @@
         <h2>Talvez você esteja procurando</h2>
         <div class="err-links" id="err-links-container">
             <a href="{{ path('pub_home') }}" class="err-link-chip">
-                <i class="fa-solid fa-house"></i> Página inicial
+                {{ ux_icon('fa6-solid:house', {'aria-hidden': 'true'}) }} Página inicial
             </a>
             <a href="{{ path('pub_home') }}#contato" class="err-link-chip">
-                <i class="fa-solid fa-envelope"></i> Contato
+                {{ ux_icon('fa6-solid:envelope', {'aria-hidden': 'true'}) }} Contato
             </a>
             {% if currentTenant is defined and currentTenant and currentTenant.categories is defined %}
                 {% for cat in currentTenant.categories|slice(0, 4) %}
@@ -456,9 +456,9 @@
 // ── Theme Toggle ──────────────────────────────────────────────────────────────
 const MODES = ['dark', 'light', 'auto'];
 const MODE_LABELS = {
-    dark:  '<i class="fa-solid fa-moon"></i> Escuro',
-    light: '<i class="fa-solid fa-sun"></i> Claro',
-    auto:  '<i class="fa-solid fa-circle-half-stroke"></i> Auto'
+    dark:  '{{ ux_icon('fa6-solid:moon', {'aria-hidden': 'true'}) }} Escuro',
+    light: '{{ ux_icon('fa6-solid:sun', {'aria-hidden': 'true'}) }} Claro',
+    auto:  '{{ ux_icon('fa6-solid:circle-half-stroke', {'aria-hidden': 'true'}) }} Auto'
 };
 
 function applyTheme(mode) {

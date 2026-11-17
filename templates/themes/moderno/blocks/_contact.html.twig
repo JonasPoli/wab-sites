@@ -50,7 +50,7 @@
                     </div>
 
                     <button type="submit" class="btn-moderno-submit">
-                        <i class="fa-solid fa-paper-plane"></i> Enviar Mensagem
+                        {{ ux_icon('fa6-solid:paper-plane', {'aria-hidden': 'true'}) }} Enviar Mensagem
                     </button>
                     {% include 'pub/_contato_protecao.html.twig' %}
                 </form>
@@ -65,7 +65,7 @@
                     {% if tenant.address %}
                     <div class="contact-item">
                         <div class="contact-item-icon">
-                            <i class="fa-solid fa-location-dot"></i>
+                            {{ ux_icon('fa6-solid:location-dot', {'aria-hidden': 'true'}) }}
                         </div>
                         <div class="contact-item-text">
                             <span class="contact-item-label">Endereço</span>
@@ -77,7 +77,7 @@
                     {% if tenant.phone %}
                     <div class="contact-item">
                         <div class="contact-item-icon">
-                            <i class="fa-solid fa-phone"></i>
+                            {{ ux_icon('fa6-solid:phone', {'aria-hidden': 'true'}) }}
                         </div>
                         <div class="contact-item-text">
                             <span class="contact-item-label">Telefone</span>
@@ -89,7 +89,7 @@
                     {% if tenant.contactEmail %}
                     <div class="contact-item">
                         <div class="contact-item-icon">
-                            <i class="fa-solid fa-envelope"></i>
+                            {{ ux_icon('fa6-solid:envelope', {'aria-hidden': 'true'}) }}
                         </div>
                         <div class="contact-item-text">
                             <span class="contact-item-label">E-mail</span>
@@ -101,7 +101,7 @@
                     {% if tenant.whatsappLink %}
                     <div class="contact-item">
                         <div class="contact-item-icon whatsapp-icon">
-                            <i class="fa-brands fa-whatsapp"></i>
+                            {{ ux_icon('fa6-brands:whatsapp', {'aria-hidden': 'true'}) }}
                         </div>
                         <div class="contact-item-text">
                             <span class="contact-item-label">WhatsApp</span>
@@ -113,7 +113,7 @@
 
                 {% if tenant.openingHours is not empty %}
                 <div class="working-hours-card">
-                    <h4 class="working-hours-title"><i class="fa-solid fa-clock"></i> Horário de Funcionamento</h4>
+                    <h4 class="working-hours-title">{{ ux_icon('fa6-solid:clock', {'aria-hidden': 'true'}) }} Horário de Funcionamento</h4>
                     {% for item in tenant.openingHours %}
                     <div class="working-hours-row">
                         {% if item.days %}<span class="working-hours-days">{{ item.days }}</span>{% endif %}

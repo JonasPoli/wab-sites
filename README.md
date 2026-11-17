@@ -137,6 +137,89 @@ O sistema de gerenciamento de permissões é baseado no conceito de `workGroup` 
 
 ---
 
+## 🔎 SEO e desempenho das páginas públicas
+
+Toda página pública sai com o SEO montado num lugar só e com as imagens passando pela
+biblioteca de miniaturas. Quem cria página nova não precisa se lembrar de nada disso.
+
+### SEO
+
+O serviço `App\Service\Seo\PageSeo` monta título, descrição, endereço canônico, Open Graph,
+Twitter Card e o JSON-LD do schema.org a partir do que a página tem em mãos, e
+`templates/pub/_seo_head.html.twig` imprime o resultado. Os quatro temas incluem esse
+parcial; **nenhum template deve escrever meta tag de SEO por conta própria**.
+
+* **Descrição nunca vazia**, por cascata: campo de SEO da página → campo de SEO do site →
+  primeiro texto do conteúdo (sem HTML) → nome do site. Corte em 160 caracteres, na
+  fronteira de palavra.
+* **Canônico** absoluto, sem parâmetro de consulta; a página usada como home aponta para `/`,
+  nunca para `/p/<slug>`. Listagem paginada mantém o `?pagina=N`.
+* **JSON-LD por tipo de página**: `Organization` + `WebSite` na home, `WebPage` nas internas,
+  `BreadcrumbList` em tudo que não é home e, no tema `noticias`, `NewsArticle` na notícia,
+  `CollectionPage` + `ItemList` na editoria e na listagem, e `ProfilePage` + `Person` no autor.
+* **Sobrescrever numa página**: variável no topo do template filho, fora de bloco —
+  `{% set seo_robots = 'noindex, follow' %}`, `{% set seo_title = 'Busca' %}`,
+  `{% set seo_description = '…' %}`.
+* `/robots.txt` e `/sitemap.xml` são rotas por domínio (`RobotsController`, `SitemapController`);
+  não existe mais `public/robots.txt`. O sitemap traz home, páginas publicadas (sem repetir a
+  que serve de home), categorias com conteúdo e, no portal, notícias, editorias e autores.
+
+### Imagens
+
+Nenhuma `<img>` de página pública aponta para `/uploads/` direto: tudo passa pelo filtro
+`thumb`, em WebP e no tamanho em que a imagem aparece.
+
+```twig
+{# src, width e height de uma vez #}
+<img {{ ('uploads/page_block/' ~ block.image)|thumb_attrs('bloco_imagem') }} alt="…" loading="lazy">
+
+{# só a URL, para <source srcset> #}
+<source media="(max-width: 767px)" srcset="{{ arquivo|thumb('banner_mobile') }}">
+```
+
+Os conjuntos de filtro ficam em `config/packages/liip_imagine.yaml` (`banner_desktop`,
+`banner_mobile`, `capa_pagina`, `bloco_imagem`, `galeria`, `equipe`, `avatar`,
+`logo_parceiro`, `logo_site`, `fundo_secao`, `capa_noticia`…), com largura igual ao dobro da
+maior largura de exibição. Imagem que o servidor não converte (AVIF, por exemplo) é mostrada
+pelo arquivo original, sem erro.
+
+> [!IMPORTANT]
+> O `build.sh` apaga `public/media/cache/*` e, no passo 7, chama
+> `bin/console app:miniaturas:aquecer` para gerar tudo de novo. **Esse passo não é opcional**:
+> sem a miniatura gravada, o HTML sai com `/media/cache/resolve/…`, que responde 302 antes de
+> servir a imagem — a cadeia de redirecionamento que derruba o LCP.
+
+### Nada de terceiro no caminho de renderização
+
+As páginas públicas não baixam CSS, fonte nem JavaScript de fora do domínio:
+
+* **Ícones** são SVG embutido (`symfony/ux-icons`). Nos temas, `{{ ux_icon('bi:search') }}`;
+  o ícone que o cliente escolhe no painel passa pelo filtro `icone_do_painel`, que traduz a
+  classe gravada (`fa-solid fa-building`) para o nome do Iconify. Ícone que não está no
+  repositório não é desenhado e fica no log.
+* **Fontes** ficam em `assets/fonts`, com `font-display: swap` em `assets/styles/fontes.css`.
+* **Carrossel** (Swiper) está em `assets/bibliotecas/swiper` e só é carregado na página que
+  tem carrossel, decidido no servidor por `usa_carrossel()`.
+* **Animação de entrada** usa `assets/animacoes.js` com `IntersectionObserver`, lendo os
+  mesmos atributos `data-aos` de antes; a biblioteca AOS saiu.
+
+```bash
+# depois de cadastrar ícone novo no painel, antes do deploy
+php bin/console app:icones:sincronizar
+php bin/console ux:icons:lock          # ícones fixos dos templates
+
+# quando entrar família nova em App\Service\HeadingFonts
+php bin/console app:fontes:sincronizar
+
+# gerar as miniaturas (o build.sh já chama)
+php bin/console app:miniaturas:aquecer
+```
+
+Os arquivos de `assets/icons`, `assets/fonts` e `assets/bibliotecas` **vão para o git**: o
+servidor não busca nada na internet para renderizar uma página.
+
+---
+
 ## 📋 Guia de Instalação e Execução
 
 ### Pré-requisitos

@@ -23,10 +23,10 @@
         <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="flex flex-col items-center text-center bg-transparent group cursor-pointer transition-transform duration-300 transform hover:-translate-y-2">
             <div class="w-full h-60 flex items-center justify-center bg-transparent overflow-hidden mb-4">
                 {% if page.coverImage %}
-                    <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="max-w-full max-h-full w-auto h-auto object-contain bg-transparent transition-transform duration-500 group-hover:scale-105 group-hover:drop-shadow-lg" loading="lazy">
+                    <img {{ ('uploads/page_cover/' ~ page.coverImage)|thumb_attrs('capa_pagina_inteira') }} alt="{{ page.title }}" class="max-w-full max-h-full w-auto h-auto object-contain bg-transparent transition-transform duration-500 group-hover:scale-105 group-hover:drop-shadow-lg" loading="lazy" decoding="async">
                 {% else %}
                     <div class="text-5xl text-gray-300 dark:text-white/20 bg-transparent flex items-center justify-center w-full h-full">
-                        <i class="bi bi-image"></i>
+                        {{ ux_icon('bi:image', {'aria-hidden': 'true'}) }}
                     </div>
                 {% endif %}
             </div>

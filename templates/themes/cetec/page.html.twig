@@ -1,14 +1,7 @@
 {% extends 'themes/cetec/base.html.twig' %}
 
-{% block title %}{{ page.seoTitle ?? page.title }}{% endblock %}
 
-{% block meta_description %}
-{% if page.seoDescription %}
-<meta name="description" content="{{ page.seoDescription }}">
-{% endif %}
-{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ app.request.uri }}">{% endblock %}
 
 {% block body %}
 
@@ -81,8 +74,14 @@
     <section id="section-{{ section.id }}" class="{{ sectionClass }}" style="{{ sectionStyle }}">
         {# Background Image layer #}
         {% if section.bgType == 'image' and section.bgImage %}
-            <div class="absolute inset-0 bg-cover bg-center pointer-events-none" 
-                 style="background-image:url('{{ asset('uploads/section/bg/' ~ section.bgImage) }}'); background-position:{{ section.bgImagePosition }}; opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;"></div>
+            {% set fundoArquivo = 'uploads/section/bg/' ~ section.bgImage %}
+            <picture class="absolute inset-0 pointer-events-none" style="opacity:{{ section.bgImageOpacity / 100 }}; z-index:0;">
+                <source media="(max-width: 767px)" srcset="{{ fundoArquivo|thumb('fundo_secao_mobile') }}">
+                <img {{ fundoArquivo|thumb_attrs('fundo_secao') }} alt="" aria-hidden="true"
+                     class="absolute inset-0 w-full h-full object-cover"
+                     style="object-position:{{ section.bgImagePosition }};"
+                     loading="lazy" decoding="async">
+            </picture>
         {% endif %}
         
         {# Background Video layer #}

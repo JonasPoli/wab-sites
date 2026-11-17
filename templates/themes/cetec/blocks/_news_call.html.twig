@@ -13,7 +13,7 @@
         <article class="bg-white dark:bg-cetec-dark border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col group">
             {% if page.coverImage %}
             <div class="h-48 overflow-hidden relative">
-                <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+                <img {{ ('uploads/page_cover/' ~ page.coverImage)|thumb_attrs('capa_pagina') }} alt="{{ page.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async">
             </div>
             {% endif %}
             <div class="p-6 flex-1 flex flex-col justify-between">
@@ -37,7 +37,7 @@
                 </div>
                 <div class="pt-4 border-t border-gray-100 dark:border-white/5">
                     <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="flex items-center gap-1.5 text-cetec-secondary hover:brightness-90 text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
-                        Ler mais <i class="bi bi-arrow-right"></i>
+                        Ler mais {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
                     </a>
                 </div>
             </div>
@@ -46,7 +46,7 @@
     </div>
     <div class="text-center mt-10">
         <a href="{{ path('pub_category', {slug: block.relatedCategory.slug}) }}" class="inline-flex items-center gap-1.5 text-cetec-secondary hover:brightness-90 text-sm font-bold tracking-wider">
-            Ver todas <i class="bi bi-arrow-right"></i>
+            Ver todas {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
         </a>
     </div>
     {% endif %}

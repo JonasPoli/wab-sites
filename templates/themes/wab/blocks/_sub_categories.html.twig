@@ -23,7 +23,7 @@
                     <img src="{{ asset('uploads/page_cover/' ~ page.coverImage) }}" alt="{{ page.title }}" class="subcat-page-img" loading="lazy">
                 {% else %}
                     <div class="subcat-page-placeholder">
-                        <i class="fa-solid fa-image"></i>
+                        {{ ux_icon('fa6-solid:image', {'aria-hidden': 'true'}) }}
                     </div>
                 {% endif %}
             </div>

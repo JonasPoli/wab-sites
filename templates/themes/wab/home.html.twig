@@ -1,18 +1,8 @@
 {% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="{{ currentTenant ? currentTenant.name ~ ' — Núcleo de Estudos e Pesquisas' : 'WAB Brasil' }}">
-{% endblock %}
 
-{% block og_tags %}
-{{ parent() }}
-<meta property="og:title" content="{{ currentTenant ? currentTenant.name : 'WAB Brasil' }}">
-<meta property="og:description" content="Núcleo de Estudos e Pesquisas — conhecimento, pesquisa e transformação">
-{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ app.request.schemeAndHttpHost }}/">{% endblock %}
 
 {# JSON-LD WebPage #}
 {% block body %}

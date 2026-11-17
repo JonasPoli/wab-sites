@@ -1,0 +1,47 @@
+{#
+  Único lugar que imprime as metas de busca e de compartilhamento das páginas públicas.
+  Incluído pelo <head> dos temas cetec, noticias, moderno e wab e por templates/pub/base.html.twig.
+
+  Lê o contexto do template (page, category, article, author, articles) pelo page_seo(),
+  então o controller não precisa passar nada: página nova nasce com o SEO certo.
+
+  Quem precisar sobrescrever põe uma variável no topo do template filho (fora de bloco):
+    {% set seo_robots = 'noindex, follow' %}
+    {% set seo_title  = 'Busca' %}
+#}
+{% set seo = page_seo(_context) %}
+{% set seoRobots = seo_robots|default(seo.robots) %}
+{% set seoTitulo = seo_title is defined and seo_title ? seo_title ~ (currentTenant ? ' | ' ~ currentTenant.name : '') : seo.title %}
+{% set seoDescricao = seo_description|default(seo.description) %}
+    <title>{{ seoTitulo }}</title>
+    <meta name="description" content="{{ seoDescricao }}">
+    <link rel="canonical" href="{{ seo.canonical }}">
+    <meta name="robots" content="{{ seoRobots }}">
+{% if currentTenant and currentTenant.seoKeywords %}
+    <meta name="keywords" content="{{ currentTenant.seoKeywords }}">
+{% endif %}
+
+    <meta property="og:site_name" content="{{ seo.siteName ?? seoTitulo }}">
+    <meta property="og:type" content="{{ seo.ogType }}">
+    <meta property="og:title" content="{{ seoTitulo }}">
+    <meta property="og:description" content="{{ seoDescricao }}">
+    <meta property="og:url" content="{{ seo.canonical }}">
+    <meta property="og:locale" content="pt_BR">
+{% if seo.hasImage %}
+    <meta property="og:image" content="{{ seo.image }}">
+{% if seo.imageWidth %}
+    <meta property="og:image:width" content="{{ seo.imageWidth }}">
+    <meta property="og:image:height" content="{{ seo.imageHeight }}">
+{% endif %}
+    <meta property="og:image:alt" content="{{ seoTitulo }}">
+{% endif %}
+
+    <meta name="twitter:card" content="{{ seo.hasImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ seoTitulo }}">
+    <meta name="twitter:description" content="{{ seoDescricao }}">
+{% if seo.hasImage %}
+    <meta name="twitter:image" content="{{ seo.image }}">
+{% endif %}
+{% if seo.jsonLd is not empty and 'noindex' not in seoRobots %}
+    <script type="application/ld+json">{{ seo_json_ld(seo) }}</script>
+{% endif %}

@@ -50,7 +50,7 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="mh-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}<span style="margin-right:.3rem">{{ item.icon|icone_do_painel('') }}</span>{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
@@ -72,20 +72,20 @@
                             {% if has_active_children %}
                                 <div class="mh-dropdown">
                                     <span class="mh-link mh-dropdown-toggle">
-                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
-                                        {{ cat.name }} <i class="fa-solid fa-chevron-down" style="font-size:.65rem;margin-left:.3rem"></i>
+                                        {% if showMenuIcons and cat.icon %}<span style="margin-right:.3rem">{{ cat.icon|icone_do_painel('') }}</span>{% endif %}
+                                        {{ cat.name }} {{ ux_icon('fa6-solid:chevron-down', {'style': 'font-size:.65rem;margin-left:.3rem', 'aria-hidden': 'true'}) }}
                                     </span>
                                     <div class="mh-dropdown-menu">
                                         {% for sub in active_children %}
                                         <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="mh-dd-item">
-                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }}"></i>{% endif %} {{ sub.name }}
+                                            {% if showMenuIcons and sub.icon %}{{ sub.icon|icone_do_painel('') }}{% endif %} {{ sub.name }}
                                         </a>
                                         {% endfor %}
                                     </div>
                                 </div>
                             {% else %}
                                 <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="mh-link">
-                                     {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                                     {% if showMenuIcons and cat.icon %}<span style="margin-right:.3rem">{{ cat.icon|icone_do_painel('') }}</span>{% endif %}
                                     {{ cat.name }}
                                 </a>
                             {% endif %}
@@ -95,7 +95,7 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="mh-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}" style="margin-right:.3rem"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}<span style="margin-right:.3rem">{{ item.icon|icone_do_painel('') }}</span>{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
@@ -103,7 +103,7 @@
                 <a href="{{ path('pub_home') }}#contato" class="mh-cta btn btn-primary" style="padding:.6rem 1.5rem;font-size:.85rem">Contato</a>
             {% endif %}
             <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" style="margin-left:.5rem">
-                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+                {{ ux_icon('fa6-solid:circle-half-stroke', {'aria-hidden': 'true'}) }} Auto
             </button>
         </nav>
 

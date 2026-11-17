@@ -4,11 +4,11 @@
         <!-- Logo -->
         <a href="{{ path('pub_home') }}" class="flex items-center">
             {% if currentTenant and currentTenant.logo %}
-                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}">
+                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" fetchpriority="high" decoding="async">
                 {% if currentTenant.darkLogo %}
-                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="{{ currentTenant.name }}">
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
                 {% else %}
-                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="{{ currentTenant.name }}">
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
                 {% endif %}
             {% else %}
                 <span class="text-2xl font-black tracking-wider uppercase" style="color: var(--color-primary);">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
@@ -52,7 +52,7 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }} mr-1"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}{{ item.icon|icone_do_painel('mr-1') }}{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
@@ -76,20 +76,20 @@
                             {% if has_active_children %}
                                 <div class="nav-dropdown">
                                     <span class="nav-link dropdown-toggle">
-                                        {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
-                                        {{ cat.name }} <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                                        {% if showMenuIcons and cat.icon %}{{ cat.icon|icone_do_painel('mr-1') }}{% endif %}
+                                        {{ cat.name }} {{ ux_icon('fa6-solid:chevron-down', {class: 'text-[10px] ml-1', 'aria-hidden': 'true'}) }}
                                     </span>
                                     <div class="dropdown-menu">
                                         {% for sub in active_children %}
                                         <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="dd-item">
-                                            {% if showMenuIcons and sub.icon %}<i class="{{ sub.icon }} w-4 text-center"></i>{% endif %} {{ sub.name }}
+                                            {% if showMenuIcons and sub.icon %}{{ sub.icon|icone_do_painel('w-4 text-center') }}{% endif %} {{ sub.name }}
                                         </a>
                                         {% endfor %}
                                     </div>
                                 </div>
                             {% else %}
                                 <a href="{{ path('pub_category', {slug: cat.slug}) }}" class="nav-link">
-                                    {% if showMenuIcons and cat.icon %}<i class="{{ cat.icon }} mr-1"></i>{% endif %}
+                                    {% if showMenuIcons and cat.icon %}{{ cat.icon|icone_do_painel('mr-1') }}{% endif %}
                                     {{ cat.name }}
                                 </a>
                             {% endif %}
@@ -100,26 +100,26 @@
                 {% for item in customMenuItems %}
                     {% if item.active and item.url %}
                         <a href="{{ item.url }}" class="nav-link"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>
-                            {% if showMenuIcons and item.icon %}<i class="{{ item.icon }} mr-1"></i>{% endif %}
+                            {% if showMenuIcons and item.icon %}{{ item.icon|icone_do_painel('mr-1') }}{% endif %}
                             {{ item.label }}
                         </a>
                     {% endif %}
                 {% endfor %}
                 
                 <a href="{{ path('pub_home') }}#contato" class="btn-inscricao">
-                    <i class="bi bi-pencil-square"></i>
+                    {{ ux_icon('bi:pencil-square', {'aria-hidden': 'true'}) }}
                     Inscreva-se
                 </a>
             {% endif %}
             
             <button id="wab-theme-btn" onclick="cycleTheme()" title="Alternar tema" class="ml-2">
-                <i class="fa-solid fa-circle-half-stroke"></i> Auto
+                {{ ux_icon('fa6-solid:circle-half-stroke', {'aria-hidden': 'true'}) }} Auto
             </button>
         </div>
 
         <!-- Mobile Menu Button -->
         <button id="mobile-menu-btn" class="lg:hidden text-3xl focus:outline-none text-current" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="mobile-menu" onclick="toggleMobileMenu()">
-            <i class="bi bi-list" aria-hidden="true" id="menu-icon-state"></i>
+            {{ ux_icon('bi:list', {'aria-hidden': 'true', 'id': 'menu-icon-state'}) }}
         </button>
     </div>
 
@@ -157,7 +157,7 @@
             {% for item in customMenuItems %}
                 {% if item.active and item.url %}
                     <a href="{{ item.url }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-secondary transition-colors flex items-center gap-2"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %} onclick="toggleMobileMenu()">
-                        {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                        {% if showMenuIcons and item.icon %}{{ item.icon|icone_do_painel('') }}{% endif %}
                         {{ item.label }}
                     </a>
                 {% endif %}
@@ -203,7 +203,7 @@
             {% for item in customMenuItems %}
                 {% if item.active and item.url %}
                     <a href="{{ item.url }}" class="py-2.5 border-b border-gray-50/5 hover:text-cetec-secondary transition-colors flex items-center gap-2"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %} onclick="toggleMobileMenu()">
-                        {% if showMenuIcons and item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                        {% if showMenuIcons and item.icon %}{{ item.icon|icone_do_painel('') }}{% endif %}
                         {{ item.label }}
                     </a>
                 {% endif %}

@@ -31,7 +31,7 @@
                     <img src="{{ vich_uploader_asset(m, 'imageFile') }}" alt="{{ m.name }}" class="team-img" loading="lazy">
                 {% else %}
                     <div class="team-img-placeholder">
-                        <i class="fa-solid fa-user-tie"></i>
+                        {{ ux_icon('fa6-solid:user-tie', {'aria-hidden': 'true'}) }}
                     </div>
                 {% endif %}
             {% if m.detailEnabled and m.slug %}</a>{% else %}</div>{% endif %}
@@ -45,28 +45,28 @@
                 {% if has_socials %}
                 <div class="team-socials">
                     {% if m.linkedinUrl %}
-                        <a href="{{ m.linkedinUrl }}" target="_blank" class="social-link linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="{{ m.linkedinUrl }}" target="_blank" class="social-link linkedin" title="LinkedIn">{{ ux_icon('fa6-brands:linkedin-in', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                     {% if m.instagramUrl %}
-                        <a href="{{ m.instagramUrl }}" target="_blank" class="social-link instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="{{ m.instagramUrl }}" target="_blank" class="social-link instagram" title="Instagram">{{ ux_icon('fa6-brands:instagram', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                     {% if m.facebookUrl %}
-                        <a href="{{ m.facebookUrl }}" target="_blank" class="social-link facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="{{ m.facebookUrl }}" target="_blank" class="social-link facebook" title="Facebook">{{ ux_icon('fa6-brands:facebook-f', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                     {% if m.whatsappUrl %}
-                        <a href="{{ m.whatsappUrl }}" target="_blank" class="social-link whatsapp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="{{ m.whatsappUrl }}" target="_blank" class="social-link whatsapp" title="WhatsApp">{{ ux_icon('fa6-brands:whatsapp', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                     {% if m.phone %}
-                        <a href="tel:{{ m.phone }}" class="social-link phone" title="Telefone"><i class="fa-solid fa-phone"></i></a>
+                        <a href="tel:{{ m.phone }}" class="social-link phone" title="Telefone">{{ ux_icon('fa6-solid:phone', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                     {% if m.email %}
-                        <a href="mailto:{{ m.email }}" class="social-link email" title="E-mail"><i class="fa-solid fa-envelope"></i></a>
+                        <a href="mailto:{{ m.email }}" class="social-link email" title="E-mail">{{ ux_icon('fa6-solid:envelope', {'aria-hidden': 'true'}) }}</a>
                     {% endif %}
                 </div>
                 {% endif %}
                 {% if m.detailEnabled and m.slug %}
                 <a href="{{ path('pub_team_member', {slug: m.slug}) }}" class="team-profile-link">
-                    Ver Perfil Completo <i class="fa-solid fa-arrow-right"></i>
+                    Ver Perfil Completo {{ ux_icon('fa6-solid:arrow-right', {'aria-hidden': 'true'}) }}
                 </a>
                 {% endif %}
             </div>

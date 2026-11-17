@@ -25,9 +25,9 @@
             <div class="mb-6">
                 {% if currentTenant and (currentTenant.darkLogo or currentTenant.logo) %}
                     {% if currentTenant.darkLogo %}
-                        <img src="{{ vich_uploader_asset(currentTenant, 'darkLogoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain">
+                        <img {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain" loading="lazy" decoding="async">
                     {% else %}
-                        <img src="{{ vich_uploader_asset(currentTenant, 'logoFile') }}" alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain brightness-0 invert">
+                        <img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="Logo {{ currentTenant.name }}" class="h-16 w-auto object-contain brightness-0 invert" loading="lazy" decoding="async">
                     {% endif %}
                 {% else %}
                     <span class="text-2xl font-black tracking-wider uppercase text-white">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
@@ -44,19 +44,19 @@
             <!-- Social Networks -->
             <div class="flex gap-4">
                 {% if currentTenant and currentTenant.facebookLink %}
-                    <a href="{{ currentTenant.facebookLink }}" target="_blank" aria-label="Facebook" class="social-icon-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="{{ currentTenant.facebookLink }}" target="_blank" aria-label="Facebook" class="social-icon-btn">{{ ux_icon('fa6-brands:facebook-f', {'aria-hidden': 'true'}) }}</a>
                 {% endif %}
                 {% if currentTenant and currentTenant.instagramLink %}
-                    <a href="{{ currentTenant.instagramLink }}" target="_blank" aria-label="Instagram" class="social-icon-btn"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="{{ currentTenant.instagramLink }}" target="_blank" aria-label="Instagram" class="social-icon-btn">{{ ux_icon('fa6-brands:instagram', {'aria-hidden': 'true'}) }}</a>
                 {% endif %}
                 {% if currentTenant and currentTenant.youtubeLink %}
-                    <a href="{{ currentTenant.youtubeLink }}" target="_blank" aria-label="YouTube" class="social-icon-btn"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="{{ currentTenant.youtubeLink }}" target="_blank" aria-label="YouTube" class="social-icon-btn">{{ ux_icon('fa6-brands:youtube', {'aria-hidden': 'true'}) }}</a>
                 {% endif %}
                 {% if currentTenant and currentTenant.linkedinLink %}
-                    <a href="{{ currentTenant.linkedinLink }}" target="_blank" aria-label="LinkedIn" class="social-icon-btn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="{{ currentTenant.linkedinLink }}" target="_blank" aria-label="LinkedIn" class="social-icon-btn">{{ ux_icon('fa6-brands:linkedin-in', {'aria-hidden': 'true'}) }}</a>
                 {% endif %}
                 {% if currentTenant and currentTenant.whatsappLink %}
-                    <a href="{{ currentTenant.whatsappLink }}" target="_blank" aria-label="WhatsApp" class="social-icon-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="{{ currentTenant.whatsappLink }}" target="_blank" aria-label="WhatsApp" class="social-icon-btn">{{ ux_icon('fa6-brands:whatsapp', {'aria-hidden': 'true'}) }}</a>
                 {% endif %}
             </div>
         </div>
@@ -65,13 +65,13 @@
         <div data-aos="fade-up" data-aos-delay="100">
             <h4 class="footer-title">Links Rápidos</h4>
             <ul class="space-y-4 text-gray-400 text-sm">
-                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Início</a></li>
+                <li><a href="{{ path('pub_home') }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Início</a></li>
                 {% if footerPages is defined %}
                     {% for page in footerPages %}
-                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> {{ page.title }}</a></li>
+                        <li><a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} {{ page.title }}</a></li>
                     {% endfor %}
                 {% endif %}
-                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary transition-all flex items-center gap-2"><i class="bi bi-chevron-right text-[10px]"></i> Contato</a></li>
+                <li><a href="{{ path('pub_home') }}#contato" class="hover:text-cetec-secondary transition-all flex items-center gap-2">{{ ux_icon('bi:chevron-right', {class: 'text-[10px]', 'aria-hidden': 'true'}) }} Contato</a></li>
             </ul>
         </div>
 
@@ -81,19 +81,19 @@
             <ul class="space-y-4 text-gray-400 text-sm">
                 {% if currentTenant and currentTenant.address %}
                     <li class="flex gap-3">
-                        <i class="bi bi-geo-alt text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        {{ ux_icon('bi:geo-alt', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <span>{{ currentTenant.address }}</span>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.contactEmail %}
                     <li class="flex gap-3">
-                        <i class="bi bi-envelope text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        {{ ux_icon('bi:envelope', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <a href="mailto:{{ currentTenant.contactEmail }}" class="hover:underline text-gray-400">{{ currentTenant.contactEmail }}</a>
                     </li>
                 {% endif %}
                 {% if currentTenant and currentTenant.phone %}
                     <li class="flex gap-3">
-                        <i class="bi bi-telephone text-cetec-secondary text-lg flex-shrink-0" style="color: var(--color-secondary);"></i>
+                        {{ ux_icon('bi:telephone', {class: 'text-cetec-secondary text-lg flex-shrink-0', 'style': 'color: var(--color-secondary);', 'aria-hidden': 'true'}) }}
                         <a href="tel:{{ currentTenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" class="hover:underline text-gray-400">{{ currentTenant.phone }}</a>
                     </li>
                 {% endif %}

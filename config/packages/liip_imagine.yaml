@@ -42,3 +42,114 @@ liip_imagine:
             format: webp
             filters:
                 thumbnail: { size: [640, 400], mode: outbound }
+
+        # ── Imagens das páginas (change seo-e-performance-dos-sites) ──────────────────
+        # Largura = o dobro da maior largura de exibição, para telas de densidade 2x.
+        # `outbound` recorta (onde o CSS já recorta hoje); `inset` cabe inteira
+        # (logo, avatar, foto de equipe), para não mudar o enquadramento que o cliente escolheu.
+
+        # Banner do topo: a imagem do LCP. Duas larguras, escolhidas por <picture>.
+        banner_desktop:
+            quality: 72
+            format: webp
+            filters:
+                thumbnail: { size: [1600, 900], mode: outbound }
+        banner_mobile:
+            quality: 68
+            format: webp
+            filters:
+                thumbnail: { size: [768, 560], mode: outbound }
+
+        # Fundo de seção (imagem atrás do conteúdo, com opacidade)
+        fundo_secao:
+            quality: 68
+            format: webp
+            filters:
+                thumbnail: { size: [1920, 1080], mode: outbound }
+        fundo_secao_mobile:
+            quality: 62
+            format: webp
+            filters:
+                thumbnail: { size: [820, 1100], mode: outbound }
+
+        # Capa de página nos cartões de listagem (news_call, page_list, categoria)
+        capa_pagina:
+            quality: 78
+            format: webp
+            filters:
+                thumbnail: { size: [720, 480], mode: outbound }
+
+        # Capa de página em cartão que mostra a imagem inteira (sub_categories)
+        capa_pagina_inteira:
+            quality: 78
+            format: webp
+            filters:
+                thumbnail: { size: [600, 600], mode: inset }
+
+        # Imagem do bloco "Imagem + Texto" e do bloco de banner interno
+        bloco_imagem:
+            quality: 78
+            format: webp
+            filters:
+                thumbnail: { size: [1000, 800], mode: inset }
+
+        # Galeria: miniatura na grade (o clique abre o arquivo original)
+        galeria:
+            quality: 76
+            format: webp
+            filters:
+                thumbnail: { size: [800, 450], mode: outbound }
+
+        # Foto de membro da equipe
+        equipe:
+            quality: 80
+            format: webp
+            filters:
+                thumbnail: { size: [600, 800], mode: inset }
+
+        # Avatar de depoimento
+        avatar:
+            quality: 80
+            format: webp
+            filters:
+                thumbnail: { size: [96, 96], mode: outbound }
+
+        # Logo de parceiro (fica em escala de cinza no tema, então aceita mais compressão)
+        logo_parceiro:
+            quality: 80
+            format: webp
+            filters:
+                thumbnail: { size: [280, 96], mode: inset }
+
+        # Logo do site no cabeçalho e no rodapé
+        logo_site:
+            quality: 85
+            format: webp
+            filters:
+                thumbnail: { size: [440, 120], mode: inset }
+
+        # "Sobre" da home e outras imagens largas de conteúdo
+        conteudo_largo:
+            quality: 78
+            format: webp
+            filters:
+                thumbnail: { size: [1200, 960], mode: inset }
+
+        # Capa da notícia na página dela (LCP do portal)
+        capa_noticia:
+            quality: 76
+            format: webp
+            filters:
+                thumbnail: { size: [1200, 675], mode: outbound }
+        capa_noticia_mobile:
+            quality: 70
+            format: webp
+            filters:
+                thumbnail: { size: [768, 432], mode: outbound }
+
+        # Favicon: o arquivo enviado costuma ser o logo inteiro
+        favicon_site:
+            quality: 85
+            format: png
+            filters:
+                thumbnail: { size: [64, 64], mode: inset }

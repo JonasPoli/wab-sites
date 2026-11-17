@@ -3,31 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ currentTenant ? currentTenant.name : 'WAB Sites' }}{% endblock %}</title>
-    {% block meta_description %}{% endblock %}
-    {% block og_tags %}
-    <meta property="og:site_name" content="{{ currentTenant ? currentTenant.name : 'WAB Sites' }}">
-    <meta property="og:type" content="website">
-    {% endblock %}
-    <meta name="twitter:card" content="summary_large_image">
-    {% block canonical %}{% endblock %}
-    {% block robots %}<meta name="robots" content="index, follow">{% endblock %}
+    {# Título, descrição, canônico, Open Graph, Twitter Card e JSON-LD num lugar só (PageSeo) #}
+    {% include 'pub/_seo_head.html.twig' %}
     {% if currentTenant and currentTenant.favicon %}
-        <link rel="icon" href="{{ asset('uploads/tenant/favicon/' ~ currentTenant.favicon) }}">
+        <link rel="icon" href="{{ ('uploads/tenant/favicon/' ~ currentTenant.favicon)|thumb('favicon_site') }}" sizes="64x64">
     {% endif %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=optional" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-
     {# ── FontAwesome 6 ── #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
     {# Apply theme BEFORE paint to prevent flash #}
     <script>
     (function(){
@@ -200,6 +182,19 @@
         gtag('config', '{{ currentTenant.googleAnalyticsId|e('js') }}');
     </script>
     {% endif %}
+    {# ── Tudo pelo próprio domínio ──────────────────────────────────────────────────
+       Saíram daqui as folhas de estilo de terceiros (Swiper e Bootstrap Icons no jsdelivr,
+       AOS no unpkg, FontAwesome no cdnjs) e o Google Fonts. Os ícones agora são SVG
+       embutido (ux-icons) e o carrossel só carrega na página que tem carrossel. #}
+    {% set usaCarrossel = usa_carrossel(_context) %}
+    <link rel="stylesheet" href="{{ asset('styles/fontes.css') }}">
+    {% for arquivo in tenant_fontes() %}
+        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ asset(arquivo) }}">
+    {% endfor %}
+    <link rel="stylesheet" href="{{ asset('styles/animacoes.css') }}">
+    {% if usaCarrossel %}
+        <link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}">
+    {% endif %}
 </head>
 <body>
 
@@ -217,7 +212,6 @@
 
 {% include 'themes/moderno/_footer.html.twig' %}
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
 {% block javascripts %}
 <script>
 // ── Theme Toggle ──────────────────────────────────────────────────────────────
@@ -262,5 +256,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 });
 </script>
 {% endblock %}
+    {# Carrossel só onde há carrossel; animação de entrada sem biblioteca #}
+    {% if usaCarrossel %}
+        <script src="{{ asset('bibliotecas/swiper/swiper-bundle.min.js') }}" defer></script>
+    {% endif %}
+    <script src="{{ asset('animacoes.js') }}" defer></script>
 </body>
 </html>

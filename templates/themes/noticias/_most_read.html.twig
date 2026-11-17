@@ -6,14 +6,14 @@
 {% set thumbs = thumbs ?? false %}
 {% if mostReadItems is not empty %}
 <section class="nt-card" aria-labelledby="nt-most-read-title">
-    <h2 class="nt-card__title" id="nt-most-read-title"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Mais <strong>lidas</strong></h2>
+    <h2 class="nt-card__title" id="nt-most-read-title">{{ ux_icon('bi:graph-up-arrow', {'aria-hidden': 'true'}) }} Mais <strong>lidas</strong></h2>
     <ol class="nt-rank{{ thumbs ? ' nt-rank--thumbs' : '' }}">
         {% for a in mostReadItems %}
         <li>
             <span class="nt-rank__n" aria-hidden="true">{{ loop.index }}</span>
             <a href="{{ path('pub_article_show', {slug: a.slug}) }}">{{ a.title }}</a>
             {% if thumbs %}
-                {% if a.coverImage %}<img src="{{ ('uploads/article/' ~ a.coverImage)|news_image('news_thumb') }}" alt="" loading="lazy">{% else %}<span></span>{% endif %}
+                {% if a.coverImage %}<img {{ ('uploads/article/' ~ a.coverImage)|thumb_attrs('news_thumb') }} alt="" loading="lazy" decoding="async">{% else %}<span></span>{% endif %}
             {% endif %}
         </li>
         {% endfor %}

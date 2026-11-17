@@ -1,8 +1,5 @@
 {% extends 'themes/noticias/base.html.twig' %}
 
-{% block title %}{{ category.name }}{{ page > 1 ? ' — página ' ~ page : '' }} | {{ currentTenant.name }}{% endblock %}
-{% block meta_description %}{% if category.description %}<meta name="description" content="{{ category.description|striptags|slice(0, 160) }}">{% endif %}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ url('pub_category', page > 1 ? {slug: category.slug, pagina: page} : {slug: category.slug}) }}">{% endblock %}
 {% block header_section %}{{ category.name }}{% endblock %}
 
 {% block body %}

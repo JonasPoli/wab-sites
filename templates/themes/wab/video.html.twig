@@ -1,19 +1,7 @@
 {% extends 'themes/wab/base.html.twig' %}
 
-{% block title %}{{ video.title }}{% endblock %}
 
-{% block meta_description %}
-{% if video.description %}
-<meta name="description" content="{{ video.description|striptags|slice(0,160) }}">
-{% endif %}
-{% endblock %}
 
-{% block og_tags %}
-{{ parent() }}
-<meta property="og:title" content="{{ video.title }}">
-<meta property="og:image" content="{{ video.thumbnailUrl }}">
-<meta property="og:video" content="https://www.youtube.com/watch?v={{ video.youtubeId }}">
-{% endblock %}
 
 {% block body %}
 <div class="container video-page">
