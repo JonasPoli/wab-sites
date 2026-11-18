@@ -243,12 +243,8 @@
     {% include 'themes/noticias/_header.html.twig' with {header_section: block('header_section') is defined ? block('header_section')|trim : ''} %}
 
     <main id="conteudo">
-        {% for msg in app.flashes('success') %}
-            <div class="nt-container"><div class="flash flash-success" role="status">{{ msg }}</div></div>
-        {% endfor %}
-        {% for msg in app.flashes('error') %}
-            <div class="nt-container"><div class="flash flash-error" role="alert">{{ msg }}</div></div>
-        {% endfor %}
+        {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
+        {% include 'pub/_aviso.html.twig' %}
         {% block body %}{% endblock %}
     </main>
 

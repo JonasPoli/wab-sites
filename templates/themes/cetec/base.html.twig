@@ -197,12 +197,8 @@
     {% include 'themes/cetec/_header.html.twig' %}
 
     <main>
-        {% for msg in app.flashes('success') %}
-            <div class="container"><div class="flash flash-success">{{ msg }}</div></div>
-        {% endfor %}
-        {% for msg in app.flashes('error') %}
-            <div class="container"><div class="flash flash-error">{{ msg }}</div></div>
-        {% endfor %}
+        {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
+        {% include 'pub/_aviso.html.twig' %}
         {% block body %}{% endblock %}
     </main>
 

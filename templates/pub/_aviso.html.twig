@@ -1,0 +1,51 @@
+{#
+  Aviso das mensagens do site (contato, newsletter): uma janela no meio da tela, com o
+  fundo escurecido, a mensagem e o botão OK. Incluído no <main> de todos os temas públicos,
+  no lugar das faixas de mensagem. Consome os avisos 'success' e 'error' (e os antigos
+  'contact_s'/'contact_f' do tema wab).
+
+  Sem JavaScript (ou num navegador sem <dialog> modal), aparece como uma caixa fixa no
+  meio da tela, que o botão OK fecha pelo próprio formulário do <dialog>.
+#}
+{% set avisos = [] %}
+{% for m in app.flashes('success')|merge(app.flashes('contact_s')) %}{% set avisos = avisos|merge([{ok: true, texto: m}]) %}{% endfor %}
+{% for m in app.flashes('error')|merge(app.flashes('contact_f')) %}{% set avisos = avisos|merge([{ok: false, texto: m}]) %}{% endfor %}
+{% if avisos|length > 0 %}
+{% set sucesso = avisos|filter(a => not a.ok)|length == 0 %}
+<dialog class="wab-aviso" id="wab-aviso" open aria-labelledby="wab-aviso-titulo" aria-describedby="wab-aviso-texto"{% if not sucesso %} role="alertdialog"{% endif %}>
+    <div class="wab-aviso__icone {{ sucesso ? 'is-ok' : 'is-erro' }}" aria-hidden="true">{{ sucesso ? '✓' : '!' }}</div>
+    <h2 class="wab-aviso__titulo" id="wab-aviso-titulo">{{ sucesso ? 'Obrigado!' : 'Atenção' }}</h2>
+    <div class="wab-aviso__texto" id="wab-aviso-texto">
+        {% for a in avisos %}<p>{{ a.texto }}</p>{% endfor %}
+    </div>
+    <form method="dialog">
+        <button type="submit" class="wab-aviso__ok" autofocus>OK</button>
+    </form>
+</dialog>
+<style>
+.wab-aviso{position:fixed;inset:0;margin:auto;z-index:1000;width:min(420px,calc(100% - 40px));height:fit-content;max-height:calc(100% - 40px);overflow:auto;
+  border:0;border-radius:14px;padding:34px 30px 28px;background:#fff;color:#1f1d1a;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35);font-family:inherit}
+.wab-aviso:not([open]){display:none}
+.wab-aviso::backdrop{background:rgba(17,15,12,.62);backdrop-filter:blur(2px)}
+.wab-aviso__icone{width:58px;height:58px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;line-height:1}
+.wab-aviso__icone.is-ok{background:#e7f5ec;color:#15803d}
+.wab-aviso__icone.is-erro{background:#fdecec;color:#b91c1c}
+.wab-aviso__titulo{font-size:22px!important;line-height:1.25;margin:0 0 8px;color:#1f1d1a;font-weight:700!important}
+.wab-aviso__texto p{margin:0 0 6px;font-size:15px;line-height:1.6;color:#4a4540}
+.wab-aviso form{margin:18px 0 0}
+.wab-aviso__ok{min-width:140px;min-height:46px;padding:12px 28px;border:0;border-radius:8px;cursor:pointer;font:inherit;font-weight:700;font-size:15px;
+  background:var(--color-primary,#1f1d1a);color:var(--color-on-primary,#fff)}
+.wab-aviso__ok:hover{filter:brightness(.9)}
+.wab-aviso__ok:focus-visible{outline:3px solid #f5ab57;outline-offset:3px}
+</style>
+<script>
+(function () {
+    var aviso = document.getElementById('wab-aviso');
+    if (!aviso || typeof aviso.showModal !== 'function') return;
+    aviso.close();
+    aviso.showModal();
+    // Clique fora da caixa também fecha
+    aviso.addEventListener('click', function (e) { if (e.target === aviso) aviso.close(); });
+})();
+</script>
+{% endif %}

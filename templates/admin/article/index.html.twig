@@ -8,10 +8,17 @@
     <a href="{{ path('admin_article_new') }}" class="btn btn-p"><sl-icon name="plus-lg"></sl-icon> {{ ehBlog ? 'Novo post' : 'Nova notícia' }}</a>
 </div>
 <div class="card"><div class="tw"><table class="at">
-    <thead><tr><th>Título</th><th>Editoria</th><th>Autor</th><th>Situação</th><th>Publicação</th><th title="Visualizações">Visualizações</th><th></th></tr></thead>
+    <thead><tr><th style="width:84px">Capa</th><th>Título</th><th>Editoria</th><th>Autor</th><th>Situação</th><th>Publicação</th><th title="Visualizações">Visualizações</th><th></th></tr></thead>
     <tbody>
     {% for a in articles %}
     <tr>
+        <td style="width:84px">
+            {% if a.coverImage %}
+                <img src="{{ ('uploads/article/' ~ a.coverImage)|thumb('admin_thumb') }}" alt="" loading="lazy" decoding="async" style="display:block;width:72px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+            {% else %}
+                <div title="Sem capa" style="width:72px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)"><sl-icon name="image"></sl-icon></div>
+            {% endif %}
+        </td>
         <td style="font-weight:600;max-width:380px">
             {{ a.title }}
             {% if a.sample %}<span class="badge bg-warn" title="Criado pelo comando app:conteudo-exemplo; sai com --remover">Exemplo</span>{% endif %}
@@ -37,7 +44,7 @@
         </div></td>
     </tr>
     {% else %}
-    <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">{{ ehBlog ? 'Nenhum post.' : 'Nenhuma notícia.' }}</td></tr>
+    <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">{{ ehBlog ? 'Nenhum post.' : 'Nenhuma notícia.' }}</td></tr>
     {% endfor %}
     </tbody>
 </table></div></div>

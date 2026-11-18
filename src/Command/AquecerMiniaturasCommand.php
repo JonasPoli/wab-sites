@@ -53,7 +53,7 @@ final class AquecerMiniaturasCommand extends Command
         'uploads/tenant/favicon' => ['favicon_site'],
         'uploads/tenant/about' => ['conteudo_largo'],
         'uploads/tenant/og' => ['conteudo_largo'],
-        'uploads/article' => ['capa_noticia', 'capa_noticia_mobile', 'news_thumb', 'news_square', 'hero_banner_mobile'],
+        'uploads/article' => ['capa_noticia', 'capa_noticia_mobile', 'news_thumb', 'news_square', 'hero_banner_mobile', 'capa_pagina', 'admin_thumb'],
         'uploads/author' => ['news_square'],
     ];
 
