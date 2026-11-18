@@ -46,7 +46,7 @@
 ## 6. Site provisório em produção (escrita, com aprovação)
 
 - [ ] 6.1 Levantar (leitura): cliente e ticket da Pichoneri no sistema WAB (`GET /clients` e `GET /tickets?q=pichoneri` pela API, conforme o CLAUDE.md global), quem administra o DNS do domínio e se há Search Console/GA4; registrar em "Pendências"
-- [ ] 6.2 Com aprovação: criar o registro DNS `pichoneri.wab.com.br` → 162.243.56.194, acrescentar o domínio ao webapp `app-wab-sites` no RunCloud e emitir o SSL; verificar `curl -I https://pichoneri.wab.com.br/robots.txt` respondendo pelo wab-sites ("Domínio não configurado" bloqueando o rastreamento)
+- [x] 6.2 Com aprovação: criar o registro DNS `pichoneri.wab.com.br` → 162.243.56.194, acrescentar o domínio ao webapp `app-wab-sites` no RunCloud e emitir o SSL; verificar `curl -I https://pichoneri.wab.com.br/robots.txt` respondendo pelo wab-sites ("Domínio não configurado" bloqueando o rastreamento)
 - [x] 6.3 Backup do banco de produção; exportar `pichoneri.localhost` no local e importar em produção pelo `/superadmin` com o domínio `pichoneri.wab.com.br`; criar o admin do site; rodar no servidor `bin/console app:miniaturas:aquecer` (fora do horário comercial)
 - [x] 6.4 Conferência: `https://pichoneri.wab.com.br/` e `/blog` com 200, imagens servidas de `/media/cache/` sem redirecionamento 302, `sh/conferir-redirecionamentos.sh https://pichoneri.wab.com.br …` sem falha, contato de teste chegando ao e-mail combinado, e HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br
 - [x] 6.5 Conferir como o site provisório responde em `/robots.txt` e nas metas de robôs; se estiver indexável, parar e pedir a decisão do Jonas (D7) antes de divulgar o endereço
@@ -77,8 +77,9 @@
 - Blog: `app:wordpress:importar pichoneri.wab.com.br https://www.marcenariapichoneri.com.br --link=/orcamento=/#contato --texto-link="peça seu orçamento"` no servidor: 44 posts (1 rascunho), 40 capas, 5 categorias, 49 redirecionamentos.
 - Home: o `/admin` do tenant só abre no próprio domínio, e o `pichoneri.wab.com.br` está com o certificado autoassinado do RunCloud (o Chrome bloqueia). A home foi montada no servidor por `var/tmp/pichoneri/montar.php` (entidades do sistema, mesmo formato do painel; backup `wab-sites-antes-deploy-20261118-2222.sql.gz` antes): 14 seções, 32 fotos de portfólio categorizadas, 11 clientes, 13 parceiros, 3 depoimentos com foto, vídeo institucional, botão e frase do cabeçalho e texto curto do site. 13 redirecionamentos avulsos (home2, página de exemplo, autor, feed, sitemaps antigos, /orcamento, /contato): 62 no total.
 - Conferência: `CURL_OPTS=-k sh/conferir-redirecionamentos.sh https://pichoneri.wab.com.br referencia/*-sitemap.xml` com 53 OK e 0 falha; os 43 posts publicados abrem sem erro e sem marcação do Divi; Lighthouse celular na home de produção com 100 nas quatro categorias (LCP 1,4 s); miniaturas geradas (`app:miniaturas:aquecer`), sem `/media/cache/resolve` no HTML.
+- Certificado: `pichoneri.wab.com.br` passou a ter Let's Encrypt (emitido em 18/11/2026 às 21h16 UTC, fora desta sessão); antes servia o certificado autoassinado do RunCloud. Conferido no Chrome: site abre sem alerta.
 - Levantamento (leitura, 18/11/2026): cliente WAB 121 "Pichoneri", projeto 78 "Demandas Gerais - Pichoneri", contrato 44 "Plano de manutenção 12h/mês" (ativo). Tickets recentes: 13456 (caminho do orçamento), 13348, 13340, 13212, 13190; nenhum sobre este redesign.
-- Não feito: envio de contato de teste (o e-mail do site é o do cliente, contato@marcenariapichoneri.com.br); certificado Let's Encrypt do provisório; decisão sobre indexação do provisório (sai `index, follow`); virada do domínio.
+- Não feito: envio de contato de teste (o e-mail do site é o do cliente, contato@marcenariapichoneri.com.br); decisão sobre indexação do provisório (sai `index, follow`); virada do domínio.
 
 ## Workflow follow-up
 
