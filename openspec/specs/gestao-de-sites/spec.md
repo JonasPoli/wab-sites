@@ -116,7 +116,7 @@ Na edição do tenant, em qualquer domínio de tenant onde o `/superadmin` estej
 - **THEN** o tenant 5 fica sem página home e o tenant 1 não muda
 
 ### Requirement: Fontes dos títulos na edição do tenant
-A edição do tenant no `/superadmin` SHALL oferecer, no campo de fonte de cada título de H1 a H5, as famílias Inter, Roboto, Playfair Display, Montserrat, Open Sans e Outfit, com a família gravada já marcada, ou Outfit quando não há nada gravado. Salvar SHALL gravar em `fontSettings` a família escolhida; uma família que não está nessa lista MUST ser gravada como Outfit.
+A edição do tenant no `/superadmin` SHALL oferecer, no campo de fonte de cada título de H1 a H5, as famílias Inter, Roboto, Playfair Display, Montserrat, Open Sans, Outfit, Manrope e DM Sans, com a família gravada já marcada, ou Outfit quando não há nada gravado. Salvar SHALL gravar em `fontSettings` a família escolhida; uma família que não está nessa lista MUST ser gravada como Outfit.
 
 #### Scenario: Escolher a Open Sans
 - **WHEN** o SuperAdmin abre a edição de um tenant, escolhe Open Sans na fonte do H1 e salva
@@ -124,11 +124,15 @@ A edição do tenant no `/superadmin` SHALL oferecer, no campo de fonte de cada 
 
 #### Scenario: Lista das famílias
 - **WHEN** o SuperAdmin abre a edição de qualquer tenant
-- **THEN** cada um dos cinco campos de fonte, de H1 a H5, oferece as seis famílias: Inter, Roboto, Playfair Display, Montserrat, Open Sans e Outfit
+- **THEN** cada um dos cinco campos de fonte, de H1 a H5, oferece as oito famílias: Inter, Roboto, Playfair Display, Montserrat, Open Sans, Outfit, Manrope e DM Sans
 
 #### Scenario: Família fora da lista
 - **WHEN** a edição do tenant recebe um envio com uma família que não está na lista na fonte do H2
 - **THEN** `fontSettings.h2.font` é gravado como Outfit
+
+#### Scenario: Site que já existia
+- **WHEN** um site com títulos em Outfit é aberto depois desta mudança
+- **THEN** os títulos continuam em Outfit e a página não baixa nenhum arquivo das famílias novas
 
 ### Requirement: Chaves do reCAPTCHA do tenant
 O cadastro e a edição do tenant no `/superadmin` SHALL ter os campos site key e secret key do reCAPTCHA v3. A secret key MUST NOT ser exibida depois de gravada: o campo mostra só se há chave, campo em branco mantém a chave atual, e uma opção explícita remove as duas chaves. O `/admin` do site MUST NOT mostrar nem editar essas chaves.
@@ -154,3 +158,25 @@ O painel do `/superadmin` SHALL indicar, na lista de tenants, quais sites estão
 #### Scenario: Depois do deploy
 - **WHEN** o SuperAdmin abre o `/superadmin` antes de cadastrar qualquer chave
 - **THEN** todos os tenants aparecem marcados como sem reCAPTCHA
+
+### Requirement: Blocos novos na exportação e na importação
+A exportação do site SHALL levar, além do que já leva, o título e a categoria de cada foto de bloco e o arquivo de vídeo do bloco `video`; a importação SHALL recriá-los, e SHALL aceitar um ZIP exportado antes desta mudança tratando esses dados como vazios.
+
+#### Scenario: Ida e volta de um portfólio
+- **WHEN** um site com um bloco `portfolio` de 5 fotos categorizadas e um bloco `video` com MP4 é exportado e importado em outro domínio
+- **THEN** o site importado mostra o mesmo filtro, as mesmas fotos e o mesmo vídeo
+
+#### Scenario: ZIP antigo
+- **WHEN** um ZIP exportado antes desta mudança é importado
+- **THEN** a importação termina sem erro e as fotos de galeria ficam sem título e sem categoria
+
+### Requirement: Interruptor do blog no cadastro do site
+A edição do site no `/superadmin` SHALL ter o interruptor "Blog", desligado em todo site novo e em todos os que já existem; a exportação SHALL levar o valor e a importação SHALL recriá-lo, tratando como desligado o ZIP que não o traz.
+
+#### Scenario: Site existente depois da atualização
+- **WHEN** a atualização é aplicada num servidor com sites já cadastrados
+- **THEN** todos continuam com o blog desligado e sem nenhuma página nova
+
+#### Scenario: ZIP antigo
+- **WHEN** um ZIP exportado antes desta mudança é importado
+- **THEN** o site importado fica com o blog desligado
