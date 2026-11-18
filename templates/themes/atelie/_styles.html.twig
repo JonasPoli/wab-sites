@@ -98,6 +98,7 @@
 .at-project{position:relative;overflow:hidden;background:#d9d0c5;margin:0}
 .at-project.is-big{grid-row:span 2}
 .at-project.is-oculto{display:none}
+.at-portfolio-grid.is-limitado .at-project:nth-child(n+12){display:none}
 .at-project img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .65s}
 .at-project:hover img{transform:scale(1.05)}
 .at-project:after{content:'';position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(22,18,14,.69));pointer-events:none}
@@ -212,8 +213,8 @@ a.at-service:hover,.at-service:hover{background:#e3dbce;transform:translateY(-4p
 .at-more{display:flex;justify-content:center;margin-top:36px}
 
 /* Logos */
-.at-logos{display:grid;grid-template-columns:repeat(var(--at-cols,6),1fr);gap:1px;background:var(--at-line);border:1px solid var(--at-line)}
-.at-logos>*{background:var(--at-bg,#f7f5f0);display:flex;align-items:center;justify-content:center;padding:26px 20px;min-height:120px}
+.at-logos{display:grid;grid-template-columns:repeat(var(--at-cols,6),1fr);gap:0;padding:1px 0 0 1px}
+.at-logos>*{background:var(--at-bg,#f7f5f0);display:flex;align-items:center;justify-content:center;padding:26px 20px;min-height:120px;border:1px solid var(--at-line);margin:-1px 0 0 -1px}
 .at-logos img{max-height:62px;width:auto;object-fit:contain;filter:grayscale(1);opacity:.78;transition:.25s}
 .at-logos>*:hover img{filter:none;opacity:1}
 

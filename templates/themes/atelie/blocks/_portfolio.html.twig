@@ -27,6 +27,9 @@
         </figure>
         {% endfor %}
     </div>
+    {% if fotos|length > 11 %}
+    <div class="at-more" hidden data-ver-todos><button type="button" class="at-btn at-btn-outline">Ver todos os {{ fotos|length }} projetos <span class="at-arrow" aria-hidden="true">↓</span></button></div>
+    {% endif %}
     {% if (cfg.note ?? null) or ((cfg.ctaText ?? null) and (cfg.ctaLink ?? null)) %}
     <div class="at-projects-note">
         <span>{{ cfg.note ?? '' }}</span>
@@ -35,16 +38,25 @@
     {% endif %}
 </div>
 {% include 'themes/atelie/blocks/_lightbox.html.twig' %}
-{% if categorias|length > 1 %}
+{% if categorias|length > 1 or fotos|length > 11 %}
 <script>
 (function () {
     var raiz = document.getElementById('portfolio-{{ block.id }}');
     if (!raiz) return;
+    // Com mais de 11 fotos, mostra 11 (4 linhas completas) e o botão "Ver todos" (sem JavaScript, todas aparecem)
+    var grade = raiz.querySelector('.at-portfolio-grid');
+    var verTodos = raiz.querySelector('[data-ver-todos]');
+    if (verTodos) {
+        grade.classList.add('is-limitado');
+        verTodos.hidden = false;
+        verTodos.querySelector('button').addEventListener('click', function () { grade.classList.remove('is-limitado'); verTodos.hidden = true; });
+    }
     var botoes = raiz.querySelectorAll('[data-filtro]');
     Array.prototype.forEach.call(botoes, function (botao) {
         botao.addEventListener('click', function () {
             var filtro = botao.getAttribute('data-filtro');
             Array.prototype.forEach.call(botoes, function (b) { b.setAttribute('aria-pressed', b === botao ? 'true' : 'false'); });
+            if (verTodos) { grade.classList.remove('is-limitado'); verTodos.hidden = true; }
             Array.prototype.forEach.call(raiz.querySelectorAll('[data-categoria]'), function (item) {
                 item.classList.toggle('is-oculto', filtro !== '*' && item.getAttribute('data-categoria') !== filtro);
             });
