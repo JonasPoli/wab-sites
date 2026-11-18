@@ -12,6 +12,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# ── O que o navegador precisa descobrir primeiro ──────────────────────────────
+       Estas duas linhas vêm antes de tudo de propósito: o leitor de pré-carga do
+       navegador lê o <head> em ordem, e cada KB de HTML antes delas atrasa o pedido.
+       Com a pré-carga no fim do <head> o PageSpeed media 470 ms de "atraso no
+       carregamento do recurso" só para começar a baixar a imagem do topo. #}
+    {% set arquivoDoLcp = imagem_do_lcp(_context) %}
+    {% if arquivoDoLcp %}
+        <link rel="preload" as="image" fetchpriority="high"
+              imagesrcset="{{ arquivoDoLcp|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}"
+              imagesizes="100vw">
+    {% endif %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {# Título, descrição, canônico, Open Graph, Twitter Card e JSON-LD num lugar só (PageSeo) #}
     {% include 'pub/_seo_head.html.twig' %}
     {% if currentTenant and currentTenant.favicon %}
@@ -27,15 +39,6 @@
        embutido (ux-icons) e o carrossel só carrega na página que tem carrossel. #}
     {% set usaCarrossel = usa_carrossel(_context) %}
 
-    {# Pré-carga da imagem do maior elemento visível (LCP). Sem ela, o navegador só
-       descobre a imagem do banner depois de ler o HTML até o bloco. O srcset e o sizes
-       são os mesmos da <img>, senão o navegador baixa a imagem duas vezes. #}
-    {% set arquivoDoLcp = imagem_do_lcp(_context) %}
-    {% if arquivoDoLcp %}
-        <link rel="preload" as="image" fetchpriority="high"
-              imagesrcset="{{ arquivoDoLcp|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}"
-              imagesizes="100vw">
-    {% endif %}
     {# Só a família do título é pré-carregada. Todas elas têm `font-display: swap`, então o
        texto já aparece na fonte de reserva; pré-carregar duas ou três ao mesmo tempo só
        tirava banda da imagem do topo — num site com duas famílias eram 79 KB na frente da
@@ -50,8 +53,6 @@
               media="print" onload="this.media='all';this.onload=null">
         <noscript><link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}"></noscript>
     {% endif %}
-    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
-
     {% set hexColor = '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i' %}
     {% set ntPrimary = currentTenant and (currentTenant.primaryColor ?? '') matches hexColor ? currentTenant.primaryColor : '#0044cc' %}
     {% set ntPrimaryDark = currentTenant and (currentTenant.primaryColorDark ?? '') matches hexColor ? currentTenant.primaryColorDark : '#3b82f6' %}
