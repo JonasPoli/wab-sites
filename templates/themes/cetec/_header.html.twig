@@ -43,6 +43,7 @@
                                 {% elseif firstBlock.type == 'steps' %}{% set sectionTitle = 'Como trabalhamos' %}
                                 {% elseif firstBlock.type == 'highlights' %}{% set sectionTitle = 'Diferenciais' %}
                                 {% elseif firstBlock.type == 'video' %}{% set sectionTitle = 'Vídeo' %}
+{% elseif firstBlock.type == 'blog_posts' %}{% set sectionTitle = 'Blog' %}
                                 {% endif %}
                             {% endif %}
                         {% endif %}
@@ -151,6 +152,7 @@
                             {% elseif firstBlock.type == 'steps' %}{% set sectionTitle = 'Como trabalhamos' %}
                             {% elseif firstBlock.type == 'highlights' %}{% set sectionTitle = 'Diferenciais' %}
                             {% elseif firstBlock.type == 'video' %}{% set sectionTitle = 'Vídeo' %}
+{% elseif firstBlock.type == 'blog_posts' %}{% set sectionTitle = 'Blog' %}
                             {% endif %}
                         {% endif %}
                     {% endif %}

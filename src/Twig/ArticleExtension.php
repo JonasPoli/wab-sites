@@ -8,6 +8,8 @@ use App\Repository\ArticleRepository;
 use App\Repository\AuthorRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\PageRepository;
+use App\Service\TenantContext;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -28,6 +30,8 @@ class ArticleExtension extends AbstractExtension
         private readonly CategoryRepository $categories,
         private readonly PageRepository $pages,
         private readonly AuthorRepository $authors,
+        private readonly UrlGeneratorInterface $urls,
+        private readonly TenantContext $tenantContext,
     ) {}
 
     #[\Override]
@@ -40,6 +44,11 @@ class ArticleExtension extends AbstractExtension
             new TwigFunction('news_most_read', fn (int $limit = 5) => $this->articles->findMostRead(7, $limit)),
             new TwigFunction('article_updated_label', $this->updatedLabel(...)),
             new TwigFunction('news_pending_authors', fn () => $this->authors->countPending()),
+            // Blog em site institucional e portal: o endereço certo num lugar só
+            new TwigFunction('article_url', $this->articleUrl(...)),
+            new TwigFunction('articles_url', $this->articlesUrl(...)),
+            new TwigFunction('latest_articles', $this->latestArticles(...)),
+            new TwigFunction('blog_categories', $this->blogCategories(...)),
         ];
     }
 
@@ -49,6 +58,63 @@ class ArticleExtension extends AbstractExtension
         return [
             new TwigFilter('relative_time', $this->relativeTime(...)),
         ];
+    }
+
+    private function temBlog(): bool
+    {
+        return (bool) $this->tenantContext->getTenant()?->hasBlog();
+    }
+
+    private function ehPortal(): bool
+    {
+        return $this->tenantContext->getTenant()?->getTheme() === 'noticias';
+    }
+
+    /** Endereço do post: /blog/{slug} no site com blog, /noticias/{slug} no portal. */
+    public function articleUrl(Article $article, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
+    {
+        return $this->urls->generate($this->temBlog() ? 'pub_blog_post' : 'pub_article_show', ['slug' => $article->getSlug()], $referenceType);
+    }
+
+    /** Lista de posts (de uma categoria, se informada): /blog… no site com blog, /noticias ou /categoria/… no portal. */
+    public function articlesUrl(?Category $category = null): string
+    {
+        if ($this->temBlog()) {
+            return $category
+                ? $this->urls->generate('pub_blog_category', ['slug' => $category->getSlug()])
+                : $this->urls->generate('pub_blog');
+        }
+        return $category
+            ? $this->urls->generate('pub_category', ['slug' => $category->getSlug()])
+            : $this->urls->generate('pub_articles');
+    }
+
+    /**
+     * Posts visíveis mais recentes, de todas as categorias ou de uma (e das subcategorias).
+     * Vazio num site sem blog que não é portal.
+     *
+     * @return Article[]
+     */
+    public function latestArticles(int $limit = 3, ?Category $category = null): array
+    {
+        if (!$this->temBlog() && !$this->ehPortal()) {
+            return [];
+        }
+        return $this->articles->findVisiblePage($category, 1, max(1, min(12, $limit)));
+    }
+
+    /**
+     * Categorias que têm post visível, em ordem alfabética (atalhos da lista do blog).
+     *
+     * @return Category[]
+     */
+    public function blogCategories(): array
+    {
+        $ids = $this->articles->findCategoryIdsWithVisibleArticles();
+        if ($ids === []) {
+            return [];
+        }
+        return $this->categories->findBy(['id' => $ids], ['name' => 'ASC']);
     }
 
     /**

@@ -1,0 +1,49 @@
+{#
+  Lista do blog (/blog e /blog/categoria/{slug}) para os temas sem desenho próprio
+  (cetec, moderno, wab). Herda o base do tema do site.
+  Variáveis: category (nula na lista geral), articles, page, pages.
+#}
+{% extends 'themes/' ~ currentTenant.theme ~ '/base.html.twig' %}
+
+{% block body %}
+<div class="py-12 md:py-16 bg-gray-50 dark:bg-cetec-dark/40 border-b border-gray-100 dark:border-white/5 text-center">
+    <div class="container mx-auto px-4">
+        {% if category %}
+            <a href="{{ path('pub_blog') }}" class="inline-block bg-cetec-secondary/30 text-cetec-primary-text px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Blog</a>
+        {% endif %}
+        <h1 class="text-3xl md:text-5xl font-black text-cetec-primary-text leading-tight">{{ category ? category.name : 'Blog' }}</h1>
+        {% if category and category.description %}
+            <p class="text-gray-600 dark:text-gray-400 max-w-xl mx-auto mt-3 text-sm md:text-base">{{ category.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<section class="py-12 md:py-16">
+    <div class="container mx-auto px-4">
+        {% set categorias = blog_categories() %}
+        {% if categorias|length > 1 %}
+        <nav class="flex flex-wrap justify-center gap-2 mb-10" aria-label="Categorias do blog">
+            <a href="{{ path('pub_blog') }}" class="px-4 py-2 rounded-full border text-xs font-bold {{ not category ? 'bg-cetec-primary border-transparent text-white' : 'border-gray-300 dark:border-white/20 text-cetec-primary-text' }}" {{ not category ? 'aria-current="page"' }}>Todos</a>
+            {% for c in categorias %}
+                {% set atual = category and category.id == c.id %}
+                <a href="{{ path('pub_blog_category', {slug: c.slug}) }}" class="px-4 py-2 rounded-full border text-xs font-bold {{ atual ? 'bg-cetec-primary border-transparent text-white' : 'border-gray-300 dark:border-white/20 text-cetec-primary-text' }}" {{ atual ? 'aria-current="page"' }}>{{ c.name }}</a>
+            {% endfor %}
+        </nav>
+        {% endif %}
+
+        {% if articles|length > 0 %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for article in articles %}
+                    {% include 'themes/_comum/blog/_card.html.twig' %}
+                {% endfor %}
+            </div>
+            {% include 'themes/_comum/blog/_pagination.html.twig' with {
+                rota: category ? 'pub_blog_category' : 'pub_blog',
+                parametros: category ? {slug: category.slug} : {}
+            } %}
+        {% else %}
+            <p class="text-center text-gray-600 dark:text-gray-400 py-16">Ainda não há publicações{{ category ? ' nesta categoria' }}.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

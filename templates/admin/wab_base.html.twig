@@ -172,6 +172,12 @@
         <a href="{{ path('admin_page_index') }}" class="nl {% if '/admin/page' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="file-text-fill"></sl-icon> Páginas
         </a>
+        {% if currentTenant and currentTenant.hasBlog %}
+        {# Blog de site institucional: o mesmo cadastro de notícias, sem jornalistas #}
+        <a href="{{ path('admin_article_index') }}" class="nl {% if '/admin/noticias' in app.request.pathInfo %}on{% endif %}">
+            <sl-icon name="journal-text"></sl-icon> Blog
+        </a>
+        {% endif %}
         {% if currentTenant and currentTenant.theme == 'noticias' %}
         <a href="{{ path('admin_article_index') }}" class="nl {% if '/admin/noticias' in app.request.pathInfo %}on{% endif %}">
             <sl-icon name="newspaper"></sl-icon> Notícias

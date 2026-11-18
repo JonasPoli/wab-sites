@@ -21,7 +21,7 @@
         <td>{{ a.viewCount }}</td>
         <td><div class="ta">
             {% if a.visible %}
-            <a href="{{ path('pub_article_show', {slug: a.slug}) }}" target="_blank" class="btn btn-g btn-sm" title="Ver no site"><sl-icon name="box-arrow-up-right"></sl-icon></a>
+            <a href="{{ article_url(a) }}" target="_blank" class="btn btn-g btn-sm" title="Ver no site"><sl-icon name="box-arrow-up-right"></sl-icon></a>
             {% endif %}
             <a href="{{ path('journalist_article_edit', {id: a.id}) }}" class="btn btn-g btn-sm" title="Editar"><sl-icon name="pencil-fill"></sl-icon></a>
             <form action="{{ path('journalist_article_delete', {id: a.id}) }}" method="post" onsubmit="return confirm('Excluir esta notícia?')" style="display:inline">

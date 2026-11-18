@@ -51,6 +51,11 @@ final class PageSeo
         if ($autor instanceof Author) {
             return $this->doAutor($autor, $tenant, $this->lista($contexto));
         }
+        // Lista do blog de site institucional (/blog e /blog/categoria/{slug})
+        $rota = $this->requestStack->getCurrentRequest()?->attributes->get('_route');
+        if (in_array($rota, ['pub_blog', 'pub_blog_category'], true)) {
+            return $this->doBlog($tenant, $categoria instanceof Category ? $categoria : null, $this->lista($contexto));
+        }
         if ($categoria instanceof Category) {
             return $this->daCategoria($categoria, $tenant, $this->lista($contexto));
         }
@@ -134,9 +139,41 @@ final class PageSeo
         );
     }
 
+    /** Lista do blog: CollectionPage com os posts, trilha Início → Blog (→ categoria). */
+    private function doBlog(?Tenant $tenant, ?Category $categoria, array $itens): SeoData
+    {
+        $canonico = $this->canonicaDoPedido();
+        $nome = $categoria ? $categoria->getName() : 'Blog';
+        $titulo = $this->titulo($categoria ? $nome . ' — Blog' : 'Blog', $tenant);
+        $descricao = $this->primeiroTexto([
+            $categoria ? TextoDeResumo::resumir($categoria->getDescription()) : null,
+            $tenant?->getSeoDescription(),
+            $this->descricaoDeReserva($tenant, $nome),
+        ]);
+        $imagem = $this->imagem($tenant, null);
+
+        $trilha = [['nome' => 'Início', 'url' => $this->base() . '/'], ['nome' => 'Blog', 'url' => $this->absoluta('pub_blog')]];
+        if ($categoria) {
+            $trilha[] = ['nome' => $nome, 'url' => $this->absoluta('pub_blog_category', ['slug' => $categoria->getSlug()])];
+        }
+
+        return new SeoData(
+            title: $titulo,
+            description: $descricao,
+            canonical: $canonico,
+            image: $imagem['url'],
+            imageWidth: $imagem['largura'],
+            imageHeight: $imagem['altura'],
+            jsonLd: [$this->noColecao($titulo, $descricao, $canonico, $itens), $this->noTrilha($trilha)],
+            siteName: $tenant?->getName(),
+        );
+    }
+
     private function daNoticia(Article $noticia, ?Tenant $tenant): SeoData
     {
-        $canonico = $this->absoluta('pub_article_show', ['slug' => $noticia->getSlug()]);
+        // No blog de site institucional o post mora em /blog/{slug} e é um BlogPosting
+        $ehBlog = (bool) $tenant?->hasBlog();
+        $canonico = $this->absoluta($ehBlog ? 'pub_blog_post' : 'pub_article_show', ['slug' => $noticia->getSlug()]);
         $titulo = $this->titulo($noticia->getTitle(), $tenant);
         $descricao = $this->primeiroTexto([
             TextoDeResumo::resumir($noticia->getSummary()),
@@ -166,7 +203,7 @@ final class PageSeo
 
         $no = [
             '@context' => 'https://schema.org',
-            '@type' => 'NewsArticle',
+            '@type' => $ehBlog ? 'BlogPosting' : 'NewsArticle',
             'headline' => TextoDeResumo::cortar($noticia->getTitle(), 110),
             'description' => $descricao,
             'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonico],
@@ -183,7 +220,7 @@ final class PageSeo
         if ($imagem['url'] !== null) {
             $no['image'] = [$imagem['url']];
         }
-        if ($noticia->getAuthor() !== null) {
+        if ($noticia->getAuthor() !== null && !$ehBlog) {
             $autor = $noticia->getAuthor();
             $no['author'] = array_filter([
                 '@type' => 'Person',
@@ -197,10 +234,13 @@ final class PageSeo
         }
 
         $trilha = [['nome' => 'Início', 'url' => $this->base() . '/']];
+        if ($ehBlog) {
+            $trilha[] = ['nome' => 'Blog', 'url' => $this->absoluta('pub_blog')];
+        }
         if ($noticia->getCategory() !== null) {
             $trilha[] = [
                 'nome' => $noticia->getCategory()->getName(),
-                'url' => $this->absoluta('pub_category', ['slug' => $noticia->getCategory()->getSlug()]),
+                'url' => $this->absoluta($ehBlog ? 'pub_blog_category' : 'pub_category', ['slug' => $noticia->getCategory()->getSlug()]),
             ];
         }
         $trilha[] = ['nome' => $noticia->getTitle(), 'url' => $canonico];
@@ -553,7 +593,7 @@ final class PageSeo
                 if ($item instanceof Article && $item->getSlug() !== '') {
                     $itens[] = [
                         'nome' => $item->getTitle(),
-                        'url' => $this->absoluta('pub_article_show', ['slug' => $item->getSlug()]),
+                        'url' => $this->absoluta($this->tenantContext->getTenant()?->hasBlog() ? 'pub_blog_post' : 'pub_article_show', ['slug' => $item->getSlug()]),
                     ];
                 } elseif ($item instanceof Page && $item->getSlug() !== '') {
                     $itens[] = [

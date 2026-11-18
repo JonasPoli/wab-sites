@@ -706,6 +706,7 @@ class SuperAdminController extends AbstractController
         $tenant->setShowSectionTitles($r->request->get('showSectionTitles') === '1');
         $tenant->setLandingPageMode($r->request->get('landingPageMode') === '1');
         $tenant->setNewsletterEnabled($r->request->get('newsletterEnabled') === '1');
+        $tenant->setBlogEnabled($r->request->get('blogEnabled') === '1');
 
         // HomePage: só página do próprio tenant editado (o /superadmin roda sem o filtro do
         // domínio). Tenant novo ainda não tem páginas: a home fica nula.

@@ -160,6 +160,10 @@ class Tenant
     #[ORM\Column(options: ['default' => true])]
     private bool $newsletterEnabled = true;
 
+    /** Serve as notícias cadastradas como blog em /blog (blog-nos-sites-institucionais) */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $blogEnabled = false;
+
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
@@ -394,6 +398,23 @@ class Tenant
         return $this;
     }
 
+    public function isBlogEnabled(): bool
+    {
+        return $this->blogEnabled;
+    }
+
+    public function setBlogEnabled(bool $blogEnabled): static
+    {
+        $this->blogEnabled = $blogEnabled;
+        return $this;
+    }
+
+    /** O site serve o blog: interruptor ligado e tema que não é o portal de notícias. */
+    public function hasBlog(): bool
+    {
+        return $this->blogEnabled && $this->theme !== 'noticias';
+    }
+
 
     /**
      * Exclude $logoFile (Symfony\Component\HttpFoundation\File\File) from serialization.
@@ -440,6 +461,7 @@ class Tenant
             'showSectionTitles'  => $this->showSectionTitles,
             'landingPageMode'    => $this->landingPageMode,
             'newsletterEnabled'  => $this->newsletterEnabled,
+            'blogEnabled'        => $this->blogEnabled,
             'darkLogo'           => $this->darkLogo,
             'homePageId'         => $this->homePage?->getId(),
             'googleAnalyticsId'  => $this->googleAnalyticsId,
@@ -489,6 +511,7 @@ class Tenant
         $this->showSectionTitles = $data['showSectionTitles'] ?? true;
         $this->landingPageMode   = $data['landingPageMode'] ?? false;
         $this->newsletterEnabled = $data['newsletterEnabled'] ?? true;
+        $this->blogEnabled       = $data['blogEnabled'] ?? false;
         $this->darkLogo          = $data['darkLogo'] ?? null;
         $this->googleAnalyticsId = $data['googleAnalyticsId'] ?? null;
         $this->recaptchaSiteKey = $data['recaptchaSiteKey'] ?? null;

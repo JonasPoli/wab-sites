@@ -1,0 +1,61 @@
+{#
+  Post do blog (/blog/{slug}) para os temas sem desenho próprio (cetec, moderno, wab).
+  Variáveis: article, next.
+#}
+{% extends 'themes/' ~ currentTenant.theme ~ '/base.html.twig' %}
+
+{% block stylesheets %}{{ parent() }}{% include 'themes/_comum/blog/_texto.html.twig' %}{% endblock %}
+
+{% block body %}
+<article class="py-12 md:py-16">
+    <div class="container mx-auto px-4"><div class="max-w-3xl mx-auto">
+        <a href="{{ path('pub_blog') }}" class="inline-flex items-center gap-2 text-cetec-secondary-text font-bold text-sm mb-6 hover:gap-3 transition-all">
+            {{ ux_icon('bi:arrow-left', {'aria-hidden': 'true'}) }} Voltar para o blog
+        </a>
+        <header class="mb-8">
+            {% if article.category %}
+                <a href="{{ articles_url(article.category) }}" class="inline-block bg-cetec-secondary/30 text-cetec-primary-text px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ article.category.name }}</a>
+            {% endif %}
+            <h1 class="text-3xl md:text-5xl font-black text-cetec-primary-text leading-tight mb-4">{{ article.title }}</h1>
+            {% if article.summary %}<p class="text-lg text-gray-600 dark:text-gray-300 mb-4">{{ article.summary }}</p>{% endif %}
+            <p class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-semibold">
+                {{ ux_icon('bi:calendar3', {'aria-hidden': 'true', class: 'w-3.5 h-3.5'}) }}
+                <time datetime="{{ article.publishedAt|date('c') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time>
+            </p>
+        </header>
+
+        {% if article.coverImage %}
+        {% set capa = 'uploads/article/' ~ article.coverImage %}
+        <figure class="rounded-3xl overflow-hidden shadow-xl mb-10 border border-gray-100 dark:border-white/5">
+            <picture>
+                <source media="(max-width: 767px)" srcset="{{ capa|thumb('capa_noticia_mobile') }}">
+                <img {{ capa|thumb_attrs('capa_noticia') }} alt="{{ article.coverCaption ?? article.title }}" class="w-full h-auto object-cover" fetchpriority="high">
+            </picture>
+            {% if article.coverCaption or article.coverCredit %}
+            <figcaption class="text-xs text-gray-600 dark:text-gray-400 px-4 py-2">
+                {{- article.coverCaption -}}{%- if article.coverCaption and article.coverCredit %} — {% endif -%}{%- if article.coverCredit %}Foto: {{ article.coverCredit }}{% endif -%}
+            </figcaption>
+            {% endif %}
+        </figure>
+        {% endif %}
+
+        {% if article.body %}
+            <div class="blog-texto text-gray-700 dark:text-gray-200">{{ article.body|raw }}</div>
+        {% endif %}
+
+        {% if article.videoId %}
+        <figure class="mt-10 aspect-video rounded-2xl overflow-hidden shadow-xl bg-black">
+            <iframe src="https://www.youtube-nocookie.com/embed/{{ article.videoId|e('url') }}" title="Vídeo: {{ article.title }}" loading="lazy" class="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </figure>
+        {% endif %}
+
+        {% if next %}
+        <nav class="mt-14 pt-6 border-t border-gray-200 dark:border-white/10" aria-label="Próximo post">
+            <span class="block text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-2">Próximo post</span>
+            <a href="{{ article_url(next) }}" class="text-lg font-bold text-cetec-primary-text hover:underline underline-offset-4">{{ next.title }}</a>
+        </nav>
+        {% endif %}
+    </div></div>
+</article>
+{% endblock %}

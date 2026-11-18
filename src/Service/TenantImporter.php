@@ -221,6 +221,7 @@ class TenantImporter
             $tenant->setShowSectionTitles($tData['showSectionTitles'] ?? true);
             $tenant->setLandingPageMode($tData['landingPageMode'] ?? false);
             $tenant->setNewsletterEnabled($tData['newsletterEnabled'] ?? true);
+            $tenant->setBlogEnabled((bool) ($tData['blogEnabled'] ?? false));
             $tenant->setRecaptchaSiteKey($tData['recaptchaSiteKey'] ?? null); // a secret key não vem no arquivo
 
             if (!empty($tData['logo'])) {

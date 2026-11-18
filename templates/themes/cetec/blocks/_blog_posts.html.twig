@@ -1,0 +1,27 @@
+{#
+  Últimas do blog (blog_posts): os posts visíveis mais recentes, de todas as categorias ou
+  de uma. Sem blog (e fora do portal), ou sem post, não desenha nada.
+#}
+{% set posts = latest_articles(block.itemCount ?? 3, block.relatedCategory) %}
+{% if posts|length > 0 %}
+<div class="wab-block my-12" data-aos="fade-up">
+    {% if block.preTitle or block.title or block.text %}
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for article in posts %}
+            {% include 'themes/_comum/blog/_card.html.twig' %}
+        {% endfor %}
+    </div>
+    <div class="text-center mt-10">
+        <a href="{{ articles_url(block.relatedCategory) }}" class="inline-flex items-center gap-1.5 text-cetec-secondary-text hover:brightness-90 text-sm font-bold tracking-wider">
+            {{ (block.config.ctaText ?? '') ?: 'Ver todos os posts' }} {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
+        </a>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,36 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="blog_posts">
+    {% if currentTenant and not currentTenant.hasBlog and currentTenant.theme != 'noticias' %}
+        <p class="af-hint" style="margin-bottom:1rem;color:var(--danger)">O blog deste site está desligado: o bloco não aparece até o SuperAdmin ligá-lo.</p>
+    {% endif %}
+    {{ c.cabecalho(block, false, 3) }}
+    <div class="af-row">
+        <div class="af-field">
+            <label>Categoria (opcional)</label>
+            <select name="relatedCategoryId" class="as">
+                <option value="">Todas as categorias</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {{ block.relatedCategory and block.relatedCategory.id == cat.id ? 'selected' }}>{{ cat.name }}</option>
+                {% for sub in cat.children %}
+                <option value="{{ sub.id }}" {{ block.relatedCategory and block.relatedCategory.id == sub.id ? 'selected' }}>— {{ sub.name }}</option>
+                {% endfor %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="af-field">
+            <label>Quantidade de posts</label>
+            <select name="itemCount" class="as">
+                {% for n in [3, 4, 6, 9, 12] %}
+                <option value="{{ n }}" {{ (block.itemCount ?? 3) == n ? 'selected' }}>{{ n }} posts</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="af-field">
+        <label>Texto do link para o blog</label>
+        <input type="text" name="config[ctaText]" class="ai" value="{{ cfg.ctaText ?? '' }}" placeholder="Ver todos os posts" maxlength="60">
+    </div>
+    {{ c.acoes(block, section) }}
+</form>

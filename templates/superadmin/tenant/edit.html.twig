@@ -109,6 +109,16 @@
                 Modo Landing Page (menu superior navega com rolagem suave entre as seções)
             </label>
         </div>
+        {# ── Blog (blog-nos-sites-institucionais) ── #}
+        <div class="af-field" style="margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:0.75rem;">
+            <input type="checkbox" id="blogEnabled" name="blogEnabled" value="1"
+                   {% if tenant.blogEnabled %}checked{% endif %}
+                   style="width:20px; height:20px; cursor:pointer; accent-color:var(--primary); margin-top:.15rem">
+            <label for="blogEnabled" style="cursor:pointer; margin:0; font-weight:600; color:var(--text)">
+                Blog
+                <span class="af-hint" style="display:block;font-weight:400">Serve as notícias cadastradas no painel do site em /blog. Não se aplica ao tema Notícias.</span>
+            </label>
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
             <div class="af-field">
                 <label>Cor Primária (Modo Claro)</label>

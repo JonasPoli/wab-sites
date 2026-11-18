@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Article;
 use App\Entity\Category;
+use App\Entity\Page;
 use App\Entity\Tenant;
 use App\Entity\User;
 use App\Service\PlaceholderImageFactory;
@@ -44,7 +46,11 @@ class CetecFixtures extends Fixture implements FixtureGroupInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        if ($manager->getRepository(Tenant::class)->findOneBy(['domain' => self::DOMAIN])) {
+        $existente = $manager->getRepository(Tenant::class)->findOneBy(['domain' => self::DOMAIN]);
+        if ($existente) {
+            // Site já carregado: só completa o blog (blog-nos-sites-institucionais), sem
+            // recriar nada, para os ids das seções e dos blocos continuarem os mesmos.
+            $this->completarBlog($manager, $existente);
             return;
         }
 
@@ -68,10 +74,28 @@ class CetecFixtures extends Fixture implements FixtureGroupInterface
         $categoria = (new Category())->setTenant($tenant)->setName('Institucional')->setSlug('institucional');
         $manager->persist($categoria);
 
-        $this->paginaTodosOsBlocos($manager, $tenant, $categoria, 'cetec');
+        $tenant->setBlogEnabled(true);
+        $this->paginaTodosOsBlocos($manager, $tenant, $categoria, 'cetec', true);
         $inicio = $this->paginaInicio($manager, $tenant, 'cetec');
         $tenant->setHomePage($inicio);
+        $this->postsDoBlog($manager, $tenant, 'cetec');
 
+        $manager->flush();
+    }
+
+    private function completarBlog(ObjectManager $manager, Tenant $tenant): void
+    {
+        if ($manager->getRepository(Article::class)->count(['tenant' => $tenant]) > 0) {
+            return;
+        }
+        $tenant->setBlogEnabled(true);
+        $this->postsDoBlog($manager, $tenant, 'cetec');
+
+        $pagina = $manager->getRepository(Page::class)->findOneBy(['tenant' => $tenant, 'slug' => 'todos-os-blocos']);
+        if ($pagina) {
+            $secao = $this->secao($manager, $pagina, 100);
+            $this->bloco($manager, $secao, 'blog_posts', ['preTitle' => 'Blog', 'title' => 'Últimas do blog', 'itemCount' => 3]);
+        }
         $manager->flush();
     }
 }

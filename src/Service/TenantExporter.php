@@ -158,6 +158,7 @@ class TenantExporter
             'showSectionTitles'   => $t->isShowSectionTitles(),
             'landingPageMode'     => $t->isLandingPageMode(),
             'newsletterEnabled'   => $t->isNewsletterEnabled(),
+            'blogEnabled'         => $t->isBlogEnabled(),
             // Só a site key do reCAPTCHA: a secret key nunca sai do servidor
             'recaptchaSiteKey'    => $t->getRecaptchaSiteKey(),
         ];

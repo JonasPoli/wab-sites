@@ -44,6 +44,18 @@ O WAB Sites oferece suporte a temas visuais customizáveis por tenant, na pasta 
 1. **Moderno (`moderno`)**: Design moderno dark-first (mas com seletor claro/escuro integrado e persistência via `localStorage`), baseado na fonte Google Fonts *Outfit* e estilização premium em vidro (glassmorphism).
 2. **Notícias (`noticias`)**: Portal de notícias com modos Claro (padrão), Escuro e Automático (segue o sistema), escolhidos pelo visitante no botão do canto direito do cabeçalho e guardados no navegador. No escuro, os fundos vêm das cores escuras do `/admin/settings`, e títulos e links usam a cor primária do modo escuro quando ela tem contraste de 4,5:1 com esses fundos (senão, texto claro). Cabeçalho e rodapé ficam sempre na cor primária do modo claro. A tipografia segue as medidas do g1 (Open Sans; título da notícia 40 px, texto 18/28 px, lista com títulos de 24 px etc.): H1, H2 e H3 da edição do tenant dão o tamanho dos títulos a partir de 768 px (no celular, 70% do H1 e 5/6 do H2), e "Padrão do Tema" usa 40, 24 e 20 px. A notícia aceita um vídeo do YouTube em campo próprio (o link é gravado como `https://www.youtube.com/watch?v=<id>`), mostrado no fim do texto num player do `youtube-nocookie.com`. A capa da notícia e a foto do jornalista só aceitam JPG ou PNG (o PHP do servidor não lê AVIF); uma imagem já gravada que o servidor não converte é mostrada pelo arquivo original no lugar da miniatura (filtro Twig `news_image`). Cabeçalho e rodapé na cor primária do site, home em lista com "Leia também" e "Mais lidas", páginas da notícia (`/noticias/{slug}`), da editoria (`/categoria/{slug}`) e do autor (`/autor/{slug}`). As notícias têm cadastro próprio no `/admin` (menu "Notícias"), e jornalistas se candidatam em `/jornalista/cadastro`, são aprovados pelo admin do site em `/admin/jornalistas` e publicam pela área `/jornalista`. As páginas institucionais usam os blocos do tema cetec.
 
+### Blog nos sites institucionais
+
+O cadastro de notícias do portal também serve de **blog** em qualquer site com tema institucional (cetec, moderno, wab e os que vierem). Liga-se pelo interruptor **Blog** na edição do site no `/superadmin` (`Tenant.blogEnabled`; `Tenant::hasBlog()` só é verdadeiro fora do tema `noticias`). Com ele ligado:
+
+* `/blog` (9 por página, `?pagina=N`), `/blog/categoria/{slug}` e `/blog/{slug}` (`App\Controller\pub\BlogController`); desligado, os três dão 404. `/noticias/...` continua sendo só do portal.
+* O `/admin` mostra o item **Blog**, que é o mesmo cadastro de notícias (sem jornalistas).
+* Bloco **Últimas do blog** (`blog_posts`) para pôr os posts recentes numa página.
+* SEO: canônico em `/blog/{slug}`, JSON-LD `BlogPosting` e `CollectionPage`; o `/sitemap.xml` traz `/blog`, os posts e as categorias com post.
+* Desenho comum em `templates/themes/_comum/blog/` (`list`, `post`, `_card`), que herda o `base.html.twig` do tema do site. Um tema pode ter o seu em `templates/themes/<tema>/blog/` com os mesmos nomes. Nos templates, use `article_url(post)`, `articles_url(categoria)` e `latest_articles(n, categoria)`, que escolhem entre `/blog` e `/noticias` sozinhas.
+
+Trocar para o tema `noticias` um site com blog leva os posts para `/noticias/{slug}` e faz `/blog` responder 404.
+
 ### Injeção de Variáveis CSS (`TenantExtension`)
 A extensão de Twig `TenantExtension` expõe globals e funções utilitárias que integram as preferências do banco com o visual público:
 * **`tenant_css_vars()`**: Injeta dinamicamente no `<head>` um bloco `<style>` contendo propriedades personalizadas CSS (`--color-primary`, `--color-secondary` e suas versões RGB) baseadas nas cores de branding cadastradas no Tenant.

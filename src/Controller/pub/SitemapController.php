@@ -133,6 +133,45 @@ class SitemapController extends AbstractController
             }
         }
 
+        // Blog de site institucional (blog-nos-sites-institucionais): posts, lista e categorias do blog
+        if (!$ehPortal && $tenant?->hasBlog()) {
+            $posts = $this->articleRepository->findAllVisible(withSamples: false);
+            $categoriasDoBlog = $this->idsDasEditorias($posts);
+            $maisRecenteDoBlog = null;
+            foreach ($posts as $post) {
+                if (!$post instanceof Article || $post->getSlug() === '') {
+                    continue;
+                }
+                $urls[] = [
+                    'loc' => $base . '/blog/' . rawurlencode($post->getSlug()),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.7',
+                    'lastmod' => $post->getUpdatedAt(),
+                ];
+                $maisRecenteDoBlog = $this->maior($maisRecenteDoBlog, $post->getUpdatedAt());
+            }
+            if ($posts !== []) {
+                $maisRecente = $this->maior($maisRecente, $maisRecenteDoBlog);
+                $urls[] = [
+                    'loc' => $base . '/blog',
+                    'changefreq' => 'daily',
+                    'priority' => '0.9',
+                    'lastmod' => $maisRecenteDoBlog ?? $agora,
+                ];
+                foreach ($this->categoriasDoSite($tenant) as $categoria) {
+                    if (!isset($categoriasDoBlog[$categoria->getId()])) {
+                        continue;
+                    }
+                    $urls[] = [
+                        'loc' => $base . '/blog/categoria/' . rawurlencode($categoria->getSlug()),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.6',
+                        'lastmod' => $maisRecenteDoBlog ?? $agora,
+                    ];
+                }
+            }
+        }
+
         // A home encabeça a lista, com a alteração mais recente do site
         array_unshift($urls, [
             'loc' => $base . '/',

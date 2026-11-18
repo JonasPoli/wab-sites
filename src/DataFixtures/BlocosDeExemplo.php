@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Article;
 use App\Entity\Category;
+use App\Entity\Enum\ArticleStatus;
 use App\Entity\Page;
 use App\Entity\PageBlock;
 use App\Entity\PageBlockImage;
@@ -154,6 +156,43 @@ trait BlocosDeExemplo
         }
 
         return $page;
+    }
+
+    /**
+     * Posts de exemplo do blog: 12 publicados em duas categorias, com capa, mais um
+     * rascunho e um agendado para o futuro (que não podem aparecer).
+     */
+    private function postsDoBlog(ObjectManager $m, Tenant $tenant, string $prefixo): void
+    {
+        $tendencias = (new Category())->setTenant($tenant)->setName('Tendências')->setSlug('tendencias');
+        $dicas = (new Category())->setTenant($tenant)->setName('Dicas de decoração')->setSlug('dicas-de-decoracao');
+        $m->persist($tendencias);
+        $m->persist($dicas);
+
+        $titulos = [
+            'Madeira clara deixa o ambiente mais acolhedor', 'Como escolher o acabamento da cozinha planejada',
+            'Painel ripado: onde usar e como cuidar', 'Móveis sob medida para apartamentos pequenos',
+            'Cinco cuidados com móveis de madeira maciça', 'Home office com marcenaria planejada',
+            'Cores que combinam com madeira natural', 'Closet planejado: medidas que fazem diferença',
+            'Recepção de clínica com móveis sob medida', 'Tendências de marcenaria para o próximo ano',
+            'Banheiro com gabinete de madeira: vale a pena?', 'Do projeto em 3D à instalação: como funciona',
+        ];
+        $agora = new \DateTimeImmutable('-1 hour');
+        foreach ($titulos as $i => $titulo) {
+            $slug = trim((string) preg_replace('~[^a-z0-9]+~', '-', (string) transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $titulo)), '-');
+            $capa = $this->img('uploads/article', sprintf('%s-post-%d.jpg', $prefixo, $i + 1), 1200, 750, [100 + $i * 8, 70, 40], [230, 200 - $i * 5, 150]);
+            $m->persist((new Article())->setTenant($tenant)->setTitle($titulo)->setSlug($slug)
+                ->setSummary('Resumo de exemplo do post "' . $titulo . '", com uma ou duas frases.')
+                ->setBody('<p>Texto de exemplo do post <strong>' . htmlspecialchars($titulo) . '</strong>.</p><h2>Um subtítulo</h2><p>Mais um parágrafo, com uma lista:</p><ul><li>Primeiro ponto</li><li>Segundo ponto</li></ul>')
+                ->setCategory($i % 2 ? $dicas : $tendencias)
+                ->setStatus(ArticleStatus::Published)
+                ->setPublishedAt($agora->modify('-' . ($i * 3) . ' days'))
+                ->setCoverImage($capa));
+        }
+        $m->persist((new Article())->setTenant($tenant)->setTitle('Rascunho que não aparece')->setSlug('rascunho-que-nao-aparece')
+            ->setBody('<p>Rascunho.</p>')->setCategory($dicas)->setStatus(ArticleStatus::Draft)->setPublishedAt($agora));
+        $m->persist((new Article())->setTenant($tenant)->setTitle('Post agendado que não aparece')->setSlug('post-agendado-que-nao-aparece')
+            ->setBody('<p>Agendado.</p>')->setCategory($dicas)->setStatus(ArticleStatus::Published)->setPublishedAt(new \DateTimeImmutable('+10 days')));
     }
 
     /** Home do layout de referência, em Modo Landing Page. */

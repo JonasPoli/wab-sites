@@ -1,0 +1,14 @@
+{# Estilos do texto do post (o projeto não usa o plugin de tipografia do Tailwind). #}
+<style>
+.blog-texto { font-size: 1.05rem; line-height: 1.8; color: inherit; }
+.blog-texto > * + * { margin-top: 1.15em; }
+.blog-texto h2 { font-size: 1.5rem; line-height: 1.3; font-weight: 800; margin-top: 1.8em; color: var(--color-primary-text); }
+.blog-texto h3 { font-size: 1.2rem; line-height: 1.35; font-weight: 700; margin-top: 1.5em; color: var(--color-primary-text); }
+.blog-texto a { color: var(--color-secondary-text); text-decoration: underline; text-underline-offset: 3px; }
+.blog-texto ul, .blog-texto ol { padding-left: 1.4em; }
+.blog-texto ul { list-style: disc; } .blog-texto ol { list-style: decimal; }
+.blog-texto li + li { margin-top: .35em; }
+.blog-texto blockquote { border-left: 3px solid var(--color-secondary); padding-left: 1.1em; font-style: italic; opacity: .9; }
+.blog-texto img { border-radius: 12px; height: auto; }
+.blog-texto strong { font-weight: 700; }
+</style>

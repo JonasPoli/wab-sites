@@ -26,6 +26,7 @@ enum BlockType: string
     case Steps         = 'steps';
     case Cta           = 'cta';
     case Video         = 'video';
+    case BlogPosts     = 'blog_posts';
 
     public function label(): string
     {
@@ -52,6 +53,7 @@ enum BlockType: string
             self::Steps         => 'Etapas',
             self::Cta           => 'Chamada para ação',
             self::Video         => 'Vídeo',
+            self::BlogPosts     => 'Últimas do blog',
         };
     }
 
@@ -80,6 +82,7 @@ enum BlockType: string
             self::Steps         => 'fa-solid fa-list-ol',
             self::Cta           => 'fa-solid fa-bullhorn',
             self::Video         => 'fa-solid fa-circle-play',
+            self::BlogPosts     => 'fa-solid fa-rss',
         };
     }
 }

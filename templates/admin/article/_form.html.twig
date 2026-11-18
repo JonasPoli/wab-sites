@@ -31,7 +31,7 @@
         <div class="af-field">
             <label for="a-slug">Slug</label>
             <input type="text" id="a-slug" name="slug" class="ai" value="{{ article.slug }}" placeholder="gerado a partir do título">
-            <p class="af-hint">Endereço: /noticias/<em>slug</em>. Se já existir no site, recebe -2, -3…</p>
+            <p class="af-hint">Endereço: /{{ currentTenant and currentTenant.hasBlog ? 'blog' : 'noticias' }}/<em>slug</em>. Se já existir no site, recebe -2, -3…</p>
         </div>
         {% else %}
         <div class="af-field">

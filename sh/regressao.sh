@@ -18,7 +18,7 @@ set -u
 cd "$(dirname "$0")/.." || exit 1
 
 BASE_DIR="var/regressao"
-HOSTS="${REGRESSAO_HOSTS:-127.0.0.1:8000 localhost:8000 noticias.localhost:8000}"
+HOSTS="${REGRESSAO_HOSTS:-127.0.0.1:8000 localhost:8000 noticias.localhost:8000 cetec.localhost:8000}"
 # "bot" no User-Agent: a notícia não conta visualização, e as "Mais lidas" não mudam entre capturas
 UA="Mozilla/5.0 (compatible; regressao-bot/1.0)"
 

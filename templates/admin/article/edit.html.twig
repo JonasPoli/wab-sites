@@ -5,7 +5,7 @@
     <h1>Editar notícia</h1>
     <div class="ta">
         {% if article.visible %}
-        <a href="{{ path('pub_article_show', {slug: article.slug}) }}" target="_blank" class="btn btn-g"><sl-icon name="box-arrow-up-right"></sl-icon> Ver no site</a>
+        <a href="{{ article_url(article) }}" target="_blank" class="btn btn-g"><sl-icon name="box-arrow-up-right"></sl-icon> Ver no site</a>
         {% endif %}
         <a href="{{ path('admin_article_index') }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar</a>
     </div>

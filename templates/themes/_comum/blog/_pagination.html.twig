@@ -1,0 +1,12 @@
+{# Paginação da lista do blog. Variáveis: page, pages, rota, parametros. #}
+{% if pages > 1 %}
+<nav class="flex items-center justify-center gap-3 mt-12 text-sm font-bold" aria-label="Paginação">
+    {% if page > 1 %}
+        <a href="{{ path(rota, parametros|merge(page > 2 ? {pagina: page - 1} : {})) }}" rel="prev" class="inline-flex items-center gap-1 px-4 py-2 rounded-md border border-gray-300 dark:border-white/20 text-cetec-primary-text hover:bg-gray-50 dark:hover:bg-white/5">{{ ux_icon('bi:arrow-left', {'aria-hidden': 'true'}) }} Mais recentes</a>
+    {% endif %}
+    <span class="text-gray-600 dark:text-gray-400 font-semibold">Página {{ page }} de {{ pages }}</span>
+    {% if page < pages %}
+        <a href="{{ path(rota, parametros|merge({pagina: page + 1})) }}" rel="next" class="inline-flex items-center gap-1 px-4 py-2 rounded-md border border-gray-300 dark:border-white/20 text-cetec-primary-text hover:bg-gray-50 dark:hover:bg-white/5">Mais antigos {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}</a>
+    {% endif %}
+</nav>
+{% endif %}
