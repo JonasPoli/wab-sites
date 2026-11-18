@@ -15,7 +15,7 @@
             <a class="at-contact-card" href="tel:{{ tenant.phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ ux_icon('bi:telephone', {'aria-hidden': 'true'}) }}<span><strong>Telefone</strong><span>{{ tenant.phone }}</span></span></a>
             {% endif %}
             {% if tenant.address %}
-            {% set mapa = tenant.mapsEmbedUrl and not (tenant.mapsEmbedUrl starts with 'https://www.google.com/maps/embed') ? tenant.mapsEmbedUrl : 'https://www.google.com/maps/search/?api=1&query=' ~ tenant.address|striptags|url_encode %}
+            {% set mapa = 'https://www.google.com/maps/search/?api=1&query=' ~ tenant.address|striptags|url_encode %}
             <a class="at-contact-card" href="{{ mapa }}" target="_blank" rel="noopener noreferrer">{{ ux_icon('bi:geo-alt', {'aria-hidden': 'true'}) }}<span><strong>Endereço</strong><span>{{ tenant.address|nl2br }}</span></span></a>
             {% endif %}
             {% if tenant.contactEmail %}
@@ -53,7 +53,8 @@
         {% include 'pub/_contato_protecao.html.twig' %}
     </form>
 </div>
-{% if tenant.mapsEmbedUrl and tenant.mapsEmbedUrl starts with 'https://www.google.com/maps/embed' %}
+{% set mapaIncorporavel = tenant.mapsEmbedUrl and (tenant.mapsEmbedUrl starts with 'https://www.google.com/maps/embed' or (tenant.mapsEmbedUrl matches '{^https://(www\\.|maps\\.)?google\\.com(\\.br)?/maps}' and 'output=embed' in tenant.mapsEmbedUrl)) %}
+{% if mapaIncorporavel %}
 <div class="at-map">
     <iframe data-adiada="{{ tenant.mapsEmbedUrl }}" title="Localização de {{ tenant.name }} no mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
 </div>

@@ -25,7 +25,7 @@
 {% if block.title or block.text or itens|length %}
 {% include 'themes/atelie/blocks/_head.html.twig' %}
 {% if itens|length %}
-<div class="at-services" style="--at-cols:{{ itens|length < 4 ? itens|length : 4 }}">
+<div class="at-services" style="--at-cols:{{ itens|length in [3, 5, 6, 9] ? 3 : (itens|length < 4 ? itens|length : 4) }}">
     {% for it in itens %}
         {% if it.url %}<a href="{{ it.url }}" class="at-service" target="{{ it.alvo }}"{% if it.alvo == '_blank' %} rel="noopener noreferrer"{% endif %} data-aos="fade-up">{% else %}<div class="at-service" data-aos="fade-up">{% endif %}
             <span class="at-symbol" aria-hidden="true">{{ it.icon ? it.icon|icone_do_painel('') : '◇' }}</span>
