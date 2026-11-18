@@ -1,0 +1,45 @@
+{# Perfil de membro da equipe no tema atelie (layouts clássico e moderno usam o mesmo). Variável: member. #}
+<section class="at-section">
+    <div class="at-wrap">
+        <div class="at-profile">
+            <aside>
+                <div class="at-profile-photo">
+                    {% if member.image %}
+                        <img {{ ('uploads/team_member_image/' ~ member.image)|thumb_attrs('equipe') }} alt="{{ member.name }}" fetchpriority="high">
+                    {% endif %}
+                </div>
+                <div class="at-profile-side">
+                    {% if member.phone %}<a href="tel:{{ member.phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ member.phone }}</a>{% endif %}
+                    {% if member.email %}<a href="mailto:{{ member.email }}">{{ member.email }}</a>{% endif %}
+                    {% if member.address %}<span>{{ member.address }}</span>{% endif %}
+                    {% set redes = [
+                        {url: member.linkedinUrl, icone: 'fa6-brands:linkedin-in', nome: 'LinkedIn'},
+                        {url: member.instagramUrl, icone: 'fa6-brands:instagram', nome: 'Instagram'},
+                        {url: member.facebookUrl, icone: 'fa6-brands:facebook-f', nome: 'Facebook'},
+                        {url: member.whatsappUrl, icone: 'fa6-brands:whatsapp', nome: 'WhatsApp'},
+                    ]|filter(r => r.url) %}
+                    {% if redes|length %}
+                    <div class="at-social">{% for r in redes %}<a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ r.nome }}" style="border-color:var(--at-line)">{{ ux_icon(r.icone, {'aria-hidden': 'true'}) }}</a>{% endfor %}</div>
+                    {% endif %}
+                    {% for cs in (member.customSections ?? []) %}
+                        {% if cs.title or cs.content %}<div><strong>{{ cs.title }}</strong><p class="at-text">{{ cs.content }}</p></div>{% endif %}
+                    {% endfor %}
+                </div>
+            </aside>
+            <div>
+                <nav class="at-breadcrumb" aria-label="Você está em"><a href="{{ path('pub_home') }}">Início</a></nav>
+                <h1>{{ member.name }}</h1>
+                {% if member.role %}<p class="at-profile-role">{{ member.role }}</p>{% endif %}
+                {% if member.summary %}<p class="at-text" style="font-size:17px;margin-top:20px">{{ member.summary }}</p>{% endif %}
+                {% if member.practiceAreas %}
+                    <h2 style="font-size:18px;margin-top:32px">Áreas de atuação</h2>
+                    <ul class="at-chips">{% for area in member.practiceAreas %}<li>{% if area.url %}<a href="{{ area.url }}">{{ area.name }}</a>{% else %}{{ area.name }}{% endif %}</li>{% endfor %}</ul>
+                {% endif %}
+                {% if member.experience or member.bio %}
+                    <h2 style="font-size:18px;margin-top:32px">Experiência</h2>
+                    <div class="at-rich" style="margin-top:12px">{% if member.experience %}{{ member.experience|raw }}{% else %}{{ member.bio|nl2br }}{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

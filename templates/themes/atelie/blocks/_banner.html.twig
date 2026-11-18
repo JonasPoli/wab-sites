@@ -1,0 +1,292 @@
+{% if (block.config.active ?? '1') == '1' %}
+{% set isFullWidth = (block.config.fullWidth ?? '0') == '1' %}
+{% set isFullHeight = (block.config.fullHeight ?? '0') == '1' %}
+
+{% set banners = [] %}
+{% if block.config.banners is defined and block.config.banners is not empty %}
+    {% for b in block.config.banners %}
+        {% if (b.active ?? '1') == '1' %}
+            {% set banners = banners|merge([b]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# Fallback to single banner properties if config banners are empty #}
+{% if banners is empty and block.title is not empty %}
+    {% set banners = [{
+        'title': block.title,
+        'text': block.text,
+        'ctaText': block.config.ctaText ?? '',
+        'ctaLink': block.config.ctaLink ?? '',
+        'image': block.image
+    }] %}
+{% endif %}
+
+{% if banners is not empty %}
+    {% set bannerStyles = 'position:relative;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;' %}
+    {% set bannerClasses = 'wab-block banner-block group' %}
+    
+    {% if isFullWidth %}
+        {% set containerStyles = bannerStyles ~ ' width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;max-width:100vw;border-radius:0;' %}
+    {% else %}
+        {% set containerStyles = bannerStyles ~ ' border-radius:24px;border:1px solid var(--border);' %}
+        {% set bannerClasses = bannerClasses ~ ' shadow-lg' %}
+    {% endif %}
+
+    {% if isFullHeight %}
+        {% set containerStyles = containerStyles ~ ' min-height:100vh;padding:0;' %}
+        {% set slideStyles = 'min-height:100vh;padding:8rem 2rem;' %}
+    {% else %}
+        {% set containerStyles = containerStyles ~ ' padding:0;' %}
+        {% set slideStyles = 'padding:6rem 2rem;' %}
+    {% endif %}
+
+    {% if isFullWidth or isFullHeight %}
+        {% set containerStyles = containerStyles ~ ' margin-bottom:0;' %}
+    {% else %}
+        {% set containerStyles = containerStyles ~ ' margin-bottom:2.5rem;' %}
+    {% endif %}
+
+    {% if banners|length == 1 %}
+        {# Single Banner Template (Redesigned, Premium Left-Aligned) #}
+        {% set b = banners[0] %}
+        <div class="{{ bannerClasses }}" style="{{ containerStyles }} display:flex;align-items:center;">
+            {# Background image #}
+            {% if b.image %}
+                {% set bannerArquivo = 'uploads/page_block/' ~ b.image %}
+                <img {{ bannerArquivo|thumb_attrs('banner_desktop') }} alt="" aria-hidden="true"
+                     srcset="{{ bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw"
+                     class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;transition:transform .5s ease"
+                     fetchpriority="high">
+            {% else %}
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0" data-aos="fade" data-aos-duration="1000"></div>
+            {% endif %}
+            
+            <div class="hero-overlay"></div>
+
+            {# Content Area #}
+            <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
+                <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
+                    {% if block.preTitle %}
+                        <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);" data-aos="fade-up" data-aos-delay="200">
+                            {{ block.preTitle }}
+                        </span>
+                    {% endif %}
+
+                    <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md" data-aos="fade-up" data-aos-delay="400">
+                        {{ b.title|raw }}
+                    </h2>
+
+                    {% if b.text %}
+                        <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed" data-aos="fade-up" data-aos-delay="600">
+                            {{ b.text }}
+                        </p>
+                    {% endif %}
+
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8" data-aos="fade-up" data-aos-delay="800">
+                        {% if b.ctaText %}
+                            <a href="{{ b.ctaLink ?: '#cursos' }}" class="cetec-secondary-btn text-on-secondary px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                {{ b.ctaText }}
+                            </a>
+                        {% else %}
+                            <a href="#cursos" class="cetec-secondary-btn text-on-secondary px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                Ver Nossos Cursos
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('pub_contact') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                            Fale Conosco
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {# Multiple Banner Carousel (Swiper layout - Redesigned, Premium Left-Aligned) #}
+        <div class="{{ bannerClasses }} swiper banner-swiper-{{ block.id }}" style="{{ containerStyles }}">
+            <div class="swiper-wrapper">
+                {% for b in banners %}
+                    <div class="swiper-slide" style="position:relative;display:flex;align-items:center;box-sizing:border-box;">
+                        {# Background image #}
+                        {% if b.image %}
+                            {% set bannerArquivo = 'uploads/page_block/' ~ b.image %}
+                            {% set bannerSrcset = bannerArquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) %}
+                            {% set bannerMedidas = thumb_size(bannerArquivo, 'banner_desktop') %}
+                            {# Num carrossel os slides ficam empilhados no mesmo ponto da tela, então o
+                               navegador trata todos como visíveis e o loading="lazy" não segura nada.
+                               Só o primeiro slide vem com src; os outros são promovidos pelo
+                               assets/imagens-adiadas.js depois que a página abre. #}
+                            <img {% if loop.first %}{{ bannerArquivo|thumb_attrs('banner_desktop') }}
+                                 srcset="{{ bannerSrcset }}" sizes="100vw"
+                                 fetchpriority="high"
+                                 {% else %}width="{{ bannerMedidas[0] }}" height="{{ bannerMedidas[1] }}"
+                                 data-adiada="{{ bannerArquivo|thumb('banner_desktop') }}"
+                                 data-adiada-srcset="{{ bannerSrcset }}"
+                                 loading="lazy" decoding="async"
+                                 {% endif %}alt="" aria-hidden="true"
+                                 class="banner-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;">
+                        {% else %}
+                            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--color-primary-rgb),.2),rgba(var(--color-secondary-rgb),.15));z-index:0" data-aos="fade" data-aos-duration="1000"></div>
+                        {% endif %}
+
+                        <div class="hero-overlay"></div>
+
+                        {# Content Area #}
+                        <div class="container mx-auto px-4 relative z-10 text-left" style="width:100%; {{ slideStyles }} display:flex; align-items:center;">
+                            <div class="max-w-3xl mx-auto md:mr-auto md:mx-0 text-center md:text-left mt-16 md:mt-0 px-10 md:px-0">
+                                {% if block.preTitle %}
+                                    <span class="inline-block text-cetec-dark px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm font-black mb-4 uppercase tracking-wider" style="background-color: var(--color-secondary);" data-aos="fade-up" data-aos-delay="200">
+                                        {{ block.preTitle }}
+                                    </span>
+                                {% endif %}
+
+                                <h2 class="banner-title text-3xl sm:text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 leading-tight text-white drop-shadow-md" data-aos="fade-up" data-aos-delay="400">
+                                    {{ b.title|raw }}
+                                </h2>
+
+                                {% if b.text %}
+                                    <p class="banner-text text-base sm:text-lg md:text-xl text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed" data-aos="fade-up" data-aos-delay="600">
+                                        {{ b.text }}
+                                    </p>
+                                {% endif %}
+
+                                <div class="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start gap-4 mt-8" data-aos="fade-up" data-aos-delay="800">
+                                    {% if b.ctaText %}
+                                        <a href="{{ b.ctaLink ?: '#cursos' }}" class="cetec-secondary-btn text-on-secondary px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                            {{ b.ctaText }}
+                                        </a>
+                                    {% else %}
+                                        <a href="#cursos" class="cetec-secondary-btn text-on-secondary px-6 py-3 md:px-8 md:py-4 rounded-md font-black text-base md:text-[19px] shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                            Ver Nossos Cursos
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ path('pub_contact') }}" class="bg-white hover:bg-gray-100 text-cetec-dark px-6 py-3 md:px-8 md:py-4 rounded-md font-bold text-base md:text-lg shadow-xl transform transition hover:-translate-y-1 w-full sm:w-auto text-center inline-block">
+                                        Fale Conosco
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Swiper Pagination & Navigation #}
+            <div class="swiper-pagination swiper-pagination-{{ block.id }}"></div>
+            <div class="swiper-button-next swiper-button-next-{{ block.id }}"></div>
+            <div class="swiper-button-prev swiper-button-prev-{{ block.id }}"></div>
+        </div>
+
+        <script>
+        // 'swiper:pronto' vem do assets/carrossel.js, que carrega o Swiper depois do load.
+        document.addEventListener('swiper:pronto', function() {
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.banner-swiper-{{ block.id }}', {
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-{{ block.id }}',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next-{{ block.id }}',
+                        prevEl: '.swiper-button-prev-{{ block.id }}',
+                    },
+                });
+            }
+        });
+        </script>
+    {% endif %}
+
+    <style>
+    {% if not isFullHeight %}
+    .banner-swiper-{{ block.id }},
+    .banner-swiper-{{ block.id }} .swiper-slide,
+    .banner-block {
+        min-height: 550px;
+    }
+    @media (min-width: 768px) {
+        .banner-swiper-{{ block.id }},
+        .banner-swiper-{{ block.id }} .swiper-slide,
+        .banner-block {
+            min-height: 750px;
+        }
+    }
+    {% endif %}
+
+    .banner-block:hover .banner-bg {
+        transform: scale(1.03);
+    }
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, rgba(26, 26, 26, 0.85) 0%, rgba(26, 26, 26, 0.7) 40%, rgba(26, 26, 26, 0.25) 100%);
+        z-index: 1;
+    }
+    .cetec-secondary-btn {
+        background-color: var(--color-secondary);
+        transition: all 0.3s ease;
+    }
+    .cetec-secondary-btn:hover {
+        filter: brightness(0.9);
+    }
+    .banner-swiper-{{ block.id }} .swiper-pagination-bullet {
+        background: rgba(255,255,255,.4);
+        opacity: 1;
+        /* Ponto de 10 px desenhado dentro de um alvo de toque de 24 px (WCAG 2.2):
+           o background-clip faz a cor pintar só a caixa de conteúdo. */
+        width: 24px;
+        height: 24px;
+        padding: 7px;
+        box-sizing: border-box;
+        background-clip: content-box;
+        margin: 0;
+        transition: background .3s ease;
+    }
+    .banner-swiper-{{ block.id }} .swiper-pagination-bullet-active {
+        background: var(--color-secondary); /* Dynamic tenant secondary color */
+        background-clip: content-box;
+        width: 38px;
+        padding: 7px 14px;
+        border-radius: 12px;
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next,
+    .banner-swiper-{{ block.id }} .swiper-button-prev {
+        color: #ffffff !important;
+        background: rgba(26, 26, 26, 0.5);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: all 0.2s ease;
+        z-index: 10;
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next:hover,
+    .banner-swiper-{{ block.id }} .swiper-button-prev:hover {
+        background: var(--color-secondary); /* Accent highlight color on hover */
+        border-color: var(--color-secondary);
+        transform: scale(1.05);
+    }
+    .banner-swiper-{{ block.id }} .swiper-button-next::after,
+    .banner-swiper-{{ block.id }} .swiper-button-prev::after {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+    @media (max-width:768px) {
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(26, 26, 26, 0.8) 0%, rgba(26, 26, 26, 0.9) 100%);
+        }
+        .banner-swiper-{{ block.id }} .swiper-button-next,
+        .banner-swiper-{{ block.id }} .swiper-button-prev {
+            display: none;
+        }
+    }
+    </style>
+{% endif %}
+{% endif %}

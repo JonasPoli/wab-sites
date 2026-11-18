@@ -1,0 +1,49 @@
+{#
+  Seções de uma página ou categoria no tema atelie. Variável: sections.
+  Seção sem fundo definido usa o fundo da página (sem alternância automática: a faixa
+  alternada fica com o bloco de etapas, como no layout de referência). Seção só com blocos
+  de largura inteira ou de topo (banner, statement, cta, steps, hero_split, highlights)
+  não tem respiro vertical próprio.
+#}
+{% set semRespiro = ['banner', 'statement', 'cta', 'steps', 'hero_split', 'highlights'] %}
+{% for section in sections %}{% if section.active %}
+    {% set tipos = section.blocks|map(b => b.type) %}
+    {% set flush = tipos|length > 0 and tipos|filter(t => t not in semRespiro)|length == 0 %}
+    {% set isDark = false %}
+    {% if section.bgType in ['image', 'video', 'gradient'] %}
+        {% set isDark = true %}
+    {% elseif section.bgType == 'color' and section.bgColor %}
+        {% set isDark = is_dark_color(section.bgColor) %}
+    {% endif %}
+    {% set estilo = '' %}
+    {% if section.bgType == 'color' and section.bgColor %}
+        {% set estilo = 'background-color:' ~ section.bgColor %}
+    {% elseif section.bgType == 'gradient' and section.bgGradient %}
+        {% set estilo = 'background:linear-gradient(' ~ section.bgGradient ~ ')' %}
+    {% elseif section.bgType in ['image', 'video'] %}
+        {% set estilo = 'overflow:hidden' %}
+    {% endif %}
+    <section id="section-{{ section.id }}" class="at-section{{ flush ? ' at-section--flush' }}{{ isDark ? ' mp-section-dark at-section--dark' }}"{% if estilo %} style="{{ estilo }}"{% endif %}>
+        {% if section.bgType == 'image' and section.bgImage %}
+            {% set fundo = 'uploads/section/bg/' ~ section.bgImage %}
+            <picture class="at-section-bg" style="opacity:{{ section.bgImageOpacity / 100 }}">
+                <source media="(max-width: 767px)" srcset="{{ fundo|thumb('fundo_secao_mobile') }}">
+                <img {{ fundo|thumb_attrs('fundo_secao') }} alt="" aria-hidden="true" loading="lazy" decoding="async" style="object-position:{{ section.bgImagePosition }}">
+            </picture>
+        {% endif %}
+        {% if section.bgType == 'video' and section.bgVideo %}
+            <div class="at-section-bg">
+                <video autoplay muted loop playsinline preload="none" data-tocar-perto>
+                    <source src="{{ asset('uploads/section/video/' ~ section.bgVideo) }}" type="video/mp4">
+                </video>
+                {% if section.bgColor %}<div style="position:absolute;inset:0;background:{{ section.bgColor }};opacity:.5"></div>{% endif %}
+            </div>
+        {% endif %}
+        {% if (currentTenant.showSectionTitles ?? true) and section.showTitle and (section.titlePart1 or section.titlePart2) %}
+            <div class="at-wrap"><p class="at-eyebrow at-section-title">{{ (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim }}</p></div>
+        {% endif %}
+        {% for block in section.blocks %}
+            {% include 'themes/atelie/_block.html.twig' %}
+        {% endfor %}
+    </section>
+{% endif %}{% endfor %}

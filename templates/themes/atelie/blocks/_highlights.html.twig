@@ -1,0 +1,9 @@
+{# Faixa de destaques (highlights) — ".cred-bar" do layout de referência. #}
+{% set itens = (block.config.items ?? [])|filter(i => (i.title ?? '')|trim != '') %}
+{% if itens|length > 0 %}
+<div class="at-cred-bar" style="--at-cols:{{ itens|length }}">
+    {% for it in itens %}
+    <div><strong>{{ it.title }}</strong>{% if it.text ?? null %}<span>{{ it.text }}</span>{% endif %}</div>
+    {% endfor %}
+</div>
+{% endif %}

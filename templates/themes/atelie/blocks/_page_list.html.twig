@@ -1,0 +1,49 @@
+{% set cat = block.relatedCategory %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}{% include 'themes/atelie/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    {% set pages = cat ? cat.pages : [] %}
+    {% if pages|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for page in pages|slice(0, block.itemCount ?? 99) %}
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="bg-white dark:bg-cetec-dark border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:border-cetec-secondary/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col group">
+            {% if page.coverImage %}
+            <div class="h-48 overflow-hidden relative">
+                <img {{ ('uploads/page_cover/' ~ page.coverImage)|thumb_attrs('capa_pagina') }} alt="{{ page.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async">
+            </div>
+            {% else %}
+            <div class="h-48 bg-gradient-to-tr from-gray-100 to-gray-200 dark:from-cetec-dark/50 dark:to-cetec-dark flex items-center justify-center text-4xl text-gray-300 dark:text-white/10">
+                {{ ux_icon('fa6-solid:file-lines', {'aria-hidden': 'true'}) }}
+            </div>
+            {% endif %}
+            <div class="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-cetec-primary-text mb-2 line-clamp-2 group-hover:text-cetec-secondary-text transition-colors">
+                        {{ page.title }}
+                    </h3>
+                    {% if page.seoDescription %}
+                    <p class="text-gray-600 dark:text-gray-400 text-xs md:text-sm mb-4 line-clamp-3 leading-relaxed">
+                        {{ page.seoDescription }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="pt-4 border-t border-gray-100 dark:border-white/5">
+                    <span class="flex items-center gap-1.5 text-cetec-secondary-text hover:brightness-90 text-sm font-bold tracking-wider group-hover:gap-2.5 transition-all">
+                        Ler mais {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-10">
+        <p class="text-gray-600 dark:text-gray-400">Nenhuma página encontrada para esta categoria.</p>
+    </div>
+    {% endif %}
+</div>

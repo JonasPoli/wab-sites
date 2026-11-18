@@ -1,0 +1,57 @@
+{% extends 'themes/atelie/base.html.twig' %}
+
+{% block body %}
+<header class="at-page-head">
+    <div class="at-wrap">
+        <nav class="at-breadcrumb" aria-label="Você está em">
+            <a href="{{ path('pub_home') }}">Início</a>
+            {% if category.parent %}<span aria-hidden="true">/</span><a href="{{ path('pub_category', {slug: category.parent.slug}) }}">{{ category.parent.name }}</a>{% endif %}
+        </nav>
+        {% if category.preTitle %}<p class="at-eyebrow" style="margin-top:20px">{{ category.preTitle }}</p>{% endif %}
+        <h1>{{ category.name }}</h1>
+        {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+    </div>
+</header>
+
+{% if category.children is defined and category.children|length > 0 %}
+<section class="at-section" style="padding-bottom:0">
+    <div class="at-wrap">
+        <div class="at-cards">
+            {% for sub in category.children %}
+            <a href="{{ path('pub_category', {slug: sub.slug}) }}" class="at-card">
+                <div class="at-card-body">
+                    <p class="at-eyebrow">Categoria</p>
+                    <h2 style="font-size:20px;margin:12px 0 8px">{{ sub.name }}</h2>
+                    {% if sub.description %}<p>{{ sub.description }}</p>{% endif %}
+                    <span class="at-card-more">Ver <span class="at-arrow" aria-hidden="true">↗</span></span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if category.pages is defined and category.pages|length > 0 %}
+<section class="at-section">
+    <div class="at-wrap">
+        <div class="at-cards">
+            {% for p in category.pages %}
+            <a href="{{ path('pub_page_show', {slug: p.slug}) }}" class="at-card">
+                {% if p.coverImage %}
+                <span class="at-card-img"><img {{ ('uploads/page_cover/' ~ p.coverImage)|thumb_attrs('capa_pagina') }} alt="" loading="lazy" decoding="async"></span>
+                {% endif %}
+                <div class="at-card-body">
+                    <h2 style="font-size:19px;margin:0 0 8px">{{ p.title }}</h2>
+                    {% if p.seoDescription %}<p>{{ p.seoDescription }}</p>{% endif %}
+                    <span class="at-card-more">Ler mais <span class="at-arrow" aria-hidden="true">↗</span></span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% include 'themes/atelie/_sections.html.twig' with {sections: category.sections} %}
+{% endblock %}

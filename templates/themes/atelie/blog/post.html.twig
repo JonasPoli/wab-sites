@@ -1,0 +1,40 @@
+{# Post do blog no tema atelie. Variáveis: article, next. #}
+{% extends 'themes/atelie/base.html.twig' %}
+
+{% block body %}
+<article>
+    <header class="at-page-head" style="border-bottom:0;padding-bottom:28px">
+        <div class="at-wrap" style="max-width:860px">
+            <nav class="at-breadcrumb" aria-label="Você está em">
+                <a href="{{ path('pub_home') }}">Início</a><span aria-hidden="true">/</span><a href="{{ path('pub_blog') }}">Blog</a>
+                {% if article.category %}<span aria-hidden="true">/</span><a href="{{ articles_url(article.category) }}">{{ article.category.name }}</a>{% endif %}
+            </nav>
+            <h1 style="font-size:clamp(32px,4.4vw,54px)">{{ article.title }}</h1>
+            {% if article.summary %}<p style="font-size:18px">{{ article.summary }}</p>{% endif %}
+            <p class="at-card-meta" style="margin-top:18px"><time datetime="{{ article.publishedAt|date('c') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time></p>
+        </div>
+    </header>
+    {% if article.coverImage %}
+    {% set capa = 'uploads/article/' ~ article.coverImage %}
+    <figure class="at-wrap" style="max-width:1000px;margin-bottom:48px">
+        <picture>
+            <source media="(max-width: 767px)" srcset="{{ capa|thumb('capa_noticia_mobile') }}">
+            <img {{ capa|thumb_attrs('capa_noticia') }} alt="{{ article.coverCaption ?? article.title }}" fetchpriority="high" style="width:100%">
+        </picture>
+        {% if article.coverCaption or article.coverCredit %}<figcaption class="at-note" style="margin-top:8px">{{ article.coverCaption }}{% if article.coverCaption and article.coverCredit %} — {% endif %}{% if article.coverCredit %}Foto: {{ article.coverCredit }}{% endif %}</figcaption>{% endif %}
+    </figure>
+    {% endif %}
+    <div class="at-wrap" style="max-width:760px;padding-bottom:90px">
+        {% if article.body %}<div class="at-rich" style="font-size:17px">{{ article.body|raw }}</div>{% endif %}
+        {% if article.videoId %}
+        <div class="at-media-frame at-media-frame--h" style="margin-top:40px">
+            <iframe src="https://www.youtube-nocookie.com/embed/{{ article.videoId|e('url') }}" title="Vídeo: {{ article.title }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+        <div style="margin-top:56px;padding-top:28px;border-top:1px solid var(--at-line);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap">
+            <a class="at-btn at-btn-outline" href="{{ path('pub_blog') }}">← Voltar para o blog</a>
+            {% if next %}<a class="at-card-more" href="{{ article_url(next) }}" style="max-width:420px">Próximo: {{ next.title }} <span class="at-arrow" aria-hidden="true">↗</span></a>{% endif %}
+        </div>
+    </div>
+</article>
+{% endblock %}

@@ -19,6 +19,8 @@ final class HeadingFonts
         'Montserrat'       => ['Montserrat (Expressiva, Geométrica)', 'sans-serif', 100, 900],
         'Open Sans'        => ['Open Sans (Humanista, Legível)', 'sans-serif', 300, 800],
         'Outfit'           => ['Outfit (Contemporânea, Original do Tema)', 'sans-serif', 100, 900],
+        'Manrope'          => ['Manrope (Geométrica, Editorial)', 'sans-serif', 200, 800],
+        'DM Sans'          => ['DM Sans (Limpa, Texto)', 'sans-serif', 100, 900],
     ];
 
     /** @return array<string, string> família => rótulo, na ordem do formulário */

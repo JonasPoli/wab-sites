@@ -40,9 +40,22 @@ Para garantir segurança e impedir o vazamento acidental de dados entre tenants,
 
 ## 🎨 Temas e Branding Dinâmico
 
-O WAB Sites oferece suporte a temas visuais customizáveis por tenant, na pasta `templates/themes/`: `cetec` (usado pelos sites de clientes), `moderno`, `wab` e `noticias`. Alguns deles:
+O WAB Sites oferece suporte a temas visuais customizáveis por tenant, na pasta `templates/themes/`: `cetec` (usado pelos sites de clientes), `moderno`, `wab`, `noticias` e `atelie`. Alguns deles:
 1. **Moderno (`moderno`)**: Design moderno dark-first (mas com seletor claro/escuro integrado e persistência via `localStorage`), baseado na fonte Google Fonts *Outfit* e estilização premium em vidro (glassmorphism).
 2. **Notícias (`noticias`)**: Portal de notícias com modos Claro (padrão), Escuro e Automático (segue o sistema), escolhidos pelo visitante no botão do canto direito do cabeçalho e guardados no navegador. No escuro, os fundos vêm das cores escuras do `/admin/settings`, e títulos e links usam a cor primária do modo escuro quando ela tem contraste de 4,5:1 com esses fundos (senão, texto claro). Cabeçalho e rodapé ficam sempre na cor primária do modo claro. A tipografia segue as medidas do g1 (Open Sans; título da notícia 40 px, texto 18/28 px, lista com títulos de 24 px etc.): H1, H2 e H3 da edição do tenant dão o tamanho dos títulos a partir de 768 px (no celular, 70% do H1 e 5/6 do H2), e "Padrão do Tema" usa 40, 24 e 20 px. A notícia aceita um vídeo do YouTube em campo próprio (o link é gravado como `https://www.youtube.com/watch?v=<id>`), mostrado no fim do texto num player do `youtube-nocookie.com`. A capa da notícia e a foto do jornalista só aceitam JPG ou PNG (o PHP do servidor não lê AVIF); uma imagem já gravada que o servidor não converte é mostrada pelo arquivo original no lugar da miniatura (filtro Twig `news_image`). Cabeçalho e rodapé na cor primária do site, home em lista com "Leia também" e "Mais lidas", páginas da notícia (`/noticias/{slug}`), da editoria (`/categoria/{slug}`) e do autor (`/autor/{slug}`). As notícias têm cadastro próprio no `/admin` (menu "Notícias"), e jornalistas se candidatam em `/jornalista/cadastro`, são aprovados pelo admin do site em `/admin/jornalistas` e publicam pela área `/jornalista`. As páginas institucionais usam os blocos do tema cetec.
+
+### Tema Ateliê (`atelie`)
+
+Tema editorial para sites de marcenaria, arquitetura, decoração e afins: fundo claro, títulos em Manrope e texto em DM Sans (servidas pelo próprio domínio), cantos retos e muito respiro. Nasceu do redesign aprovado da Marcenaria Pichoneri (`openspec/changes/tema-atelie/referencia/`), mas não traz nada do cliente: textos, fotos e cores vêm do site.
+
+* CSS próprio em `templates/themes/atelie/_styles.html.twig`, com classes `at-*` e estilos de elemento presos a `.at-root` (o `<body>`). As cores da marca vêm do `tenant_css_vars()`; o fundo da página é a "cor clara 1" do site e a faixa de etapas usa a "cor clara 2".
+* Só modo claro: ignora o modo escuro salvo pelos outros temas.
+* Todos os tipos de bloco têm desenho próprio em `templates/themes/atelie/blocks/`. `banner`, `statement`, `cta` e `steps` ocupam a largura toda; seção só com eles (ou com `hero_split` e `highlights`) fica sem respiro vertical, como no layout.
+* Cabeçalho: logo, nome do site, a **frase** e o **botão de ação** cadastrados em `/admin/settings` (bloco "Botão de ação e frase do cabeçalho"), barra superior com a opção nova **Horário de funcionamento**, e o menu das seções da home no Modo Landing Page.
+* Blog com desenho próprio em `templates/themes/atelie/blog/`.
+* Demonstração em `https://atelie.localhost:8000` (`AtelieFixtures`, admin `atelie.admin` / `admin123`): `php bin/console doctrine:fixtures:load --append --group=atelie`.
+
+Um tema precisa ter, no mínimo, `page`, `home`, `category`, `team_member_classic` e `team_member_modern` (o `WabPublicController` os renderiza direto) e um desenho para cada tipo de bloco; o `tests/Entity/BlockTypeCoberturaTest.php` confere as duas coisas.
 
 ### Blog nos sites institucionais
 

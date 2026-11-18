@@ -40,7 +40,7 @@ Pasta `templates/themes/atelie/`, valor `atelie`, rótulo "Ateliê (editorial, t
 | `--brand2` (`#c96a18`) e `#e7a15b` (sobre escuro) | `var(--color-secondary)` |
 | texto/eyebrow na cor da marca | `var(--color-primary-text)` |
 | texto sobre a cor da marca | `var(--color-on-primary)` |
-| `--bg` (`#f7f5f0`) e `#ebe6dc` (faixa alternada) | classes `auto-bg-a` / `auto-bg-b` que o `tenant_css_vars()` já gera a partir de `bgColorLight1/2` |
+| `--bg` (`#f7f5f0`) e `#ebe6dc` (faixa alternada) | `--at-bg` e `--at-bg2` no `<body>`, tirados de `bgColorLight1/2` do site (valor conferido como cor hexadecimal). Sem alternância automática das seções: o layout de referência só usa a cor 2 na faixa de etapas e na de destaques |
 | `--ink`, `--muted`, `--line`, `--dark`, `--paper` | ficam como variáveis `--at-*` fixas no tema |
 
 - O `app.css` continua carregado (traz os `@font-face` e mantém funcionando qualquer classe Tailwind usada num parcial copiado do cetec). O JavaScript do menu, do filtro e da animação de entrada vai num `<script>` no fim do `base.html.twig` (o filtro mora no parcial do portfólio). A animação de entrada usa o `assets/animacoes.js` que já existe (`data-aos="fade-up"`), não o `IntersectionObserver` do HTML de referência.

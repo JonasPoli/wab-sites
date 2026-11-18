@@ -1,0 +1,14 @@
+{% if block.embedUrl %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-10">
+        {% if block.preTitle %}{% include 'themes/atelie/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    <div class="rounded-3xl overflow-hidden shadow-2xl h-[450px] border border-gray-100 dark:border-white/5 relative">
+        <iframe data-adiada="{{ block.embedUrl }}" width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="{{ block.title }}"></iframe>
+    </div>
+</div>
+{% endif %}

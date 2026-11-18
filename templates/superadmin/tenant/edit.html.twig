@@ -87,6 +87,7 @@
                 <option value="moderno" {{ tenant.theme == 'moderno' ? 'selected' }}>Moderno (dark, vibrante)</option>
                 <option value="cetec" {{ tenant.theme == 'cetec' ? 'selected' }}>CETEC (Laranja, Profissional/Técnico)</option>
                 <option value="noticias" {{ tenant.theme == 'noticias' ? 'selected' }}>Notícias (portal de notícias com jornalistas)</option>
+                <option value="atelie" {{ tenant.theme == 'atelie' ? 'selected' }}>Ateliê (editorial, tons de madeira)</option>
             </select>
         </div>
 
@@ -580,6 +581,10 @@
                             <input type="checkbox" name="topBarLeft[]" value="address" {% if 'address' in topBarLeft %}checked{% endif %}>
                             <span>Endereço</span>
                         </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                        	<input type="checkbox" name="topBarLeft[]" value="hours" {% if 'hours' in topBarLeft %}checked{% endif %}>
+                        	<span>Horário de funcionamento</span>
+                        </label>
                     </div>
                 </div>
                 <div class="af-field">
@@ -601,6 +606,10 @@
                         <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
                             <input type="checkbox" name="topBarRight[]" value="address" {% if 'address' in topBarRight %}checked{% endif %}>
                             <span>Endereço</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
+                        	<input type="checkbox" name="topBarRight[]" value="hours" {% if 'hours' in topBarRight %}checked{% endif %}>
+                        	<span>Horário de funcionamento</span>
                         </label>
                     </div>
                 </div>

@@ -1,0 +1,38 @@
+{# Texto com 4 blocos (blurbs4) — ".services" do layout de referência. Mesma lógica de itens e links do cetec. #}
+{% set config = block.config ?? {} %}
+{% set itens = [] %}
+{% for it in (config.items ?? []) %}
+    {% if it.title ?? null %}
+        {% set url = null %}
+        {% if (it.link ?? null) == 'external' and (it.externalUrl ?? null) %}
+            {% set url = it.externalUrl|trim %}
+            {% if url and not (url starts with 'http://' or url starts with 'https://' or url starts with '//' or url starts with 'mailto:' or url starts with 'tel:' or url starts with '/' or url starts with '#') %}{% set url = 'https://' ~ url %}{% endif %}
+        {% elseif (it.link ?? null) and (it.link starts with 'http://' or it.link starts with 'https://' or it.link starts with '//') %}
+            {% set url = it.link|trim %}
+        {% elseif (it.link ?? null) and it.link != 'external' %}
+            {% set url = path('pub_page_show', {slug: it.link}) %}
+        {% endif %}
+        {% set itens = itens|merge([{icon: it.icon ?? null, title: it.title, text: it.text ?? null, url: url, alvo: it.linkTarget ?? '_self'}]) %}
+    {% endif %}
+{% endfor %}
+{% if itens|length == 0 %}
+    {% for i in 1..4 %}
+        {% if config['item' ~ i ~ '_title'] ?? null %}
+            {% set itens = itens|merge([{icon: config['item' ~ i ~ '_icon'] ?? null, title: config['item' ~ i ~ '_title'], text: config['item' ~ i ~ '_text'] ?? null, url: null, alvo: '_self'}]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% if block.title or block.text or itens|length %}
+{% include 'themes/atelie/blocks/_head.html.twig' %}
+{% if itens|length %}
+<div class="at-services" style="--at-cols:{{ itens|length < 4 ? itens|length : 4 }}">
+    {% for it in itens %}
+        {% if it.url %}<a href="{{ it.url }}" class="at-service" target="{{ it.alvo }}"{% if it.alvo == '_blank' %} rel="noopener noreferrer"{% endif %} data-aos="fade-up">{% else %}<div class="at-service" data-aos="fade-up">{% endif %}
+            <span class="at-symbol" aria-hidden="true">{{ it.icon ? it.icon|icone_do_painel('') : '◇' }}</span>
+            <h3>{{ it.title }}</h3>
+            {% if it.text %}<p>{{ it.text }}</p>{% endif %}
+        {% if it.url %}</a>{% else %}</div>{% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+{% endif %}

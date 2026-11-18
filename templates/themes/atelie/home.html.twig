@@ -1,0 +1,47 @@
+{#
+  Home do tema atelie quando o site não tem página montada como home: o primeiro banner
+  ativo como destaque, o texto "sobre" do site e, com blog, as três publicações recentes.
+#}
+{% extends 'themes/atelie/base.html.twig' %}
+
+{% block body %}
+{% set b = banner ?? null %}
+<section class="at-hero">
+    <div class="at-wrap at-hero-grid {{ (b and b.backgroundImage) ? '' : 'at-hero-grid--solo' }}">
+        <div class="at-hero-copy">
+            <h1 class="at-hero-title">{{ b ? b.title : currentTenant.name }}</h1>
+            {% if b and b.subtitle %}<p class="at-lead">{{ b.subtitle }}</p>{% endif %}
+            {% if b and b.ctaText and b.ctaLink %}<a class="at-btn at-btn-primary" href="{{ b.ctaLink }}">{{ b.ctaText }} <span class="at-arrow" aria-hidden="true">↗</span></a>{% endif %}
+        </div>
+        {% if b and b.backgroundImage %}
+        {% set arquivo = 'uploads/hero/' ~ b.backgroundImage %}
+        <figure class="at-hero-photo">
+            <img {{ arquivo|thumb_attrs('banner_desktop') }} srcset="{{ arquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}" sizes="100vw" alt="" fetchpriority="high">
+        </figure>
+        {% endif %}
+    </div>
+</section>
+
+{% if currentTenant.aboutText %}
+<section class="at-section">
+    <div class="at-wrap">
+        <div class="at-split at-split--solo">
+            <div>
+                <p class="at-eyebrow">Sobre</p>
+                <div class="at-rich" style="margin-top:18px">{{ currentTenant.aboutText|raw }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% set recentes = latest_articles(3) %}
+{% if recentes|length %}
+<section class="at-section" style="padding-top:0">
+    <div class="at-wrap">
+        <div class="at-section-head"><div><p class="at-eyebrow">Blog</p><h2 class="at-h2">Publicações recentes</h2></div></div>
+        <div class="at-cards">{% for article in recentes %}{% include 'themes/atelie/blog/_card.html.twig' %}{% endfor %}</div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

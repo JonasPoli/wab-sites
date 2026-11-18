@@ -13,7 +13,10 @@ use PHPUnit\Framework\TestCase;
 final class BlockTypeCoberturaTest extends TestCase
 {
     /** Temas que despacham os blocos por um _block.html.twig próprio. */
-    private const TEMAS = ['cetec', 'moderno', 'wab'];
+    private const TEMAS = ['cetec', 'moderno', 'wab', 'atelie'];
+
+    /** Arquivos que o WabPublicController renderiza direto: sem eles a rota dá erro 500. */
+    private const OBRIGATORIOS = ['page', 'home', 'category', 'team_member_classic', 'team_member_modern'];
 
     private static function raiz(): string
     {
@@ -31,6 +34,30 @@ final class BlockTypeCoberturaTest extends TestCase
     {
         foreach (BlockType::cases() as $tipo) {
             self::assertFileExists(self::raiz() . '/templates/themes/cetec/blocks/_' . $tipo->value . '.html.twig', "Falta o desenho do bloco {$tipo->value} no cetec");
+        }
+    }
+
+    public function testParcialDoAtelie(): void
+    {
+        foreach (BlockType::cases() as $tipo) {
+            self::assertFileExists(self::raiz() . '/templates/themes/atelie/blocks/_' . $tipo->value . '.html.twig', "Falta o desenho do bloco {$tipo->value} no atelie");
+        }
+    }
+
+    public function testArquivosObrigatoriosDosTemas(): void
+    {
+        foreach (self::TEMAS as $tema) {
+            foreach (self::OBRIGATORIOS as $arquivo) {
+                self::assertFileExists(self::raiz() . "/templates/themes/{$tema}/{$arquivo}.html.twig", "O tema {$tema} não tem {$arquivo}.html.twig");
+            }
+        }
+    }
+
+    public function testAtelieNaoDependeDoCetec(): void
+    {
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::raiz() . '/templates/themes/atelie', \FilesystemIterator::SKIP_DOTS));
+        foreach ($it as $arquivo) {
+            self::assertStringNotContainsString('themes/cetec/', (string) file_get_contents((string) $arquivo), (string) $arquivo);
         }
     }
 

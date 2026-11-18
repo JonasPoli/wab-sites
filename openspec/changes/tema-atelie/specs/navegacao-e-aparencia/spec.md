@@ -50,7 +50,7 @@ No tema `atelie`, todas as rotas públicas que os outros temas institucionais at
 - **THEN** a resposta é 404 "Página não encontrada."
 
 ### Requirement: Aparência do tema atelie
-O tema `atelie` SHALL seguir o layout de referência aprovado (fundo claro, títulos em Manrope, texto em DM Sans, cantos retos), usando a cor primária do site em botões, destaques e na faixa de chamada, a secundária nos destaques sobre fundo escuro, e as cores de fundo claras do site nas seções sem fundo definido, alternadas; o tema só tem modo claro e não mostra seletor de aparência.
+O tema `atelie` SHALL seguir o layout de referência aprovado (fundo claro, títulos em Manrope, texto em DM Sans, cantos retos), usando a cor primária do site em botões, destaques e na faixa de chamada, a secundária nos destaques sobre fundo escuro, a cor de fundo clara 1 do site no fundo da página e a cor clara 2 na faixa de etapas e na faixa de destaques; seções sem fundo definido não alternam cor. O tema só tem modo claro e não mostra seletor de aparência.
 
 #### Scenario: Cores do site
 - **WHEN** o site muda a cor primária de marrom para verde

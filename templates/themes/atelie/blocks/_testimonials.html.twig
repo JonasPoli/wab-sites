@@ -1,0 +1,46 @@
+{#
+  Depoimentos (testimonials) — ".testimonial-inner" do layout de referência: citação grande
+  no centro. Com mais de um, uma faixa que mostra um por vez, com setas (sem biblioteca).
+#}
+{% set lista = block.testimonials %}
+{% if lista|length > 0 %}
+<div class="at-testimonial" id="depoimentos-{{ block.id }}" data-aos="fade-up">
+    {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+    {% if block.title %}<h2 class="at-h2" style="margin-top:14px">{{ block.title }}</h2>{% endif %}
+    {% if lista|length > 1 %}<div class="at-slider"><div class="at-slider-track" tabindex="0" aria-label="Depoimentos">{% endif %}
+    {% for t in lista %}
+        <figure class="at-quote{{ t.text|length > 180 ? ' at-quote--long' }}">
+            <blockquote>“{{ t.text }}”</blockquote>
+            <figcaption>
+                {% if t.avatar %}<img {{ ('uploads/testimonial_avatar/' ~ t.avatar)|thumb_attrs('avatar') }} alt="" loading="lazy" decoding="async">{% endif %}
+                <strong>{{ t.name }}</strong>
+                {% if t.role %}<small>{{ t.role }}</small>{% endif %}
+                {% if t.rating %}<span class="at-stars" role="img" aria-label="{{ t.rating }} de 5 estrelas">{% for i in 1..t.rating %}★{% endfor %}</span>{% endif %}
+            </figcaption>
+        </figure>
+    {% endfor %}
+    {% if lista|length > 1 %}
+        </div>
+        <div class="at-slider-nav">
+            <button type="button" data-dir="-1" aria-label="Depoimento anterior">{{ ux_icon('bi:arrow-left', {'aria-hidden': 'true', width: 16, height: 16}) }}</button>
+            <span class="at-slider-count" aria-live="polite">1 / {{ lista|length }}</span>
+            <button type="button" data-dir="1" aria-label="Próximo depoimento">{{ ux_icon('bi:arrow-right', {'aria-hidden': 'true', width: 16, height: 16}) }}</button>
+        </div>
+    </div>
+    <script>
+    (function () {
+        var raiz = document.getElementById('depoimentos-{{ block.id }}');
+        var trilho = raiz.querySelector('.at-slider-track');
+        var contador = raiz.querySelector('.at-slider-count');
+        var total = trilho.children.length;
+        function atual() { return Math.round(trilho.scrollLeft / trilho.clientWidth); }
+        function ir(i) { i = (i + total) % total; trilho.scrollTo({left: i * trilho.clientWidth, behavior: 'smooth'}); }
+        Array.prototype.forEach.call(raiz.querySelectorAll('[data-dir]'), function (b) {
+            b.addEventListener('click', function () { ir(atual() + parseInt(b.getAttribute('data-dir'), 10)); });
+        });
+        trilho.addEventListener('scroll', function () { contador.textContent = (atual() + 1) + ' / ' + total; }, {passive: true});
+    })();
+    </script>
+    {% endif %}
+</div>
+{% endif %}

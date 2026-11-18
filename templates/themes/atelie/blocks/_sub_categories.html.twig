@@ -1,0 +1,41 @@
+{% set cat = block.relatedCategory %}
+{% if cat %}
+    {% set pages = cat.pages %}
+    {% if pages is empty and cat.children|length > 0 %}
+        {% set pages = [] %}
+        {% for child in cat.children %}
+            {% for p in child.pages %}
+                {% set pages = pages|merge([p]) %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+<div class="wab-block my-16" data-aos="fade-up">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        {% if block.preTitle %}{% include 'themes/atelie/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    
+    {% if pages|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-transparent">
+        {% for page in pages %}
+        <a href="{{ path('pub_page_show', {slug: page.slug}) }}" class="flex flex-col items-center text-center bg-transparent group cursor-pointer transition-transform duration-300 transform hover:-translate-y-2">
+            <div class="w-full h-60 flex items-center justify-center bg-transparent overflow-hidden mb-4">
+                {% if page.coverImage %}
+                    <img {{ ('uploads/page_cover/' ~ page.coverImage)|thumb_attrs('capa_pagina_inteira') }} alt="{{ page.title }}" class="max-w-full max-h-full w-auto h-auto object-contain bg-transparent transition-transform duration-500 group-hover:scale-105 group-hover:drop-shadow-lg" loading="lazy" decoding="async">
+                {% else %}
+                    <div class="text-5xl text-gray-300 dark:text-white/20 bg-transparent flex items-center justify-center w-full h-full">
+                        {{ ux_icon('bi:image', {'aria-hidden': 'true'}) }}
+                    </div>
+                {% endif %}
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-cetec-primary-text group-hover:text-cetec-secondary-text transition-colors duration-300">
+                {{ page.title }}
+            </h3>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}

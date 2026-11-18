@@ -1086,6 +1086,10 @@ class AdminContentController extends AbstractController
                 'topBarLeft'      => $topBarLeft,
                 'topBarRight'     => $topBarRight,
                 'customMenuItems' => $customMenuItems,
+                // Botão de ação e frase do cabeçalho (tema atelie)
+                'headerCtaLabel'  => mb_substr(trim((string) $r->request->get('headerCtaLabel', '')), 0, 60),
+                'headerCtaUrl'    => $this->urlDoBotao((string) $r->request->get('headerCtaUrl', '')),
+                'headerTagline'   => mb_substr(trim((string) $r->request->get('headerTagline', '')), 0, 60),
             ]);
 
             $em->flush();
@@ -1101,6 +1105,16 @@ class AdminContentController extends AbstractController
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /** Seção de página ou categoria do site do domínio, ou 404 (não depende do tenant_filter). */
+    /** URL do botão de ação do cabeçalho: mesma regra dos itens de menu personalizados. */
+    private function urlDoBotao(string $url): string
+    {
+        $url = mb_substr(trim($url), 0, 255);
+        if ($url !== '' && !preg_match('~^(https?://|//|mailto:|tel:|/|#)~i', $url)) {
+            $url = 'https://' . $url;
+        }
+        return $url;
+    }
+
     private function sectionOr404(int $id): PageSection
     {
         return $this->container->get(PageSectionRepository::class)->findOneForTenant($id, $this->domainTenant())

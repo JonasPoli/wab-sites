@@ -1,0 +1,20 @@
+{# Etapas (steps) — ".process" do layout de referência: faixa de largura inteira no fundo claro 2. #}
+{% set etapas = (block.config.steps ?? [])|filter(e => (e.title ?? '')|trim != '') %}
+{% if etapas|length > 0 or block.title %}
+<div class="at-process">
+    <div class="at-wrap">
+        {% include 'themes/atelie/blocks/_head.html.twig' %}
+        {% if etapas|length > 0 %}
+        <ol class="at-process-grid" style="--at-cols:{{ etapas|length > 4 ? 3 : etapas|length }}">
+            {% for e in etapas %}
+            <li class="at-step" data-aos="fade-up">
+                <div class="at-number">{{ (e.label ?? '')|trim ?: '%02d'|format(loop.index) }}</div>
+                <h3>{{ e.title }}</h3>
+                {% if e.text ?? null %}<p>{{ e.text }}</p>{% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

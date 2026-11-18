@@ -1,0 +1,14 @@
+{# Galeria (gallery): grade de fotos que abrem ampliadas. #}
+{% set fotos = block.galleryImages %}
+{% if fotos|length > 0 %}
+{% include 'themes/atelie/blocks/_head.html.twig' %}
+<div class="at-gallery">
+    {% for f in fotos %}
+    {% set arquivo = 'uploads/page_block_gallery/' ~ f.filename %}
+    <a href="{{ asset(arquivo) }}" data-lightbox="galeria-{{ block.id }}">
+        <img {{ arquivo|thumb_attrs('galeria') }} alt="{{ f.caption ?: f.title ?: block.title ~ ' — foto ' ~ loop.index }}" loading="lazy" decoding="async">
+    </a>
+    {% endfor %}
+</div>
+{% include 'themes/atelie/blocks/_lightbox.html.twig' %}
+{% endif %}

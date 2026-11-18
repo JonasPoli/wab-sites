@@ -1,0 +1,43 @@
+{# Lista do blog no tema atelie. Variáveis: category, articles, page, pages. #}
+{% extends 'themes/atelie/base.html.twig' %}
+
+{% block body %}
+<header class="at-page-head">
+    <div class="at-wrap">
+        <nav class="at-breadcrumb" aria-label="Você está em">
+            <a href="{{ path('pub_home') }}">Início</a>
+            {% if category %}<span aria-hidden="true">/</span><a href="{{ path('pub_blog') }}">Blog</a>{% endif %}
+        </nav>
+        <h1>{{ category ? category.name : 'Blog' }}</h1>
+        {% if category and category.description %}<p>{{ category.description }}</p>{% endif %}
+    </div>
+</header>
+<section class="at-section" style="padding-top:48px">
+    <div class="at-wrap">
+        {% set categorias = blog_categories() %}
+        {% if categorias|length > 1 %}
+        <nav class="at-filters" aria-label="Categorias do blog">
+            <a class="at-filter" href="{{ path('pub_blog') }}" {{ not category ? 'aria-current="page" style="background:var(--at-ink);border-color:var(--at-ink);color:#fff"' }}>Todos</a>
+            {% for c in categorias %}
+                {% set atual = category and category.id == c.id %}
+                <a class="at-filter" href="{{ path('pub_blog_category', {slug: c.slug}) }}" {{ atual ? 'aria-current="page" style="background:var(--at-ink);border-color:var(--at-ink);color:#fff"' }}>{{ c.name }}</a>
+            {% endfor %}
+        </nav>
+        {% endif %}
+        {% if articles|length %}
+            <div class="at-cards">{% for article in articles %}{% include 'themes/atelie/blog/_card.html.twig' %}{% endfor %}</div>
+            {% if pages > 1 %}
+            {% set rota = category ? 'pub_blog_category' : 'pub_blog' %}
+            {% set params = category ? {slug: category.slug} : {} %}
+            <nav class="at-more" style="gap:14px;align-items:center" aria-label="Paginação">
+                {% if page > 1 %}<a class="at-btn at-btn-outline" rel="prev" href="{{ path(rota, params|merge(page > 2 ? {pagina: page - 1} : {})) }}">← Mais recentes</a>{% endif %}
+                <span class="at-muted" style="font-size:13px">Página {{ page }} de {{ pages }}</span>
+                {% if page < pages %}<a class="at-btn at-btn-outline" rel="next" href="{{ path(rota, params|merge({pagina: page + 1})) }}">Mais antigos →</a>{% endif %}
+            </nav>
+            {% endif %}
+        {% else %}
+            <p class="at-muted at-center" style="padding:60px 0">Ainda não há publicações{{ category ? ' nesta categoria' }}.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

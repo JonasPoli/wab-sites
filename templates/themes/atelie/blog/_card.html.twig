@@ -1,0 +1,18 @@
+{# Cartão de post no tema atelie. Variável: article. #}
+{% set url = article_url(article) %}
+<article class="at-card">
+    {% if article.coverImage %}
+    <a href="{{ url }}" class="at-card-img" tabindex="-1" aria-hidden="true">
+        <img {{ ('uploads/article/' ~ article.coverImage)|thumb_attrs('capa_pagina') }} alt="" loading="lazy" decoding="async">
+    </a>
+    {% endif %}
+    <div class="at-card-body">
+        <div class="at-card-meta">
+            {% if article.category %}<a href="{{ articles_url(article.category) }}">{{ article.category.name }}</a>{% endif %}
+            <time datetime="{{ article.publishedAt|date('Y-m-d') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time>
+        </div>
+        <h3><a href="{{ url }}">{{ article.title }}</a></h3>
+        {% if article.summary %}<p>{{ article.summary }}</p>{% endif %}
+        <a href="{{ url }}" class="at-card-more" aria-label="Ler o post: {{ article.title }}">Ler mais <span class="at-arrow" aria-hidden="true">↗</span></a>
+    </div>
+</article>

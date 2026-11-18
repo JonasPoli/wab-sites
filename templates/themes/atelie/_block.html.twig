@@ -1,0 +1,17 @@
+{#
+  Despachante de blocos do tema atelie. A lista é literal: o tipo vindo do banco nunca
+  monta um caminho de arquivo que não esteja aqui. Os de largura inteira desenham a própria
+  faixa; os demais ficam na coluna central (at-wrap).
+#}
+{% set t = block.type %}
+{% set tipos = ['text_image', 'text_only', 'gallery', 'newsletter', 'stats', 'news_call', 'map', 'sub_categories', 'page_list', 'blurbs4', 'testimonials', 'partner_logos', 'banner', 'team', 'contact', 'hero_split', 'highlights', 'portfolio', 'statement', 'steps', 'cta', 'video', 'blog_posts'] %}
+{% set larguraTotal = ['banner', 'statement', 'cta', 'steps'] %}
+{% if t in tipos and not (t == 'newsletter' and not (currentTenant.newsletterEnabled ?? false)) %}
+    {% if t in larguraTotal %}
+        {% include 'themes/atelie/blocks/_' ~ t ~ '.html.twig' %}
+    {% else %}
+        <div class="at-wrap at-block at-block--{{ t|replace({'_': '-'}) }}">
+            {% include 'themes/atelie/blocks/_' ~ t ~ '.html.twig' %}
+        </div>
+    {% endif %}
+{% endif %}

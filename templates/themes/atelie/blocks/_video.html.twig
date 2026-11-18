@@ -1,0 +1,31 @@
+{# Vídeo (video): YouTube pelo link (player só perto da tela) ou MP4 enviado, com texto ao lado. #}
+{% set cfg = block.config ?? {} %}
+{% set mp4 = cfg.videoFile ?? null %}
+{% set yt = mp4 ? null : (block.embedUrl|youtube_id) %}
+{% set vertical = (cfg.orientation ?? 'horizontal') == 'vertical' %}
+{% set temTexto = block.title or block.text or block.preTitle %}
+{% if mp4 or yt or temTexto %}
+<div class="at-media{{ not (temTexto and (mp4 or yt)) ? ' at-media--solo' }}{{ (cfg.videoPosition ?? 'right') == 'left' ? ' at-media--left' }}">
+    {% if temTexto %}
+    <div class="at-media-copy" data-aos="fade-up">
+        {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+        {% if block.title %}<h2 class="at-h2">{{ block.title }}</h2>{% endif %}
+        {% if block.text %}<p class="at-text">{{ block.text|nl2br }}</p>{% endif %}
+        {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}<p style="margin-top:28px"><a class="at-btn at-btn-primary" href="{{ cfg.ctaLink }}">{{ cfg.ctaText }} <span class="at-arrow" aria-hidden="true">↗</span></a></p>{% endif %}
+    </div>
+    {% endif %}
+    {% if mp4 or yt %}
+    <div class="at-media-frame {{ vertical ? 'at-media-frame--v' : 'at-media-frame--h' }}">
+        {% if mp4 %}
+            <video playsinline preload="none"{% if (cfg.autoplay ?? '') == '1' %} muted loop data-tocar-perto{% else %} controls{% endif %}{% if block.image %} poster="{{ ('uploads/page_block/' ~ block.image)|thumb('bloco_imagem') }}"{% endif %} aria-label="{{ block.title ?: 'Vídeo' }}">
+                <source src="{{ asset('uploads/page_block_video/' ~ mp4) }}" type="video/mp4">
+            </video>
+        {% else %}
+            <iframe data-adiada="https://www.youtube-nocookie.com/embed/{{ yt|e('url') }}" title="Vídeo: {{ block.title ?: 'YouTube' }}" loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}

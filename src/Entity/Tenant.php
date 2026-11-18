@@ -334,6 +334,9 @@ class Tenant
             'topBarLeft'      => [],
             'topBarRight'     => [],
             'customMenuItems' => [],
+            'headerCtaLabel'  => '',
+            'headerCtaUrl'    => '',
+            'headerTagline'   => '',
         ];
 
         return array_merge($defaults, $this->navigationSettings ?? []);

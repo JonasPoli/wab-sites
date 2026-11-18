@@ -1,0 +1,12 @@
+{# Logos de parceiros/clientes (partner_logos): grade de logos em tons neutros. #}
+{% set logos = block.partnerLogos %}
+{% if logos|length > 0 %}
+{% set cols = (block.config.columns ?? 6)|default(6) %}
+{% include 'themes/atelie/blocks/_head.html.twig' %}
+<div class="at-logos" style="--at-cols:{{ cols > 6 ? 6 : (cols < 2 ? 2 : cols) }}" data-aos="fade-up">
+    {% for logo in logos %}
+        {% set imagem %}<img {{ ('uploads/partner_logo/' ~ logo.logoFilename)|thumb_attrs('logo_parceiro') }} alt="{{ logo.name ?: 'Logo ' ~ loop.index }}" loading="lazy" decoding="async">{% endset %}
+        {% if logo.url %}<a href="{{ logo.url }}" target="_blank" rel="noopener noreferrer">{{ imagem }}</a>{% else %}<div>{{ imagem }}</div>{% endif %}
+    {% endfor %}
+</div>
+{% endif %}

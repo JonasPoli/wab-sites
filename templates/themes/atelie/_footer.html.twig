@@ -1,0 +1,70 @@
+{#
+  Rodapé do tema atelie: nome e texto curto do site, endereço e horários, contatos e redes,
+  newsletter (quando ligada), páginas do rodapé e crédito da WAB. Dado ausente não aparece.
+#}
+{% set t = currentTenant %}
+<footer class="at-footer">
+    <div class="at-wrap">
+        <div class="at-footer-grid">
+            <div>
+                {% if t and t.logo %}
+                    <div class="at-footer-logo"><img {{ ('uploads/tenant/' ~ (t.darkLogo ? 'dark_logo/' ~ t.darkLogo : 'logo/' ~ t.logo))|thumb_attrs('logo_site') }} alt="{{ t.name }}" loading="lazy" decoding="async"></div>
+                {% endif %}
+                <h2>{{ t ? t.name : '' }}</h2>
+                {% if t and t.aboutText %}{% set sobre = t.aboutText|striptags|trim %}<p>{{ sobre|length > 220 ? sobre|slice(0, 217)|trim ~ '…' : sobre }}</p>{% endif %}
+                {% set redes = [
+                    {url: t ? t.instagramLink : null, icone: 'fa6-brands:instagram', nome: 'Instagram'},
+                    {url: t ? t.facebookLink : null, icone: 'fa6-brands:facebook-f', nome: 'Facebook'},
+                    {url: t ? t.whatsappLink : null, icone: 'fa6-brands:whatsapp', nome: 'WhatsApp'},
+                    {url: t ? t.youtubeLink : null, icone: 'fa6-brands:youtube', nome: 'YouTube'},
+                    {url: t ? t.linkedinLink : null, icone: 'fa6-brands:linkedin-in', nome: 'LinkedIn'},
+                ]|filter(r => r.url) %}
+                {% if redes|length %}
+                <div class="at-social">
+                    {% for r in redes %}<a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ r.nome }}">{{ ux_icon(r.icone, {'aria-hidden': 'true'}) }}</a>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div>
+                {% if t and t.address %}
+                    <h2>Endereço</h2>
+                    <p>{{ t.address|nl2br }}</p>
+                {% endif %}
+                {% if t and t.openingHours|length %}
+                    <h2 style="margin-top:18px">Horário</h2>
+                    <ul>{% for h in t.openingHours %}<li>{{ h.days }} {{ h.hours }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+            <div>
+                <h2>Contato</h2>
+                <ul>
+                    {% if t and t.phone %}<li><a href="tel:{{ t.phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ t.phone }}</a></li>{% endif %}
+                    {% if t and t.contactEmail %}<li><a href="mailto:{{ t.contactEmail }}">{{ t.contactEmail }}</a></li>{% endif %}
+                    {% if t and t.whatsappLink %}<li><a href="{{ t.whatsappLink }}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>{% endif %}
+                </ul>
+            </div>
+            <div>
+                {% if t and t.newsletterEnabled %}
+                    <h2>Fique por dentro</h2>
+                    <p>Receba nossas novidades por e-mail.</p>
+                    <form action="{{ path('pub_newsletter_subscribe') }}" method="post" class="at-footer-news">
+                        <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
+                        <label for="at-news-email" class="at-sr">Seu e-mail</label>
+                        <input type="email" id="at-news-email" name="email" class="at-input" placeholder="Seu e-mail" required autocomplete="email">
+                        <button type="submit" class="at-btn at-btn-primary" style="min-height:46px">Inscrever</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% if footerPages is defined and footerPages|length %}
+            <nav class="at-footer-pages" aria-label="Páginas">
+                {% for p in footerPages %}<a href="{{ path('pub_page_show', {slug: p.slug}) }}">{{ p.title }}</a>{% endfor %}
+                {% if t and t.hasBlog %}<a href="{{ path('pub_blog') }}">Blog</a>{% endif %}
+            </nav>
+        {% endif %}
+        <div class="at-footer-bottom">
+            <span>© {{ 'now'|date('Y') }} {{ t ? t.name : '' }}</span>
+            <span>Desenvolvido por <a href="https://wab.com.br" target="_blank" rel="noopener">wab.com.br</a></span>
+        </div>
+    </div>
+</footer>

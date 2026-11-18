@@ -1,0 +1,16 @@
+{% extends 'themes/atelie/base.html.twig' %}
+
+{% block body %}
+{% if page.showTitle ?? true %}
+<header class="at-page-head">
+    <div class="at-wrap">
+        <nav class="at-breadcrumb" aria-label="Você está em">
+            <a href="{{ path('pub_home') }}">Início</a>
+            {% if page.category %}<span aria-hidden="true">/</span><a href="{{ path('pub_category', {slug: page.category.slug}) }}">{{ page.category.name }}</a>{% endif %}
+        </nav>
+        <h1>{{ page.title }}</h1>
+    </div>
+</header>
+{% endif %}
+{% include 'themes/atelie/_sections.html.twig' with {sections: page.sections} %}
+{% endblock %}

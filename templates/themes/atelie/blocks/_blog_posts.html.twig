@@ -1,0 +1,9 @@
+{# Últimas do blog (blog_posts). Sem blog (e fora do portal) ou sem post, não desenha nada. #}
+{% set posts = latest_articles(block.itemCount ?? 3, block.relatedCategory) %}
+{% if posts|length > 0 %}
+{% include 'themes/atelie/blocks/_head.html.twig' %}
+<div class="at-cards">
+    {% for article in posts %}{% include 'themes/atelie/blog/_card.html.twig' %}{% endfor %}
+</div>
+<div class="at-more"><a class="at-btn at-btn-outline" href="{{ articles_url(block.relatedCategory) }}">{{ (block.config.ctaText ?? '') ?: 'Ver todos os posts' }} <span class="at-arrow" aria-hidden="true">↗</span></a></div>
+{% endif %}

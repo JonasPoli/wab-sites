@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{#
+  Tema atelie (tema-atelie): editorial, fundo claro, Manrope nos títulos e DM Sans no texto,
+  cantos retos. Só modo claro: ignora o modo escuro salvo pelos outros temas.
+  O <head> segue o do cetec (pré-carga do LCP, app.css, SEO, cores do site, fontes locais).
+#}
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Pré-carga da imagem do topo antes de tudo (ver cetec/base.html.twig) #}
+    {% set arquivoDoLcp = imagem_do_lcp(_context) %}
+    {% set lcp = filtros_do_lcp(_context, '(min-width: 721px) 58vw, 100vw') %}
+    {% if arquivoDoLcp %}
+        <link rel="preload" as="image" fetchpriority="high"
+              imagesrcset="{{ arquivoDoLcp|thumb_srcset(lcp.filtros) }}"
+              imagesizes="{{ lcp.sizes }}">
+    {% endif %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% include 'pub/_seo_head.html.twig' %}
+    {% if currentTenant and currentTenant.favicon %}
+        <link rel="icon" href="{{ ('uploads/tenant/favicon/' ~ currentTenant.favicon)|thumb('favicon_site') }}" sizes="64x64">
+    {% endif %}
+    {{ tenant_css_vars()|raw }}
+    {% set usaCarrossel = usa_carrossel(_context) %}
+    {% for arquivo in tenant_fontes()|slice(0, 1) %}
+        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ asset(arquivo) }}">
+    {% endfor %}
+    {% if usaCarrossel %}
+        <link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}" media="print" onload="this.media='all';this.onload=null">
+        <noscript><link rel="stylesheet" href="{{ asset('bibliotecas/swiper/swiper-bundle.min.css') }}"></noscript>
+    {% endif %}
+    {% include 'themes/atelie/_styles.html.twig' %}
+    {% block stylesheets %}{% endblock %}
+    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ currentTenant.googleAnalyticsId|e('js') }}');
+    </script>
+    {% endif %}
+</head>
+{% set fundo1 = currentTenant ? (currentTenant.bgColorLight1 ?? '') : '' %}
+{% set fundo2 = currentTenant ? (currentTenant.bgColorLight2 ?? '') : '' %}
+{% if not (fundo1 matches '/^#[0-9a-fA-F]{3,8}$/') %}{% set fundo1 = '#f7f5f0' %}{% endif %}
+{% if not (fundo2 matches '/^#[0-9a-fA-F]{3,8}$/') %}{% set fundo2 = '#ebe6dc' %}{% endif %}
+<body class="at-root" style="--at-bg:{{ fundo1 }};--at-bg2:{{ fundo2 }}">
+    <a href="#conteudo" class="at-sr">Pular para o conteúdo</a>
+    {% include 'themes/atelie/_header.html.twig' %}
+
+    <main id="conteudo">
+        {% for msg in app.flashes('success') %}
+            <div class="at-wrap"><div class="at-flash at-flash--ok" role="status">{{ msg }}</div></div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="at-wrap"><div class="at-flash at-flash--erro" role="alert">{{ msg }}</div></div>
+        {% endfor %}
+        {% block body %}{% endblock %}
+    </main>
+
+    {% include 'themes/atelie/_footer.html.twig' %}
+
+    {% if currentTenant and currentTenant.whatsappLink %}
+        <a href="{{ currentTenant.whatsappLink }}" class="at-float-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp">
+            {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }} WhatsApp
+        </a>
+    {% endif %}
+
+    {% if usaCarrossel %}
+        <script src="{{ asset('carrossel.js') }}" defer data-swiper="{{ asset('bibliotecas/swiper/swiper-bundle.min.js') }}"></script>
+    {% endif %}
+    <script src="{{ asset('animacoes.js') }}" defer></script>
+    <script src="{{ asset('imagens-adiadas.js') }}" defer></script>
+    <script>
+    (function () {
+        var botao = document.getElementById('at-menu-toggle');
+        var menu = document.getElementById('at-links');
+        if (!botao || !menu) return;
+        function fechar() { menu.classList.remove('is-aberto'); botao.setAttribute('aria-expanded', 'false'); botao.setAttribute('aria-label', 'Abrir menu'); }
+        botao.addEventListener('click', function () {
+            var aberto = menu.classList.toggle('is-aberto');
+            botao.setAttribute('aria-expanded', String(aberto));
+            botao.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+        });
+        Array.prototype.forEach.call(menu.querySelectorAll('a'), function (a) { a.addEventListener('click', fechar); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
+    })();
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

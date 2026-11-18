@@ -1,0 +1,11 @@
+{# Apenas Texto (text_only): o texto é HTML do editor do painel. #}
+{% if block.title or block.text or block.preTitle %}
+{% set cfg = block.config ?? {} %}
+{% set largura = (cfg.maxWidth ?? 'full') == 'narrow' ? '640px' : '820px' %}
+<div style="max-width:{{ largura }};{{ (cfg.textAlign ?? 'left') == 'center' ? 'margin-inline:auto;text-align:center' }}" data-aos="fade-up">
+    {% if block.preTitle %}<p class="at-eyebrow"{% if (cfg.textAlign ?? 'left') == 'center' %} style="justify-content:center"{% endif %}>{{ block.preTitle }}</p>{% endif %}
+    {% if block.title %}<h2 class="at-h2" style="margin:14px 0 22px">{{ block.title }}</h2>{% endif %}
+    {% if block.text %}<div class="at-rich">{{ block.text|raw }}</div>{% endif %}
+    {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}<p style="margin-top:28px"><a class="at-btn at-btn-primary" href="{{ cfg.ctaLink }}">{{ cfg.ctaText }} <span class="at-arrow" aria-hidden="true">↗</span></a></p>{% endif %}
+</div>
+{% endif %}

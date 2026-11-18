@@ -1,0 +1,23 @@
+{# Manifesto com imagem (statement) — ".statement" do layout de referência, de largura inteira. #}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text or block.image %}
+<div class="at-statement mp-section-dark{{ (cfg.imagePosition ?? 'right') == 'left' ? ' at-statement--left' }}">
+    <div class="at-statement-grid{{ block.image ? '' : ' at-statement-grid--solo' }}">
+        <div class="at-statement-text" data-aos="fade-up">
+            {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+            {% if block.title %}<h2 class="at-h2">{{ block.title }}</h2>{% endif %}
+            {% if block.text %}<div class="at-statement-body">{{ block.text|nl2br }}</div>{% endif %}
+            {% if cfg.statNumber ?? null %}
+            <div class="at-stat"><strong>{{ cfg.statNumber }}</strong>{% if cfg.statLabel ?? null %}<span>{{ cfg.statLabel }}</span>{% endif %}</div>
+            {% endif %}
+        </div>
+        {% if block.image %}
+        {% set arquivo = 'uploads/page_block/' ~ block.image %}
+        <picture class="at-statement-image">
+            <source media="(max-width: 767px)" srcset="{{ arquivo|thumb('destaque_foto_mobile') }}">
+            <img {{ arquivo|thumb_attrs('destaque_foto') }} alt="{{ block.title }}" loading="lazy" decoding="async">
+        </picture>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

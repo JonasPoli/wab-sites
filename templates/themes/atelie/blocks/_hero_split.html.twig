@@ -1,0 +1,42 @@
+{# Destaque com foto (hero_split) — ".hero" do layout de referência. #}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text or block.image %}
+{% set alvo = page is defined ? page : (category is defined ? category : null) %}
+{% set primeiraSecao = alvo ? (alvo.sections|filter(s => s.active)|first) : null %}
+{% set ehPrimeiro = primeiraSecao and primeiraSecao.blocks|length > 0 and (primeiraSecao.blocks|first).id == block.id %}
+{% set tag = (ehPrimeiro and page is defined and not (page.showTitle ?? true)) ? 'h1' : 'h2' %}
+{% set destaque = cfg.titleHighlight ?? '' %}
+<div class="at-hero">
+    <div class="at-hero-grid{{ block.image ? '' : ' at-hero-grid--solo' }}">
+        <div class="at-hero-copy">
+            {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+            {% if block.title %}
+            <{{ tag }} class="at-hero-title">
+                {%- if destaque and destaque in block.title -%}
+                    {%- set partes = block.title|split(destaque, 2) -%}
+                    {{ partes[0] }}<em>{{ destaque }}</em>{{ partes[1] }}
+                {%- else -%}{{ block.title }}{%- endif -%}
+            </{{ tag }}>
+            {% endif %}
+            {% if block.text %}<p class="at-lead">{{ block.text|nl2br }}</p>{% endif %}
+            {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+                <a class="at-btn at-btn-primary" href="{{ cfg.ctaLink }}">{{ cfg.ctaText }} <span class="at-arrow" aria-hidden="true">↗</span></a>
+            {% endif %}
+        </div>
+        {% if block.image %}
+        {% set arquivo = 'uploads/page_block/' ~ block.image %}
+        <figure class="at-hero-photo">
+            <img {{ arquivo|thumb_attrs('destaque_foto') }}
+                 srcset="{{ arquivo|thumb_srcset({'destaque_foto_mobile': 800, 'destaque_foto': 1400}) }}"
+                 sizes="(min-width: 721px) 58vw, 100vw"
+                 alt="{{ cfg.caption ?? block.title }}"
+                 {% if ehPrimeiro %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+            {% if cfg.stampNumber ?? null %}
+                <div class="at-hero-stamp"><strong>{{ cfg.stampNumber }}</strong>{{ cfg.stampLabel ?? '' }}</div>
+            {% endif %}
+            {% if cfg.caption ?? null %}<figcaption class="at-hero-caption">{{ cfg.caption }}</figcaption>{% endif %}
+        </figure>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

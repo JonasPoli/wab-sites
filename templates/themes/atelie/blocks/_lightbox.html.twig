@@ -1,0 +1,49 @@
+{# Visualizador de fotos do tema atelie, criado uma vez por página (links com data-lightbox="<grupo>"). #}
+<script>
+(function () {
+    if (window.atLightbox) return;
+    window.atLightbox = true;
+    var caixa, img, grupo = [], atual = 0, origem = null;
+    function montar() {
+        caixa = document.createElement('div');
+        caixa.className = 'at-lightbox';
+        caixa.setAttribute('role', 'dialog');
+        caixa.setAttribute('aria-modal', 'true');
+        caixa.setAttribute('aria-label', 'Foto ampliada');
+        caixa.innerHTML = '<img alt=""><button type="button" class="at-lb-fechar" aria-label="Fechar">×</button><button type="button" class="at-lb-ant" aria-label="Foto anterior">‹</button><button type="button" class="at-lb-prox" aria-label="Próxima foto">›</button>';
+        document.body.appendChild(caixa);
+        img = caixa.querySelector('img');
+        caixa.querySelector('.at-lb-fechar').addEventListener('click', fechar);
+        caixa.querySelector('.at-lb-ant').addEventListener('click', function () { mostrar(atual - 1); });
+        caixa.querySelector('.at-lb-prox').addEventListener('click', function () { mostrar(atual + 1); });
+        caixa.addEventListener('click', function (e) { if (e.target === caixa) fechar(); });
+        document.addEventListener('keydown', function (e) {
+            if (!caixa.classList.contains('is-aberto')) return;
+            if (e.key === 'Escape') fechar();
+            if (e.key === 'ArrowLeft') mostrar(atual - 1);
+            if (e.key === 'ArrowRight') mostrar(atual + 1);
+        });
+    }
+    function visiveis(nome) {
+        return Array.prototype.filter.call(document.querySelectorAll('[data-lightbox="' + nome + '"]'), function (a) { return a.offsetParent !== null; });
+    }
+    function mostrar(i) {
+        if (!grupo.length) return;
+        atual = (i + grupo.length) % grupo.length;
+        img.src = grupo[atual].getAttribute('href');
+        img.alt = (grupo[atual].closest('figure') || grupo[atual]).querySelector('img') ? (grupo[atual].closest('figure') || grupo[atual]).querySelector('img').alt : '';
+    }
+    function fechar() { caixa.classList.remove('is-aberto'); img.removeAttribute('src'); if (origem) origem.focus(); }
+    document.addEventListener('click', function (e) {
+        var link = e.target.closest ? e.target.closest('[data-lightbox]') : null;
+        if (!link) return;
+        e.preventDefault();
+        if (!caixa) montar();
+        origem = link;
+        grupo = visiveis(link.getAttribute('data-lightbox'));
+        caixa.classList.add('is-aberto');
+        mostrar(grupo.indexOf(link));
+        caixa.querySelector('.at-lb-fechar').focus();
+    });
+})();
+</script>

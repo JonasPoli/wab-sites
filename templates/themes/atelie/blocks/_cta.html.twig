@@ -1,0 +1,16 @@
+{# Chamada para ação (cta) — ".final-cta" do layout de referência, de largura inteira. #}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text %}
+<div class="at-final-cta">
+    <div class="at-wrap at-cta-grid">
+        <div>
+            {% if block.preTitle %}<small>{{ block.preTitle }}</small>{% endif %}
+            {% if block.title %}<h2>{{ block.title }}</h2>{% endif %}
+            {% if block.text %}<p>{{ block.text }}</p>{% endif %}
+        </div>
+        {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+            <a class="at-btn at-btn-light" href="{{ cfg.ctaLink }}"{% if (cfg.ctaNewTab ?? '') == '1' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ cfg.ctaText }} <span class="at-arrow" aria-hidden="true">↗</span></a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

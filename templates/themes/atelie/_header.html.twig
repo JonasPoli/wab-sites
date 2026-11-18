@@ -1,0 +1,89 @@
+{#
+  Cabeçalho do tema atelie: barra superior (themes/_topbar), logo + nome + frase do site,
+  menu e botão de ação (navigationSettings.headerCtaLabel / headerCtaUrl).
+  Menu: no Modo Landing Page com home, as seções da home; senão, Início, categorias com
+  conteúdo (com submenu), páginas marcadas para o cabeçalho e itens personalizados.
+#}
+{% include 'themes/_topbar.html.twig' %}
+{% set nav = currentTenant ? (currentTenant.navigationSettings ?? {}) : {} %}
+{% set customMenuItems = nav.customMenuItems ?? [] %}
+{% set ctaRotulo = nav.headerCtaLabel ?? '' %}
+{% set ctaUrl = nav.headerCtaUrl ?? '' %}
+{% set frase = nav.headerTagline ?? '' %}
+{% set rota = app.request.attributes.get('_route') %}
+<header class="at-header">
+    <div class="at-wrap at-nav">
+        <a class="at-logo" href="{{ path('pub_home') }}" aria-label="{{ currentTenant ? currentTenant.name : 'Início' }} — página inicial">
+            {% if currentTenant and currentTenant.logo %}
+                <img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="" decoding="async">
+            {% endif %}
+            <span class="at-logo-words">
+                <strong>{{ currentTenant ? currentTenant.name : '' }}</strong>
+                {% if frase %}<small>{{ frase }}</small>{% endif %}
+            </span>
+        </a>
+
+        <button type="button" class="at-menu-toggle" id="at-menu-toggle" aria-controls="at-links" aria-expanded="false" aria-label="Abrir menu">{{ ux_icon('bi:list', {'aria-hidden': 'true', width: 28, height: 28}) }}</button>
+
+        <nav class="at-links" id="at-links" aria-label="Navegação principal">
+            {% if currentTenant and currentTenant.landingPageMode and currentTenant.homePage %}
+                {% set prefixo = rota == 'pub_home' ? '' : path('pub_home') %}
+                {% set blogNoMenu = false %}
+                {% for section in currentTenant.homePage.sections %}
+                    {% if section.active and (section.showInMenu ?? true) %}
+                        {% set rotulo = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
+                        {% if rotulo == '' %}
+                            {% set primeiro = section.blocks|first %}
+                            {% set rotulos = {banner: 'Início', hero_split: 'Início', blurbs4: 'Recursos', team: 'Equipe', statement: 'Sobre', contact: 'Contato', cta: 'Contato', gallery: 'Portfólio', portfolio: 'Portfólio', steps: 'Como trabalhamos', highlights: 'Diferenciais', video: 'Vídeo', blog_posts: 'Blog'} %}
+                            {% set rotulo = primeiro ? (rotulos[primeiro.type] ?? '') : '' %}
+                            {% if rotulo == '' %}{% set rotulo = 'Seção ' ~ loop.index %}{% endif %}
+                        {% endif %}
+                        {% if (section.blocks|first) and (section.blocks|first).type == 'blog_posts' and currentTenant.hasBlog %}
+                            {% set blogNoMenu = true %}
+                            <a href="{{ path('pub_blog') }}" {{ rota starts with 'pub_blog' ? 'aria-current="page"' }}>{{ rotulo }}</a>
+                        {% else %}
+                            <a href="{{ prefixo }}#section-{{ section.id }}">{{ rotulo }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% if currentTenant.hasBlog and not blogNoMenu %}
+                    <a href="{{ path('pub_blog') }}" {{ rota starts with 'pub_blog' ? 'aria-current="page"' }}>Blog</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ path('pub_home') }}" {{ rota == 'pub_home' ? 'aria-current="page"' }}>Início</a>
+                {% for cat in headerCategories ?? [] %}
+                    {% set filhas = cat.children|filter(s => s.pages|length > 0) %}
+                    {% if filhas|length > 0 %}
+                        <div class="at-dd">
+                            <button type="button" aria-haspopup="true">{{ cat.name }} {{ ux_icon('bi:chevron-right', {'aria-hidden': 'true', width: 12, height: 12, style: 'transform:rotate(90deg)'}) }}</button>
+                            <div class="at-dd-menu">
+                                {% if cat.pages|length > 0 %}<a href="{{ path('pub_category', {slug: cat.slug}) }}">{{ cat.name }}</a>{% endif %}
+                                {% for sub in filhas %}<a href="{{ path('pub_category', {slug: sub.slug}) }}">{{ sub.name }}</a>{% endfor %}
+                            </div>
+                        </div>
+                    {% elseif cat.pages|length > 0 %}
+                        <a href="{{ path('pub_category', {slug: cat.slug}) }}">{{ cat.name }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% for p in news_menu_pages() %}
+                    {% if not (currentTenant.homePage and currentTenant.homePage.id == p.id) %}
+                        <a href="{{ path('pub_page_show', {slug: p.slug}) }}">{{ p.title }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if currentTenant and currentTenant.hasBlog %}
+                    <a href="{{ path('pub_blog') }}" {{ rota starts with 'pub_blog' ? 'aria-current="page"' }}>Blog</a>
+                {% endif %}
+            {% endif %}
+            {% for item in customMenuItems %}
+                {% if item.active and item.url %}
+                    <a href="{{ item.url }}"{% if item.target == '_blank' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.label }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if ctaRotulo and ctaUrl %}
+                {% set externo = ctaUrl starts with 'http' %}
+                {% set destino = (ctaUrl starts with '#' and rota != 'pub_home') ? path('pub_home') ~ ctaUrl : ctaUrl %}
+                <a class="at-btn at-btn-primary" href="{{ destino }}"{% if externo %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ ctaRotulo }} <span class="at-arrow" aria-hidden="true">↗</span></a>
+            {% endif %}
+        </nav>
+    </div>
+</header>

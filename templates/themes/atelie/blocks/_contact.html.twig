@@ -1,0 +1,60 @@
+{#
+  Formulário de contato (contact) no tema atelie. Mesmos campos, POST e proteção do cetec
+  (pub_contact_post + _contato_protecao); só a marcação muda.
+#}
+{% set tenant = currentTenant %}
+<div id="contato" class="at-contact">
+    <div data-aos="fade-up">
+        {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+        <h2 class="at-h2" style="margin:14px 0 18px">{{ block.title ?: 'Fale conosco' }}</h2>
+        {% if block.text %}<div class="at-text">{{ block.text|raw }}</div>{% endif %}
+        <div class="at-contact-cards">
+            {% if tenant.whatsappLink %}
+            <a class="at-contact-card" href="{{ tenant.whatsappLink }}" target="_blank" rel="noopener noreferrer">{{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }}<span><strong>WhatsApp</strong><span>{{ tenant.phone ?: 'Clique para conversar' }}</span></span></a>
+            {% elseif tenant.phone %}
+            <a class="at-contact-card" href="tel:{{ tenant.phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ ux_icon('bi:telephone', {'aria-hidden': 'true'}) }}<span><strong>Telefone</strong><span>{{ tenant.phone }}</span></span></a>
+            {% endif %}
+            {% if tenant.address %}
+            {% set mapa = tenant.mapsEmbedUrl and not (tenant.mapsEmbedUrl starts with 'https://www.google.com/maps/embed') ? tenant.mapsEmbedUrl : 'https://www.google.com/maps/search/?api=1&query=' ~ tenant.address|striptags|url_encode %}
+            <a class="at-contact-card" href="{{ mapa }}" target="_blank" rel="noopener noreferrer">{{ ux_icon('bi:geo-alt', {'aria-hidden': 'true'}) }}<span><strong>Endereço</strong><span>{{ tenant.address|nl2br }}</span></span></a>
+            {% endif %}
+            {% if tenant.contactEmail %}
+            <a class="at-contact-card" href="mailto:{{ tenant.contactEmail }}">{{ ux_icon('bi:envelope', {'aria-hidden': 'true'}) }}<span><strong>E-mail</strong><span>{{ tenant.contactEmail }}</span></span></a>
+            {% endif %}
+            {% if tenant.openingHours is not empty %}
+            <div class="at-contact-card">{{ ux_icon('bi:clock-history', {'aria-hidden': 'true'}) }}<span><strong>Horário</strong>{% for h in tenant.openingHours %}<span>{{ h.days }} {{ h.hours }}</span>{% endfor %}</span></div>
+            {% endif %}
+        </div>
+    </div>
+    <form name="contato_publico" action="{{ path('pub_contact_post') }}" method="post" class="at-form" data-aos="fade-up">
+        <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
+        <div>
+            <label for="contato_publico_nome">Seu nome *</label>
+            <input type="text" id="contato_publico_nome" name="name" required class="at-input" autocomplete="name">
+        </div>
+        <div class="at-form-row">
+            <div>
+                <label for="contato_publico_telefone">WhatsApp com DDD</label>
+                <input type="tel" id="contato_publico_telefone" name="phone" class="at-input" autocomplete="tel">
+            </div>
+            <div>
+                <label for="contato_publico_email">Seu melhor e-mail *</label>
+                <input type="email" id="contato_publico_email" name="email" required class="at-input" autocomplete="email">
+            </div>
+        </div>
+        <div>
+            <label for="contato_publico_mensagem">Conte seu projeto *</label>
+            <textarea id="contato_publico_mensagem" name="message" required class="at-input" placeholder="{{ block.config.placeholder ?? 'Cidade, tipo de projeto, ambientes, medidas e prazo' }}"></textarea>
+        </div>
+        <div>
+            <button type="submit" class="at-btn at-btn-primary">{{ block.config.ctaText ?? 'Enviar mensagem' }} <span class="at-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <p class="at-note">{{ block.config.note ?? 'Usamos seus dados apenas para responder a esta mensagem.' }}</p>
+        {% include 'pub/_contato_protecao.html.twig' %}
+    </form>
+</div>
+{% if tenant.mapsEmbedUrl and tenant.mapsEmbedUrl starts with 'https://www.google.com/maps/embed' %}
+<div class="at-map">
+    <iframe data-adiada="{{ tenant.mapsEmbedUrl }}" title="Localização de {{ tenant.name }} no mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+</div>
+{% endif %}

@@ -1,0 +1,16 @@
+{#
+  Cabeçalho de bloco do tema atelie (o ".section-head" do layout de referência):
+  eyebrow + h2 à esquerda e texto curto à direita. Parâmetros: block, centro (opcional),
+  textoRico (opcional: o texto do bloco é HTML).
+#}
+{% if block.preTitle or block.title or block.text %}
+<div class="at-section-head{{ (centro ?? false) ? ' at-section-head--center' }}" data-aos="fade-up">
+    <div>
+        {% if block.preTitle %}<p class="at-eyebrow">{{ block.preTitle }}</p>{% endif %}
+        {% if block.title %}<h2 class="at-h2">{{ block.title }}</h2>{% endif %}
+    </div>
+    {% if block.text %}
+        {% if textoRico ?? false %}<div class="at-head-text">{{ block.text|raw }}</div>{% else %}<p>{{ block.text|nl2br }}</p>{% endif %}
+    {% endif %}
+</div>
+{% endif %}

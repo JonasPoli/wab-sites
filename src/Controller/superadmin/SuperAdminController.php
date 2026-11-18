@@ -779,6 +779,10 @@ class SuperAdminController extends AbstractController
             'topBarLeft'      => $topBarLeft,
             'topBarRight'     => $topBarRight,
             'customMenuItems' => $existingNav['customMenuItems'] ?? [],
+            // Editados só no /admin/settings: mantidos ao salvar pelo SuperAdmin
+            'headerCtaLabel'  => $existingNav['headerCtaLabel'] ?? '',
+            'headerCtaUrl'    => $existingNav['headerCtaUrl'] ?? '',
+            'headerTagline'   => $existingNav['headerTagline'] ?? '',
         ]);
 
         $fontSettings = [];
