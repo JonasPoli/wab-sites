@@ -11,7 +11,8 @@
             {% if article.category %}<a href="{{ articles_url(article.category) }}">{{ article.category.name }}</a>{% endif %}
             <time datetime="{{ article.publishedAt|date('Y-m-d') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time>
         </div>
-        <h3><a href="{{ url }}">{{ article.title }}</a></h3>
+        {% set nivel = nivel ?? 'h3' %}
+        <{{ nivel }} class="at-card-title"><a href="{{ url }}">{{ article.title }}</a></{{ nivel }}>
         {% if article.summary %}<p>{{ article.summary }}</p>{% endif %}
         <a href="{{ url }}" class="at-card-more" aria-label="Ler o post: {{ article.title }}">Ler mais <span class="at-arrow" aria-hidden="true">↗</span></a>
     </div>

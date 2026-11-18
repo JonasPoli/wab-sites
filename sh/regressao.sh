@@ -31,7 +31,7 @@ normalizar() {
     -e 's/-[A-Za-z0-9_-]{7}\.(css|js|woff2|svg|png)/-HASH.\1/g' \
     -e 's/^[[:space:]]+//' \
     -e 's#<lastmod>[^<]*</lastmod>#<lastmod>DATA</lastmod>#g' \
-    -e 's/([Hh])á ([0-9]+|N) (minuto|hora|segundo|dia)s?/\1á N \3/g' \
+    -e 's/([Hh])á ([0-9]+|N) (minuto|hora|segundo|dia|TEMPO)s?/\1á N TEMPO/g' \
     -e 's/^(date|set-cookie|x-debug-token[a-z-]*|x-request-id):.*$/\1: X/Ig' \
     -e 's/nonce="[^"]*"/nonce="N"/g' \
   | perl -0pe 's/<div id="sfwdt.*?(?=<\/body>)//s'   # barra de depuração do Symfony (só no dev)

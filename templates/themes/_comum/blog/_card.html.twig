@@ -17,9 +17,10 @@
             {% endif %}
             <time datetime="{{ article.publishedAt|date('Y-m-d') }}" class="text-gray-600 dark:text-gray-400">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time>
         </div>
-        <h3 class="text-lg font-bold leading-snug text-cetec-primary-text mb-2">
+        {% set nivel = nivel ?? 'h3' %}
+        <{{ nivel }} class="text-lg font-bold leading-snug text-cetec-primary-text mb-2">
             <a href="{{ url }}" class="hover:underline underline-offset-4">{{ article.title }}</a>
-        </h3>
+        </{{ nivel }}>
         {% if article.summary %}
             <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 mb-4">{{ article.summary }}</p>
         {% endif %}
