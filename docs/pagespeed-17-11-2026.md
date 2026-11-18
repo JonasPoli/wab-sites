@@ -84,6 +84,43 @@ miniaturas, que já estava configurada no projeto.
   `@import` dentro de um `<style>` em linha.
 - `/favicon.ico` respondia 404 em todos os domínios.
 
+## Notas depois (medição controlada, celular / computador)
+
+| Domínio | Celular | Computador |
+|---|---|---|
+| ajope.wab.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| cemporcentoexpresso.com.br | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| imperiodainformatica.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| marapossi.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| pkwy.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| site.abifer.com.br | 100 / 100 / 100 / 100 | 99 / 100 / 100 / 100 |
+| site.petvida.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| site.topdrim.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+| site.transterraararaquara.com.br | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 |
+
+16 das 18 execuções deram 100 nas quatro categorias; duas deram 99 em desempenho.
+
+**Acessibilidade, Práticas recomendadas e SEO marcam 100 em todas as 18 execuções, de forma
+estável.** O desempenho é o único número que oscila.
+
+### Sobre a oscilação da nota de desempenho
+
+A nota de desempenho é uma estimativa, e o próprio PageSpeed avisa isso embaixo do medidor.
+Medindo a mesma página duas vezes seguidas, sem mudar nada no código, vimos:
+
+| Medição | Speed Index | Nota (celular) |
+|---|---|---|
+| imperiodainformatica.com.br, 1ª | 2,2 s | 99 |
+| imperiodainformatica.com.br, 2ª | 4,2 s | 95 |
+
+Por isso o que vale como prova é o conjunto de métricas, não um número isolado:
+
+- Tempo de resposta do servidor, medido nele mesmo: **37 ms**
+- Bloqueio total da linha principal (TBT): **0 ms** em todos
+- Deslocamento de layout (CLS): **0** em todos
+- CSS bloqueante: **um arquivo de 10,7 KB**
+- Requisições a domínio de terceiro no caminho de renderização: **nenhuma**
+
 ## O que foi feito
 
 Ver a change `seo-e-performance-dos-sites` no OpenSpec e a seção

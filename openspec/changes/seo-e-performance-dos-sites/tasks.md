@@ -37,7 +37,7 @@
 
 - [x] 5.1 Criar o comando `app:fontes:sincronizar` que baixa os `woff2` das 6 famílias de `HeadingFonts` para `assets/fonts/` e gera `assets/styles/fontes.css` com `@font-face` e `font-display: swap`; rodar e verificar que as 6 famílias têm arquivo
 - [x] 5.2 Tirar o `@import` do Google Fonts do `tenant_css_vars()` e carregar `fontes.css`; dar `preload` só nas famílias que o tenant usa; verificar com `curl` numa home local que não há requisição para `fonts.googleapis.com` nem `fonts.gstatic.com`
-- [ ] 5.3 Conferir nos quatro temas que os títulos continuam com a família, o peso e o tamanho gravados no tenant, inclusive a Open Sans do tema `noticias`; verificar comparando a home do ajope local antes e depois
+- [x] 5.3 Conferir nos quatro temas que os títulos continuam com a família, o peso e o tamanho gravados no tenant, inclusive a Open Sans do tema `noticias`; verificar comparando a home do ajope local antes e depois
 
 ## 6. Carrossel local e animação sem biblioteca
 
@@ -72,8 +72,8 @@
 
 - [x] 10.1 Rodar `vendor/bin/phpunit` inteiro e `openspec validate seo-e-performance-dos-sites --strict`, os dois sem erro
 - [x] 10.2 Conferir no ambiente local, nos três hosts, que as 9 páginas de referência (home, página institucional, categoria, notícia, editoria, listagem, autor, busca e cadastro de jornalista) abrem sem erro e com as metas certas
-- [ ] 10.3 Depois do deploy e do aquecimento, rodar `sh/medir-pagespeed.sh depois` e `sh/comparar-pagespeed.php`; verificar que os 9 domínios marcam 100 nas quatro categorias nos dois formatos, ou registrar o que ficou abaixo e por quê
-- [ ] 10.4 Confirmar no PageSpeed Insights oficial, com print, a home de cada um dos 9 domínios em celular e computador
+- [x] 10.3 Depois do deploy e do aquecimento, rodar `sh/medir-pagespeed.sh depois` e `sh/comparar-pagespeed.php`; verificar que os 9 domínios marcam 100 nas quatro categorias nos dois formatos, ou registrar o que ficou abaixo e por quê
+- [x] 10.4 Confirmar no PageSpeed Insights oficial, com print, a home de cada um dos 9 domínios em celular e computador
 
 ## Workflow follow-up
 
