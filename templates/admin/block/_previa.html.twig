@@ -1,0 +1,181 @@
+{#
+  Prévia do bloco (previa-do-bloco-no-painel). Variável: urlPrevia (rota admin_block_preview
+  com ?section= ou ?block=). Monta o FormData do formulário do bloco, troca cada campo de
+  texto vazio pelo nome público do campo, avisa quais campos de arquivo têm arquivo escolhido
+  (os arquivos não sobem) e mostra a resposta — o page.html.twig do tema — num iframe.
+#}
+<aside class="previa-bloco" id="previa-bloco" data-url="{{ urlPrevia }}" aria-label="Prévia do bloco">
+    <div class="previa-barra">
+        <strong><sl-icon name="eye"></sl-icon> Prévia</strong>
+        <span class="previa-estado" aria-live="polite"></span>
+        <div class="previa-modos" role="group" aria-label="Tamanho da tela">
+            <button type="button" class="btn btn-g btn-sm is-ativo" data-largura="1280" aria-pressed="true"><sl-icon name="display"></sl-icon> Computador</button>
+            <button type="button" class="btn btn-g btn-sm" data-largura="390" aria-pressed="false"><sl-icon name="phone"></sl-icon> Celular</button>
+            <button type="button" class="btn btn-g btn-sm" data-atualizar title="Atualizar a prévia"><sl-icon name="arrow-clockwise"></sl-icon></button>
+        </div>
+    </div>
+    <p class="previa-dica">Como o bloco vai ficar no site, com o tema atual. Campo vazio aparece com o nome do campo. Nada é salvo aqui.</p>
+    <div class="previa-caixa"><iframe title="Prévia do bloco" loading="eager"></iframe></div>
+</aside>
+<style>
+.bloco-editor{display:grid;grid-template-columns:1fr;gap:1.25rem;align-items:start}
+@media (min-width:1280px){.bloco-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.previa-bloco{position:sticky;top:1rem;max-height:calc(100vh - 2rem);overflow:auto}}
+.bloco-editor>.card{margin:0}
+.previa-bloco{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.previa-barra{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.previa-barra strong{display:inline-flex;align-items:center;gap:.4rem}
+.previa-estado{font-size:.75rem;color:var(--muted);flex:1}
+.previa-modos{display:flex;gap:.35rem}
+.previa-modos .is-ativo{border-color:var(--primary);color:var(--primary)}
+.previa-dica{font-size:.75rem;color:var(--muted);margin:.5rem 0 .75rem}
+.previa-caixa{position:relative;overflow:hidden;border-radius:8px;border:1px solid var(--border);background:#fff;min-height:160px}
+.previa-caixa iframe{display:block;border:0;transform-origin:0 0;background:#fff;height:600px}
+.previa-bloco.is-carregando .previa-caixa{opacity:.6;transition:opacity .2s}
+</style>
+<script>
+(function () {
+    var raiz = document.getElementById('previa-bloco');
+    var form = document.querySelector('.bloco-editor__form form');
+    if (!raiz || !form) return;
+    var iframe = raiz.querySelector('iframe');
+    var caixa = raiz.querySelector('.previa-caixa');
+    var estado = raiz.querySelector('.previa-estado');
+    var largura = 1280, espera = null, pedido = 0, urls = [];
+
+    // Nome público do campo: o <label> do .af-field (sem dicas), aria-label ou placeholder;
+    // num grupo repetido (cartão "Item 2", "Etapa 3"…), o nome do grupo vem antes.
+    function rotulo(el) {
+        var texto = el.getAttribute('aria-label') || '';
+        var campo = el.closest('.af-field');
+        if (!texto && campo) {
+            var l = campo.querySelector('label');
+            if (l) {
+                var c = l.cloneNode(true);
+                c.querySelectorAll('span, small, .af-hint, sl-icon').forEach(function (s) { s.remove(); });
+                texto = c.textContent.replace(/\*/g, '').replace(/\s+/g, ' ').trim();
+            }
+        }
+        if (!texto) texto = el.getAttribute('placeholder') || el.name;
+        var cartao = el.closest('.card');
+        if (cartao && !cartao.contains(form)) {
+            var cab = cartao.querySelector(':scope > div');
+            if (cab && cab.children.length === 0 && cab.textContent.trim().length < 40) texto = cab.textContent.trim() + ' — ' + texto;
+        }
+        return texto;
+    }
+
+    function dados() {
+        // Editor de texto rico: copia o HTML para o textarea do formulário
+        form.querySelectorAll('[id^="quill-"]').forEach(function (q) {
+            var t = document.getElementById(q.id.slice(6));
+            var ed = q.querySelector('.ql-editor');
+            if (t && ed) t.value = ed.innerHTML;
+        });
+        var fd = new FormData(form);
+        var arquivos = {};
+        form.querySelectorAll('input[type=file]').forEach(function (i) {
+            if (!i.name) return;
+            fd.delete(i.name);
+            if (i.files && i.files.length) arquivos[i.name] = (arquivos[i.name] || 0) + i.files.length;
+        });
+        Object.keys(arquivos).forEach(function (n) { fd.append('_previa_arquivos[' + n + ']', arquivos[n]); });
+        form.querySelectorAll('input, textarea').forEach(function (el) {
+            if (!el.name || el.disabled || el.closest('template')) return;
+            var tipo = (el.getAttribute('type') || 'text').toLowerCase();
+            if (el.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'search'].indexOf(tipo) === -1) return;
+            if (/(^_token$)|\[id\]$|\[slug\]$/.test(el.name)) return;
+            var vazio = el.tagName === 'TEXTAREA' && el.style.display === 'none'
+                ? /^(\s|<p>(<br>|\s|&nbsp;)*<\/p>)*$/.test(el.value)
+                : el.value.trim() === '';
+            if (vazio) fd.set(el.name, rotulo(el));
+        });
+        return fd;
+    }
+
+    function trocarArquivos(doc) {
+        urls.forEach(function (u) { URL.revokeObjectURL(u); });
+        urls = [];
+        var fila = {imagem: [], foto: [], logo: [], avatar: [], pessoa: []};
+        form.querySelectorAll('input[type=file]').forEach(function (i) {
+            var n = i.name || '';
+            var t = /galleryFiles/.test(n) ? 'foto' : /logo/i.test(n) ? 'logo' : /avatarFile/.test(n) ? 'avatar' : /^team\[/.test(n) ? 'pessoa' : /imageFile/.test(n) ? 'imagem' : null;
+            if (t && i.files) Array.prototype.forEach.call(i.files, function (f) { fila[t].push(f); });
+        });
+        var usados = {};
+        doc.querySelectorAll('img').forEach(function (img) {
+            var src = (img.getAttribute('src') || '') + ' ' + (img.getAttribute('data-adiada') || '');
+            var m = src.match(/previa-(imagem|foto|logo|avatar|pessoa)-arquivo/);
+            if (!m || !fila[m[1]].length) return;
+            usados[m[1]] = (usados[m[1]] === undefined ? 0 : usados[m[1]] + 1);
+            var f = fila[m[1]][Math.min(usados[m[1]], fila[m[1]].length - 1)];
+            var u = URL.createObjectURL(f);
+            urls.push(u);
+            ['srcset', 'data-adiada', 'data-adiada-srcset', 'sizes'].forEach(function (a) { img.removeAttribute(a); });
+            img.src = u;
+            var pic = img.closest('picture');
+            if (pic) pic.querySelectorAll('source').forEach(function (s) { s.remove(); });
+        });
+    }
+
+    function ajustar() {
+        var doc = iframe.contentDocument;
+        if (!doc || !doc.body) return;
+        iframe.style.width = largura + 'px';
+        iframe.style.height = '700px';
+        var altura = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight, 200);
+        iframe.style.height = altura + 'px';
+        var escala = Math.min(1, caixa.clientWidth / largura);
+        iframe.style.transform = 'scale(' + escala + ')';
+        iframe.style.marginLeft = largura * escala < caixa.clientWidth ? ((caixa.clientWidth - largura * escala) / 2) + 'px' : '0';
+        caixa.style.height = Math.ceil(altura * escala) + 'px';
+    }
+
+    function atualizar() {
+        var n = ++pedido;
+        raiz.classList.add('is-carregando');
+        estado.textContent = 'Atualizando…';
+        fetch(raiz.dataset.url, {method: 'POST', body: dados(), headers: {'X-Requested-With': 'XMLHttpRequest'}, credentials: 'same-origin'})
+            .then(function (r) { return r.text().then(function (h) { return {ok: r.ok, status: r.status, html: h}; }); })
+            .then(function (res) {
+                if (n !== pedido) return;
+                iframe.srcdoc = res.ok ? res.html : '<p style="font:14px sans-serif;padding:20px">Não foi possível montar a prévia (' + res.status + ').</p>';
+                estado.textContent = res.ok ? '' : 'Erro ' + res.status;
+            })
+            .catch(function () { estado.textContent = 'Sem conexão'; })
+            .finally(function () { if (n === pedido) raiz.classList.remove('is-carregando'); });
+    }
+
+    function agendar() {
+        clearTimeout(espera);
+        espera = setTimeout(atualizar, 500);
+    }
+
+    iframe.addEventListener('load', function () {
+        var doc = iframe.contentDocument;
+        if (!doc) return;
+        // Na prévia, nada navega nem envia
+        doc.addEventListener('click', function (e) { if (e.target.closest('a, button[type=submit], input[type=submit]')) e.preventDefault(); }, true);
+        doc.addEventListener('submit', function (e) { e.preventDefault(); }, true);
+        trocarArquivos(doc);
+        ajustar();
+        doc.querySelectorAll('img').forEach(function (img) { if (!img.complete) img.addEventListener('load', ajustar); });
+        setTimeout(ajustar, 500);
+        setTimeout(ajustar, 1500);
+    });
+
+    form.addEventListener('input', agendar);
+    form.addEventListener('change', agendar);
+    form.addEventListener('click', function (e) { if (e.target.closest('button[type=button]')) agendar(); });
+    raiz.querySelectorAll('[data-largura]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            largura = parseInt(b.dataset.largura, 10);
+            raiz.querySelectorAll('[data-largura]').forEach(function (x) { x.classList.toggle('is-ativo', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+            atualizar();
+        });
+    });
+    raiz.querySelector('[data-atualizar]').addEventListener('click', atualizar);
+    window.addEventListener('resize', ajustar);
+    // O editor de texto rico termina de montar depois do DOMContentLoaded
+    setTimeout(atualizar, 300);
+})();
+</script>

@@ -8,6 +8,7 @@
   meio da tela, que o botão OK fecha pelo próprio formulário do <dialog>.
 #}
 {% set avisos = [] %}
+{% if not (modoPrevia ?? false) %}
 {% for m in app.flashes('success')|merge(app.flashes('contact_s')) %}{% set avisos = avisos|merge([{ok: true, texto: m}]) %}{% endfor %}
 {% for m in app.flashes('error')|merge(app.flashes('contact_f')) %}{% set avisos = avisos|merge([{ok: false, texto: m}]) %}{% endfor %}
 {% if avisos|length > 0 %}
@@ -48,4 +49,5 @@
     aviso.addEventListener('click', function (e) { if (e.target === aviso) aviso.close(); });
 })();
 </script>
+{% endif %}
 {% endif %}

@@ -32,7 +32,7 @@
     {% endif %}
     {% include 'themes/atelie/_styles.html.twig' %}
     {% block stylesheets %}{% endblock %}
-    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    {% if currentTenant and currentTenant.googleAnalyticsId and not (modoPrevia ?? false) %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -48,7 +48,7 @@
 {% if not (fundo2 matches '/^#[0-9a-fA-F]{3,8}$/') %}{% set fundo2 = '#ebe6dc' %}{% endif %}
 <body class="at-root" style="--at-bg:{{ fundo1 }};--at-bg2:{{ fundo2 }}">
     <a href="#conteudo" class="at-sr">Pular para o conteúdo</a>
-    {% include 'themes/atelie/_header.html.twig' %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/atelie/_header.html.twig' %}{% endif %}
 
     <main id="conteudo">
         {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
@@ -56,9 +56,9 @@
         {% block body %}{% endblock %}
     </main>
 
-    {% include 'themes/atelie/_footer.html.twig' %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/atelie/_footer.html.twig' %}{% endif %}
 
-    {% if currentTenant and currentTenant.whatsappLink %}
+    {% if currentTenant and currentTenant.whatsappLink and not (modoPrevia ?? false) %}
         <a href="{{ currentTenant.whatsappLink }}" class="at-float-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp">
             {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }} WhatsApp
         </a>

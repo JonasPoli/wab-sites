@@ -185,7 +185,7 @@
     {% block stylesheets %}{% endblock %}
 
     {# ── Google Analytics (GA4) ── #}
-    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    {% if currentTenant and currentTenant.googleAnalyticsId and not (modoPrevia ?? false) %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -217,7 +217,7 @@
 </head>
 <body>
 
-{% include 'themes/moderno/_header.html.twig' %}
+{% if not (modoPrevia ?? false) %}{% include 'themes/moderno/_header.html.twig' %}{% endif %}
 
 <main>
     {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
@@ -225,7 +225,7 @@
     {% block body %}{% endblock %}
 </main>
 
-{% include 'themes/moderno/_footer.html.twig' %}
+{% if not (modoPrevia ?? false) %}{% include 'themes/moderno/_footer.html.twig' %}{% endif %}
 
 {% block javascripts %}
 <script>

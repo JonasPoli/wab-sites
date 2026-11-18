@@ -581,6 +581,29 @@ class AdminContentController extends AbstractController
         ]);
     }
 
+    /**
+     * Prévia do bloco (previa-do-bloco-no-painel): renderiza o `page.html.twig` do tema do site
+     * com uma página e uma seção em memória contendo só o bloco, a partir dos dados do
+     * formulário. Nada é gravado. `?section=` na criação, `?block=` na edição; os dois só
+     * acham conteúdo do site do domínio (404 nos outros).
+     */
+    #[Route('/block/previa', name: 'block_preview', methods: ['POST'])]
+    public function blockPreview(Request $r, TenantContext $tc, \App\Service\PreviaDoBloco $previa): Response
+    {
+        $salvo = $r->query->getInt('block') ? $this->blockOr404($r->query->getInt('block')) : null;
+        $secao = $salvo?->getSection() ?? $this->sectionOr404($r->query->getInt('section'));
+        $tenant = $tc->requireTenant();
+
+        $resposta = $this->render('themes/' . $tenant->getTheme() . '/page.html.twig', [
+            'page'       => $previa->montar($r, $tenant, $secao, $salvo),
+            'modoPrevia' => true,
+        ]);
+        $resposta->headers->set('Cache-Control', 'no-store');
+        $resposta->headers->set('X-Robots-Tag', 'noindex');
+
+        return $resposta;
+    }
+
     private function populateBlock(PageBlock $block, Request $r, EntityManagerInterface $em, CategoryRepository $cats): void
     {
         $type = $r->request->get('type', $block->getType() ?: 'text_image');

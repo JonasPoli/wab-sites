@@ -182,7 +182,7 @@
     {% block stylesheets %}{% endblock %}
 
     {# ── Google Analytics (GA4) ── #}
-    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    {% if currentTenant and currentTenant.googleAnalyticsId and not (modoPrevia ?? false) %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -194,7 +194,7 @@
 </head>
 <body>
 
-    {% include 'themes/cetec/_header.html.twig' %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/cetec/_header.html.twig' %}{% endif %}
 
     <main>
         {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
@@ -202,10 +202,10 @@
         {% block body %}{% endblock %}
     </main>
 
-    {% include 'themes/cetec/_footer.html.twig' %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/cetec/_footer.html.twig' %}{% endif %}
 
     <!-- WhatsApp Floating Dynamic -->
-    {% if currentTenant and currentTenant.whatsappLink %}
+    {% if currentTenant and currentTenant.whatsappLink and not (modoPrevia ?? false) %}
         <a href="{{ currentTenant.whatsappLink }}" target="_blank" rel="noopener"
            aria-label="Fale conosco pelo WhatsApp" class="whatsapp-float">
             {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }}

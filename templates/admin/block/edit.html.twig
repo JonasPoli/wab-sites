@@ -18,7 +18,8 @@
     </div>
     <a href="{{ path('admin_block_index', {sectionId: block.section.id}) }}" class="btn btn-g"><sl-icon name="arrow-left"></sl-icon> Voltar para Seção</a>
 </div>
-<div class="card">
+<div class="bloco-editor">
+<div class="card bloco-editor__form">
     {% include 'admin/block/_form_' ~ block.type ~ '.html.twig' with {
         block: block,
         section: block.section,
@@ -26,5 +27,7 @@
         categories: categories,
         pages: pages ?? []
     } %}
+</div>
+{% include 'admin/block/_previa.html.twig' with {urlPrevia: path('admin_block_preview', {block: block.id})} %}
 </div>
 {% endblock %}

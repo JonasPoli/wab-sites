@@ -227,7 +227,7 @@
     {% include 'themes/noticias/_news_styles.html.twig' %}
     {% block stylesheets %}{% endblock %}
 
-    {% if currentTenant and currentTenant.googleAnalyticsId %}
+    {% if currentTenant and currentTenant.googleAnalyticsId and not (modoPrevia ?? false) %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ currentTenant.googleAnalyticsId|e('html_attr') }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -240,7 +240,7 @@
 <body>
     <a class="nt-skip" href="#conteudo">Pular para o conteúdo</a>
 
-    {% include 'themes/noticias/_header.html.twig' with {header_section: block('header_section') is defined ? block('header_section')|trim : ''} %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/noticias/_header.html.twig' with {header_section: block('header_section') is defined ? block('header_section')|trim : ''} %}{% endif %}
 
     <main id="conteudo">
         {# Mensagens do site (contato, newsletter) numa janela com o fundo escurecido #}
@@ -248,7 +248,7 @@
         {% block body %}{% endblock %}
     </main>
 
-    {% include 'themes/noticias/_footer.html.twig' %}
+    {% if not (modoPrevia ?? false) %}{% include 'themes/noticias/_footer.html.twig' %}{% endif %}
     {% include 'themes/noticias/_theme_mode.html.twig' with {part: 'foot'} %}
 
     <script>
