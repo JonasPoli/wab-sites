@@ -69,6 +69,23 @@ O cadastro de notícias do portal também serve de **blog** em qualquer site com
 
 Trocar para o tema `noticias` um site com blog leva os posts para `/noticias/{slug}` e faz `/blog` responder 404.
 
+### Redirecionamentos de endereços antigos
+
+Em `/admin/redirecionamentos` (admin do site) cadastram-se pares "endereço antigo → endereço novo" do próprio site, respondidos com **301**. O `RedirecionamentoSubscriber` só age quando o pedido GET/HEAD daria **404**: uma página ou rota que existe nunca é desviada, e o 404 de sempre continua para quem não tem cadastro. O endereço antigo é comparado sem consulta e sem barra final (`App\Service\CaminhoNormalizado`); o novo precisa começar com `/` (nada de destino externo). A lista mostra quantas vezes cada um foi usado, e vai junto na exportação e na importação do site.
+
+### Importar um blog do WordPress
+
+```bash
+# simulação: mostra posts, categorias, capas e redirecionamentos, sem gravar nada
+php bin/console app:wordpress:importar pichoneri.wab.com.br https://www.marcenariapichoneri.com.br --simular
+
+# importação; --link troca links do próprio WordPress (e URLs soltas no texto) por um endereço novo
+php bin/console app:wordpress:importar pichoneri.wab.com.br https://www.marcenariapichoneri.com.br \
+    --link=/orcamento=/#contato --texto-link="peça seu orçamento"
+```
+
+Lê a API REST pública (`/wp-json/wp/v2`) e cria uma notícia por post publicado, com título, slug, data (horário de Brasília), primeira categoria, texto limpo (sem shortcodes do Divi nem incorporações, passado pelo mesmo sanitizador do painel), resumo de até 160 caracteres e capa (JPG/PNG; WebP vira JPG). Post sem texto entra como rascunho. Cria também os redirecionamentos `/AAAA/MM/DD/slug → /blog/slug` e `/category/slug → /blog/categoria/slug`. Pode ser rodado de novo: o que já existe é pulado. Não mexe no cadastro do site nem nas páginas. Depois de importar, abra alguns posts e, no servidor, rode `bin/console app:miniaturas:aquecer`.
+
 ### Injeção de Variáveis CSS (`TenantExtension`)
 A extensão de Twig `TenantExtension` expõe globals e funções utilitárias que integram as preferências do banco com o visual público:
 * **`tenant_css_vars()`**: Injeta dinamicamente no `<head>` um bloco `<style>` contendo propriedades personalizadas CSS (`--color-primary`, `--color-secondary` e suas versões RGB) baseadas nas cores de branding cadastradas no Tenant.

@@ -17,7 +17,10 @@
                 <a href="{{ articles_url(article.category) }}" class="inline-block bg-cetec-secondary/30 text-cetec-primary-text px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{{ article.category.name }}</a>
             {% endif %}
             <h1 class="text-3xl md:text-5xl font-black text-cetec-primary-text leading-tight mb-4">{{ article.title }}</h1>
-            {% if article.summary %}<p class="text-lg text-gray-600 dark:text-gray-300 mb-4">{{ article.summary }}</p>{% endif %}
+            {# O resumo some quando só repete o começo do texto (posts importados do WordPress) #}
+            {% set inicioDoTexto = article.body ? article.body|striptags|replace({"\n": ' '})|trim : '' %}
+            {% set resumoRepete = article.summary and inicioDoTexto starts with article.summary|slice(0, 40) %}
+            {% if article.summary and not resumoRepete %}<p class="text-lg text-gray-600 dark:text-gray-300 mb-4">{{ article.summary }}</p>{% endif %}
             <p class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-semibold">
                 {{ ux_icon('bi:calendar3', {'aria-hidden': 'true', class: 'w-3.5 h-3.5'}) }}
                 <time datetime="{{ article.publishedAt|date('c') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time>

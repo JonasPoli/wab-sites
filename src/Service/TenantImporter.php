@@ -21,6 +21,7 @@ use App\Entity\ResearchLine;
 use App\Entity\ContactFormField;
 use App\Entity\ContactMessage;
 use App\Entity\NewsletterSubscriber;
+use App\Entity\Redirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZipArchive;
@@ -529,6 +530,17 @@ class TenantImporter
                 $messagesImported++;
             }
             $this->logger->info('[TenantImporter] Mensagens de contato importadas.', ['count' => $messagesImported]);
+
+            // ── Redirecionamentos (ZIP antigo não traz a lista) ───────────
+            foreach ($data['redirects'] ?? [] as $rData) {
+                if (empty($rData['from']) || empty($rData['to'])) {
+                    continue;
+                }
+                $this->em->persist((new Redirect())->setTenant($tenant)
+                    ->setFromPath(\App\Service\CaminhoNormalizado::de((string) $rData['from']))
+                    ->setToPath((string) $rData['to'])
+                    ->setHits((int) ($rData['hits'] ?? 0)));
+            }
 
             // ── 12. Newsletter Subscribers ────────────────────────────────
             $subscribersImported = 0;

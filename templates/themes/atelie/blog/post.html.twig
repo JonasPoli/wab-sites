@@ -10,7 +10,10 @@
                 {% if article.category %}<span aria-hidden="true">/</span><a href="{{ articles_url(article.category) }}">{{ article.category.name }}</a>{% endif %}
             </nav>
             <h1 style="font-size:clamp(32px,4.4vw,54px)">{{ article.title }}</h1>
-            {% if article.summary %}<p style="font-size:18px">{{ article.summary }}</p>{% endif %}
+            {# O resumo some quando só repete o começo do texto (posts importados do WordPress) #}
+            {% set inicioDoTexto = article.body ? article.body|striptags|replace({"\n": ' '})|trim : '' %}
+            {% set resumoRepete = article.summary and inicioDoTexto starts with article.summary|slice(0, 40) %}
+            {% if article.summary and not resumoRepete %}<p style="font-size:18px">{{ article.summary }}</p>{% endif %}
             <p class="at-card-meta" style="margin-top:18px"><time datetime="{{ article.publishedAt|date('c') }}">{{ article.publishedAt|date('d/m/Y', 'America/Sao_Paulo') }}</time></p>
         </div>
     </header>

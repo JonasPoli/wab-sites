@@ -19,6 +19,7 @@ use App\Entity\ResearchLine;
 use App\Entity\ContactFormField;
 use App\Entity\ContactMessage;
 use App\Entity\NewsletterSubscriber;
+use App\Entity\Redirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZipArchive;
@@ -75,6 +76,7 @@ class TenantExporter
             'contact_form_fields'  => $this->serializeContactFormFields($tenant),
             'contact_messages'     => $this->serializeContactMessages($tenant),
             'newsletter_subscribers' => $this->serializeNewsletterSubscribers($tenant),
+            'redirects'              => $this->serializeRedirects($tenant),
             'authors'              => $this->serializeAuthors($tenant),
             'articles'             => $this->serializeArticles($tenant),
         ];
@@ -442,6 +444,16 @@ class TenantExporter
         }
         $this->logger->info('[TenantExporter] Mensagens de contato serializadas.', ['count' => count($serialized)]);
         return $serialized;
+    }
+
+    /** Redirecionamentos de endereços antigos (site-marcenaria-pichoneri). */
+    private function serializeRedirects(Tenant $t): array
+    {
+        return array_map(static fn (Redirect $r) => [
+            'from' => $r->getFromPath(),
+            'to'   => $r->getToPath(),
+            'hits' => $r->getHits(),
+        ], $this->em->getRepository(Redirect::class)->findBy(['tenant' => $t]));
     }
 
     private function serializeNewsletterSubscribers(Tenant $t): array

@@ -1,0 +1,39 @@
+{% extends 'admin/wab_base.html.twig' %}
+{% block title %}Redirecionamentos{% endblock %}{% block page_title %}Redirecionamentos{% endblock %}
+{% block body %}
+<div class="ph">
+    <h1>Redirecionamentos <span class="badge bg-inf">{{ total }}</span></h1>
+</div>
+<p class="af-hint" style="margin:-.5rem 0 1.25rem">Endereços antigos (por exemplo, do site anterior) que levam a um endereço deste site com redirecionamento permanente (301). Só valem para endereços que não existem: uma página que existe nunca é desviada.</p>
+
+<div class="card" style="margin-bottom:1.5rem">
+    <form method="post" class="af" style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:end">
+        <input type="hidden" name="_token" value="{{ csrf_token('redirect_new') }}">
+        <div class="af-field" style="margin:0"><label for="r-from">Endereço antigo</label><input type="text" id="r-from" name="from" class="ai" value="{{ de }}" placeholder="/2023/07/13/nome-do-post/" required></div>
+        <div class="af-field" style="margin:0"><label for="r-to">Endereço novo</label><input type="text" id="r-to" name="to" class="ai" value="{{ para }}" placeholder="/blog/nome-do-post" required></div>
+        <button type="submit" class="btn btn-p"><sl-icon name="plus-lg"></sl-icon> Cadastrar</button>
+    </form>
+</div>
+
+<div class="card"><div class="tw"><table class="at">
+    <thead><tr><th>Endereço antigo</th><th>Endereço novo</th><th style="text-align:right">Acessos</th><th></th></tr></thead>
+    <tbody>
+    {% for r in redirects %}
+    <tr>
+        <td><code>{{ r.fromPath }}</code></td>
+        <td><a href="{{ r.toPath }}" target="_blank" rel="noopener" style="color:var(--primary)">{{ r.toPath }}</a></td>
+        <td style="text-align:right">{{ r.hits }}</td>
+        <td><form action="{{ path('admin_redirect_delete', {id: r.id}) }}" method="post" onsubmit="return confirm('Excluir este redirecionamento?')">
+            <input type="hidden" name="_token" value="{{ csrf_token('del_redirect_' ~ r.id) }}">
+            <button class="btn btn-d btn-sm" title="Excluir"><sl-icon name="trash-fill"></sl-icon></button>
+        </form></td>
+    </tr>
+    {% else %}<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:2rem">Nenhum redirecionamento.</td></tr>{% endfor %}
+    </tbody>
+</table></div></div>
+{% if paginas > 1 %}
+<div style="display:flex;gap:.5rem;justify-content:center;margin-top:1rem">
+    {% for p in 1..paginas %}<a href="?pagina={{ p }}" class="btn btn-sm {{ p == pagina ? 'btn-p' : 'btn-g' }}">{{ p }}</a>{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

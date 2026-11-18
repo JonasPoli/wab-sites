@@ -4,24 +4,24 @@
 
 ## 1. Redirecionamentos
 
-- [ ] 1.1 Rodar `sh/regressao.sh capturar antes` com as fixtures carregadas (grupos padrão, `cetec`, `atelie`)
-- [ ] 1.2 Criar `src/Entity/Redirect.php` conforme D1 (implementando `TenantAwareInterface`, FK do tenant com `onDelete: 'CASCADE'`, índice único tenant + `fromPath`) e `src/Repository/RedirectRepository.php` (`findOneByPath(Tenant, string)`, `incrementHits(int $id)` por DQL `UPDATE`, listagem paginada); gerar a migration com `doctrine:migrations:diff`, conferir que só cria a tabela `redirect`, aplicar e validar com `doctrine:schema:validate`
-- [ ] 1.3 Criar `src/Service/CaminhoNormalizado.php` (função pura de D1: sem query, sem barra final, `/` para vazio, decodificado) com `tests/Service/CaminhoNormalizadoTest.php`; verificar com `vendor/bin/phpunit --filter CaminhoNormalizado`
-- [ ] 1.4 Criar `src/EventSubscriber/RedirecionamentoSubscriber.php` conforme D1; criar `tests/Controller/RedirecionamentoTest.php` (molde: `tests/Controller/SitemapERobotsTest.php`) com os cenários da spec: 301 com barra final e query, 404 sem cadastro, POST não redireciona, página existente tem prioridade, outro site responde 404; verificar com `vendor/bin/phpunit --filter Redirecionamento`
-- [ ] 1.5 Criar as rotas `/admin/redirecionamentos` (lista, incluir, excluir; `ROLE_ADMIN` + só `workGroup` 0, como as rotas de editores em `AdminContentController` linhas ~922–965) num controller novo `src/Controller/admin/AdminRedirectController.php`, os templates em `templates/admin/redirect/` no padrão de `templates/admin/newsletter/index.html.twig`, as validações de D1 e o item de menu em `templates/admin/wab_base.html.twig`; verificar os cenários "Destino externo", "Endereço antigo repetido" e "Contagem de uso" no painel local, e que um editor recebe 403
-- [ ] 1.6 `TenantExporter`/`TenantImporter`: lista `redirects`; conferir na tela de exclusão do `/superadmin` (e no método que conta o que será apagado) que os redirecionamentos entram na contagem; verificar exportando e importando um site com 3 redirecionamentos e excluindo o importado
-- [ ] 1.7 README: seção curta "Redirecionamentos" (para que serve, que só age no 404, como cadastrar)
+- [x] 1.1 Rodar `sh/regressao.sh capturar antes` com as fixtures carregadas (grupos padrão, `cetec`, `atelie`)
+- [x] 1.2 Criar `src/Entity/Redirect.php` conforme D1 (implementando `TenantAwareInterface`, FK do tenant com `onDelete: 'CASCADE'`, índice único tenant + `fromPath`) e `src/Repository/RedirectRepository.php` (`findOneByPath(Tenant, string)`, `incrementHits(int $id)` por DQL `UPDATE`, listagem paginada); gerar a migration com `doctrine:migrations:diff`, conferir que só cria a tabela `redirect`, aplicar e validar com `doctrine:schema:validate`
+- [x] 1.3 Criar `src/Service/CaminhoNormalizado.php` (função pura de D1: sem query, sem barra final, `/` para vazio, decodificado) com `tests/Service/CaminhoNormalizadoTest.php`; verificar com `vendor/bin/phpunit --filter CaminhoNormalizado`
+- [x] 1.4 Criar `src/EventSubscriber/RedirecionamentoSubscriber.php` conforme D1; criar `tests/Controller/RedirecionamentoTest.php` (molde: `tests/Controller/SitemapERobotsTest.php`) com os cenários da spec: 301 com barra final e query, 404 sem cadastro, POST não redireciona, página existente tem prioridade, outro site responde 404; verificar com `vendor/bin/phpunit --filter Redirecionamento`
+- [x] 1.5 Criar as rotas `/admin/redirecionamentos` (lista, incluir, excluir; `ROLE_ADMIN` + só `workGroup` 0, como as rotas de editores em `AdminContentController` linhas ~922–965) num controller novo `src/Controller/admin/AdminRedirectController.php`, os templates em `templates/admin/redirect/` no padrão de `templates/admin/newsletter/index.html.twig`, as validações de D1 e o item de menu em `templates/admin/wab_base.html.twig`; verificar os cenários "Destino externo", "Endereço antigo repetido" e "Contagem de uso" no painel local, e que um editor recebe 403
+- [x] 1.6 `TenantExporter`/`TenantImporter`: lista `redirects`; conferir na tela de exclusão do `/superadmin` (e no método que conta o que será apagado) que os redirecionamentos entram na contagem; verificar exportando e importando um site com 3 redirecionamentos e excluindo o importado
+- [x] 1.7 README: seção curta "Redirecionamentos" (para que serve, que só age no 404, como cadastrar)
 
 ## 2. Importador de WordPress
 
-- [ ] 2.1 Criar `src/Service/Wordpress/LimpadorDeConteudo.php` conforme D2.4 com `tests/Service/Wordpress/LimpadorDeConteudoTest.php` usando trechos reais (pegar 3 posts com `curl` de `https://www.marcenariapichoneri.com.br/wp-json/wp/v2/posts?per_page=3&_embed=1` e mais um com incorporação de `/orcamento/`, por exemplo um de jul/2023); verificar com `vendor/bin/phpunit --filter LimpadorDeConteudo`
-- [ ] 2.2 Criar `src/Service/Wordpress/ClienteWordpress.php` (categorias e posts paginados pelo cabeçalho `X-WP-TotalPages`, `User-Agent` genérico, espera de 300 ms, erro claro quando a API responde diferente de 200) e `ImportadorDePosts.php` conforme D2 (capa com conversão de WebP por GD; relatório)
-- [ ] 2.3 Criar `src/Command/ImportarWordpressCommand.php` (`app:wordpress:importar`, opções `--simular` e `--limite`), seguindo `SampleContentCommand` para resolver o tenant e ligar o filtro; verificar com `--simular` num site local: relatório com 44 posts, 5 categorias e 49 redirecionamentos, e nada gravado (`/admin/noticias` vazio)
-- [ ] 2.4 README: seção "Importar um blog do WordPress" com o comando, a simulação e o que conferir depois
+- [x] 2.1 Criar `src/Service/Wordpress/LimpadorDeConteudo.php` conforme D2.4 com `tests/Service/Wordpress/LimpadorDeConteudoTest.php` usando trechos reais (pegar 3 posts com `curl` de `https://www.marcenariapichoneri.com.br/wp-json/wp/v2/posts?per_page=3&_embed=1` e mais um com incorporação de `/orcamento/`, por exemplo um de jul/2023); verificar com `vendor/bin/phpunit --filter LimpadorDeConteudo`
+- [x] 2.2 Criar `src/Service/Wordpress/ClienteWordpress.php` (categorias e posts paginados pelo cabeçalho `X-WP-TotalPages`, `User-Agent` genérico, espera de 300 ms, erro claro quando a API responde diferente de 200) e `ImportadorDePosts.php` conforme D2 (capa com conversão de WebP por GD; relatório)
+- [x] 2.3 Criar `src/Command/ImportarWordpressCommand.php` (`app:wordpress:importar`, opções `--simular` e `--limite`), seguindo `SampleContentCommand` para resolver o tenant e ligar o filtro; verificar com `--simular` num site local: relatório com 44 posts, 5 categorias e 49 redirecionamentos, e nada gravado (`/admin/noticias` vazio)
+- [x] 2.4 README: seção "Importar um blog do WordPress" com o comando, a simulação e o que conferir depois
 
 ## 3. Código em produção
 
-- [ ] 3.1 `sh/regressao.sh capturar depois` + `comparar` sem diferença; `vendor/bin/phpunit` inteiro; `openspec validate site-marcenaria-pichoneri --strict`
+- [x] 3.1 `sh/regressao.sh capturar depois` + `comparar` sem diferença; `vendor/bin/phpunit` inteiro; `openspec validate site-marcenaria-pichoneri --strict`
 - [ ] 3.2 Backup do banco de produção no servidor wabsites e anotação do HTTP dos domínios (leitura + arquivo de backup)
 - [ ] 3.3 Deploy (escrita): `git push origin main`; no servidor `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
 - [ ] 3.4 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; um endereço inexistente de um deles continua 404
@@ -67,7 +67,8 @@
 
 ## Pendências
 
-<!-- preencher ao longo das tarefas: problemas de posts, pontos a confirmar com o cliente, quem administra o DNS, cliente/ticket no sistema WAB -->
+- Importação de teste em `atelie.localhost` (18/11/2026): 44 posts, 1 rascunho ("O que está por vir em 2024?", sem texto), 4 sem capa (os de 2026), 4 categorias novas + "Tendências" já existente, 49 redirecionamentos; segunda execução com 44 pulados e 0 novos.
+- Mudança de rota em relação ao plano (pedido do Jonas em 18/11/2026): o tenant 11 (`pichoneri.wab.com.br`) já existe em produção, então o site é cadastrado direto nele pelo `/superadmin` e pelo `/admin` (Chrome), e o blog é importado no servidor com `app:wordpress:importar`, em vez de montar localmente e importar um ZIP (a importação de ZIP cria um site novo e não atualiza um existente).
 
 ## Workflow follow-up
 
