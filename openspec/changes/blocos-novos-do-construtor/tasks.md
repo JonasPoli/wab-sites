@@ -64,9 +64,9 @@
 
 ## 9. Deploy (só com aprovação explícita do Jonas)
 
-- [ ] 9.1 Backup (leitura + escrita em arquivo no servidor): `mysqldump` do banco de produção para `~/backups/` no servidor wabsites e anotar o HTTP atual dos domínios de cliente
-- [ ] 9.2 Deploy (escrita): `git push origin main`; no servidor, `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
-- [ ] 9.3 Conferência: HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br; abrir a home de dois deles e comparar visualmente com antes; conferir em `/admin` de um site que a escolha de tipo mostra os blocos novos
+- [x] 9.1 Backup (leitura + escrita em arquivo no servidor): `mysqldump` do banco de produção para `~/backups/` no servidor wabsites e anotar o HTTP atual dos domínios de cliente
+- [x] 9.2 Deploy (escrita): `git push origin main`; no servidor, `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
+- [x] 9.3 Conferência: HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br; abrir a home de dois deles e comparar visualmente com antes; conferir em `/admin` de um site que a escolha de tipo mostra os blocos novos
 
 ## Medições
 
@@ -75,6 +75,10 @@
 - `sh/regressao.sh comparar`: sem diferença em 127.0.0.1, localhost e noticias.localhost.
 - `vendor/bin/phpunit`: 68 passam; os 5 que falham são os do `SuperTestFieldsControllerTest`, já desatualizados antes desta mudança.
 - Correção fora do escopo, necessária para editar depoimentos: `templates/admin/block/_form_testimonials.html.twig` fazia `'★' * s`, que dá erro 500 no PHP 8 ao editar um bloco de depoimentos com itens (também em produção).
+
+## Deploy
+
+- Deploy único das quatro mudanças em 18/11/2026: backup `~/backups/wab-sites-antes-deploy-20261118-2207.sql.gz`, `git pull` (bffff0e), `cache:clear`, 3 migrations (`Version20261118211438`, `Version20261118214127`, `Version20261118220044`), `./build.sh` (737 miniaturas). HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br antes e depois; `/blog` responde 404 nos sites com o blog desligado.
 
 ## Workflow follow-up
 

@@ -62,9 +62,9 @@
 
 ## 10. Deploy (só com aprovação explícita do Jonas)
 
-- [ ] 10.1 Anotar o HTTP dos domínios de cliente (leitura); não há migration, então não há backup de banco obrigatório nesta mudança
-- [ ] 10.2 Deploy (escrita): `git push origin main`; no servidor `git pull` e `./build.sh`
-- [ ] 10.3 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; a opção "Ateliê" aparece na edição de um site no `/superadmin` (sem salvar)
+- [x] 10.1 Anotar o HTTP dos domínios de cliente (leitura); não há migration, então não há backup de banco obrigatório nesta mudança
+- [x] 10.2 Deploy (escrita): `git push origin main`; no servidor `git pull` e `./build.sh`
+- [x] 10.3 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; a opção "Ateliê" aparece na edição de um site no `/superadmin` (sem salvar)
 
 ## Conferência
 
@@ -74,6 +74,10 @@
 - `sh/regressao.sh comparar`: sem diferença em 127.0.0.1, localhost, noticias.localhost e cetec.localhost.
 - `app.css`: 78.681 bytes (+5,4 KB, das regras `@font-face` de Manrope e DM Sans; os arquivos de fonte só são baixados por quem usa).
 - Acréscimo fora do plano: opção "Horário de funcionamento" na barra superior (`themes/_topbar.html.twig`, `/admin/settings` e `/superadmin`), porque o site atual da Pichoneri mostra o horário no topo. Só aparece no site que marcar a opção.
+
+## Deploy
+
+- Deploy único das quatro mudanças em 18/11/2026: backup `~/backups/wab-sites-antes-deploy-20261118-2207.sql.gz`, `git pull` (bffff0e), `cache:clear`, 3 migrations (`Version20261118211438`, `Version20261118214127`, `Version20261118220044`), `./build.sh` (737 miniaturas). HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br antes e depois; `/blog` responde 404 nos sites com o blog desligado.
 
 ## Workflow follow-up
 

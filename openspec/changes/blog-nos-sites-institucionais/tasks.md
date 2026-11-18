@@ -45,9 +45,9 @@
 
 ## 9. Deploy (só com aprovação explícita do Jonas)
 
-- [ ] 9.1 Backup do banco de produção no servidor wabsites e anotação do HTTP dos domínios (leitura + arquivo de backup)
-- [ ] 9.2 Deploy (escrita): `git push origin main`; no servidor `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
-- [ ] 9.3 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; `/blog` respondendo 404 em um deles (blog desligado); `/noticias` do ajope igual a antes
+- [x] 9.1 Backup do banco de produção no servidor wabsites e anotação do HTTP dos domínios (leitura + arquivo de backup)
+- [x] 9.2 Deploy (escrita): `git push origin main`; no servidor `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
+- [x] 9.3 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; `/blog` respondendo 404 em um deles (blog desligado); `/noticias` do ajope igual a antes
 
 ## Conferência
 
@@ -55,6 +55,10 @@
 - Painel: "Blog" em `cetec.localhost`, nada em `127.0.0.1`, "Notícias" e "Jornalistas" em `noticias.localhost`. Os links "Ver no site" do painel e da área do jornalista passaram a usar `article_url()`.
 - Regressão com o blog de `cetec.localhost` desligado: sem diferença nos outros três hosts; em `cetec.localhost`, só a seção vazia do bloco `blog_posts` acrescentada à página de teste.
 - `vendor/bin/phpunit`: só falham os 5 testes antigos do `SuperTestFieldsControllerTest`.
+
+## Deploy
+
+- Deploy único das quatro mudanças em 18/11/2026: backup `~/backups/wab-sites-antes-deploy-20261118-2207.sql.gz`, `git pull` (bffff0e), `cache:clear`, 3 migrations (`Version20261118211438`, `Version20261118214127`, `Version20261118220044`), `./build.sh` (737 miniaturas). HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br antes e depois; `/blog` responde 404 nos sites com o blog desligado.
 
 ## Workflow follow-up
 

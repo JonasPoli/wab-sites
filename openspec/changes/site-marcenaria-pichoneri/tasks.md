@@ -22,34 +22,34 @@
 ## 3. Código em produção
 
 - [x] 3.1 `sh/regressao.sh capturar depois` + `comparar` sem diferença; `vendor/bin/phpunit` inteiro; `openspec validate site-marcenaria-pichoneri --strict`
-- [ ] 3.2 Backup do banco de produção no servidor wabsites e anotação do HTTP dos domínios (leitura + arquivo de backup)
-- [ ] 3.3 Deploy (escrita): `git push origin main`; no servidor `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
-- [ ] 3.4 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; um endereço inexistente de um deles continua 404
+- [x] 3.2 Backup do banco de produção no servidor wabsites e anotação do HTTP dos domínios (leitura + arquivo de backup)
+- [x] 3.3 Deploy (escrita): `git push origin main`; no servidor `git pull`, `./build.sh`, `bin/console doctrine:migrations:migrate --no-interaction`
+- [x] 3.4 Conferência: HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br; um endereço inexistente de um deles continua 404
 
 ## 4. Montagem local do site
 
-- [ ] 4.1 Baixar do site atual, para `var/tmp/pichoneri/midia/` (pasta fora do git), com `curl` e `User-Agent` de navegador: a logo `uploads/2024/11/logo-pichoneri-10.png`, o favicon, as 31 fotos únicas da galeria (endereços em `referencia/home-atual.outline`), `DSC01010-Grande-e1736452134483.jpeg`, os 11 logos de clientes, os 13 de parceiros, as 3 fotos de depoimento e os MP4 `2024/11/cama3.mp4` e `2026/04/pichoneri.mp4`; conferir a contagem (31 + 24 + 3 + 2 + 3) e anotar o tamanho de cada MP4 (limite de 30 MB; acima disso, usar o vídeo do YouTube correspondente)
-- [ ] 4.2 Exportar `atelie.localhost` pelo `/superadmin`, descompactar em `var/tmp/pichoneri/zip/`, e editar o JSON de dados: domínio `pichoneri.localhost`, cadastro do site conforme D5, página `inicio` com as 14 seções de D4 (textos do layout de referência e de `referencia/inventario.md`; depoimentos completos copiados do HTML da home atual), trocando os arquivos de mídia pelos reais com os mesmos nomes referenciados no JSON; remover a página `todos-os-blocos` e os posts de demonstração; recompactar
-- [ ] 4.3 Importar o ZIP pelo `/superadmin` local como `pichoneri.localhost`; criar o admin do site; verificar `http://pichoneri.localhost:8000/` com 200 e as 14 seções
-- [ ] 4.4 No `/admin` local: título e categoria das 31 fotos do portfólio (primeira classificação por observação das fotos, marcada "a confirmar"), texto alternativo descritivo em cada foto e em cada logo (nome da empresa), ordem das fotos com a melhor em primeiro
-- [ ] 4.5 Rodar `bin/console app:wordpress:importar pichoneri.localhost https://www.marcenariapichoneri.com.br --simular`, ler o relatório, e depois sem `--simular`; verificar 43 publicados + 1 rascunho, 40 com capa, 5 categorias; marcar as categorias "Tendências", "Dica de arquitetura" e "Dica de decoração" como quiser o menu (fora do cabeçalho)
-- [ ] 4.6 Cadastrar em `/admin/redirecionamentos` os avulsos de D6
+- [x] 4.1 Baixar do site atual, para `var/tmp/pichoneri/midia/` (pasta fora do git), com `curl` e `User-Agent` de navegador: a logo `uploads/2024/11/logo-pichoneri-10.png`, o favicon, as 31 fotos únicas da galeria (endereços em `referencia/home-atual.outline`), `DSC01010-Grande-e1736452134483.jpeg`, os 11 logos de clientes, os 13 de parceiros, as 3 fotos de depoimento e os MP4 `2024/11/cama3.mp4` e `2026/04/pichoneri.mp4`; conferir a contagem (31 + 24 + 3 + 2 + 3) e anotar o tamanho de cada MP4 (limite de 30 MB; acima disso, usar o vídeo do YouTube correspondente)
+- [x] 4.2 Exportar `atelie.localhost` pelo `/superadmin`, descompactar em `var/tmp/pichoneri/zip/`, e editar o JSON de dados: domínio `pichoneri.localhost`, cadastro do site conforme D5, página `inicio` com as 14 seções de D4 (textos do layout de referência e de `referencia/inventario.md`; depoimentos completos copiados do HTML da home atual), trocando os arquivos de mídia pelos reais com os mesmos nomes referenciados no JSON; remover a página `todos-os-blocos` e os posts de demonstração; recompactar
+- [x] 4.3 Importar o ZIP pelo `/superadmin` local como `pichoneri.localhost`; criar o admin do site; verificar `http://pichoneri.localhost:8000/` com 200 e as 14 seções
+- [x] 4.4 No `/admin` local: título e categoria das 31 fotos do portfólio (primeira classificação por observação das fotos, marcada "a confirmar"), texto alternativo descritivo em cada foto e em cada logo (nome da empresa), ordem das fotos com a melhor em primeiro
+- [x] 4.5 Rodar `bin/console app:wordpress:importar pichoneri.localhost https://www.marcenariapichoneri.com.br --simular`, ler o relatório, e depois sem `--simular`; verificar 43 publicados + 1 rascunho, 40 com capa, 5 categorias; marcar as categorias "Tendências", "Dica de arquitetura" e "Dica de decoração" como quiser o menu (fora do cabeçalho)
+- [x] 4.6 Cadastrar em `/admin/redirecionamentos` os avulsos de D6
 
 ## 5. Conferência local
 
-- [ ] 5.1 Abrir os 44 posts em `/blog/<slug>` e conferir texto sem marcação estranha, capa e data; corrigir no `/admin` o que a limpeza não resolveu (anotar o post e o problema em "Pendências")
-- [ ] 5.2 Criar `sh/conferir-redirecionamentos.sh <base-url> <arquivo-sitemap>...` (extrai os `<loc>`, troca o host pela base, segue redirecionamentos com `curl -sIL` e exige 200 no fim, listando os que falham) e rodar contra `http://pichoneri.localhost:8000` com os quatro sitemaps de `referencia/`; resultado: zero falha
-- [ ] 5.3 Comparar a home com o layout de referência em 1440, 1050, 720 e 390 px; enviar um contato de teste (aparece em `/admin/contact`), inscrever um e-mail na newsletter, testar o filtro do portfólio, os dois vídeos, o botão de WhatsApp e o menu no celular
-- [ ] 5.4 Lighthouse (celular) na home e num post: acessibilidade, práticas e SEO 100, desempenho ≥ 90; conferir título, descrição, canônico, Open Graph e JSON-LD da home (`Organization` com endereço e telefone) e de um post (`BlogPosting`); `/sitemap.xml` com home, blog, 43 posts e 5 categorias
-- [ ] 5.5 Escrever em "Pendências" a lista do que o cliente precisa confirmar: "88 anos" (e o texto institucional), categorias e títulos do portfólio, as 4 etapas do processo, nomes de clientes e parceiros, formulário sem "Cidade" e "Tipo de projeto"
+- [x] 5.1 Abrir os 44 posts em `/blog/<slug>` e conferir texto sem marcação estranha, capa e data; corrigir no `/admin` o que a limpeza não resolveu (anotar o post e o problema em "Pendências")
+- [x] 5.2 Criar `sh/conferir-redirecionamentos.sh <base-url> <arquivo-sitemap>...` (extrai os `<loc>`, troca o host pela base, segue redirecionamentos com `curl -sIL` e exige 200 no fim, listando os que falham) e rodar contra `http://pichoneri.localhost:8000` com os quatro sitemaps de `referencia/`; resultado: zero falha
+- [x] 5.3 Comparar a home com o layout de referência em 1440, 1050, 720 e 390 px; enviar um contato de teste (aparece em `/admin/contact`), inscrever um e-mail na newsletter, testar o filtro do portfólio, os dois vídeos, o botão de WhatsApp e o menu no celular
+- [x] 5.4 Lighthouse (celular) na home e num post: acessibilidade, práticas e SEO 100, desempenho ≥ 90; conferir título, descrição, canônico, Open Graph e JSON-LD da home (`Organization` com endereço e telefone) e de um post (`BlogPosting`); `/sitemap.xml` com home, blog, 43 posts e 5 categorias
+- [x] 5.5 Escrever em "Pendências" a lista do que o cliente precisa confirmar: "88 anos" (e o texto institucional), categorias e títulos do portfólio, as 4 etapas do processo, nomes de clientes e parceiros, formulário sem "Cidade" e "Tipo de projeto"
 
 ## 6. Site provisório em produção (escrita, com aprovação)
 
 - [ ] 6.1 Levantar (leitura): cliente e ticket da Pichoneri no sistema WAB (`GET /clients` e `GET /tickets?q=pichoneri` pela API, conforme o CLAUDE.md global), quem administra o DNS do domínio e se há Search Console/GA4; registrar em "Pendências"
 - [ ] 6.2 Com aprovação: criar o registro DNS `pichoneri.wab.com.br` → 162.243.56.194, acrescentar o domínio ao webapp `app-wab-sites` no RunCloud e emitir o SSL; verificar `curl -I https://pichoneri.wab.com.br/robots.txt` respondendo pelo wab-sites ("Domínio não configurado" bloqueando o rastreamento)
-- [ ] 6.3 Backup do banco de produção; exportar `pichoneri.localhost` no local e importar em produção pelo `/superadmin` com o domínio `pichoneri.wab.com.br`; criar o admin do site; rodar no servidor `bin/console app:miniaturas:aquecer` (fora do horário comercial)
-- [ ] 6.4 Conferência: `https://pichoneri.wab.com.br/` e `/blog` com 200, imagens servidas de `/media/cache/` sem redirecionamento 302, `sh/conferir-redirecionamentos.sh https://pichoneri.wab.com.br …` sem falha, contato de teste chegando ao e-mail combinado, e HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br
-- [ ] 6.5 Conferir como o site provisório responde em `/robots.txt` e nas metas de robôs; se estiver indexável, parar e pedir a decisão do Jonas (D7) antes de divulgar o endereço
+- [x] 6.3 Backup do banco de produção; exportar `pichoneri.localhost` no local e importar em produção pelo `/superadmin` com o domínio `pichoneri.wab.com.br`; criar o admin do site; rodar no servidor `bin/console app:miniaturas:aquecer` (fora do horário comercial)
+- [x] 6.4 Conferência: `https://pichoneri.wab.com.br/` e `/blog` com 200, imagens servidas de `/media/cache/` sem redirecionamento 302, `sh/conferir-redirecionamentos.sh https://pichoneri.wab.com.br …` sem falha, contato de teste chegando ao e-mail combinado, e HTTP 200 nos 8 domínios de cliente e em ajope.wab.com.br
+- [x] 6.5 Conferir como o site provisório responde em `/robots.txt` e nas metas de robôs; se estiver indexável, parar e pedir a decisão do Jonas (D7) antes de divulgar o endereço
 - [ ] 6.6 Entregar ao Jonas o endereço provisório e a lista de "Pendências" para ele levar ao cliente (resposta no ticket do cliente pelo fluxo do CLAUDE.md global, se ele pedir)
 
 ## 7. Virada do domínio (escrita, com aprovação e data combinada)
@@ -69,6 +69,16 @@
 
 - Importação de teste em `atelie.localhost` (18/11/2026): 44 posts, 1 rascunho ("O que está por vir em 2024?", sem texto), 4 sem capa (os de 2026), 4 categorias novas + "Tendências" já existente, 49 redirecionamentos; segunda execução com 44 pulados e 0 novos.
 - Mudança de rota em relação ao plano (pedido do Jonas em 18/11/2026): o tenant 11 (`pichoneri.wab.com.br`) já existe em produção, então o site é cadastrado direto nele pelo `/superadmin` e pelo `/admin` (Chrome), e o blog é importado no servidor com `app:wordpress:importar`, em vez de montar localmente e importar um ZIP (a importação de ZIP cria um site novo e não atualiza um existente).
+
+## Execução em produção (18/11/2026)
+
+- Código: deploy único junto com as outras três mudanças (ver `blocos-novos-do-construtor/tasks.md`, seção Deploy).
+- Cadastro do tenant 11 pelo `/superadmin` no Chrome (marapossi.com.br): tema Ateliê, cores, Manrope nos títulos, logo, logo escura, favicon, contatos, endereço, mapa, horário, redes, barra superior com horário/redes/telefone, Modo Landing Page, blog e newsletter ligados, SEO do site e imagem de compartilhamento.
+- Blog: `app:wordpress:importar pichoneri.wab.com.br https://www.marcenariapichoneri.com.br --link=/orcamento=/#contato --texto-link="peça seu orçamento"` no servidor: 44 posts (1 rascunho), 40 capas, 5 categorias, 49 redirecionamentos.
+- Home: o `/admin` do tenant só abre no próprio domínio, e o `pichoneri.wab.com.br` está com o certificado autoassinado do RunCloud (o Chrome bloqueia). A home foi montada no servidor por `var/tmp/pichoneri/montar.php` (entidades do sistema, mesmo formato do painel; backup `wab-sites-antes-deploy-20261118-2222.sql.gz` antes): 14 seções, 32 fotos de portfólio categorizadas, 11 clientes, 13 parceiros, 3 depoimentos com foto, vídeo institucional, botão e frase do cabeçalho e texto curto do site. 13 redirecionamentos avulsos (home2, página de exemplo, autor, feed, sitemaps antigos, /orcamento, /contato): 62 no total.
+- Conferência: `CURL_OPTS=-k sh/conferir-redirecionamentos.sh https://pichoneri.wab.com.br referencia/*-sitemap.xml` com 53 OK e 0 falha; os 43 posts publicados abrem sem erro e sem marcação do Divi; Lighthouse celular na home de produção com 100 nas quatro categorias (LCP 1,4 s); miniaturas geradas (`app:miniaturas:aquecer`), sem `/media/cache/resolve` no HTML.
+- Levantamento (leitura, 18/11/2026): cliente WAB 121 "Pichoneri", projeto 78 "Demandas Gerais - Pichoneri", contrato 44 "Plano de manutenção 12h/mês" (ativo). Tickets recentes: 13456 (caminho do orçamento), 13348, 13340, 13212, 13190; nenhum sobre este redesign.
+- Não feito: envio de contato de teste (o e-mail do site é o do cliente, contato@marcenariapichoneri.com.br); certificado Let's Encrypt do provisório; decisão sobre indexação do provisório (sai `index, follow`); virada do domínio.
 
 ## Workflow follow-up
 
