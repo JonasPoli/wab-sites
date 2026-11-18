@@ -1,0 +1,17 @@
+{# Chamada para ação (cta): faixa na cor da marca com título e botão. #}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text %}
+<div class="wab-block rounded-3xl px-8 py-12 md:px-14 md:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8 shadow-lg" style="background:var(--color-primary);color:var(--color-on-primary)" data-aos="fade-up">
+    <div class="max-w-2xl">
+        {% if block.preTitle %}<p class="text-xs font-bold uppercase tracking-[.2em] mb-3 opacity-90">{{ block.preTitle }}</p>{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold leading-tight" style="color:inherit">{{ block.title }}</h2>{% endif %}
+        {% if block.text %}<p class="mt-3 text-sm md:text-base opacity-90">{{ block.text }}</p>{% endif %}
+    </div>
+    {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+        <a href="{{ cfg.ctaLink }}" class="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-6 py-3.5 rounded-md font-black text-sm shadow-md hover:bg-gray-100 transition-all shrink-0"
+           {% if (cfg.ctaNewTab ?? '') == '1' %}target="_blank" rel="noopener noreferrer"{% endif %}>
+            {{ cfg.ctaText }} {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
+        </a>
+    {% endif %}
+</div>
+{% endif %}

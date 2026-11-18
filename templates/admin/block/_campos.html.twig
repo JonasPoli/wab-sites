@@ -1,0 +1,86 @@
+{#
+  Campos repetidos nos formulários dos blocos novos (hero_split, highlights, portfolio,
+  statement, steps, cta, video, blog_posts). Os 15 formulários antigos não usam este arquivo.
+#}
+{% macro cabecalho(block, tituloObrigatorio = true, linhasTexto = 4) %}
+<div class="af-field">
+    <label>Pré-título <span class="af-hint" style="display:inline;margin-left:.4rem">(texto pequeno acima do título)</span></label>
+    <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}" maxlength="255">
+</div>
+<div class="af-field">
+    <label>Título{% if tituloObrigatorio %} <span class="req">*</span>{% endif %}</label>
+    <input type="text" name="title" class="ai" value="{{ block.title }}" maxlength="255" {{ tituloObrigatorio ? 'required' }}>
+</div>
+<div class="af-field">
+    <label>Texto</label>
+    <textarea name="text" class="ate" rows="{{ linhasTexto }}">{{ block.text }}</textarea>
+</div>
+{% endmacro %}
+
+{% macro imagem(block, rotulo = 'Imagem', dica = 'JPG, PNG ou WebP — máx. 5 MB') %}
+<div class="af-field">
+    <label>{{ rotulo }}</label>
+    <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+        {% if block.image %}
+            <img id="img-prev" src="{{ asset('uploads/page_block/' ~ block.image) }}" alt="" style="height:80px;border-radius:8px;object-fit:cover">
+        {% else %}
+            <div id="img-prev" style="width:80px;height:80px;background:var(--bg3);border:1px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)"><sl-icon name="image"></sl-icon></div>
+        {% endif %}
+        <div>
+            <label for="img-up" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:8px;border:1px dashed var(--primary);color:var(--primary);font-size:.85rem;font-weight:600;cursor:pointer">
+                <sl-icon name="upload"></sl-icon> Escolher imagem
+            </label>
+            <input type="file" id="img-up" name="imageFile" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="blocoPrevImg(this,'img-prev')">
+            <p class="af-hint" style="margin-top:.4rem">{{ dica }}</p>
+        </div>
+    </div>
+</div>
+<script>
+window.blocoPrevImg = window.blocoPrevImg || function (input, targetId) {
+    if (!input.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+        let el = document.getElementById(targetId);
+        if (el.tagName === 'DIV') {
+            const img = document.createElement('img');
+            img.id = targetId;
+            img.style.cssText = 'height:80px;border-radius:8px;object-fit:cover';
+            el.replaceWith(img); el = img;
+        }
+        el.src = e.target.result;
+    };
+    r.readAsDataURL(input.files[0]);
+};
+</script>
+{% endmacro %}
+
+{% macro botao(cfg, rotulo = 'Botão', comNovaAba = false) %}
+<div class="af-row">
+    <div class="af-field"><label>{{ rotulo }}: texto</label><input type="text" name="config[ctaText]" class="ai" value="{{ cfg.ctaText ?? '' }}" maxlength="80"></div>
+    <div class="af-field"><label>{{ rotulo }}: link</label><input type="text" name="config[ctaLink]" class="ai" value="{{ cfg.ctaLink ?? '' }}" placeholder="#contato, /p/sobre ou https://…"></div>
+</div>
+{% if comNovaAba %}
+<div class="af-field">
+    <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+        <input type="checkbox" name="config[ctaNewTab]" value="1" {{ (cfg.ctaNewTab ?? '') == '1' ? 'checked' }}> Abrir o link em nova aba
+    </label>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro lado(nome, cfg, rotulo, padrao = 'right') %}
+<div class="af-field">
+    <label>{{ rotulo }}</label>
+    <select name="config[{{ nome }}]" class="as">
+        <option value="right" {{ (cfg[nome] ?? padrao) == 'right' ? 'selected' }}>Direita</option>
+        <option value="left" {{ (cfg[nome] ?? padrao) == 'left' ? 'selected' }}>Esquerda</option>
+    </select>
+</div>
+{% endmacro %}
+
+{% macro acoes(block, section) %}
+<div class="af-actions">
+    <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+    <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+</div>
+{% endmacro %}

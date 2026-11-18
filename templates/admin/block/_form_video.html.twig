@@ -1,0 +1,37 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="video">
+    {{ c.cabecalho(block, false, 4) }}
+    <div class="af-field">
+        <label>Link do YouTube</label>
+        <input type="text" name="embedUrl" class="ai" value="{{ block.embedUrl }}" placeholder="https://www.youtube.com/watch?v=… ou https://youtube.com/shorts/…">
+    </div>
+    <div class="af-field">
+        <label>Ou envie um vídeo MP4</label>
+        {% if cfg.videoFile ?? null %}
+            <p style="margin:.2rem 0 .5rem;font-size:.85rem">Atual: <a href="{{ asset('uploads/page_block_video/' ~ cfg.videoFile) }}" target="_blank" rel="noopener">{{ cfg.videoFile }}</a>
+            <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;font-size:.8rem;color:var(--muted)"><input type="checkbox" name="removeVideo" value="1" style="accent-color:var(--danger)"> Remover</label></p>
+        {% endif %}
+        <input type="file" name="videoUpload" accept="video/mp4" class="ai" style="cursor:pointer">
+        <p class="af-hint">Só MP4, até 30 MB. Havendo MP4 e link, vale o MP4.</p>
+    </div>
+    {{ c.imagem(block, 'Capa do vídeo (MP4)', 'Imagem mostrada antes de tocar · JPG, PNG ou WebP') }}
+    <div class="af-row">
+        <div class="af-field">
+            <label>Formato</label>
+            <select name="config[orientation]" class="as">
+                <option value="horizontal" {{ (cfg.orientation ?? 'horizontal') == 'horizontal' ? 'selected' }}>Horizontal (16:9)</option>
+                <option value="vertical" {{ (cfg.orientation ?? '') == 'vertical' ? 'selected' }}>Vertical (9:16)</option>
+            </select>
+        </div>
+        {{ c.lado('videoPosition', cfg, 'Lado do vídeo') }}
+    </div>
+    <div class="af-field">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+            <input type="checkbox" name="config[autoplay]" value="1" {{ (cfg.autoplay ?? '') == '1' ? 'checked' }}> Tocar sozinho, mudo e em repetição (só MP4)
+        </label>
+    </div>
+    {{ c.botao(cfg) }}
+    {{ c.acoes(block, section) }}
+</form>

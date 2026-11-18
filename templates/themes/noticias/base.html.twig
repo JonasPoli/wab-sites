@@ -18,10 +18,11 @@
        Com a pré-carga no fim do <head> o PageSpeed media 470 ms de "atraso no
        carregamento do recurso" só para começar a baixar a imagem do topo. #}
     {% set arquivoDoLcp = imagem_do_lcp(_context) %}
+    {% set lcp = filtros_do_lcp(_context) %}
     {% if arquivoDoLcp %}
         <link rel="preload" as="image" fetchpriority="high"
-              imagesrcset="{{ arquivoDoLcp|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}"
-              imagesizes="100vw">
+              imagesrcset="{{ arquivoDoLcp|thumb_srcset(lcp.filtros) }}"
+              imagesizes="{{ lcp.sizes }}">
     {% endif %}
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {# Título, descrição, canônico, Open Graph, Twitter Card e JSON-LD num lugar só (PageSeo) #}

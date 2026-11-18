@@ -1,0 +1,33 @@
+{#
+  Manifesto com imagem (statement): texto sobre fundo escuro, número em destaque e foto
+  ocupando a outra metade até a borda da tela. Desenha o próprio fundo (classe
+  mp-section-dark troca as variáveis de cor para as do modo escuro).
+#}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text or block.image %}
+{% set fotoEsquerda = (cfg.imagePosition ?? 'right') == 'left' %}
+<div class="wab-block mp-section-dark relative w-screen left-1/2 -translate-x-1/2 text-white" style="background:#2c2923">
+    <div class="grid {{ block.image ? 'lg:grid-cols-2' : '' }} lg:min-h-[500px]">
+        <div class="flex flex-col justify-center py-16 px-6 {{ fotoEsquerda ? 'lg:pl-12 lg:pr-[max(1.5rem,calc((100vw_-_1200px)/2))]' : 'lg:pr-12 lg:pl-[max(1.5rem,calc((100vw_-_1200px)/2))]' }}" data-aos="fade-up">
+            {% if block.preTitle %}<p class="text-xs font-bold uppercase tracking-[.2em] mb-4 text-cetec-secondary-text">{{ block.preTitle }}</p>{% endif %}
+            {% if block.title %}<h2 class="text-3xl md:text-5xl font-semibold leading-tight text-white mb-6 max-w-xl">{{ block.title }}</h2>{% endif %}
+            {% if block.text %}<div class="text-sm md:text-base leading-relaxed text-gray-300 max-w-lg">{{ block.text|nl2br }}</div>{% endif %}
+            {% if cfg.statNumber ?? null %}
+            <div class="flex items-center gap-5 border-t border-white/20 pt-6 mt-8 max-w-lg">
+                <strong class="text-5xl font-black tracking-tight text-cetec-secondary-text">{{ cfg.statNumber }}</strong>
+                {% if cfg.statLabel ?? null %}<span class="text-sm leading-snug text-gray-200 max-w-[200px]">{{ cfg.statLabel }}</span>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% if block.image %}
+        {% set arquivo = 'uploads/page_block/' ~ block.image %}
+        <div class="relative min-h-[300px] {{ fotoEsquerda ? 'lg:order-first' }}">
+            <picture>
+                <source media="(max-width: 767px)" srcset="{{ arquivo|thumb('destaque_foto_mobile') }}">
+                <img {{ arquivo|thumb_attrs('destaque_foto') }} alt="{{ block.title }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover">
+            </picture>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

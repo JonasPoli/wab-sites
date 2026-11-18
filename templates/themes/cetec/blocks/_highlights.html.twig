@@ -1,0 +1,13 @@
+{# Faixa de destaques (highlights): 2 a 4 diferenciais lado a lado. #}
+{% set itens = (block.config.items ?? [])|filter(i => (i.title ?? '')|trim != '') %}
+{% if itens|length > 0 %}
+{% set colunas = {1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4'}[itens|length] ?? 'lg:grid-cols-4' %}
+<div class="wab-block grid grid-cols-2 {{ colunas }} gap-px rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-200 dark:bg-white/10" data-aos="fade-up">
+    {% for it in itens %}
+    <div class="p-5 md:p-7 bg-gray-50 dark:bg-cetec-dark {{ loop.last and loop.index is odd ? 'col-span-2 lg:col-span-1' }}">
+        <strong class="block text-sm md:text-base font-bold text-cetec-primary-text mb-1">{{ it.title }}</strong>
+        {% if it.text ?? null %}<span class="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ it.text }}</span>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

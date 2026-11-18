@@ -1,0 +1,17 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="highlights">
+    <p class="af-hint" style="margin-bottom:1rem">Faixa com 2 a 4 diferenciais lado a lado. Item sem título não aparece.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+    {% for i in 0..3 %}
+        {% set it = {title: '', text: ''}|merge(cfg.items[i] ?? {}) %}
+        <div class="card" style="margin:0;padding:1rem">
+            <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Item {{ i + 1 }}</div>
+            <div class="af-field"><label>Título</label><input type="text" name="config[items][{{ i }}][title]" class="ai" value="{{ it.title }}" maxlength="80"></div>
+            <div class="af-field"><label>Texto curto</label><input type="text" name="config[items][{{ i }}][text]" class="ai" value="{{ it.text }}" maxlength="120"></div>
+        </div>
+    {% endfor %}
+    </div>
+    {{ c.acoes(block, section) }}
+</form>

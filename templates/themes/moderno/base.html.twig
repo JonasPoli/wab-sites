@@ -8,10 +8,11 @@
        navegador lê o <head> em ordem, e cada KB de HTML antes delas atrasa o pedido.
        O app.css traz também os @font-face das fontes servidas pelo próprio domínio. #}
     {% set arquivoDoLcp = imagem_do_lcp(_context) %}
+    {% set lcp = filtros_do_lcp(_context) %}
     {% if arquivoDoLcp %}
         <link rel="preload" as="image" fetchpriority="high"
-              imagesrcset="{{ arquivoDoLcp|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) }}"
-              imagesizes="100vw">
+              imagesrcset="{{ arquivoDoLcp|thumb_srcset(lcp.filtros) }}"
+              imagesizes="{{ lcp.sizes }}">
     {% endif %}
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {# Título, descrição, canônico, Open Graph, Twitter Card e JSON-LD num lugar só (PageSeo) #}

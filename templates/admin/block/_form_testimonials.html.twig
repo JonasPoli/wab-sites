@@ -21,7 +21,7 @@
         <div class="af-row">
             <div class="af-field"><label>Avaliação (estrelas)</label>
                 <select name="testimonials[{{ loop.index0 }}][rating]" class="as">
-                    {% for s in 1..5 %}<option value="{{ s }}" {{ t.rating == s ? 'selected' }}>{{ '★' * s }}</option>{% endfor %}
+                    {% for s in 1..5 %}<option value="{{ s }}" {{ t.rating == s ? 'selected' }}>{% for i in 1..s %}★{% endfor %}</option>{% endfor %}
                 </select>
             </div>
             <div class="af-field"><label>Foto (avatar)</label>

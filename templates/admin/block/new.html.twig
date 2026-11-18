@@ -43,6 +43,13 @@
             {key: 'partner_logos',  label: 'Logos de Parceiros',        icon: 'fa-solid fa-handshake',            desc: 'Linha/grid de logos'},
             {key: 'team',           label: 'Membros da Equipe',         icon: 'fa-solid fa-users',                desc: 'Cards com membros da sua equipe'},
             {key: 'contact',        label: 'Formulário de Contato',     icon: 'fa-solid fa-envelope',             desc: 'Exibe dados de contato e um formulário'},
+            {key: 'hero_split',     label: 'Destaque com foto',         icon: 'fa-solid fa-panorama',             desc: 'Texto de um lado, foto com selo do outro'},
+            {key: 'highlights',     label: 'Faixa de destaques',        icon: 'fa-solid fa-grip-lines',           desc: 'Faixa com 2 a 4 diferenciais'},
+            {key: 'portfolio',      label: 'Portfólio com filtro',      icon: 'fa-solid fa-table-cells-large',    desc: 'Grade de fotos com filtro por categoria'},
+            {key: 'statement',      label: 'Manifesto com imagem',      icon: 'fa-solid fa-quote-right',          desc: 'Texto em fundo escuro com número e foto'},
+            {key: 'steps',          label: 'Etapas',                    icon: 'fa-solid fa-list-ol',              desc: 'Passos numerados do processo'},
+            {key: 'cta',            label: 'Chamada para ação',         icon: 'fa-solid fa-bullhorn',             desc: 'Faixa colorida com título e botão'},
+            {key: 'video',          label: 'Vídeo',                     icon: 'fa-solid fa-circle-play',          desc: 'YouTube ou MP4 com texto ao lado'},
         ] %}
         {% for t in types %}
         {% if t.key == 'newsletter' and (not currentTenant or not currentTenant.newsletterEnabled) %}

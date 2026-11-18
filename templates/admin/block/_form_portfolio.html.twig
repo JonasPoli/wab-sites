@@ -1,0 +1,42 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+{% set categorias = [] %}
+{% for img in block.galleryImages %}{% if img.category and img.category not in categorias %}{% set categorias = categorias|merge([img.category]) %}{% endif %}{% endfor %}
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="portfolio">
+    {{ c.cabecalho(block, true, 3) }}
+    {% if block.id and block.galleryImages|length %}
+    <div class="af-field">
+        <label>Fotos</label>
+        <p class="af-hint" style="margin-bottom:.75rem">A primeira (menor ordem) aparece maior. A categoria vira um botão de filtro; foto sem categoria só aparece em "Todos".</p>
+        <datalist id="portfolio-cats-{{ block.id }}">{% for cat in categorias %}<option value="{{ cat }}">{% endfor %}</datalist>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem">
+            {% for img in block.galleryImages %}
+            <div class="card" style="margin:0;padding:.75rem;display:flex;gap:.75rem">
+                <img src="{{ ('uploads/page_block_gallery/' ~ img.filename)|thumb('admin_thumb') }}" alt="" style="height:96px;width:96px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex-shrink:0">
+                <div style="flex:1;display:flex;flex-direction:column;gap:.35rem">
+                    <input type="text" name="gallery_meta[{{ img.id }}][title]" class="ai" value="{{ img.title }}" placeholder="Título" maxlength="255" aria-label="Título da foto">
+                    <input type="text" name="gallery_meta[{{ img.id }}][category]" class="ai" value="{{ img.category }}" placeholder="Categoria" maxlength="100" list="portfolio-cats-{{ block.id }}" aria-label="Categoria da foto">
+                    <input type="text" name="gallery_meta[{{ img.id }}][caption]" class="ai" value="{{ img.caption }}" placeholder="Texto alternativo (descreva a foto)" maxlength="255" aria-label="Texto alternativo">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--muted)">Ordem <input type="number" name="gallery_meta[{{ img.id }}][position]" value="{{ img.position }}" class="ai" style="width:4.5rem;padding:.25rem .4rem"></label>
+                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--muted)"><input type="checkbox" name="delete_gallery[]" value="{{ img.id }}" style="accent-color:var(--danger)"> Remover</label>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="af-field">
+        <label>Adicionar fotos</label>
+        <input type="file" name="galleryFiles[]" multiple accept="image/webp,image/jpeg,image/png" class="ai" style="cursor:pointer">
+        <p class="af-hint">Selecione várias de uma vez. Depois de salvar, volte aqui para dar título e categoria.</p>
+    </div>
+    <div class="af-field">
+        <label>Nota ao pé da grade</label>
+        <input type="text" name="config[note]" class="ai" value="{{ cfg.note ?? '' }}" maxlength="200">
+    </div>
+    {{ c.botao(cfg, 'Botão ao pé') }}
+    {{ c.acoes(block, section) }}
+</form>

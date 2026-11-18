@@ -1,0 +1,57 @@
+{#
+  Destaque com foto (hero_split): texto de um lado, foto com selo e legenda do outro.
+  Usado também pelos temas moderno, wab e noticias.
+#}
+{% set cfg = block.config ?? {} %}
+{% if block.title or block.text or block.image %}
+{% set alvo = page is defined ? page : (category is defined ? category : null) %}
+{% set primeiraSecao = alvo ? (alvo.sections|filter(s => s.active)|first) : null %}
+{% set ehPrimeiro = primeiraSecao and primeiraSecao.blocks|length > 0 and (primeiraSecao.blocks|first).id == block.id %}
+{% set tagTitulo = (ehPrimeiro and page is defined and not (page.showTitle ?? true)) ? 'h1' : 'h2' %}
+{% set destaque = cfg.titleHighlight ?? '' %}
+<div class="wab-block grid {{ block.image ? 'lg:grid-cols-2' : '' }} items-center gap-10 lg:gap-14 py-6">
+    <div class="text-left" data-aos="fade-right">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}
+        <{{ tagTitulo }} class="text-3xl md:text-5xl font-black leading-tight text-cetec-primary-text mb-5">
+            {%- if destaque and destaque in block.title -%}
+                {%- set partes = block.title|split(destaque, 2) -%}
+                {{ partes[0] }}<span class="text-cetec-secondary-text">{{ destaque }}</span>{{ partes[1] }}
+            {%- else -%}
+                {{ block.title }}
+            {%- endif -%}
+        </{{ tagTitulo }}>
+        {% endif %}
+        {% if block.text %}
+            <div class="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed max-w-xl">{{ block.text|nl2br }}</div>
+        {% endif %}
+        {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+            <div class="mt-7">
+                <a href="{{ cfg.ctaLink }}" class="inline-flex items-center gap-2 bg-cetec-primary px-6 py-3 rounded-md font-black text-sm shadow-md hover:brightness-90 transition-all" style="color:var(--color-on-primary)">
+                    {{ cfg.ctaText }} {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {% if block.image %}
+    {% set arquivo = 'uploads/page_block/' ~ block.image %}
+    <figure class="relative m-0 overflow-hidden rounded-2xl shadow-xl min-h-[320px] lg:min-h-[480px]" data-aos="fade-left">
+        <img {{ arquivo|thumb_attrs('destaque_foto') }}
+             srcset="{{ arquivo|thumb_srcset({'destaque_foto_mobile': 800, 'destaque_foto': 1400}) }}"
+             sizes="(min-width: 1024px) 50vw, 100vw"
+             alt="{{ cfg.caption ?? block.title }}"
+             {% if ehPrimeiro %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async"
+             class="absolute inset-0 w-full h-full object-cover">
+        {% if cfg.stampNumber ?? null %}
+            <div class="absolute top-4 right-4 w-24 h-24 md:w-28 md:h-28 rounded-full border border-white/70 bg-black/45 backdrop-blur text-white flex flex-col items-center justify-center text-center text-[10px] uppercase tracking-wider leading-tight px-2">
+                <strong class="text-3xl md:text-4xl font-black normal-case tracking-tight">{{ cfg.stampNumber }}</strong>
+                {{ cfg.stampLabel ?? '' }}
+            </div>
+        {% endif %}
+        {% if cfg.caption ?? null %}
+            <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white text-sm px-6 pt-12 pb-5">{{ cfg.caption }}</figcaption>
+        {% endif %}
+    </figure>
+    {% endif %}
+</div>
+{% endif %}

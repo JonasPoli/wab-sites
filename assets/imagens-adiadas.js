@@ -70,6 +70,37 @@
         }
     }
 
+    /*
+     * Vídeo MP4 que toca sozinho (bloco de vídeo com "tocar sozinho"): sai com
+     * preload="none" e só é baixado e tocado quando chega perto da tela, mudo e em
+     * repetição. Sem isso, um vídeo no meio da página disputaria banda com a imagem do topo.
+     */
+    var videos = document.querySelectorAll('video[data-tocar-perto]');
+    if (videos.length) {
+        var tocar = function (video) {
+            video.removeAttribute('data-tocar-perto');
+            video.muted = true;
+            video.preload = 'auto';
+            var promessa = video.play();
+            if (promessa && typeof promessa.catch === 'function') {
+                promessa.catch(function () { video.setAttribute('controls', ''); });
+            }
+        };
+        if (typeof IntersectionObserver === 'undefined') {
+            Array.prototype.forEach.call(videos, tocar);
+        } else {
+            var vigiaVideo = new IntersectionObserver(function (entradas) {
+                entradas.forEach(function (entrada) {
+                    if (entrada.isIntersecting) {
+                        tocar(entrada.target);
+                        vigiaVideo.unobserve(entrada.target);
+                    }
+                });
+            }, { rootMargin: '200px' });
+            Array.prototype.forEach.call(videos, function (video) { vigiaVideo.observe(video); });
+        }
+    }
+
     // Se o visitante mexer no carrossel antes disso, as imagens entram na hora.
     ['pointerdown', 'keydown', 'touchstart'].forEach(function (evento) {
         window.addEventListener(evento, promover, { once: true, passive: true });

@@ -1,0 +1,22 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="hero_split">
+    {{ c.cabecalho(block) }}
+    <div class="af-field">
+        <label>Trecho do título em destaque</label>
+        <input type="text" name="config[titleHighlight]" class="ai" value="{{ cfg.titleHighlight ?? '' }}" placeholder="ex.: histórias">
+        <p class="af-hint">Escreva exatamente como está no título; esse trecho sai na cor da marca.</p>
+    </div>
+    {{ c.botao(cfg) }}
+    {{ c.imagem(block, 'Foto', 'JPG, PNG ou WebP · recomendado 1600 px de largura · aparece ao lado do texto') }}
+    <div class="af-row">
+        <div class="af-field"><label>Selo: número</label><input type="text" name="config[stampNumber]" class="ai" value="{{ cfg.stampNumber ?? '' }}" maxlength="12" placeholder="88"></div>
+        <div class="af-field"><label>Selo: legenda</label><input type="text" name="config[stampLabel]" class="ai" value="{{ cfg.stampLabel ?? '' }}" maxlength="40" placeholder="anos de tradição"></div>
+    </div>
+    <div class="af-field">
+        <label>Legenda da foto</label>
+        <input type="text" name="config[caption]" class="ai" value="{{ cfg.caption ?? '' }}" maxlength="120" placeholder="Peças únicas, criadas para cada espaço">
+    </div>
+    {{ c.acoes(block, section) }}
+</form>

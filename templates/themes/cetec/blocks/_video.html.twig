@@ -1,0 +1,45 @@
+{#
+  Vídeo (video): YouTube pelo link ou MP4 enviado, com texto ao lado. O player do
+  YouTube só entra perto da tela (iframe[data-adiada], assets/imagens-adiadas.js); o MP4
+  não é baixado antes de tocar, salvo com "tocar sozinho", que toca mudo perto da tela.
+#}
+{% set cfg = block.config ?? {} %}
+{% set mp4 = cfg.videoFile ?? null %}
+{% set yt = mp4 ? null : (block.embedUrl|youtube_id) %}
+{% set vertical = (cfg.orientation ?? 'horizontal') == 'vertical' %}
+{% set temTexto = block.title or block.text or block.preTitle %}
+{% set temVideo = mp4 or yt %}
+{% if temVideo or temTexto %}
+{% set videoEsquerda = (cfg.videoPosition ?? 'right') == 'left' %}
+<div class="wab-block grid {{ temVideo and temTexto ? 'lg:grid-cols-2' : '' }} items-center gap-10 lg:gap-16 py-6" data-aos="fade-up">
+    {% if temTexto %}
+    <div class="text-left">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-4 text-cetec-primary-text leading-tight">{{ block.title }}</h2>{% endif %}
+        {% if block.text %}<div class="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed">{{ block.text|nl2br }}</div>{% endif %}
+        {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+            <div class="mt-6"><a href="{{ cfg.ctaLink }}" class="inline-flex items-center gap-2 bg-cetec-secondary text-cetec-dark px-6 py-3 rounded-md font-black text-sm shadow-md hover:brightness-90 transition-all">{{ cfg.ctaText }} {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}</a></div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if temVideo %}
+    <div class="{{ videoEsquerda ? 'lg:order-first' }} {{ vertical ? 'w-full max-w-[320px] mx-auto' : 'w-full' }}">
+        <div class="relative overflow-hidden rounded-2xl shadow-xl bg-black {{ vertical ? 'aspect-[9/16]' : 'aspect-video' }}">
+            {% if mp4 %}
+                <video class="absolute inset-0 w-full h-full object-cover" playsinline preload="none"
+                       {% if (cfg.autoplay ?? '') == '1' %}muted loop data-tocar-perto{% else %}controls{% endif %}
+                       {% if block.image %}poster="{{ ('uploads/page_block/' ~ block.image)|thumb('bloco_imagem') }}"{% endif %}
+                       aria-label="{{ block.title ?: 'Vídeo' }}">
+                    <source src="{{ asset('uploads/page_block_video/' ~ mp4) }}" type="video/mp4">
+                </video>
+            {% else %}
+                <iframe data-adiada="https://www.youtube-nocookie.com/embed/{{ yt|e('url') }}" title="Vídeo: {{ block.title ?: 'YouTube' }}"
+                        class="absolute inset-0 w-full h-full border-0" loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}

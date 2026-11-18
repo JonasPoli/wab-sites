@@ -1,0 +1,8 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="cta">
+    {{ c.cabecalho(block, true, 2) }}
+    {{ c.botao(cfg, 'Botão', true) }}
+    {{ c.acoes(block, section) }}
+</form>

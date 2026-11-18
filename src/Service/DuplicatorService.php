@@ -73,6 +73,8 @@ class DuplicatorService
             $c->setBlock($copy);
             $c->setFilename($img->getFilename());
             $c->setCaption($img->getCaption() ?? null);
+            $c->setTitle($img->getTitle());
+            $c->setCategory($img->getCategory());
             $c->setPosition($img->getPosition());
             $this->em->persist($c);
             $copy->getGalleryImages()->add($c);

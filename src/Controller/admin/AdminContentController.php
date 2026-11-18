@@ -595,6 +595,9 @@ class AdminContentController extends AbstractController
         $catId = (int) $r->request->get('relatedCategoryId');
         $block->setRelatedCategory($catId ? $cats->find($catId) : null);
 
+        // O config do POST não traz o nome do MP4 do bloco de vídeo: guardar antes de trocar
+        $previousVideo = ($block->getConfig() ?? [])['videoFile'] ?? null;
+
         // Config JSON
         $cfg = $r->request->all('config');
         if (isset($cfg['items']) && is_array($cfg['items'])) {
@@ -616,11 +619,27 @@ class AdminContentController extends AbstractController
         $file = $r->files->get('imageFile');
         if ($file instanceof UploadedFile && $file->isValid()) { $block->setImageFile($file); }
 
-        // Gallery images
-        if ($type === 'gallery') {
+        // Gallery images (galeria e portfólio usam a mesma coleção de fotos)
+        if (in_array($type, ['gallery', 'portfolio'], true)) {
             $delIds = array_filter(array_map('intval', (array)$r->request->all('delete_gallery')));
             foreach ($block->getGalleryImages() as $img) {
                 if (in_array($img->getId(), $delIds, true)) { $em->remove($img); }
+            }
+            // Portfólio: título, categoria, texto alternativo e ordem de cada foto já gravada.
+            // Só as fotos deste bloco: um id de outro bloco no POST é ignorado.
+            if ($type === 'portfolio') {
+                $meta = $r->request->all('gallery_meta');
+                foreach ($block->getGalleryImages() as $img) {
+                    $dados = $meta[(string) $img->getId()] ?? null;
+                    if (!is_array($dados) || in_array($img->getId(), $delIds, true)) { continue; }
+                    $limpar = static fn ($v, int $max) => ($v = mb_substr(trim((string) $v), 0, $max)) === '' ? null : $v;
+                    $img->setTitle($limpar($dados['title'] ?? '', 255));
+                    $img->setCategory($limpar($dados['category'] ?? '', 100));
+                    $img->setCaption($limpar($dados['caption'] ?? '', 255));
+                    if (isset($dados['position']) && is_numeric($dados['position'])) {
+                        $img->setPosition((int) $dados['position']);
+                    }
+                }
             }
             foreach ((array)$r->files->all('galleryFiles') as $gFile) {
                 if (!$gFile instanceof UploadedFile || !$gFile->isValid()) { continue; }
@@ -784,6 +803,33 @@ class AdminContentController extends AbstractController
             }
         }
 
+
+        // Vídeo: MP4 enviado vai para uploads/page_block_video e o nome fica em config.videoFile
+        if ($type === 'video') {
+            $cfg = $block->getConfig() ?? [];
+            $anterior = $previousVideo ?? null;
+            if ($r->request->get('removeVideo') === '1') {
+                $anterior = null;
+            }
+            $video = $r->files->get('videoUpload');
+            if ($video instanceof UploadedFile) {
+                if (!$video->isValid()) {
+                    $this->addFlash('error', 'O vídeo não foi enviado: ' . $video->getErrorMessage());
+                } elseif ($video->getMimeType() !== 'video/mp4' || $video->getSize() > 30 * 1024 * 1024) {
+                    $this->addFlash('error', 'O vídeo precisa ser MP4 e ter até 30 MB. O vídeo anterior foi mantido.');
+                } else {
+                    $nome = uniqid('video_', true) . '.mp4';
+                    $video->move($this->getParameter('kernel.project_dir') . '/public/uploads/page_block_video', $nome);
+                    $anterior = $nome;
+                }
+            }
+            if ($anterior) {
+                $cfg['videoFile'] = $anterior;
+            } else {
+                unset($cfg['videoFile']);
+            }
+            $block->setConfig($cfg ?: null);
+        }
 
         // Banners (multi-slide support)
         if ($type === 'banner') {

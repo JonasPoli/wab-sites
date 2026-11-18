@@ -308,6 +308,8 @@ class TenantExporter
                 'id'       => $img->getId(),
                 'filename' => $img->getFilename(),
                 'caption'  => $img->getCaption(),
+                'title'    => $img->getTitle(),
+                'category' => $img->getCategory(),
                 'position' => $img->getPosition(),
             ];
         }
@@ -605,6 +607,11 @@ class TenantExporter
         if (!empty($config['image']) && is_string($config['image'])) {
             $this->addMediaFile($zip, 'page_block_image', $config['image']);
         }
+
+        // Bloco de vídeo: MP4 enviado (config.videoFile)
+        if (!empty($config['videoFile']) && is_string($config['videoFile'])) {
+            $this->addMediaFile($zip, 'page_block_video', $config['videoFile']);
+        }
     }
 
     private function addMediaFile(ZipArchive $zip, string $mapping, ?string $filename): void
@@ -643,6 +650,7 @@ class TenantExporter
             'section_bg_video'   => 'section/video',
             'page_block_image'   => 'page_block',
             'page_block_gallery' => 'page_block_gallery',
+            'page_block_video'   => 'page_block_video',
             'testimonial_avatar' => 'testimonial_avatar',
             'partner_logo'       => 'partner_logo',
             'team_member_image'  => 'team_member_image',

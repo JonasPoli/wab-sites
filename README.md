@@ -90,6 +90,15 @@ Os blocos de conteúdo são filhos diretos das seções e determinam o layout in
 | `testimonials` | Depoimentos | Lista de avaliações/depoimentos com notas em estrelas (1 a 5), nomes, avatares e cargos dos depoentes. |
 | `partner_logos` | Logos de Parceiros | Linha horizontal de logotipos de patrocinadores ou parceiros institucionais com animações de hover. |
 | `banner` | Banner | Slider de banners rotativos com imagens de fundo, títulos e botões de chamada de ação. |
+| `hero_split` | Destaque com foto | Texto (com um trecho do título em destaque) ao lado de uma foto com selo de número e legenda. Primeiro bloco da página sem título: sai como `h1` e a foto é pré-carregada. |
+| `highlights` | Faixa de destaques | 2 a 4 diferenciais curtos lado a lado. |
+| `portfolio` | Portfólio com filtro | Fotos com título e categoria; um botão por categoria filtra a grade sem recarregar. A primeira foto sai maior. |
+| `statement` | Manifesto com imagem | Texto sobre fundo escuro, número em destaque e foto até a borda da tela. |
+| `steps` | Etapas | Até 6 passos numerados (rótulo, título, texto). |
+| `cta` | Chamada para ação | Faixa na cor primária com título e botão (pode abrir em nova aba). |
+| `video` | Vídeo | YouTube pelo link (watch, youtu.be, shorts) ou MP4 enviado (até 30 MB, em `uploads/page_block_video`), horizontal ou vertical, com texto ao lado. |
+
+Os sete últimos são desenhados por `templates/themes/cetec/blocks/`, também nos temas `moderno`, `wab` e `noticias`. Ao criar um tipo novo, o teste `tests/Entity/BlockTypeCoberturaTest.php` cobra o formulário do painel, a entrada na escolha de tipo e o desenho em cada tema.
 
 > [!TIP]
 > Os blocos flexibilizam as propriedades armazenando configurações estruturais complexas (ex: links CTA, títulos de cards) em uma única coluna do tipo **JSON** (`config`), mantendo a tabela limpa e a arquitetura altamente extensível.
@@ -263,6 +272,7 @@ servidor não busca nada na internet para renderizar uma página.
    > O comando de fixtures apaga o banco local e cria três Tenants de desenvolvimento apontando para os hosts locais:
    > * **Tenant A (Domínio: `127.0.0.1`)**: Configurado com o tema `wab` e cores institucionais (Azul e Amarelo).
    > * **Tenant B (Domínio: `localhost`)**: Configurado com o tema `moderno` e cores escuras (Verde e Cinza).
+   > * **Conferência do tema cetec (Domínio: `cetec.localhost`)**: página `todos-os-blocos` (um bloco de cada tipo) e home em Modo Landing Page (`src/DataFixtures/CetecFixtures.php`, admin `cetec.admin` / `admin123`). Num banco já carregado, só ela: `php bin/console doctrine:fixtures:load --append --group=cetec`.
    > * **Portal de notícias (Domínio: `noticias.localhost`)**: Tema `noticias`, "AJoPE — Local", com editorias, cerca de 25 notícias, jornalistas em todas as situações e as páginas "Sobre" e "Todos os blocos" (`src/DataFixtures/PortalNoticiasFixtures.php`). Navegadores e o curl resolvem `*.localhost` para a máquina local.
 
 5. **Iniciar o Servidor Local:**
@@ -273,6 +283,10 @@ servidor não busca nada na internet para renderizar uma página.
    php -S 127.0.0.1:8000 -t public
    ```
    > Com o servidor embutido do PHP sem script de roteamento, as miniaturas do LiipImagine (`/media/cache/resolve/...jpg`) respondem 404, porque o PHP trata a URL como arquivo estático. Prefira `symfony server:start`.
+
+   > Neste Mac o projeto fica num disco exFAT, e o verificador de maiúsculas do Symfony em modo debug recusa uma pasta do `liip/imagine-bundle`. Rode o servidor e o console com `APP_DEBUG=0` (`APP_DEBUG=0 symfony server:start -d`) e limpe o cache dos templates depois de editar (`rm -rf var/cache/dev/twig`).
+   >
+   > Para provar que uma mudança não alterou os sites que já existem: `sh/regressao.sh capturar antes` antes de mexer, `sh/regressao.sh capturar depois` no fim (sem recarregar as fixtures) e `sh/regressao.sh comparar`.
 
 ### Acessos de Teste
 

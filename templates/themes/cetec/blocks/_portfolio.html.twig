@@ -1,0 +1,78 @@
+{#
+  Portfólio com filtro (portfolio): fotos do bloco em grade, a primeira maior, com
+  categoria e título; os botões escondem as fotos das outras categorias sem recarregar.
+  Sem JavaScript, todas as fotos aparecem.
+#}
+{% set cfg = block.config ?? {} %}
+{% set fotos = block.galleryImages %}
+{% if fotos|length > 0 %}
+{% set categorias = {} %}
+{% for f in fotos %}{% if f.category %}{% set chave = f.category|lower|trim %}{% if categorias[chave] is not defined %}{% set categorias = categorias|merge({(chave): f.category}) %}{% endif %}{% endif %}{% endfor %}
+<div class="wab-block my-12" id="portfolio-{{ block.id }}" data-aos="fade-up">
+    {% if block.preTitle or block.title or block.text %}
+    <div class="text-center max-w-3xl mx-auto mb-10">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xl mx-auto">{{ block.text }}</p>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if categorias|length > 1 %}
+    <div class="flex flex-wrap justify-center gap-2 mb-8" role="group" aria-label="Filtrar fotos por categoria">
+        <button type="button" class="wab-filtro px-4 py-2 rounded-full border border-gray-300 dark:border-white/20 text-xs font-bold transition-colors" data-filtro="*" aria-pressed="true">Todos</button>
+        {% for chave, nome in categorias %}
+        <button type="button" class="wab-filtro px-4 py-2 rounded-full border border-gray-300 dark:border-white/20 text-xs font-bold transition-colors" data-filtro="{{ chave }}" aria-pressed="false">{{ nome }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[170px] md:auto-rows-[230px]">
+        {% for f in fotos %}
+        {% set arquivo = 'uploads/page_block_gallery/' ~ f.filename %}
+        <figure class="relative m-0 overflow-hidden rounded-xl group bg-gray-200 dark:bg-white/5 {{ loop.first ? 'col-span-2 lg:col-span-1 row-span-2' }}" data-categoria="{{ f.category ? f.category|lower|trim : '' }}">
+            <img {{ arquivo|thumb_attrs(loop.first ? 'portfolio_grande' : 'portfolio') }} alt="{{ f.caption ?: f.title ?: block.title }}" loading="lazy" decoding="async"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            {% if f.title or f.category %}
+            <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent text-white px-4 pt-10 pb-4">
+                {% if f.category %}<small class="block text-[10px] uppercase tracking-widest opacity-90 mb-1">{{ f.category }}</small>{% endif %}
+                {% if f.title %}<strong class="text-sm md:text-base font-semibold">{{ f.title }}</strong>{% endif %}
+            </figcaption>
+            {% endif %}
+        </figure>
+        {% endfor %}
+    </div>
+
+    {% if (cfg.note ?? null) or ((cfg.ctaText ?? null) and (cfg.ctaLink ?? null)) %}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6 text-xs text-gray-600 dark:text-gray-400">
+        <span>{{ cfg.note ?? '' }}</span>
+        {% if (cfg.ctaText ?? null) and (cfg.ctaLink ?? null) %}
+            <a href="{{ cfg.ctaLink }}" class="inline-flex items-center gap-2 border border-gray-300 dark:border-white/20 px-5 py-3 rounded-md font-bold text-sm text-cetec-primary-text hover:bg-cetec-primary hover:text-white transition-colors">{{ cfg.ctaText }} {{ ux_icon('bi:arrow-right', {'aria-hidden': 'true'}) }}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% if categorias|length > 1 %}
+<style>
+.wab-filtro[aria-pressed="true"] { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+</style>
+<script>
+(function () {
+    window.wabPortfolio = window.wabPortfolio || function (raiz) {
+        if (!raiz) return;
+        var botoes = raiz.querySelectorAll('[data-filtro]');
+        Array.prototype.forEach.call(botoes, function (botao) {
+            botao.addEventListener('click', function () {
+                var filtro = botao.getAttribute('data-filtro');
+                Array.prototype.forEach.call(botoes, function (b) { b.setAttribute('aria-pressed', b === botao ? 'true' : 'false'); });
+                Array.prototype.forEach.call(raiz.querySelectorAll('[data-categoria]'), function (item) {
+                    item.classList.toggle('hidden', filtro !== '*' && item.getAttribute('data-categoria') !== filtro);
+                });
+            });
+        });
+    };
+    window.wabPortfolio(document.getElementById('portfolio-{{ block.id }}'));
+})();
+</script>
+{% endif %}
+{% endif %}

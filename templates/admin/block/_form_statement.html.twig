@@ -1,0 +1,13 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="statement">
+    {{ c.cabecalho(block, true, 5) }}
+    <div class="af-row">
+        <div class="af-field"><label>Número em destaque</label><input type="text" name="config[statNumber]" class="ai" value="{{ cfg.statNumber ?? '' }}" maxlength="12" placeholder="88"></div>
+        <div class="af-field"><label>Legenda do número</label><input type="text" name="config[statLabel]" class="ai" value="{{ cfg.statLabel ?? '' }}" maxlength="120" placeholder="anos de história"></div>
+    </div>
+    {{ c.imagem(block, 'Foto', 'JPG, PNG ou WebP · ocupa metade da largura, até a borda da tela') }}
+    {{ c.lado('imagePosition', cfg, 'Lado da foto') }}
+    {{ c.acoes(block, section) }}
+</form>

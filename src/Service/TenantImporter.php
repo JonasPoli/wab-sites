@@ -396,6 +396,8 @@ class TenantImporter
                     $gImg->setBlock($block);
                     $gImg->setFilename($imgData['filename']);
                     $gImg->setCaption($imgData['caption'] ?? null);
+                    $gImg->setTitle($imgData['title'] ?? null);
+                    $gImg->setCategory($imgData['category'] ?? null);
                     $gImg->setPosition((int) $imgData['position']);
                     $this->em->persist($gImg);
                     $this->relocateMediaFile($tempWorkDir, 'page_block_gallery', $imgData['filename']);
@@ -670,6 +672,11 @@ class TenantImporter
         if (!empty($config['image']) && is_string($config['image'])) {
             $this->relocateMediaFile($tempWorkDir, 'page_block_image', $config['image']);
         }
+
+        // Bloco de vídeo: MP4 enviado (config.videoFile)
+        if (!empty($config['videoFile']) && is_string($config['videoFile'])) {
+            $this->relocateMediaFile($tempWorkDir, 'page_block_video', $config['videoFile']);
+        }
     }
 
     private function relocateMediaFile(string $tempWorkDir, string $mapping, string $filename): void
@@ -716,6 +723,7 @@ class TenantImporter
             'section_bg_video'   => 'section/video',
             'page_block_image'   => 'page_block',
             'page_block_gallery' => 'page_block_gallery',
+            'page_block_video'   => 'page_block_video',
             'testimonial_avatar' => 'testimonial_avatar',
             'partner_logo'       => 'partner_logo',
             'team_member_image'  => 'team_member_image',

@@ -32,6 +32,7 @@ final class AtivosExtension extends AbstractExtension
         return [
             new TwigFunction('usa_carrossel', $this->usaCarrossel(...)),
             new TwigFunction('imagem_do_lcp', $this->imagemDoLcp(...)),
+            new TwigFunction('filtros_do_lcp', $this->filtrosDoLcp(...)),
         ];
     }
 
@@ -124,6 +125,70 @@ final class AtivosExtension extends AbstractExtension
         }
 
         return null;
+    }
+
+    /** Blocos cuja foto é desenhada com os filtros `destaque_foto*`, e não os de banner. */
+    private const BLOCOS_DE_DESTAQUE = ['hero_split', 'statement'];
+
+    /**
+     * Filtros e `sizes` da pré-carga do LCP, para a pré-carga pedir o mesmo arquivo que a
+     * `<img>` vai pedir. O padrão é o do banner (`banner_mobile`/`banner_desktop`, 100vw),
+     * que vale para todas as páginas que existiam antes dos blocos novos; quando a imagem
+     * do LCP vem de um bloco `hero_split` ou `statement`, valem `destaque_foto*`, que não
+     * recortam a foto em 16:9, com o `sizes` que o tema informa.
+     *
+     * @param array<string, mixed> $contexto o `_context` do template
+     * @return array{filtros: array<string, int>, sizes: string}
+     */
+    public function filtrosDoLcp(array $contexto = [], string $sizesDoDestaque = '(min-width: 1024px) 50vw, 100vw'): array
+    {
+        $padrao = ['filtros' => ['banner_mobile' => 768, 'banner_desktop' => 1600], 'sizes' => '100vw'];
+
+        $banners = $contexto['banners'] ?? null;
+        if (is_iterable($banners)) {
+            foreach ($banners as $banner) {
+                if (method_exists($banner, 'getBackgroundImage') && $banner->getBackgroundImage()) {
+                    return $padrao;
+                }
+            }
+        }
+
+        foreach (['page', 'category'] as $chave) {
+            $alvo = $contexto[$chave] ?? null;
+            if (!$alvo instanceof Page && !$alvo instanceof Category) {
+                continue;
+            }
+            foreach ($alvo->getSections() as $secao) {
+                if (method_exists($secao, 'isActive') && !$secao->isActive()) {
+                    continue;
+                }
+                // Mesma ordem de imagemDoLcp(): banner, fundo da seção, primeira imagem de bloco
+                foreach ($secao->getBlocks() as $bloco) {
+                    if ($this->tipo($bloco) === 'banner') {
+                        return $padrao;
+                    }
+                }
+                if ($secao->getBgType() === 'image' && $secao->getBgImage()) {
+                    return $padrao;
+                }
+                foreach ($secao->getBlocks() as $bloco) {
+                    if ($bloco->getImage()) {
+                        return in_array($this->tipo($bloco), self::BLOCOS_DE_DESTAQUE, true)
+                            ? ['filtros' => ['destaque_foto_mobile' => 800, 'destaque_foto' => 1400], 'sizes' => $sizesDoDestaque]
+                            : $padrao;
+                    }
+                }
+                break;
+            }
+        }
+
+        return $padrao;
+    }
+
+    private function tipo(object $bloco): string
+    {
+        $tipo = $bloco->getType();
+        return $tipo instanceof \BackedEnum ? (string) $tipo->value : (string) $tipo;
     }
 
     private function temBlocoDeCarrossel(Page|Category $alvo): bool

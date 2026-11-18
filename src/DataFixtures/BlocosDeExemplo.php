@@ -1,0 +1,235 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Category;
+use App\Entity\Page;
+use App\Entity\PageBlock;
+use App\Entity\PageBlockImage;
+use App\Entity\PageBlockPartnerLogo;
+use App\Entity\PageBlockTeamMember;
+use App\Entity\PageBlockTestimonial;
+use App\Entity\PageSection;
+use App\Entity\Tenant;
+use App\Service\PlaceholderImageFactory;
+use Doctrine\Persistence\ObjectManager;
+
+/**
+ * Páginas de exemplo para conferir os temas institucionais (CetecFixtures, AtelieFixtures):
+ *
+ *   - "todos-os-blocos": uma seção por tipo de bloco, preenchida;
+ *   - "inicio": home em Modo Landing Page com o conteúdo do layout de referência
+ *     (openspec/changes/tema-atelie/referencia/proposta-redesign-marcenaria-pichoneri.html).
+ *
+ * As imagens são degradês gerados com GD (nenhuma foto real, nada da internet).
+ */
+trait BlocosDeExemplo
+{
+    abstract protected function imagens(): PlaceholderImageFactory;
+
+    /** @var array<string, string> cache de arquivos gerados por nome */
+    private array $gerados = [];
+
+    private function img(string $dir, string $nome, int $w, int $h, array $de, array $para): ?string
+    {
+        $chave = $dir . '/' . $nome;
+        return $this->gerados[$chave] ??= (string) $this->imagens()->gradient($dir, $nome, $w, $h, $de, $para);
+    }
+
+    private function secao(ObjectManager $m, Page $page, int $pos, ?string $t1 = null, ?string $t2 = null, bool $noMenu = true): PageSection
+    {
+        $s = (new PageSection())->setPage($page)->setPosition($pos)->setTitlePart1($t1)->setTitlePart2($t2)->setShowInMenu($noMenu);
+        $m->persist($s);
+        return $s;
+    }
+
+    private function bloco(ObjectManager $m, PageSection $s, string $tipo, array $d = []): PageBlock
+    {
+        $b = (new PageBlock())->setSection($s)->setType($tipo)
+            ->setPreTitle($d['preTitle'] ?? null)
+            ->setTitle($d['title'] ?? null)
+            ->setText($d['text'] ?? null)
+            ->setImage($d['image'] ?? null)
+            ->setConfig($d['config'] ?? null)
+            ->setEmbedUrl($d['embedUrl'] ?? null)
+            ->setItemCount($d['itemCount'] ?? null)
+            ->setRelatedCategory($d['relatedCategory'] ?? null)
+            ->setPosition($d['position'] ?? 0);
+        $m->persist($b);
+        return $b;
+    }
+
+    /** Fotos do portfólio: [título, categoria] */
+    private function fotosDoPortfolio(ObjectManager $m, PageBlock $b, string $prefixo, array $fotos): void
+    {
+        $cores = [[[110, 70, 40], [210, 170, 120]], [[60, 60, 55], [190, 180, 160]], [[150, 90, 30], [240, 210, 160]], [[40, 50, 70], [170, 180, 200]], [[90, 60, 50], [220, 190, 170]]];
+        foreach ($fotos as $i => [$titulo, $categoria]) {
+            [$de, $para] = $cores[$i % count($cores)];
+            $arq = $this->img('uploads/page_block_gallery', sprintf('%s-portfolio-%d.jpg', $prefixo, $i + 1), 1200, 900, $de, $para);
+            $m->persist((new PageBlockImage())->setBlock($b)->setFilename($arq)->setTitle($titulo)->setCategory($categoria)
+                ->setCaption($titulo . ' — foto de exemplo')->setPosition($i));
+        }
+    }
+
+    private function paginaTodosOsBlocos(ObjectManager $m, Tenant $tenant, Category $categoria, string $prefixo, bool $comBlog = false): Page
+    {
+        $page = (new Page())->setTenant($tenant)->setTitle('Todos os blocos')->setSlug('todos-os-blocos')->setCategory($categoria);
+        $m->persist($page);
+
+        $foto = $this->img('uploads/page_block', $prefixo . '-destaque.jpg', 1400, 1100, [120, 70, 30], [230, 200, 160]);
+        $fotoManifesto = $this->img('uploads/page_block', $prefixo . '-manifesto.jpg', 1400, 1000, [50, 45, 40], [180, 150, 110]);
+
+        $tipos = [
+            'hero_split'     => ['preTitle' => 'Do detalhe ao extraordinário', 'title' => 'Madeira, design e histórias feitas para durar.',
+                                 'text' => 'Mobiliário e soluções de marcenaria sob medida, com a precisão de hoje e a experiência de gerações.', 'image' => $foto,
+                                 'config' => ['titleHighlight' => 'histórias', 'ctaText' => 'Conheça nossos projetos', 'ctaLink' => '#projetos',
+                                              'stampNumber' => '88', 'stampLabel' => 'anos de tradição', 'caption' => 'Peças únicas, criadas para cada espaço']],
+            'highlights'     => ['config' => ['items' => [
+                                    ['title' => '88 anos de história', 'text' => 'Experiência que atravessa gerações'],
+                                    ['title' => 'Projetos sob medida', 'text' => 'Para necessidades e ambientes únicos'],
+                                    ['title' => 'Projeto em 3D', 'text' => 'Planejamento antes da execução'],
+                                    ['title' => 'Execução completa', 'text' => 'Da fabricação à instalação'],
+                                 ]]],
+            'portfolio'      => ['preTitle' => 'Portfólio selecionado', 'title' => 'O cuidado está em cada detalhe.',
+                                 'text' => 'Da concepção ao acabamento, uma seleção de trabalhos.', 'config' => ['note' => 'Fotos de exemplo.', 'ctaText' => 'Quero um projeto assim', 'ctaLink' => '#contato']],
+            'statement'      => ['preTitle' => 'Nossa essência', 'title' => 'Tradição artesanal. Precisão contemporânea.',
+                                 'text' => 'Uma história construída com dedicação, confiança e respeito à matéria-prima.', 'image' => $fotoManifesto,
+                                 'config' => ['statNumber' => '88', 'statLabel' => 'anos de história', 'imagePosition' => 'right']],
+            'steps'          => ['preTitle' => 'Como trabalhamos', 'title' => 'Uma boa execução começa pelo diálogo.', 'text' => 'Um percurso simples de entender.',
+                                 'config' => ['steps' => [
+                                    ['label' => '01 / Entendimento', 'title' => 'Escuta e briefing', 'text' => 'Conhecemos a ideia, o espaço e os objetivos do projeto.'],
+                                    ['label' => '', 'title' => 'Projeto e 3D', 'text' => 'Visualização, definições técnicas e detalhamento.'],
+                                    ['label' => '03 / Produção', 'title' => 'Fabricação', 'text' => 'Execução com atenção aos materiais e acabamentos.'],
+                                    ['label' => '04 / Finalização', 'title' => 'Instalação', 'text' => 'Montagem e ajustes para a entrega do ambiente.'],
+                                 ]]],
+            'cta'            => ['preTitle' => 'Vamos conversar?', 'title' => 'Seu próximo ambiente começa com uma boa ideia.',
+                                 'config' => ['ctaText' => 'Falar sobre meu projeto', 'ctaLink' => 'https://wa.me/5500000000000', 'ctaNewTab' => '1']],
+            'video'          => ['preTitle' => 'Projeto 3D', 'title' => 'Planeje sem erros, execute com perfeição.',
+                                 'text' => 'Visualize seu projeto em 3D antes da execução.', 'embedUrl' => 'https://www.youtube.com/shorts/7-y0py3nPrQ',
+                                 'config' => ['orientation' => 'vertical', 'videoPosition' => 'right']],
+            'banner'         => ['title' => 'Banner de exemplo', 'text' => 'Texto do banner', 'config' => ['ctaText' => 'Saiba mais', 'ctaLink' => '#contato']],
+            'text_image'     => ['title' => 'Imagem e texto', 'text' => 'Texto ao lado da imagem.', 'image' => $foto, 'config' => ['imagePosition' => 'left']],
+            'text_only'      => ['title' => 'Só texto', 'text' => '<p>Bloco de texto simples.</p>'],
+            'gallery'        => ['title' => 'Galeria'],
+            'newsletter'     => ['title' => 'Receba as novidades'],
+            'stats'          => ['title' => 'Números', 'config' => ['stats' => [['number' => '88', 'label' => 'Anos'], ['number' => '1.500+', 'label' => 'Projetos']]]],
+            'news_call'      => ['title' => 'Chamada para páginas', 'itemCount' => 3, 'relatedCategory' => $categoria],
+            'map'            => ['title' => 'Mapa', 'embedUrl' => 'https://www.google.com/maps/embed?pb=!1m14'],
+            'sub_categories' => ['title' => 'Subcategorias', 'relatedCategory' => $categoria],
+            'page_list'      => ['title' => 'Lista de páginas', 'itemCount' => 5, 'relatedCategory' => $categoria],
+            'blurbs4'        => ['preTitle' => 'Soluções', 'title' => 'Versatilidade para diferentes espaços.', 'config' => ['items' => [
+                                    ['icon' => 'fa-solid fa-house', 'title' => 'Residencial', 'text' => 'Cozinhas, armários, painéis e móveis personalizados.'],
+                                    ['icon' => 'fa-solid fa-building', 'title' => 'Corporativo', 'text' => 'Ambientes de trabalho e mobiliário sob medida.'],
+                                    ['icon' => 'fa-solid fa-industry', 'title' => 'Industrial', 'text' => 'Soluções especiais para necessidades técnicas.'],
+                                    ['icon' => 'fa-solid fa-house-medical', 'title' => 'Hospitalar', 'text' => 'Mobiliário adequado às exigências de cada projeto.'],
+                                 ]]],
+            'testimonials'   => ['preTitle' => 'Quem confia em nosso trabalho', 'title' => 'Depoimentos'],
+            'partner_logos'  => ['title' => 'Parceiros', 'config' => ['columns' => 4, 'style' => 'grid']],
+            'team'           => ['title' => 'Equipe'],
+            'contact'        => ['title' => 'Contato'],
+        ];
+        if ($comBlog) {
+            $tipos['blog_posts'] = ['preTitle' => 'Blog', 'title' => 'Últimas do blog', 'itemCount' => 3];
+        }
+
+        $pos = 0;
+        foreach ($tipos as $tipo => $dados) {
+            $s = $this->secao($m, $page, $pos++);
+            $b = $this->bloco($m, $s, $tipo, $dados);
+            match ($tipo) {
+                'portfolio' => $this->fotosDoPortfolio($m, $b, $prefixo, [
+                    ['Design orgânico e funcional', 'Corporativo'], ['Cozinha planejada', 'Residencial'], ['Texturas e acabamento', 'Detalhes'],
+                    ['Estação de trabalho autoral', 'Corporativo'], ['Painéis e revestimentos', 'Residencial'],
+                ]),
+                'gallery' => $this->fotosDoPortfolio($m, $b, $prefixo . '-galeria', [['Foto 1', null], ['Foto 2', null], ['Foto 3', null]]),
+                'testimonials' => $m->persist((new PageBlockTestimonial())->setBlock($b)->setName('Vicente Carlos Meca')->setRole('Cliente')
+                    ->setText('Com a marcenaria não existe isso de "não fazemos". Tudo é possível.')->setRating(5)),
+                'partner_logos' => array_map(fn (int $i) => $m->persist((new PageBlockPartnerLogo())->setBlock($b)->setName('Parceiro ' . $i)
+                    ->setLogoFilename($this->img('uploads/partner_logo', sprintf('%s-parceiro-%d.jpg', $prefixo, $i), 280, 96, [90, 90, 90], [200, 200, 200]))
+                    ->setPosition($i)), [1, 2, 3, 4]),
+                'team' => $m->persist((new PageBlockTeamMember())->setBlock($b)->setName('Responsável Exemplo')->setRole('Marceneiro')
+                    ->setSlug($prefixo . '-responsavel')->setDetailEnabled(true)->setDetailLayout('classic')),
+                default => null,
+            };
+        }
+
+        return $page;
+    }
+
+    /** Home do layout de referência, em Modo Landing Page. */
+    private function paginaInicio(ObjectManager $m, Tenant $tenant, string $prefixo, bool $comBlog = false): Page
+    {
+        $page = (new Page())->setTenant($tenant)->setTitle('Início')->setSlug('inicio')->setShowTitle(false);
+        $m->persist($page);
+
+        $foto = $this->img('uploads/page_block', $prefixo . '-destaque.jpg', 1400, 1100, [120, 70, 30], [230, 200, 160]);
+        $fotoManifesto = $this->img('uploads/page_block', $prefixo . '-manifesto.jpg', 1400, 1000, [50, 45, 40], [180, 150, 110]);
+
+        $pos = 0;
+        $this->bloco($m, $this->secao($m, $page, $pos++, null, null, false), 'hero_split', [
+            'preTitle' => 'Do detalhe ao extraordinário', 'title' => 'Madeira, design e histórias feitas para durar.',
+            'text' => 'Mobiliário e soluções de marcenaria sob medida, com a precisão de hoje e a experiência de gerações.', 'image' => $foto,
+            'config' => ['titleHighlight' => 'histórias', 'ctaText' => 'Conheça nossos projetos', 'ctaLink' => '#projetos',
+                         'stampNumber' => '88', 'stampLabel' => 'anos de tradição', 'caption' => 'Peças únicas, criadas para cada espaço'],
+        ]);
+        $this->bloco($m, $this->secao($m, $page, $pos++, null, null, false), 'highlights', ['config' => ['items' => [
+            ['title' => '88 anos de história', 'text' => 'Experiência que atravessa gerações'],
+            ['title' => 'Projetos sob medida', 'text' => 'Para necessidades e ambientes únicos'],
+            ['title' => 'Projeto em 3D', 'text' => 'Planejamento antes da execução'],
+            ['title' => 'Execução completa', 'text' => 'Da fabricação à instalação'],
+        ]]]);
+        $s = $this->secao($m, $page, $pos++, 'Projetos');
+        $s->setShowTitle(false);
+        $b = $this->bloco($m, $s, 'portfolio', [
+            'preTitle' => 'Portfólio selecionado', 'title' => 'O cuidado está em cada detalhe.',
+            'text' => 'Da concepção ao acabamento, uma seleção de trabalhos reais.',
+            'config' => ['note' => 'Fotos de exemplo.', 'ctaText' => 'Quero um projeto assim', 'ctaLink' => '#contato'],
+        ]);
+        $this->fotosDoPortfolio($m, $b, $prefixo, [
+            ['Design orgânico e funcional', 'Corporativo'], ['Cozinha planejada', 'Residencial'], ['Texturas e acabamento', 'Detalhes'],
+            ['Estação de trabalho autoral', 'Corporativo'], ['Painéis e revestimentos', 'Residencial'],
+        ]);
+        $s = $this->secao($m, $page, $pos++, 'Nossa história');
+        $s->setShowTitle(false);
+        $this->bloco($m, $s, 'statement', [
+            'preTitle' => 'Nossa essência', 'title' => 'Tradição artesanal. Precisão contemporânea.',
+            'text' => 'Uma história construída com dedicação, confiança e respeito à matéria-prima. Unimos experiência em marcenaria, tecnologia e atenção aos detalhes para materializar ideias de diferentes escalas.',
+            'image' => $fotoManifesto, 'config' => ['statNumber' => '88', 'statLabel' => 'anos de história', 'imagePosition' => 'right'],
+        ]);
+        $s = $this->secao($m, $page, $pos++, 'O que fazemos');
+        $s->setShowTitle(false);
+        $this->bloco($m, $s, 'blurbs4', ['preTitle' => 'Soluções', 'title' => 'Versatilidade para diferentes espaços.',
+            'text' => 'Propostas pensadas para a forma como cada ambiente é vivido, utilizado e transformado.',
+            'config' => ['items' => [
+                ['icon' => 'fa-solid fa-house', 'title' => 'Residencial', 'text' => 'Cozinhas, armários, painéis e móveis personalizados.'],
+                ['icon' => 'fa-solid fa-building', 'title' => 'Corporativo', 'text' => 'Ambientes de trabalho e mobiliário funcional sob medida.'],
+                ['icon' => 'fa-solid fa-industry', 'title' => 'Industrial', 'text' => 'Soluções especiais para espaços e necessidades técnicas.'],
+                ['icon' => 'fa-solid fa-house-medical', 'title' => 'Hospitalar', 'text' => 'Mobiliário adequado às exigências específicas de cada projeto.'],
+            ]]]);
+        $s = $this->secao($m, $page, $pos++, 'Nosso processo');
+        $s->setShowTitle(false);
+        $this->bloco($m, $s, 'steps', ['preTitle' => 'Como trabalhamos', 'title' => 'Uma boa execução começa pelo diálogo.',
+            'text' => 'Um percurso simples de entender e orientado à qualidade do resultado.',
+            'config' => ['steps' => [
+                ['label' => '01 / Entendimento', 'title' => 'Escuta e briefing', 'text' => 'Conhecemos a ideia, o espaço e os objetivos do projeto.'],
+                ['label' => '02 / Planejamento', 'title' => 'Projeto e 3D', 'text' => 'Visualização, definições técnicas e detalhamento.'],
+                ['label' => '03 / Produção', 'title' => 'Fabricação', 'text' => 'Execução com atenção aos materiais e acabamentos.'],
+                ['label' => '04 / Finalização', 'title' => 'Instalação', 'text' => 'Montagem e ajustes para a entrega do ambiente.'],
+            ]]]);
+        $b = $this->bloco($m, $this->secao($m, $page, $pos++, null, null, false), 'testimonials', ['preTitle' => 'Quem confia em nosso trabalho']);
+        $m->persist((new PageBlockTestimonial())->setBlock($b)->setName('Vicente Carlos Meca')->setRole('Depoimento de exemplo')
+            ->setText('Com a marcenaria não existe isso de "não fazemos". Tudo é possível.')->setRating(5));
+        if ($comBlog) {
+            $s = $this->secao($m, $page, $pos++, 'Blog');
+            $s->setShowTitle(false);
+            $this->bloco($m, $s, 'blog_posts', ['preTitle' => 'Blog', 'title' => 'Ideias para o seu ambiente.', 'itemCount' => 3]);
+        }
+        $this->bloco($m, $this->secao($m, $page, $pos++, null, null, false), 'cta', [
+            'preTitle' => 'Vamos conversar?', 'title' => 'Seu próximo ambiente começa com uma boa ideia.',
+            'config' => ['ctaText' => 'Falar sobre meu projeto', 'ctaLink' => 'https://wa.me/5500000000000', 'ctaNewTab' => '1'],
+        ]);
+        $this->bloco($m, $this->secao($m, $page, $pos++, 'Contato'), 'contact', ['title' => 'Peça seu orçamento']);
+
+        return $page;
+    }
+}

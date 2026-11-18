@@ -30,14 +30,17 @@
                         {% if sectionTitle == '' %}
                             {% set firstBlock = section.blocks|first %}
                             {% if firstBlock %}
-                                {% if firstBlock.type == 'banner' %}{% set sectionTitle = 'Início' %}
+                                {% if firstBlock.type in ['banner', 'hero_split'] %}{% set sectionTitle = 'Início' %}
                                 {% elseif firstBlock.type in ['features', 'blurbs', 'blurbs4'] %}{% set sectionTitle = 'Recursos' %}
                                 {% elseif firstBlock.type == 'team' %}{% set sectionTitle = 'Equipe' %}
-                                {% elseif firstBlock.type in ['about', 'content'] %}{% set sectionTitle = 'Sobre' %}
+                                {% elseif firstBlock.type in ['about', 'content', 'statement'] %}{% set sectionTitle = 'Sobre' %}
                                 {% elseif firstBlock.type == 'pricing' %}{% set sectionTitle = 'Preços' %}
-                                {% elseif firstBlock.type == 'contact' %}{% set sectionTitle = 'Contato' %}
+                                {% elseif firstBlock.type in ['contact', 'cta'] %}{% set sectionTitle = 'Contato' %}
                                 {% elseif firstBlock.type == 'faq' %}{% set sectionTitle = 'FAQ' %}
                                 {% elseif firstBlock.type in ['gallery', 'portfolio'] %}{% set sectionTitle = 'Portfólio' %}
+                                {% elseif firstBlock.type == 'steps' %}{% set sectionTitle = 'Como trabalhamos' %}
+                                {% elseif firstBlock.type == 'highlights' %}{% set sectionTitle = 'Diferenciais' %}
+                                {% elseif firstBlock.type == 'video' %}{% set sectionTitle = 'Vídeo' %}
                                 {% endif %}
                             {% endif %}
                         {% endif %}

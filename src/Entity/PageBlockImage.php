@@ -29,6 +29,14 @@ class PageBlockImage
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $caption = null;
 
+    /** Título da foto no bloco portfolio */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $title = null;
+
+    /** Categoria da foto no filtro do bloco portfolio */
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $category = null;
+
     #[ORM\Column(options: ['default' => 0])]
     private int $position = 0;
 
@@ -58,6 +66,12 @@ class PageBlockImage
 
     public function getCaption(): ?string { return $this->caption; }
     public function setCaption(?string $caption): static { $this->caption = $caption; return $this; }
+
+    public function getTitle(): ?string { return $this->title; }
+    public function setTitle(?string $title): static { $this->title = $title; return $this; }
+
+    public function getCategory(): ?string { return $this->category; }
+    public function setCategory(?string $category): static { $this->category = $category; return $this; }
 
     public function getPosition(): int { return $this->position; }
     public function setPosition(int $position): static { $this->position = $position; return $this; }

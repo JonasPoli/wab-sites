@@ -8,6 +8,7 @@ use App\Repository\PageRepository;
 use App\Service\TenantContext;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
@@ -43,6 +44,28 @@ class TenantExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+
+    #[\Override]
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('youtube_id', self::youtubeId(...)),
+        ];
+    }
+
+    /**
+     * Id do vídeo de um link do YouTube (watch?v=, youtu.be/, shorts/, embed/, live/);
+     * null para qualquer outro texto. Usado pelo bloco de vídeo.
+     */
+    public static function youtubeId(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+        $padrao = '~^(?:https?://)?(?:www\.|m\.)?(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$~';
+        return preg_match($padrao, $url, $m) ? $m[1] : null;
+    }
 
     #[\Override]
     public function getFunctions(): array

@@ -1,0 +1,20 @@
+{% import 'admin/block/_campos.html.twig' as c %}
+{% set cfg = block.config ?? {} %}
+<form method="post" action="{{ action }}" class="af">
+    <input type="hidden" name="type" value="steps">
+    {{ c.cabecalho(block, true, 3) }}
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Etapas (até 6, na ordem)</div>
+    <p class="af-hint" style="margin-bottom:.75rem">Etapa sem título não aparece. Rótulo vazio vira o número da etapa (01, 02…).</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+    {% for i in 0..5 %}
+        {% set st = {label: '', title: '', text: ''}|merge(cfg.steps[i] ?? {}) %}
+        <div class="card" style="margin:0;padding:1rem">
+            <div style="font-weight:600;font-size:.83rem;margin-bottom:.75rem">Etapa {{ i + 1 }}</div>
+            <div class="af-field"><label>Rótulo</label><input type="text" name="config[steps][{{ i }}][label]" class="ai" value="{{ st.label }}" maxlength="40" placeholder="01 / ENTENDIMENTO"></div>
+            <div class="af-field"><label>Título</label><input type="text" name="config[steps][{{ i }}][title]" class="ai" value="{{ st.title }}" maxlength="80"></div>
+            <div class="af-field"><label>Texto</label><textarea name="config[steps][{{ i }}][text]" class="ate" rows="2">{{ st.text }}</textarea></div>
+        </div>
+    {% endfor %}
+    </div>
+    {{ c.acoes(block, section) }}
+</form>

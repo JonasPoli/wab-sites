@@ -19,6 +19,13 @@ enum BlockType: string
     case Banner        = 'banner';
     case Team          = 'team';
     case Contact       = 'contact';
+    case HeroSplit     = 'hero_split';
+    case Highlights    = 'highlights';
+    case Portfolio     = 'portfolio';
+    case Statement     = 'statement';
+    case Steps         = 'steps';
+    case Cta           = 'cta';
+    case Video         = 'video';
 
     public function label(): string
     {
@@ -38,6 +45,13 @@ enum BlockType: string
             self::Banner        => 'Banner',
             self::Team          => 'Membros da Equipe',
             self::Contact       => 'Formulário de Contato',
+            self::HeroSplit     => 'Destaque com foto',
+            self::Highlights    => 'Faixa de destaques',
+            self::Portfolio     => 'Portfólio com filtro',
+            self::Statement     => 'Manifesto com imagem',
+            self::Steps         => 'Etapas',
+            self::Cta           => 'Chamada para ação',
+            self::Video         => 'Vídeo',
         };
     }
 
@@ -59,6 +73,13 @@ enum BlockType: string
             self::Banner        => 'fa-solid fa-image',
             self::Team          => 'fa-solid fa-users',
             self::Contact       => 'fa-solid fa-envelope',
+            self::HeroSplit     => 'fa-solid fa-panorama',
+            self::Highlights    => 'fa-solid fa-grip-lines',
+            self::Portfolio     => 'fa-solid fa-table-cells-large',
+            self::Statement     => 'fa-solid fa-quote-right',
+            self::Steps         => 'fa-solid fa-list-ol',
+            self::Cta           => 'fa-solid fa-bullhorn',
+            self::Video         => 'fa-solid fa-circle-play',
         };
     }
 }
