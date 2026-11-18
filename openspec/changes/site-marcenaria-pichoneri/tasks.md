@@ -65,6 +65,13 @@
 
 - [ ] 8.1 Uma semana depois da virada: conferir em `/admin/redirecionamentos` os acessos, procurar 404 recorrentes (Search Console ou log do nginx, se o Jonas tiver acesso) e cadastrar o que faltar; registrar o resultado no ticket do cliente
 
+## 9. Ajustes pedidos depois da montagem (18/11/2026)
+
+- [x] 9.1 Publicar "O que está por vir em 2024?" (no site antigo está publicado, só com a imagem) e apontar o redirecionamento do endereço antigo para `/blog/o-que-esta-por-vir-em-2024`; conferido 200 e 301
+- [x] 9.2 Capas dos 4 posts de 2026, que não têm imagem no site antigo (nem destacada, nem no corpo, nem anexada): quadro do vídeo anexado ao "Antes e Depois" e fotos de projetos do site antigo nos outros três; conferido: os 44 posts da listagem com imagem
+- [x] 9.3 Aviso de envio em janela (`templates/pub/_aviso.html.twig`, nos cinco temas): conferido no local (sucesso) e em produção (erro da newsletter, sem gravar nada), OK fecha a janela
+- [x] 9.4 Capa na lista de notícias do painel e `capa_pagina`/`admin_thumb` no `app:miniaturas:aquecer`: conferido no local (44 com capa, 6 sem) e o cabeçalho em produção; 81 miniaturas geradas e nenhuma imagem da listagem do blog dependendo de geração na hora
+
 ## Pendências
 
 - Importação de teste em `atelie.localhost` (18/11/2026): 44 posts, 1 rascunho ("O que está por vir em 2024?", sem texto), 4 sem capa (os de 2026), 4 categorias novas + "Tendências" já existente, 49 redirecionamentos; segunda execução com 44 pulados e 0 novos.
