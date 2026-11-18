@@ -14,8 +14,8 @@ O sistema SHALL responder em `/sitemap.xml` um XML com o cabeçalho `X-Robots-Ta
 - **THEN** o sitemap traz as 3 publicadas em `/noticias/{slug}` e não traz o rascunho
 
 #### Scenario: Site institucional
-- **WHEN** um site com tema cetec recebe `/sitemap.xml`
-- **THEN** o XML traz a home, as páginas e as categorias, sem URLs de notícia, de editoria nem de autor
+- **WHEN** um site com tema cetec e o blog desligado recebe `/sitemap.xml`
+- **THEN** o XML traz a home, as páginas e as categorias, sem URLs de notícia, de editoria, de autor nem do blog
 
 #### Scenario: Página que serve de home
 - **WHEN** o tenant tem `homePage` definida

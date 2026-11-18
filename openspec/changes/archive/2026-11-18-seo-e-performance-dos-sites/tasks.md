@@ -81,3 +81,8 @@
 - Registrar o resultado no ticket interno da WAB (cliente 196) com as medições antes e depois.
 - Preencher, com a equipe, a descrição de SEO dos tenants que estão sem ela.
 - Arquivar a change depois da conferência em produção.
+
+## Arquivamento
+
+- Arquivada em 18/11/2026 a pedido do Jonas com a tarefa 9.2 pendente: o cache longo do nginx em `/assets`, `/media/cache` e `/uploads` precisa ser configurado no painel do RunCloud (trecho pronto em `docs/nginx-cache-dos-estaticos.md`).
+- O requisito "Sitemap", longo demais para a validação estrita, foi dividido na spec principal em "Sitemap", "Sitemap do portal de notícias", "Data de alteração no sitemap" e "Endereços fora do sitemap", sem mudar o comportamento.
