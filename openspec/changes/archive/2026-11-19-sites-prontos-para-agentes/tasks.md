@@ -26,4 +26,10 @@
 
 - [x] 5.1 Zonas `_agents.<domínio>` dos 10 sites (escrita, root no wab2): backup, criação, delegação e DS nas zonas pai, validação com âncora
 - [x] 5.2 DNSSEC das 8 zonas de cliente (escrita, root no wab2): backup, delegação de subzonas, assinatura, teste com âncora, vigia e reassinatura estendidos; DS no registro.br (Jonas para abifer, pkwy, topdrim, transterraararaquara e cemporcentoexpresso; pedido aos clientes de marapossi, imperiodainformatica e petvida)
-- [ ] 5.3 Medir de novo; a cada site em 100, print marcado e resposta no ticket dele; registrar em docs e na skill `agentready-100`
+- [x] 5.3 Medir de novo; a cada site em 100, print marcado e resposta no ticket dele; registrar em docs e na skill `agentready-100`
+
+## Resultado (19/11/2026)
+
+- 100 no isitagentready.com: ajope.wab.com.br, pichoneri.wab.com.br, pkwy.com.br, site.transterraararaquara.com.br, site.topdrim.com.br, site.abifer.com.br e cemporcentoexpresso.com.br (DS publicado pela conta LMD16).
+- 93, nível 5: marapossi.com.br, imperiodainformatica.com.br e site.petvida.com.br. Zonas assinadas no wab2; falta só o DS no registro.br, que depende de quem administra cada domínio (MSSPO4, REGFI21, MAAAN31). Tickets #13486, #13489 e #13491 encerrados com essa observação.
+- Tickets #13486 a #13495 concluídos, com print do antes e do depois.

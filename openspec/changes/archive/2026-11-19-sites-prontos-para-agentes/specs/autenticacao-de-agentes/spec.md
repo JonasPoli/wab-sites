@@ -1,5 +1,9 @@
 # Spec Delta
 
+## Purpose
+
+Define como um agente de IA se registra e obtém acesso a dados de cada site (Auth.md e OAuth sem banco, com o emissor no domínio do tenant), a API para agentes e o agente A2A.
+
 ## ADDED Requirements
 
 ### Requirement: Auth.md e servidor de autorização por domínio

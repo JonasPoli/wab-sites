@@ -1,6 +1,10 @@
-# Spec Delta
+# integracoes-para-agentes Specification
 
-## ADDED Requirements
+## Purpose
+
+Define os protocolos e documentos que deixam agentes de IA usar cada site: o servidor MCP só de leitura, as habilidades, o cartão do servidor, os catálogos de API e ARD, o poppy.json e o WebMCP nos temas.
+
+## Requirements
 
 ### Requirement: Servidor MCP por domínio
 O sistema SHALL servir em `/mcp` de cada tenant um servidor MCP (Streamable HTTP, JSON-RPC 2.0, sem sessão e só de leitura) com as ferramentas `dados_do_site`, `listar_paginas`, `ler_pagina` e `listar_noticias`, e com as páginas públicas como recursos. Nenhuma ferramenta SHALL gravar dado ou enviar mensagem.

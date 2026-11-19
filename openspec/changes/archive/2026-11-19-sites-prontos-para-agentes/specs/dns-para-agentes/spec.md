@@ -1,5 +1,9 @@
 # Spec Delta
 
+## Purpose
+
+Define os registros DNS-AID de cada site e o DNSSEC das zonas dos domínios dos sites no servidor de DNS da WAB, condição para a descoberta de agentes por DNS ser validada.
+
 ## ADDED Requirements
 
 ### Requirement: Registros DNS-AID por domínio
