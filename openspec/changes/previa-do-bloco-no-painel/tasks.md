@@ -13,4 +13,11 @@
 
 ## 3. Publicação
 
-- [ ] 3.1 Testes, regressão, commit, deploy (`git pull` + `cache:clear`) e conferência no painel de produção
+- [x] 3.1 Testes, regressão, commit, deploy (`git pull` + `cache:clear`) e conferência no painel de produção
+
+## Conferência
+
+- Local: os 23 tipos abrem a tela de criação com a prévia e a prévia responde 200 sem erro nos temas atelie e cetec; edição de um portfólio com as fotos salvas; seção de outro site responde 404; sem cabeçalho, rodapé nem WhatsApp na prévia; `tests/Controller/PreviaDoBlocoTest.php` passa (texto enviado, parcial do tema, depoimento de exemplo, 404 e nenhum bloco gravado).
+- `sh/regressao.sh`: sem diferença causada pela mudança (só as já conhecidas do blog e uma notícia agendada das fixtures que passou a aparecer pelo horário).
+- Produção (Chrome, marapossi.com.br, sem salvar): prévia ao lado do formulário no tema cetec com os nomes dos campos vazios; título e item digitados aparecem em segundos; edição do bloco 9 com o conteúdo real; Ampliar (largura total) e Celular funcionando.
+- Acréscimo: botão "Ampliar", porque no modo Computador a prévia lado a lado fica pequena numa tela de notebook.
