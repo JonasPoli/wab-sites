@@ -18,12 +18,12 @@
 
 ## 4. Publicação
 
-- [ ] 4.1 Deploy (escrita): git pull, `./build.sh`; HTTP 200 dos 10 domínios
-- [ ] 4.2 Nginx (escrita, root no wabsites): backup, arquivo do D7, `nginx-rc -t`, recarregar; documentos em 200 nos 10 domínios, `acme-challenge` 404, `.env` 403
-- [ ] 4.3 Medir os 10 domínios no isitagentready.com e rodar o fluxo de ponta a ponta em todos
+- [x] 4.1 Deploy (escrita): git pull, `./build.sh`; HTTP 200 dos 10 domínios
+- [x] 4.2 Nginx (escrita, root no wabsites): backup, arquivo do D7, `nginx-rc -t`, recarregar; documentos em 200 nos 10 domínios, `acme-challenge` 404, `.env` 403
+- [x] 4.3 Medir os 10 domínios no isitagentready.com e rodar o fluxo de ponta a ponta em todos
 
 ## 5. DNS
 
-- [ ] 5.1 Zonas `_agents.<domínio>` dos 10 sites (escrita, root no wab2): backup, criação, delegação e DS nas zonas pai, validação com âncora
-- [ ] 5.2 DNSSEC das 8 zonas de cliente (escrita, root no wab2): backup, delegação de subzonas, assinatura, teste com âncora, vigia e reassinatura estendidos; DS no registro.br (Jonas para abifer, pkwy, topdrim, transterraararaquara e cemporcentoexpresso; pedido aos clientes de marapossi, imperiodainformatica e petvida)
+- [x] 5.1 Zonas `_agents.<domínio>` dos 10 sites (escrita, root no wab2): backup, criação, delegação e DS nas zonas pai, validação com âncora
+- [x] 5.2 DNSSEC das 8 zonas de cliente (escrita, root no wab2): backup, delegação de subzonas, assinatura, teste com âncora, vigia e reassinatura estendidos; DS no registro.br (Jonas para abifer, pkwy, topdrim, transterraararaquara e cemporcentoexpresso; pedido aos clientes de marapossi, imperiodainformatica e petvida)
 - [ ] 5.3 Medir de novo; a cada site em 100, print marcado e resposta no ticket dele; registrar em docs e na skill `agentready-100`

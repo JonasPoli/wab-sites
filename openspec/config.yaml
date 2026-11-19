@@ -54,6 +54,16 @@ context: |
     domínio do site do usuário (TenantUserChecker e TenantAccessVoter); os SuperAdmins (sem tenant e workGroup 0,
     ids 1 e 19) entram em todos.
 
+  Agentes de IA (mudança sites-prontos-para-agentes, 19/11/2026): todo tenant tem robots com regras de IA,
+  versão .md das páginas, llms.txt, servidor MCP (/mcp), A2A (/a2a), Auth.md com OAuth sem banco (chave em
+  var/oauth/<env>/, não apagar no deploy; o client_id leva o domínio e o APP_SECRET), API /api/agentes e
+  WebMCP no parcial themes/_comum/_webmcp.html.twig (incluído no base dos 5 temas). As páginas para agentes
+  vêm de App\Agentes\PaginasDoSite, a mesma fonte do sitemap. Os caminhos em /.well-known/ chegam ao
+  Symfony pelo arquivo /etc/nginx-rc/extra.d/app-wab-sites.location.main-before.descoberta-agentes.conf
+  (root no wabsites): rota nova em /.well-known/ precisa de bloco novo lá. Domínio novo de site precisa da
+  zona _agents.<domínio> e do DNSSEC no wab2 para chegar a 100 no isitagentready.com (ficha
+  docs/outros/dnssec-wab-com-br.md e skill agentready-100 do repositório servidores-wab-runcloud).
+
   Deploy
   - Local: git push origin main. No servidor, como runcloud, em ~/webapps/app-wab-sites: git pull; depois
     ./build.sh se mudou template, CSS, JS ou dependência, ou só bin/console cache:clear se mudou apenas PHP;
