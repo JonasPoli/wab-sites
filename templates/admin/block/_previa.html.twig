@@ -11,6 +11,7 @@
         <div class="previa-modos" role="group" aria-label="Tamanho da tela">
             <button type="button" class="btn btn-g btn-sm is-ativo" data-largura="1280" aria-pressed="true"><sl-icon name="display"></sl-icon> Computador</button>
             <button type="button" class="btn btn-g btn-sm" data-largura="390" aria-pressed="false"><sl-icon name="phone"></sl-icon> Celular</button>
+            <button type="button" class="btn btn-g btn-sm" data-ampliar aria-pressed="false" title="Mostrar a prévia em largura total, acima do formulário"><sl-icon name="arrows-angle-expand"></sl-icon> Ampliar</button>
             <button type="button" class="btn btn-g btn-sm" data-atualizar title="Atualizar a prévia"><sl-icon name="arrow-clockwise"></sl-icon></button>
         </div>
     </div>
@@ -21,6 +22,9 @@
 .bloco-editor{display:grid;grid-template-columns:1fr;gap:1.25rem;align-items:start}
 @media (min-width:1280px){.bloco-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.previa-bloco{position:sticky;top:1rem;max-height:calc(100vh - 2rem);overflow:auto}}
 .bloco-editor>.card{margin:0}
+.bloco-editor.is-ampliada{grid-template-columns:1fr}
+.bloco-editor.is-ampliada .previa-bloco{order:-1;position:static;max-height:none}
+.previa-modos [data-ampliar][aria-pressed="true"]{border-color:var(--primary);color:var(--primary)}
 .previa-bloco{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem}
 .previa-barra{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
 .previa-barra strong{display:inline-flex;align-items:center;gap:.4rem}
@@ -174,6 +178,17 @@
         });
     });
     raiz.querySelector('[data-atualizar]').addEventListener('click', atualizar);
+    // Ampliar: prévia em largura total acima do formulário (lembrado neste navegador)
+    var editor = raiz.closest('.bloco-editor');
+    var botaoAmpliar = raiz.querySelector('[data-ampliar]');
+    function ampliar(sim) {
+        editor.classList.toggle('is-ampliada', sim);
+        botaoAmpliar.setAttribute('aria-pressed', sim ? 'true' : 'false');
+        try { localStorage.setItem('wab-previa-ampliada', sim ? '1' : '0'); } catch (e) {}
+        setTimeout(ajustar, 50);
+    }
+    botaoAmpliar.addEventListener('click', function () { ampliar(!editor.classList.contains('is-ampliada')); });
+    try { if (localStorage.getItem('wab-previa-ampliada') === '1') ampliar(true); } catch (e) {}
     window.addEventListener('resize', ajustar);
     // O editor de texto rico termina de montar depois do DOMContentLoaded
     setTimeout(atualizar, 300);
