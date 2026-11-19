@@ -1,0 +1,23 @@
+{#- WebMCP (spec integracoes-para-agentes): registra a ferramenta ler_pagina em toda página
+    quando o navegador oferece document.modelContext (ou navigator.modelContext, nos
+    Chrome mais antigos). A ferramenta só lê: busca a versão Markdown da página. -#}
+<script>
+(function () {
+  var mc = document.modelContext || (window.navigator && window.navigator.modelContext);
+  if (!mc || typeof mc.registerTool !== 'function') { return; }
+  try {
+    mc.registerTool({
+      name: 'ler_pagina',
+      description: 'Lê uma página deste site ({{ app.request.host }}) em Markdown. Informe o caminho (por exemplo "/" para a home); sem caminho, lê a página atual. Lista das páginas: /llms.txt',
+      inputSchema: { type: 'object', properties: { caminho: { type: 'string', description: 'Caminho da página neste site' } } },
+      execute: function (args) {
+        var c = (args && args.caminho) || window.location.pathname;
+        var url = (c === '/' || c === '') ? '/index.md' : (/\.(md|txt)$/.test(c) ? c : c.replace(/\/$/, '') + '.md');
+        return fetch(url, { headers: { Accept: 'text/markdown' } })
+          .then(function (r) { return r.text(); })
+          .then(function (t) { return { content: [{ type: 'text', text: t }] }; });
+      }
+    });
+  } catch (e) { /* navegador sem suporte completo: segue sem a ferramenta */ }
+})();
+</script>

@@ -49,9 +49,9 @@
     </div>
 </header>
 <div class="nt-search" id="nt-search" hidden>
-    <form class="nt-container nt-search-form" action="{{ path('pub_search') }}" method="get" role="search">
+    <form class="nt-container nt-search-form" action="{{ path('pub_search') }}" method="get" role="search" toolname="buscar_noticias" tooldescription="Busca notícias deste portal por palavra-chave.">
         <label for="nt-search-input" class="nt-sr-only">Buscar notícias</label>
-        <input type="search" id="nt-search-input" name="q" maxlength="100" placeholder="O que você procura?" value="{{ app.request.attributes.get('_route') == 'pub_search' ? app.request.query.get('q') : '' }}">
+        <input type="search" id="nt-search-input" name="q" toolparamdescription="Palavra ou frase a buscar" maxlength="100" placeholder="O que você procura?" value="{{ app.request.attributes.get('_route') == 'pub_search' ? app.request.query.get('q') : '' }}">
         <button type="submit">{{ ux_icon('bi:search', {'aria-hidden': 'true'}) }}<span>Buscar</span></button>
     </form>
 </div>

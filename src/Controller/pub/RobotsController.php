@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
  * exemplo nos 9 sites e tinha a linha `Sitemap:` comentada.
  *
  * Ver a requirement "Regras de rastreamento por domínio" da spec `seo-das-paginas`.
+ * Regra da casa para site de cliente (mudança sites-prontos-para-agentes, D3): busca e
+ * assistentes de IA podem ler o site; robôs de treino de modelos, não.
  */
 final class RobotsController extends AbstractController
 {
@@ -31,7 +33,22 @@ final class RobotsController extends AbstractController
         '/_profiler',
     ];
 
-    #[Route('/robots.txt', name: 'pub_robots', defaults: ['_format' => 'txt'], methods: ['GET'])]
+    /** Robôs de busca com IA e de assistentes que buscam a página quando alguém pergunta. */
+    public const ASSISTENTES = [
+        'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot',
+        'Perplexity-User', 'DuckAssistBot', 'MistralAI-User', 'Meta-ExternalFetcher',
+    ];
+
+    /** Robôs (e marcadores) de coleta para treino de modelos: proibidos em sites de cliente. */
+    public const TREINO = [
+        'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Google-Extended', 'Applebot-Extended', 'CCBot',
+        'Bytespider', 'Meta-ExternalAgent', 'FacebookBot', 'Amazonbot', 'cohere-ai', 'Diffbot',
+        'ImagesiftBot', 'img2dataset', 'omgili',
+    ];
+
+    public const CONTENT_SIGNAL = 'search=yes, ai-input=yes, ai-train=no';
+
+    #[Route('/robots.txt', name: 'pub_robots', defaults: ['_format' => 'txt'], methods: ['GET', 'HEAD'])]
     public function robots(Request $request, TenantContext $tenantContext): Response
     {
         $tenant = $tenantContext->getTenant();
@@ -41,11 +58,32 @@ final class RobotsController extends AbstractController
             // Domínio que aponta para o servidor sem ser site: nada para indexar.
             $corpo = "User-agent: *\nDisallow: /\n";
         } else {
-            $linhas = ['User-agent: *'];
+            $linhas = ['# robots.txt de ' . $request->getHost(), '#',
+                '# Buscadores e assistentes de IA podem ler o site; robôs de treino de modelos, não.',
+                '# Versão para agentes: ' . $base . '/llms.txt', ''];
+            $linhas[] = '# Buscadores e demais robôs';
+            $linhas[] = 'User-agent: *';
+            $linhas[] = 'Content-Signal: ' . self::CONTENT_SIGNAL;
             foreach (self::PROIBIDOS as $caminho) {
                 $linhas[] = 'Disallow: ' . $caminho;
             }
             $linhas[] = 'Allow: /';
+            $linhas[] = '';
+            $linhas[] = '# Busca com IA e assistentes';
+            foreach (self::ASSISTENTES as $robo) {
+                $linhas[] = 'User-agent: ' . $robo;
+            }
+            $linhas[] = 'Content-Signal: ' . self::CONTENT_SIGNAL;
+            foreach (self::PROIBIDOS as $caminho) {
+                $linhas[] = 'Disallow: ' . $caminho;
+            }
+            $linhas[] = 'Allow: /';
+            $linhas[] = '';
+            $linhas[] = '# Treino de modelos de IA';
+            foreach (self::TREINO as $robo) {
+                $linhas[] = 'User-agent: ' . $robo;
+            }
+            $linhas[] = 'Disallow: /';
             $linhas[] = '';
             $linhas[] = 'Sitemap: ' . $base . '/sitemap.xml';
             $corpo = implode("\n", $linhas) . "\n";

@@ -26,25 +26,25 @@
             {% endif %}
         </div>
     </div>
-    <form name="contato_publico" action="{{ path('pub_contact_post') }}" method="post" class="at-form" data-aos="fade-up">
+    <form name="contato_publico" toolname="enviar_contato" tooldescription="Envia uma mensagem para a empresa pelo formulário de contato do site. A pessoa confere os dados e confirma o envio." action="{{ path('pub_contact_post') }}" method="post" class="at-form" data-aos="fade-up">
         <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
         <div>
             <label for="contato_publico_nome">Seu nome *</label>
-            <input type="text" id="contato_publico_nome" name="name" required class="at-input" autocomplete="name">
+            <input type="text" id="contato_publico_nome" name="name" toolparamdescription="Nome completo de quem escreve" required class="at-input" autocomplete="name">
         </div>
         <div class="at-form-row">
             <div>
                 <label for="contato_publico_telefone">WhatsApp com DDD</label>
-                <input type="tel" id="contato_publico_telefone" name="phone" class="at-input" autocomplete="tel">
+                <input type="tel" id="contato_publico_telefone" name="phone" toolparamdescription="Telefone ou WhatsApp (opcional)" class="at-input" autocomplete="tel">
             </div>
             <div>
                 <label for="contato_publico_email">Seu melhor e-mail *</label>
-                <input type="email" id="contato_publico_email" name="email" required class="at-input" autocomplete="email">
+                <input type="email" id="contato_publico_email" name="email" toolparamdescription="E-mail para a resposta" required class="at-input" autocomplete="email">
             </div>
         </div>
         <div>
             <label for="contato_publico_mensagem">Conte seu projeto *</label>
-            <textarea id="contato_publico_mensagem" name="message" required class="at-input" placeholder="{{ block.config.placeholder ?? 'Cidade, tipo de projeto, ambientes, medidas e prazo' }}"></textarea>
+            <textarea id="contato_publico_mensagem" name="message" toolparamdescription="A mensagem: o que a pessoa precisa" required class="at-input" placeholder="{{ block.config.placeholder ?? 'Cidade, tipo de projeto, ambientes, medidas e prazo' }}"></textarea>
         </div>
         <div>
             <button type="submit" class="at-btn at-btn-primary">{{ block.config.ctaText ?? 'Enviar mensagem' }} <span class="at-arrow" aria-hidden="true">↗</span></button>

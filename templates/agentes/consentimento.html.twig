@@ -1,0 +1,43 @@
+{#- Página de consentimento do OAuth (/oauth/authorize) de cada site. Sem tema: é uma tela
+    rápida de autorização, com noindex e fora do sitemap. -#}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Autorizar agente — {{ site_nome }}</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f6f6f4; color: #1d1d1b; margin: 0; }
+        main { max-width: 36rem; margin: 4rem auto; background: #fff; padding: 2rem; border-radius: .75rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+        h1 { font-size: 1.4rem; margin-top: 0; }
+        .erro { background: #fde2e1; border: 1px solid #c62828; padding: .75rem; border-radius: .5rem; }
+        .acoes { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        button { font: inherit; padding: .7rem 1.4rem; border-radius: .5rem; border: 1px solid #555; background: #fff; cursor: pointer; }
+        button.sim { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+        code { font-size: .9em; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Autorizar agente — {{ site_nome }}</h1>
+    {% if erro is defined %}
+        <p class="erro" role="alert">{{ erro }}</p>
+        <p>Veja como registrar um agente em <a href="/auth.md">/auth.md</a>.</p>
+    {% else %}
+        <p>O agente <strong>{{ cliente.name }}</strong> pede permissão para usar a API para agentes deste site.</p>
+        <ul>
+            <li>Escopo <code>api.read</code>: ler os dados de contato, as páginas e as notícias do site.</li>
+            <li>São os mesmos dados públicos do site. O agente não poderá enviar mensagens nem alterar nada.</li>
+            <li>O acesso dura uma hora e pode ser revogado pelo agente.</li>
+        </ul>
+        <p><small>Depois da sua resposta, você volta para <code>{{ params.redirect_uri }}</code>.</small></p>
+        <form method="POST" action="{{ path('oauth_authorize') }}" class="acoes">
+            {% for nome, valor in params %}<input type="hidden" name="{{ nome }}" value="{{ valor }}">{% endfor %}
+            <button type="submit" name="decisao" value="autorizar" class="sim">Autorizar</button>
+            <button type="submit" name="decisao" value="recusar">Recusar</button>
+        </form>
+    {% endif %}
+</main>
+</body>
+</html>

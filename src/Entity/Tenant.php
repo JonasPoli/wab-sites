@@ -320,6 +320,12 @@ class Tenant
         return $this->openingHours;
     }
 
+    /** Se o site cadastrou horário (getOpeningHours() devolve um padrão de exemplo quando não). */
+    public function hasOpeningHours(): bool
+    {
+        return !empty($this->openingHours);
+    }
+
     public function setOpeningHours(?array $openingHours): static
     {
         $this->openingHours = $openingHours;
