@@ -27,7 +27,7 @@ Nenhuma.
 ### Modified Capabilities
 
 - `construtor-de-paginas`: "Blocos por tipo" passa de 23 para 24 tipos; requisitos novos para a sanfona (itens de texto e de tabela, abrir e fechar, tabela no celular, edição no painel, colar de planilha, sanitização, prévia).
-- `navegacao-e-aparencia`: "Menu do Modo Landing Page" ganha o rótulo da sanfona (e passa a citar o de `blog_posts`, que o código já usa).
+- `navegacao-e-aparencia`: "Menu do Modo Landing Page" ganha o rótulo da sanfona.
 - `conteudo-para-agentes`: a versão Markdown da página converte tabelas em tabelas Markdown.
 
 ## Impact
