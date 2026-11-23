@@ -1097,6 +1097,8 @@
 .wab-sanfona__tabela :is(th, td) { padding: .65rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--sf-b); overflow-wrap: anywhere; min-width: 7rem; }
 .wab-sanfona__tabela th { background: var(--sf-c); color: var(--sf-x); border-bottom: 2px solid rgba(var(--color-secondary-rgb), .6); }
 .wab-sanfona__tabela tr:nth-child(even) { background: var(--sf-f2); }
+.wab-sanfona__img { display: block; width: auto; height: auto; max-width: 160px; max-height: 80px; object-fit: contain; background: #fff; border-radius: .375rem; padding: .25rem; }
+.wab-sanfona__img:not(:last-child) { margin-bottom: .4rem; }
 @media (max-width: 639px) {
     /* Tabela com cabeçalho vira cartões: "Coluna: valor" */
     .wab-sanfona__rolagem:has(.tem-cabecalho) { border: 0; }
@@ -1108,3 +1110,38 @@
     .tem-cabecalho td::before { content: attr(data-rotulo); font-weight: 700; color: var(--sf-x); }
     .tem-cabecalho td.is-vazia { display: none; }
 }
+
+
+/* ===== Mapa de representantes (bloco representatives, change bloco-mapa-de-representantes) =====
+   Estados em SVG (themes/_comum/_mapa_do_brasil); escolhido e cartão na cor primária do site.
+   ========================================= */
+.wab-mapa { --mp-uf: #a3a3a3; --mp-sem: #d4d4d4; --mp-borda: #fff; --mp-caixa: #fff; --mp-texto: #4b5563; }
+:is(.dark, .wab-section-dark, .mp-section-dark) .wab-mapa { --mp-uf: #6b7280; --mp-sem: #374151; --mp-borda: #111827; --mp-caixa: #ffffff0f; --mp-texto: #e5e7eb; }
+.wab-mapa [hidden] { display: none !important; }
+.mapa-br { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; }
+.mapa-uf { fill: var(--mp-uf); stroke: var(--mp-borda); stroke-width: 2; stroke-linejoin: round; transition: fill .2s; }
+.mapa-uf.sem { fill: var(--mp-sem); }
+.wab-mapa a:is(:hover, :focus-visible) .mapa-uf { fill: rgba(var(--color-primary-rgb), .6); }
+.wab-mapa a.is-ativo .mapa-uf { fill: var(--color-primary); }
+.wab-mapa a:focus { outline: none; }
+.wab-mapa a:focus-visible .mapa-uf { stroke: var(--color-secondary); stroke-width: 5; }
+.wab-mapa__rotulo { display: block; max-width: 560px; margin: 0 auto .35rem; font-size: .8rem; font-weight: 700; }
+.wab-mapa__seletor { display: block; width: 100%; max-width: 560px; margin: 0 auto 1.25rem; padding: .6rem .8rem; border: 1px solid #d1d5db; border-radius: .5rem; background: var(--mp-caixa); color: inherit; }
+.wab-mapa__seletor option { color: #111827; }
+.wab-mapa__chamada { display: flex; align-items: center; gap: 1.25rem; padding: 1.75rem; border-radius: 1rem; background: var(--mp-caixa); box-shadow: 0 20px 40px -24px #00000059; color: var(--mp-texto); font-size: 1.15rem; font-weight: 800; line-height: 1.35; }
+.wab-mapa__chamada svg { flex-shrink: 0; width: 48px; height: 48px; color: var(--color-primary-text); }
+.wab-mapa__cartao { background: var(--color-primary); color: var(--color-on-primary); border-radius: clamp(1.25rem, 3vw, 2rem); padding: clamp(1.5rem, 3vw, 2.25rem); }
+.wab-mapa__cartao + .wab-mapa__cartao { margin-top: 1rem; }
+.wab-mapa__estado { font-size: 1.5rem; font-weight: 800; margin-bottom: 1.25rem; }
+.wab-mapa__estado span { font-size: .9rem; opacity: .75; margin-left: .3rem; }
+.wab-mapa__rep { display: flex; gap: 1rem; align-items: flex-start; }
+.wab-mapa__rep + .wab-mapa__rep { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+.wab-mapa__logo { flex-shrink: 0; width: 88px; padding: .4rem; border-radius: .75rem; background: #fff; }
+.wab-mapa__logo img { display: block; width: 100%; height: auto; max-height: 56px; object-fit: contain; }
+.wab-mapa__texto { min-width: 0; font-size: .9rem; line-height: 1.55; overflow-wrap: anywhere; }
+.wab-mapa__texto > * + * { margin-top: .5em; }
+.wab-mapa__texto h3 { font-size: 1.15rem; font-weight: 800; line-height: 1.3; }
+.wab-mapa__texto a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.wab-mapa__texto :is(ul, ol) { padding-left: 1.2em; list-style: disc; }
+.wab-mapa__logo--vazio { background: none; }
+@media (max-width: 479px) { .wab-mapa__rep { flex-direction: column; gap: .75rem; } .wab-mapa__logo--vazio { display: none; } }

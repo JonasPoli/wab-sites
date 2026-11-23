@@ -10,8 +10,11 @@ namespace App\Service;
  *
  *   config = {
  *     firstOpen: '1'|ausente, multiple: '1'|ausente,
- *     panels: [{title, kind: 'text'|'table', html: ?string, table: {header: bool, rows: string[][]}}]
+ *     panels: [{title, kind: 'text'|'table', html: ?string, table: {header: bool, rows: (string|{text, image})[][]}}]
  *   }
+ *
+ *   Célula só de texto é string; célula com imagem (uploads/page_block_media, change
+ *   imagem-na-celula-da-sanfona) é {text, image}.
  *
  * A tabela chega como JSON num campo só por item (as células não têm `name` no formulário),
  * para uma tabela grande não passar do `max_input_vars` do PHP. `html` e `table` ficam os
@@ -87,11 +90,17 @@ final class SanfonaDoBloco
             }
             $celulas = [];
             foreach (array_slice(array_values($linha), 0, self::MAX_COLUNAS) as $c) {
+                // Célula com imagem chega como {text, image}; só de texto, como string
+                $imagem = null;
+                if (is_array($c)) {
+                    $imagem = MidiaDoBloco::nomeValido($c['image'] ?? null);
+                    $c = $c['text'] ?? '';
+                }
                 $texto = is_scalar($c) ? (string) $c : '';
-                $texto = str_replace(["\r\n", "\r"], "\n", $texto);
-                $celulas[] = mb_substr(trim($texto), 0, self::MAX_CELULA);
+                $texto = mb_substr(trim(str_replace(["\r\n", "\r"], "\n", $texto)), 0, self::MAX_CELULA);
+                $celulas[] = $imagem !== null ? ['text' => $texto, 'image' => $imagem] : $texto;
             }
-            if (implode('', $celulas) === '') {
+            if (array_filter($celulas, static fn ($c) => $c !== '') === []) {
                 continue;
             }
             $linhas[] = $celulas;

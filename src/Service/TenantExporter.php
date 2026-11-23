@@ -625,6 +625,11 @@ class TenantExporter
         if (!empty($config['videoFile']) && is_string($config['videoFile'])) {
             $this->addMediaFile($zip, 'page_block_video', $config['videoFile']);
         }
+
+        // Imagens enviadas na hora pelo painel (célula da sanfona, logo do mapa de representantes)
+        foreach (\App\Service\MidiaDoBloco::arquivosDoConfig($config) as $arquivo) {
+            $this->addMediaFile($zip, 'page_block_media', $arquivo);
+        }
     }
 
     private function addMediaFile(ZipArchive $zip, string $mapping, ?string $filename): void
@@ -664,6 +669,7 @@ class TenantExporter
             'page_block_image'   => 'page_block',
             'page_block_gallery' => 'page_block_gallery',
             'page_block_video'   => 'page_block_video',
+            'page_block_media'   => 'page_block_media',
             'testimonial_avatar' => 'testimonial_avatar',
             'partner_logo'       => 'partner_logo',
             'team_member_image'  => 'team_member_image',

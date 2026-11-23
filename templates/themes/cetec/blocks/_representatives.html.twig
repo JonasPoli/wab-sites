@@ -1,0 +1,65 @@
+{#
+  Mapa de representantes (representatives, change bloco-mapa-de-representantes): mapa do
+  Brasil em SVG (themes/_comum/_mapa_do_brasil) e, ao lado, a chamada e um cartão por estado
+  com os registros (logo à esquerda, texto HTML limpo ao gravar). O script comum esconde os
+  cartões e abre o estado clicado. Estilos no componente .wab-mapa do app.css. Também usado
+  pelos temas moderno, wab e noticias.
+#}
+{% set cfg = block.config ?? {} %}
+{% set grupos = mapa_por_estado(cfg.reps ?? []) %}
+{% set nomes = estados_do_brasil() %}
+{% if grupos|length > 0 or (cfg.emptyMessage ?? null) %}
+{% set mapaId = block.id ?? random(100000, 999999) %}
+{% set contagem = {} %}
+{% for uf, regs in grupos %}{% set contagem = contagem|merge({(uf): regs|length}) %}{% endfor %}
+<div class="wab-block wab-mapa my-10" data-mapa="{{ mapaId }}">
+    {% if block.preTitle or block.title %}
+    <div class="text-center max-w-3xl mx-auto mb-10">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto rounded-full"></div>
+    </div>
+    {% endif %}
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        {# No computador o mapa fica parado enquanto a lista de um estado grande rola #}
+        <div class="lg:sticky lg:top-24">
+            <label class="wab-mapa__rotulo" for="mapa-{{ mapaId }}-seletor">Escolha o estado no mapa ou na lista</label>
+            <select class="wab-mapa__seletor" id="mapa-{{ mapaId }}-seletor" data-mapa-seletor>
+                <option value="">Selecione o estado…</option>
+                {% for uf, nome in nomes %}
+                <option value="{{ uf }}" data-nome="{{ nome }}">{{ nome }}{{ contagem[uf] is defined ? ' (' ~ contagem[uf] ~ ')' }}</option>
+                {% endfor %}
+            </select>
+            {% include 'themes/_comum/_mapa_do_brasil.html.twig' with {mapaId: mapaId, contagem: contagem, nomes: nomes} %}
+        </div>
+        <div class="wab-mapa__lado" aria-live="polite">
+            {% if block.text %}
+            <div class="wab-mapa__chamada" data-mapa-inicio>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+                <p>{{ block.text|nl2br }}</p>
+            </div>
+            {% endif %}
+            {% for uf, regs in grupos %}
+            <section class="wab-mapa__cartao" id="mapa-{{ mapaId }}-{{ uf }}" data-mapa-painel="{{ uf }}" aria-label="{{ nomes[uf] }}">
+                <p class="wab-mapa__estado">{{ nomes[uf] }} <span>{{ uf }}</span></p>
+                {# Se algum registro do estado tem logo, os outros ganham o mesmo recuo (textos alinhados) #}
+                {% set comLogo = regs|filter(r => r.image)|length > 0 %}
+                {% for r in regs %}
+                <article class="wab-mapa__rep">
+                    {% if r.image %}<div class="wab-mapa__logo"><img src="{{ ('uploads/page_block_media/' ~ r.image)|thumb('logo_bloco') }}" width="160" height="80" loading="lazy" decoding="async" alt=""></div>{% elseif comLogo %}<div class="wab-mapa__logo wab-mapa__logo--vazio" aria-hidden="true"></div>{% endif %}
+                    {% if r.html %}<div class="wab-mapa__texto">{{ r.html|raw }}</div>{% endif %}
+                </article>
+                {% endfor %}
+            </section>
+            {% endfor %}
+            {% if cfg.emptyMessage ?? null %}
+            <section class="wab-mapa__cartao" id="mapa-{{ mapaId }}-vazio" data-mapa-painel="vazio">
+                <p class="wab-mapa__estado" data-mapa-vazio-nome>Demais estados</p>
+                <div class="wab-mapa__texto"><p>{{ cfg.emptyMessage|celula_da_sanfona }}</p></div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% include 'themes/_comum/_mapa_script.html.twig' %}
+{% endif %}

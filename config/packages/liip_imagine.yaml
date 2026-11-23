@@ -147,6 +147,14 @@ liip_imagine:
             filters:
                 thumbnail: { size: [280, 96], mode: inset }
 
+        # Imagem enviada pelo painel para blocos em JSON: logo na célula da sanfona e
+        # logo da rede de revendas (uploads/page_block_media; exibida em até 160×80)
+        logo_bloco:
+            quality: 85
+            format: webp
+            filters:
+                thumbnail: { size: [320, 160], mode: inset }
+
         # Logo do site no cabeçalho e no rodapé
         logo_site:
             quality: 85

@@ -82,7 +82,24 @@ trait BlocosDeExemplo
             ]]];
     }
 
-    /** Fotos do portfólio: [título, categoria] */
+    /** Mapa de representantes de exemplo (change bloco-mapa-de-representantes): 5 registros em 3 estados. */
+    public static function mapaDeExemplo(): array
+    {
+        $ficha = static fn (string $nome, string $cidade, string $fone) => '<h3>' . $nome . '</h3><p>Cidade: ' . $cidade
+            . '<br>Fone: <a href="tel:+55' . preg_replace('/\D/', '', $fone) . '">' . $fone . '</a></p><p><strong>Assistência técnica · Distribuidor</strong></p>';
+        return ['preTitle' => 'Onde encontrar', 'title' => 'Mapa de representantes',
+            'text' => 'Clique no mapa e encontre o representante mais próximo da sua região.',
+            'config' => ['emptyMessage' => "Ainda não temos representante neste estado.\nFale com a fábrica: contato@exemplo.com.br",
+                'reps' => [
+                    ['uf' => 'BA', 'image' => null, 'html' => $ficha('Exemplo Equipamentos Ltda', 'Salvador – BA', '(71) 3000-0000')],
+                    ['uf' => 'BA', 'image' => null, 'html' => $ficha('Modelo Serviços Técnicos', 'Feira de Santana – BA', '(75) 3000-0000')],
+                    ['uf' => 'MS', 'image' => null, 'html' => $ficha('Demonstração Equipamentos', 'Fátima do Sul – MS', '(67) 99810-0000')],
+                    ['uf' => 'SP', 'image' => null, 'html' => $ficha('Paulista Hospitalar', 'Campinas – SP', '(19) 3000-0000')],
+                    ['uf' => 'SP', 'image' => null, 'html' => $ficha('Capital Médica', 'São Paulo – SP', '(11) 3000-0000')],
+                ]]];
+    }
+
+        /** Fotos do portfólio: [título, categoria] */
     private function fotosDoPortfolio(ObjectManager $m, PageBlock $b, string $prefixo, array $fotos): void
     {
         $cores = [[[110, 70, 40], [210, 170, 120]], [[60, 60, 55], [190, 180, 160]], [[150, 90, 30], [240, 210, 160]], [[40, 50, 70], [170, 180, 200]], [[90, 60, 50], [220, 190, 170]]];
@@ -152,6 +169,7 @@ trait BlocosDeExemplo
             'contact'        => ['title' => 'Contato'],
         ];
         $tipos['accordion'] = self::sanfonaDeExemplo();
+        $tipos['representatives'] = self::mapaDeExemplo();
         if ($comBlog) {
             $tipos['blog_posts'] = ['preTitle' => 'Blog', 'title' => 'Últimas do blog', 'itemCount' => 3];
         }

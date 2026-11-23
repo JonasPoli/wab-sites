@@ -31,7 +31,7 @@
     {% include 'themes/wab/blocks/_team.html.twig' %}
 {% elseif t == 'contact' %}
     {% include 'themes/wab/blocks/_contact.html.twig' %}
-{% elseif t in ['hero_split', 'highlights', 'portfolio', 'statement', 'steps', 'cta', 'video', 'blog_posts', 'accordion'] %}
+{% elseif t in ['hero_split', 'highlights', 'portfolio', 'statement', 'steps', 'cta', 'video', 'blog_posts', 'accordion', 'representatives'] %}
     {# Blocos novos: desenho do tema cetec, nas cores do site (blocos-novos-do-construtor) #}
     {% include 'themes/cetec/blocks/_' ~ t ~ '.html.twig' %}
 {% endif %}

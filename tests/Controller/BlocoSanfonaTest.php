@@ -98,8 +98,8 @@ final class BlocoSanfonaTest extends WebTestCase
             'firstOpen' => '1',
             'panels' => [
                 ['title' => 'Acre', 'kind' => 'table', 'html' => null, 'table' => ['header' => true, 'rows' => [
-                    ['Cidade', 'Empresa', 'Assistência Técnica'],
-                    ['RIO BRANCO', "J. G. PACHECO & CIA LTDA\nE-mail: comercial@jgp.com.br", 'X'],
+                    ['Cidade', 'Logo', 'Empresa', 'Assistência Técnica'],
+                    ['RIO BRANCO', ['text' => '', 'image' => 'midia_teste.png'], "J. G. PACHECO & CIA LTDA\nE-mail: comercial@jgp.com.br", 'X'],
                 ]]],
                 ['title' => '', 'kind' => 'text', 'html' => '<p>Sem título</p>', 'table' => ['header' => true, 'rows' => []]],
                 ['title' => 'Amapá', 'kind' => 'text', 'html' => '<p>Entre em contato com a <strong>EMAI</strong>.</p>', 'table' => ['header' => true, 'rows' => []]],
@@ -127,6 +127,8 @@ final class BlocoSanfonaTest extends WebTestCase
             self::assertStringContainsString('href="mailto:comercial@jgp.com.br"', $html, "{$tema}: e-mail da célula vira link");
             self::assertStringContainsString('J. G. PACHECO &amp; CIA LTDA<br>', $html, "{$tema}: quebra de linha da célula");
             self::assertStringContainsString('<strong>EMAI</strong>', $html, "{$tema}: texto formatado");
+            self::assertMatchesRegularExpression('~<img class="[^"]*" src="[^"]*midia_teste[^"]*" width="160" height="80"[^>]*alt="Logo"~', $html, "{$tema}: logo na célula, alt = cabeçalho da coluna");
+            self::assertStringNotContainsString('data-rotulo="Logo" class="is-vazia"', $html, "{$tema}: célula só com imagem não é vazia");
             self::assertStringContainsString('Distribuidores no Brasil', $html);
         }
     }

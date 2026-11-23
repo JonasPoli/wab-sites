@@ -4,7 +4,7 @@
   faixa; os demais ficam na coluna central (at-wrap).
 #}
 {% set t = block.type %}
-{% set tipos = ['text_image', 'text_only', 'gallery', 'newsletter', 'stats', 'news_call', 'map', 'sub_categories', 'page_list', 'blurbs4', 'testimonials', 'partner_logos', 'banner', 'team', 'contact', 'hero_split', 'highlights', 'portfolio', 'statement', 'steps', 'cta', 'video', 'blog_posts', 'accordion'] %}
+{% set tipos = ['text_image', 'text_only', 'gallery', 'newsletter', 'stats', 'news_call', 'map', 'sub_categories', 'page_list', 'blurbs4', 'testimonials', 'partner_logos', 'banner', 'team', 'contact', 'hero_split', 'highlights', 'portfolio', 'statement', 'steps', 'cta', 'video', 'blog_posts', 'accordion', 'representatives'] %}
 {% set larguraTotal = ['banner', 'statement', 'cta', 'steps'] %}
 {% if t in tipos and not (t == 'newsletter' and not (currentTenant.newsletterEnabled ?? false)) %}
     {% if t in larguraTotal %}

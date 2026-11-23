@@ -46,6 +46,7 @@ class AdminContentController extends AbstractController
             PageSectionRepository::class => PageSectionRepository::class,
             PageBlockRepository::class   => PageBlockRepository::class,
             \App\Service\SanfonaDoBloco::class => \App\Service\SanfonaDoBloco::class,
+            \App\Service\MapaDeRepresentantes::class => \App\Service\MapaDeRepresentantes::class,
         ];
     }
 
@@ -605,6 +606,30 @@ class AdminContentController extends AbstractController
         return $resposta;
     }
 
+    /**
+     * Envio de imagem na hora, para blocos que guardam os dados em JSON (imagem na célula da
+     * sanfona, logo do mapa de representantes). Devolve {arquivo, url} ou {erro}. Não grava bloco:
+     * o nome só passa a valer quando o formulário do bloco é salvo.
+     */
+    #[Route('/block/midia', name: 'block_media', methods: ['POST'])]
+    public function blockMedia(Request $r, \App\Service\MidiaDoBloco $midia): JsonResponse
+    {
+        if (!$this->isCsrfTokenValid('block_media', (string) $r->request->get('_token'))) {
+            return new JsonResponse(['erro' => 'Sessão expirada: recarregue a página e tente de novo.'], 403);
+        }
+        $arquivo = $r->files->get('arquivo');
+        if (!$arquivo instanceof UploadedFile) {
+            return new JsonResponse(['erro' => 'Nenhuma imagem foi enviada.'], 400);
+        }
+        try {
+            $nome = $midia->gravar($arquivo);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse(['erro' => $e->getMessage()], 400);
+        }
+
+        return new JsonResponse(['arquivo' => $nome, 'url' => $r->getBasePath() . '/' . \App\Service\MidiaDoBloco::PASTA . '/' . $nome]);
+    }
+
     private function populateBlock(PageBlock $block, Request $r, EntityManagerInterface $em, CategoryRepository $cats): void
     {
         $type = $r->request->get('type', $block->getType() ?: 'text_image');
@@ -640,6 +665,10 @@ class AdminContentController extends AbstractController
         // Sanfona: itens limpos (HTML sanitizado, tabela do JSON) — change bloco-sanfona
         if ($type === 'accordion') {
             $cfg = $this->container->get(\App\Service\SanfonaDoBloco::class)->normalizar(is_array($cfg) ? $cfg : []);
+        }
+        // Mapa de representantes: registros do JSON, HTML limpo — change bloco-mapa-de-representantes
+        if ($type === 'representatives') {
+            $cfg = $this->container->get(\App\Service\MapaDeRepresentantes::class)->normalizar(is_array($cfg) ? $cfg : []);
         }
         $block->setConfig($cfg ?: null);
 

@@ -1,0 +1,53 @@
+{#
+  Comportamento do bloco "Mapa de representantes" (change bloco-mapa-de-representantes),
+  comum aos temas. O HTML sai com todos os cartões visíveis (sem JavaScript e para a versão
+  Markdown); este script esconde os cartões, mostra a chamada e abre o estado clicado no mapa
+  (link do SVG, teclado) ou escolhido no seletor. Endereço com #mapa-<id>-<UF> abre o estado.
+#}
+<script>
+window.wabMapa = window.wabMapa || function (raiz) {
+    if (raiz.dataset.mapaPronto) return;
+    raiz.dataset.mapaPronto = '1';
+    var id = raiz.dataset.mapa;
+    var paineis = raiz.querySelectorAll('[data-mapa-painel]');
+    var inicio = raiz.querySelector('[data-mapa-inicio]');
+    var vazio = raiz.querySelector('[data-mapa-painel="vazio"]');
+    var seletor = raiz.querySelector('[data-mapa-seletor]');
+    var estados = raiz.querySelectorAll('[data-mapa-uf]');
+
+    function mostrar(uf, rolar) {
+        var painel = raiz.querySelector('[data-mapa-painel="' + uf + '"]');
+        paineis.forEach(function (p) { p.hidden = true; });
+        if (inicio) inicio.hidden = !!uf;
+        if (uf) {
+            if (!painel && vazio) {
+                painel = vazio;
+                var nome = vazio.querySelector('[data-mapa-vazio-nome]');
+                var opcao = seletor && seletor.querySelector('option[value="' + uf + '"]');
+                if (nome) nome.textContent = opcao ? opcao.dataset.nome : uf;
+            }
+            if (painel) painel.hidden = false;
+        }
+        estados.forEach(function (a) {
+            var ativo = a.dataset.mapaUf === uf;
+            a.classList.toggle('is-ativo', ativo);
+            if (ativo) { a.setAttribute('aria-current', 'true'); } else { a.removeAttribute('aria-current'); }
+        });
+        if (seletor) seletor.value = uf || '';
+        if (uf && history.replaceState) history.replaceState(null, '', '#mapa-' + id + '-' + uf);
+        // No celular o cartão fica abaixo do mapa: leva a pessoa até ele
+        if (rolar && painel && window.matchMedia('(max-width: 1023px)').matches) {
+            painel.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+    }
+
+    estados.forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); mostrar(a.dataset.mapaUf, true); });
+    });
+    if (seletor) seletor.addEventListener('change', function () { mostrar(seletor.value, true); });
+
+    var m = location.hash.match(new RegExp('^#mapa-' + id + '-([A-Z]{2})$'));
+    mostrar(m ? m[1] : '', false);
+};
+document.querySelectorAll('[data-mapa]').forEach(function (r) { window.wabMapa(r); });
+</script>

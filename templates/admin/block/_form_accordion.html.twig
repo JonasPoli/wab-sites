@@ -56,7 +56,7 @@
             <p class="af-hint sf-colar__aviso" data-sf-aviso aria-live="polite"></p>
             <button type="button" class="btn btn-g btn-sm" data-sf-acao="desfazer" hidden><sl-icon name="arrow-counterclockwise"></sl-icon> Desfazer colagem</button>
         </div>
-        <p class="af-hint">Dica: dá para colar várias células direto numa célula da tabela. E-mails e endereços de site viram links no site; Enter quebra a linha dentro da célula.</p>
+        <p class="af-hint">Dica: dá para colar várias células direto numa célula da tabela. E-mails e endereços de site viram links no site; Enter quebra a linha dentro da célula. O botão <sl-icon name="image"></sl-icon> de cada célula põe uma imagem (logo) nela: JPG, PNG, WebP ou GIF até 5 MB.</p>
     </div>
 </div>
 {% endmacro %}
@@ -93,6 +93,10 @@
 .sf-celula:focus{background:rgba(79,110,247,.1);box-shadow:inset 0 0 0 2px var(--primary)}
 .sf-mini{background:none;border:0;color:var(--muted);cursor:pointer;padding:.15rem .35rem;border-radius:4px;font-size:.85rem;line-height:1}
 .sf-mini:hover{color:var(--danger);background:rgba(239,68,68,.1)}
+.sf-celula-img{display:flex;align-items:center;gap:.35rem;padding:0 .35rem .35rem}
+.sf-celula-img img{max-width:110px;max-height:48px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
+.sf-mini--img:hover{color:var(--primary);background:rgba(79,110,247,.12)}
+.sf-celula-img.is-enviando{opacity:.5}
 .sf-contagem{margin:.35rem 0 .75rem}
 .sf-colar{border:1px dashed var(--border);border-radius:8px;padding:.75rem;margin-bottom:.5rem}
 .sf-colar__rotulo{display:flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem}
@@ -104,7 +108,7 @@
 @media (max-width:700px){.sf-item__cabeca{grid-template-columns:1fr}.sf-item__acoes .sf-remover span{display:none}}
 </style>
 
-<form method="post" action="{{ action }}" class="af" data-sf-form>
+<form method="post" action="{{ action }}" class="af" data-sf-form data-midia-url="{{ path('admin_block_media') }}" data-midia-base="{{ asset('uploads/page_block_media/') }}" data-token-midia="{{ csrf_token('block_media') }}">
     <input type="hidden" name="type" value="accordion">
     {{ c.cabecalho(block, false, 3) }}
     <div class="af-row" style="margin:.5rem 0 1rem">
@@ -135,6 +139,12 @@
     var lista = form.querySelector('[data-sf-itens]');
     var modelo = form.querySelector('[data-sf-modelo]');
     var MAX_COL = 12, MAX_LIN = 500, seq = 0;
+    var base = form.dataset.midiaBase || '';
+    // Um seletor de arquivo só, para a célula que pediu a imagem
+    var seletor = document.createElement('input');
+    seletor.type = 'file'; seletor.accept = 'image/jpeg,image/png,image/webp,image/gif'; seletor.hidden = true;
+    form.appendChild(seletor);
+    var alvo = null;
 
     function avisarPrevia() { form.dispatchEvent(new Event('input', {bubbles: true})); }
     function itens() { return Array.prototype.slice.call(lista.querySelectorAll('[data-sf-item]')); }
@@ -174,13 +184,18 @@
         if (!it._tabela) {
             var t;
             try { t = JSON.parse(it.querySelector('[data-campo=table]').value || '{}'); } catch (e) { t = {}; }
-            var linhas = Array.isArray(t.rows) ? t.rows.map(function (l) { return (Array.isArray(l) ? l : []).map(function (c) { return c == null ? '' : String(c); }); }) : [];
+            var linhas = Array.isArray(t.rows) ? t.rows.map(function (l) { return (Array.isArray(l) ? l : []).map(function (c) { return c && typeof c === 'object' ? (c.image ? {text: String(c.text || ''), image: String(c.image)} : String(c.text || '')) : (c == null ? '' : String(c)); }); }) : [];
             it._tabela = {header: t.header !== false, rows: linhas};
             igualar(it._tabela);
             if (!it._tabela.rows.length) it._tabela.rows = [['', '', ''], ['', '', ''], ['', '', '']];
         }
         return it._tabela;
     }
+    // Célula: string, ou {text, image} quando tem imagem (change imagem-na-celula-da-sanfona)
+    function txt(c) { return c && typeof c === 'object' ? c.text : (c || ''); }
+    function img(c) { return c && typeof c === 'object' ? c.image : ''; }
+    function porTexto(t, r, c, v) { var x = t.rows[r][c]; if (x && typeof x === 'object') x.text = v; else t.rows[r][c] = v; }
+    function porImagem(t, r, c, arq) { var v = txt(t.rows[r][c]); t.rows[r][c] = arq ? {text: v, image: arq} : v; }
     function largura(t) { return t.rows.reduce(function (m, l) { return Math.max(m, l.length); }, 0) || 1; }
     function igualar(t) {
         var w = largura(t);
@@ -189,7 +204,7 @@
     function gravar(it) {
         it.querySelector('[data-campo=table]').value = JSON.stringify(estado(it));
         var t = estado(it);
-        var cheias = t.rows.filter(function (l) { return l.join('').trim() !== ''; }).length;
+        var cheias = t.rows.filter(function (l) { return l.some(function (c) { return txt(c).trim() !== '' || img(c); }); }).length;
         it.querySelector('[data-sf-contagem]').textContent = cheias + (cheias === 1 ? ' linha' : ' linhas') + ' preenchida' + (cheias === 1 ? '' : 's') + ' · ' + largura(t) + (largura(t) === 1 ? ' coluna' : ' colunas') + (t.header && cheias ? ' (a primeira é o cabeçalho)' : '') + '. Linhas vazias não são gravadas.';
     }
     function crescer(el) { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
@@ -211,13 +226,18 @@
         t.rows.forEach(function (l, r) {
             h += '<tr class="' + (r === 0 && t.header ? 'is-cabecalho' : '') + '"><td class="sf-grade__ponta">' + (r + 1) + '</td>';
             for (var c = 0; c < w; c++) {
-                h += '<td><textarea class="sf-celula" rows="1" data-r="' + r + '" data-c="' + c + '" data-previa-vazio aria-label="Linha ' + (r + 1) + ', coluna ' + (c + 1) + '"></textarea></td>';
+                var im = img(t.rows[r][c]), onde = 'linha ' + (r + 1) + ', coluna ' + (c + 1);
+                h += '<td><textarea class="sf-celula" rows="1" data-r="' + r + '" data-c="' + c + '" data-previa-vazio aria-label="Linha ' + (r + 1) + ', coluna ' + (c + 1) + '"></textarea>'
+                    + '<div class="sf-celula-img">'
+                    + (im ? '<img src="' + base + encodeURIComponent(im) + '" alt="Imagem da ' + onde + '"><button type="button" class="sf-mini" data-sf-acao="tirar-imagem" data-r="' + r + '" data-c="' + c + '" title="Tirar a imagem da ' + onde + '" aria-label="Tirar a imagem da ' + onde + '">✕</button>' : '')
+                    + '<button type="button" class="sf-mini sf-mini--img" data-sf-acao="imagem" data-r="' + r + '" data-c="' + c + '" title="' + (im ? 'Trocar' : 'Pôr') + ' imagem na ' + onde + '" aria-label="' + (im ? 'Trocar' : 'Pôr') + ' imagem na ' + onde + '"><sl-icon name="image"></sl-icon></button>'
+                    + '</div></td>';
             }
             h += '<td class="sf-grade__ponta">' + (t.rows.length > 1 ? '<button type="button" class="sf-mini" data-sf-acao="tirar-linha" data-r="' + r + '" title="Remover a linha ' + (r + 1) + '" aria-label="Remover a linha ' + (r + 1) + '">✕</button>' : '') + '</td></tr>';
         });
         grade.innerHTML = h + '</tbody>';
         grade.querySelectorAll('.sf-celula').forEach(function (el) {
-            el.value = t.rows[+el.dataset.r][+el.dataset.c];
+            el.value = txt(t.rows[+el.dataset.r][+el.dataset.c]);
         });
         // altura só depois de o navegador medir (o item pode estar escondido; fontes ainda carregando)
         ajustarAlturas(grade);
@@ -320,7 +340,7 @@
             var r = r0 + i;
             if (r >= MAX_LIN) return;
             while (t.rows.length <= r) t.rows.push([]);
-            l.forEach(function (v, j) { if (c0 + j < MAX_COL) { while (t.rows[r].length <= c0 + j) t.rows[r].push(''); t.rows[r][c0 + j] = v; } });
+            l.forEach(function (v, j) { if (c0 + j < MAX_COL) { while (t.rows[r].length <= c0 + j) t.rows[r].push(''); porTexto(t, r, c0 + j, v); } });
         });
         igualar(t);
         desenhar(it);
@@ -340,7 +360,7 @@
         var el = e.target, it = el.closest('[data-sf-item]');
         if (!it) return;
         if (el.classList.contains('sf-celula')) {
-            estado(it).rows[+el.dataset.r][+el.dataset.c] = el.value;
+            porTexto(estado(it), +el.dataset.r, +el.dataset.c, el.value);
             crescer(el);
             gravar(it);
             it.querySelector('[data-sf-acao=desfazer]').hidden = true;
@@ -414,6 +434,15 @@
                 t.rows.forEach(function (l) { l.splice(+b.dataset.c, 1); });
                 desenhar(it);
                 break;
+            case 'imagem':
+                alvo = {it: it, r: +b.dataset.r, c: +b.dataset.c, caixa: b.parentNode};
+                seletor.value = '';
+                seletor.click();
+                return;
+            case 'tirar-imagem':
+                porImagem(estado(it), +b.dataset.r, +b.dataset.c, '');
+                desenhar(it);
+                break;
             case 'desfazer':
                 if (it._antes) { it._tabela = it._antes; it._antes = null; desenhar(it); }
                 b.hidden = true;
@@ -423,6 +452,35 @@
                 return;
         }
         avisarPrevia();
+    });
+
+    seletor.addEventListener('change', function () {
+        if (!alvo || !seletor.files || !seletor.files[0]) return;
+        var a = alvo, fd = new FormData(), aviso = a.it.querySelector('[data-sf-aviso]');
+        fd.append('arquivo', seletor.files[0]);
+        fd.append('_token', form.dataset.tokenMidia);
+        a.caixa.classList.add('is-enviando');
+        fetch(form.dataset.midiaUrl, {method: 'POST', body: fd, headers: {'X-Requested-With': 'XMLHttpRequest'}, credentials: 'same-origin'})
+            .then(function (r) { return r.json().catch(function () { return {erro: 'Erro ' + r.status + ' ao enviar a imagem.'}; }); })
+            .then(function (res) {
+                if (res.erro || !res.arquivo) {
+                    aviso.className = 'af-hint sf-colar__aviso is-erro';
+                    aviso.textContent = res.erro || 'Não foi possível enviar a imagem.';
+                    a.caixa.classList.remove('is-enviando');
+                    return;
+                }
+                porImagem(estado(a.it), a.r, a.c, res.arquivo);
+                desenhar(a.it);
+                aviso.className = 'af-hint sf-colar__aviso';
+                aviso.textContent = 'Imagem posta na linha ' + (a.r + 1) + ', coluna ' + (a.c + 1) + '. Ela vale depois de salvar o bloco.';
+                avisarPrevia();
+            })
+            .catch(function () {
+                aviso.className = 'af-hint sf-colar__aviso is-erro';
+                aviso.textContent = 'Sem conexão: a imagem não foi enviada.';
+                a.caixa.classList.remove('is-enviando');
+            });
+        alvo = null;
     });
 
     form.addEventListener('submit', function () {

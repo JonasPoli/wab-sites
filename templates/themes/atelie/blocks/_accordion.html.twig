@@ -23,10 +23,10 @@
                 {% set cabeca = (p.table.header ?? true) ? linhas|first : null %}
                 <div class="at-accordion-scroll">
                     <table class="at-accordion-table{{ cabeca ? ' at-has-head' }}">
-                        {% if cabeca %}<thead><tr>{% for h in cabeca %}<th scope="col">{{ h|celula_da_sanfona }}</th>{% endfor %}</tr></thead>{% endif %}
+                        {% if cabeca %}<thead><tr>{% for h in cabeca %}<th scope="col">{{ (h.text ?? h)|celula_da_sanfona }}</th>{% endfor %}</tr></thead>{% endif %}
                         <tbody>
                             {% for linha in (cabeca ? linhas|slice(1) : linhas) %}
-                            <tr>{% for celula in linha %}<td{% if cabeca %} data-rotulo="{{ cabeca[loop.index0] ?? '' }}"{% endif %}{% if celula == '' %} class="is-vazia"{% endif %}><span>{{ celula|celula_da_sanfona }}</span></td>{% endfor %}</tr>
+                            <tr>{% for celula in linha %}{% set img = celula.image ?? null %}{% set txt = img ? (celula.text ?? '') : celula %}{% set rot = cabeca ? ((cabeca[loop.index0] ?? '').text ?? (cabeca[loop.index0] ?? '')) : '' %}<td{% if cabeca %} data-rotulo="{{ rot }}"{% endif %}{% if not img and txt == '' %} class="is-vazia"{% endif %}><span>{% if img %}<img class="at-accordion-img" src="{{ ('uploads/page_block_media/' ~ img)|thumb('logo_bloco') }}" width="160" height="80" loading="lazy" decoding="async" alt="{{ txt ?: rot ?: 'Imagem' }}">{% endif %}{{ txt|celula_da_sanfona }}</span></td>{% endfor %}</tr>
                             {% endfor %}
                         </tbody>
                     </table>

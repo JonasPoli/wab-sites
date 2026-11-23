@@ -1,0 +1,267 @@
+{#
+  Formulário do bloco "Mapa de representantes" (representatives, change
+  bloco-mapa-de-representantes). Os registros (estado, logo, texto HTML) ficam em memória e
+  vão como JSON num campo só (config[repsJson]); o logo é enviado na hora pelo
+  admin_block_media. O editor de texto (Quill 2) só aceita título h3.
+#}
+{% set cfg = block.config ?? {} %}
+{% set nomes = estados_do_brasil() %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<style>
+.mp-barra{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 1rem}
+.mp-barra .as{width:auto;min-width:220px}
+.mp-total{font-size:.8rem;color:var(--muted);flex:1}
+.mp-rep{margin:0 0 .75rem;padding:.75rem 1rem}
+.card.mp-rep+.card.mp-rep{margin-top:0}
+.mp-rep__resumo{display:flex;align-items:center;gap:.75rem}
+.mp-uf{flex-shrink:0;min-width:2.4rem;text-align:center;font-weight:800;font-size:.78rem;padding:.25rem .4rem;border-radius:6px;background:rgba(79,110,247,.15);color:var(--primary)}
+.mp-uf.is-sem{background:rgba(239,68,68,.15);color:var(--danger)}
+.mp-mini-logo{flex-shrink:0;width:56px;height:32px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
+.mp-rep__titulo{flex:1;min-width:0;font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-rep__titulo small{display:block;font-weight:400;color:var(--muted);font-size:.75rem;overflow:hidden;text-overflow:ellipsis}
+.mp-rep__acoes{display:flex;gap:.3rem;flex-shrink:0}
+.mp-rep__acoes .btn:disabled{opacity:.35;cursor:default}
+.mp-remover.is-confirmar{background:var(--danger);color:#fff;border-color:var(--danger)}
+.mp-rep__edicao{margin-top:1rem;display:grid;gap:1rem}
+.mp-linha{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:1rem;align-items:end}
+.mp-logo{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.mp-logo img{width:120px;height:60px;object-fit:contain;background:#fff;border-radius:6px;padding:4px}
+.mp-quill{background:#fff;color:#1a1a2e;border-radius:0 0 6px 6px}
+.mp-quill .ql-editor{min-height:150px;max-height:420px;font-size:.95rem;line-height:1.6;color:#1a1a2e}
+.mp-quill .ql-editor a{color:#2563eb}
+.mp-rep__edicao .ql-toolbar.ql-snow{background:#f1f5f9;border-radius:6px 6px 0 0;border-color:var(--border)}
+.mp-rep__edicao .ql-container.ql-snow{border-color:var(--border)}
+.mp-aviso{font-size:.78rem;color:var(--success)}
+.mp-aviso.is-erro{color:var(--danger)}
+.mp-aviso:empty{display:none}
+[data-mp-form] [hidden]{display:none!important}
+@media (max-width:700px){.mp-linha{grid-template-columns:1fr}.mp-rep__acoes .mp-texto-botao{display:none}}
+</style>
+
+<form method="post" action="{{ action }}" class="af" data-mp-form data-midia-url="{{ path('admin_block_media') }}" data-midia-base="{{ asset('uploads/page_block_media/') }}" data-token-midia="{{ csrf_token('block_media') }}">
+    <input type="hidden" name="type" value="representatives">
+    <div class="af-field">
+        <label>Pré-título <span class="af-hint" style="display:inline;margin-left:.4rem">(texto pequeno acima do título)</span></label>
+        <input type="text" name="preTitle" class="ai" value="{{ block.preTitle }}" maxlength="255">
+    </div>
+    <div class="af-field">
+        <label>Título</label>
+        <input type="text" name="title" class="ai" value="{{ block.title }}" maxlength="255" placeholder="Mapa de representantes">
+    </div>
+    <div class="af-field">
+        <label>Chamada <span class="af-hint" style="display:inline;margin-left:.4rem">(aparece ao lado do mapa até o visitante escolher um estado)</span></label>
+        <textarea name="text" class="ate" rows="2" placeholder="Clique no mapa e encontre o representante mais próximo da sua região.">{{ block.text }}</textarea>
+    </div>
+    <div class="af-field">
+        <label>Mensagem para estados sem representante</label>
+        <textarea name="config[emptyMessage]" class="ate" rows="3" placeholder="Entre em contato conosco: (11) 0000-0000 · contato@empresa.com.br">{{ cfg.emptyMessage ?? '' }}</textarea>
+        <p class="af-hint">Aparece quando o visitante escolhe um estado sem registro. E-mails e endereços de site viram links.</p>
+    </div>
+
+    <input type="hidden" name="config[repsJson]" data-mp-json value="{{ (cfg.reps ?? [])|json_encode }}">
+    <div style="margin:1.25rem 0 .25rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Representantes</div>
+    <p class="af-hint">Cada registro tem o estado, o logo (à esquerda da ficha) e o texto. No texto, use "Título" para o nome da empresa; telefone, WhatsApp e e-mail podem virar links pelo botão de link (ex.: <code>tel:+5511999999999</code>, <code>https://wa.me/5511999999999</code>, <code>mailto:…</code>).</p>
+    <div class="mp-barra">
+        <select class="as" data-mp-filtro aria-label="Filtrar por estado">
+            <option value="">Todos os estados</option>
+            {% for uf, nome in nomes %}<option value="{{ uf }}" data-nome="{{ nome }}">{{ nome }}</option>{% endfor %}
+        </select>
+        <span class="mp-total" data-mp-total></span>
+        <button type="button" class="btn btn-g btn-sm" data-mp-acao="novo"><sl-icon name="plus-lg"></sl-icon> Novo representante</button>
+    </div>
+    <div data-mp-lista></div>
+    <p class="mp-aviso" data-mp-aviso aria-live="polite"></p>
+
+    <div class="af-actions">
+        <button type="submit" class="btn btn-p"><sl-icon name="check-lg"></sl-icon> Salvar</button>
+        <a href="{{ path('admin_block_index', {sectionId: block.section.id ?? section.id}) }}" class="btn btn-g">Cancelar</a>
+    </div>
+</form>
+
+<script>
+(function () {
+    var form = document.querySelector('[data-mp-form]');
+    if (!form) return;
+    var campo = form.querySelector('[data-mp-json]');
+    var lista = form.querySelector('[data-mp-lista]');
+    var filtro = form.querySelector('[data-mp-filtro]');
+    var total = form.querySelector('[data-mp-total]');
+    var aviso = form.querySelector('[data-mp-aviso]');
+    var base = form.dataset.midiaBase;
+    var NOMES = {};
+    filtro.querySelectorAll('option[value]').forEach(function (o) { if (o.value) NOMES[o.value] = o.dataset.nome; });
+    var seq = 0, nos = {};
+    var regs;
+    try { regs = JSON.parse(campo.value || '[]'); } catch (e) { regs = []; }
+    if (!Array.isArray(regs)) regs = [];
+    regs = regs.map(function (r) { return {k: ++seq, uf: r.uf || '', image: r.image || '', html: r.html || ''}; });
+
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+    function vazio(html) { return /^(\s|<p>(<br>|\s|&nbsp;)*<\/p>)*$/.test(html || ''); }
+    function resumo(r) {
+        var d = document.createElement('div');
+        d.innerHTML = r.html || '';
+        var h = d.querySelector('h1, h2, h3');
+        var titulo = (h ? h.textContent : '').trim();
+        var resto = d.textContent.replace(titulo, '').replace(/\s+/g, ' ').trim();
+        return {titulo: titulo || resto.slice(0, 80) || '(sem texto)', detalhe: titulo ? resto.slice(0, 120) : ''};
+    }
+    function gravar() {
+        campo.value = JSON.stringify(regs.map(function (r) { return {uf: r.uf, image: r.image, html: vazio(r.html) ? '' : r.html}; }));
+        var cont = {};
+        regs.forEach(function (r) { cont[r.uf] = (cont[r.uf] || 0) + 1; });
+        filtro.querySelectorAll('option').forEach(function (o) { if (o.value) o.textContent = NOMES[o.value] + (cont[o.value] ? ' (' + cont[o.value] + ')' : ''); });
+        var ufs = Object.keys(cont).filter(function (u) { return u; }).length;
+        total.textContent = regs.length + (regs.length === 1 ? ' registro' : ' registros') + ' em ' + ufs + (ufs === 1 ? ' estado' : ' estados');
+        form.dispatchEvent(new Event('input', {bubbles: true}));
+    }
+    function atualizarResumo(r) {
+        var no = nos[r.k];
+        if (!no) return;
+        var s = resumo(r);
+        var uf = no.querySelector('.mp-uf');
+        uf.textContent = r.uf || '??';
+        uf.classList.toggle('is-sem', !r.uf);
+        uf.title = r.uf ? NOMES[r.uf] : 'Sem estado: este registro não será gravado';
+        no.querySelector('.mp-rep__titulo').innerHTML = esc(s.titulo) + (s.detalhe ? '<small>' + esc(s.detalhe) + '</small>' : '');
+        var mini = no.querySelector('.mp-mini-logo');
+        if (r.image) { mini.src = base + encodeURIComponent(r.image); mini.style.visibility = ''; }
+        else { mini.removeAttribute('src'); mini.style.visibility = 'hidden'; }
+        var logo = no.querySelector('[data-mp-logo]');
+        logo.innerHTML = r.image ? '<img src="' + base + encodeURIComponent(r.image) + '" alt="Logo atual">' : '<span class="af-hint">Sem logo</span>';
+        no.querySelector('[data-mp-acao=tirar-logo]').hidden = !r.image;
+    }
+    function criar(r) {
+        var no = document.createElement('div');
+        no.className = 'card mp-rep';
+        no.dataset.k = r.k;
+        var opcoes = '<option value="">Escolha o estado…</option>';
+        Object.keys(NOMES).forEach(function (u) { opcoes += '<option value="' + u + '">' + esc(NOMES[u]) + '</option>'; });
+        no.innerHTML = '<div class="mp-rep__resumo"><span class="mp-uf"></span><img class="mp-mini-logo" alt="Logo"><div class="mp-rep__titulo"></div>'
+            + '<div class="mp-rep__acoes">'
+            + '<button type="button" class="btn btn-g btn-sm" data-mp-acao="subir" title="Subir" aria-label="Subir o registro"><sl-icon name="arrow-up"></sl-icon></button>'
+            + '<button type="button" class="btn btn-g btn-sm" data-mp-acao="descer" title="Descer" aria-label="Descer o registro"><sl-icon name="arrow-down"></sl-icon></button>'
+            + '<button type="button" class="btn btn-g btn-sm" data-mp-acao="editar" aria-expanded="false"><sl-icon name="pencil"></sl-icon> <span class="mp-texto-botao">Editar</span></button>'
+            + '<button type="button" class="btn btn-g btn-sm mp-remover" data-mp-acao="remover"><sl-icon name="trash"></sl-icon> <span class="mp-texto-botao">Remover</span></button>'
+            + '</div></div>'
+            + '<div class="mp-rep__edicao" hidden>'
+            + '<div class="mp-linha"><div class="af-field"><label>Estado</label><select class="as" data-mp-uf>' + opcoes + '</select></div>'
+            + '<div class="af-field"><label>Logo <span class="af-hint" style="display:inline">(JPG, PNG, WebP ou GIF até 5 MB)</span></label><div class="mp-logo"><span data-mp-logo></span>'
+            + '<button type="button" class="btn btn-g btn-sm" data-mp-acao="logo"><sl-icon name="image"></sl-icon> Escolher logo</button>'
+            + '<button type="button" class="btn btn-g btn-sm" data-mp-acao="tirar-logo">Tirar</button></div></div></div>'
+            + '<div class="af-field"><label>Texto</label><div class="mp-quill"></div></div>'
+            + '</div>';
+        no.querySelector('[data-mp-uf]').value = r.uf;
+        nos[r.k] = no;
+        atualizarResumo(r);
+        return no;
+    }
+    function porK(k) { for (var i = 0; i < regs.length; i++) if (regs[i].k === +k) return i; return -1; }
+    function desenhar() {
+        var f = filtro.value;
+        Object.keys(nos).forEach(function (k) { if (porK(k) < 0) { nos[k].remove(); delete nos[k]; } });
+        var visiveis = regs.filter(function (r) { return !f || r.uf === f; });
+        regs.forEach(function (r) {
+            var no = nos[r.k] || criar(r);
+            lista.appendChild(no);
+            no.hidden = !!f && r.uf !== f;
+        });
+        visiveis.forEach(function (r, i) {
+            nos[r.k].querySelector('[data-mp-acao=subir]').disabled = i === 0;
+            nos[r.k].querySelector('[data-mp-acao=descer]').disabled = i === visiveis.length - 1;
+        });
+        gravar();
+    }
+    function abrir(no, r) {
+        var ed = no.querySelector('.mp-rep__edicao');
+        var botao = no.querySelector('[data-mp-acao=editar]');
+        ed.hidden = !ed.hidden;
+        botao.setAttribute('aria-expanded', ed.hidden ? 'false' : 'true');
+        if (!ed.hidden && !no._quill && typeof Quill !== 'undefined') {
+            var q = new Quill(no.querySelector('.mp-quill'), {
+                theme: 'snow',
+                placeholder: 'Nome da empresa (como Título), cidade, endereço, contatos…',
+                modules: {toolbar: [[{header: [3, false]}], ['bold', 'italic', 'underline'], [{list: 'ordered'}, {list: 'bullet'}], ['link'], ['clean']]}
+            });
+            if (r.html) q.clipboard.dangerouslyPasteHTML(r.html.replace(/<(\/?)h[12](\s|>)/gi, '<$1h3$2'));
+            q.on('text-change', function () { r.html = q.root.innerHTML; atualizarResumo(r); gravar(); });
+            no._quill = q;
+        }
+    }
+    // Logo: um seletor de arquivo só
+    var seletor = document.createElement('input');
+    seletor.type = 'file'; seletor.accept = 'image/jpeg,image/png,image/webp,image/gif'; seletor.hidden = true;
+    form.appendChild(seletor);
+    var alvo = null;
+    seletor.addEventListener('change', function () {
+        if (!alvo || !seletor.files || !seletor.files[0]) return;
+        var r = alvo, fd = new FormData();
+        fd.append('arquivo', seletor.files[0]);
+        fd.append('_token', form.dataset.tokenMidia);
+        aviso.className = 'mp-aviso'; aviso.textContent = 'Enviando o logo…';
+        fetch(form.dataset.midiaUrl, {method: 'POST', body: fd, headers: {'X-Requested-With': 'XMLHttpRequest'}, credentials: 'same-origin'})
+            .then(function (res) { return res.json().catch(function () { return {erro: 'Erro ' + res.status + ' ao enviar o logo.'}; }); })
+            .then(function (res) {
+                if (res.erro || !res.arquivo) { aviso.className = 'mp-aviso is-erro'; aviso.textContent = res.erro || 'Não foi possível enviar o logo.'; return; }
+                r.image = res.arquivo; atualizarResumo(r); gravar();
+                aviso.className = 'mp-aviso'; aviso.textContent = 'Logo enviado. Ele vale depois de salvar o bloco.';
+            })
+            .catch(function () { aviso.className = 'mp-aviso is-erro'; aviso.textContent = 'Sem conexão: o logo não foi enviado.'; });
+        alvo = null;
+    });
+
+    lista.addEventListener('change', function (e) {
+        var no = e.target.closest('.mp-rep');
+        if (!no || !e.target.hasAttribute('data-mp-uf')) return;
+        var r = regs[porK(no.dataset.k)];
+        r.uf = e.target.value;
+        atualizarResumo(r);
+        gravar();
+    });
+    filtro.addEventListener('change', desenhar);
+    form.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-mp-acao]');
+        if (!b) return;
+        var acao = b.dataset.mpAcao;
+        if (acao === 'novo') {
+            var r = {k: ++seq, uf: filtro.value || '', image: '', html: ''};
+            regs.push(r);
+            desenhar();
+            abrir(nos[r.k], r);
+            nos[r.k].scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        }
+        var no = b.closest('.mp-rep');
+        if (!no) return;
+        var i = porK(no.dataset.k), reg = regs[i];
+        if (acao === 'editar') { abrir(no, reg); return; }
+        if (acao === 'logo') { alvo = reg; seletor.value = ''; seletor.click(); return; }
+        if (acao === 'tirar-logo') { reg.image = ''; atualizarResumo(reg); gravar(); return; }
+        if (acao === 'remover') {
+            if (!b.classList.contains('is-confirmar')) {
+                b.classList.add('is-confirmar');
+                b.querySelector('span').textContent = 'Confirmar';
+                setTimeout(function () { b.classList.remove('is-confirmar'); b.querySelector('span').textContent = 'Remover'; }, 3000);
+                return;
+            }
+            regs.splice(i, 1);
+            desenhar();
+            return;
+        }
+        if (acao === 'subir' || acao === 'descer') {
+            // troca com o vizinho visível (respeita o filtro)
+            var f = filtro.value, j = i;
+            do { j += acao === 'subir' ? -1 : 1; } while (j >= 0 && j < regs.length && f && regs[j].uf !== f);
+            if (j < 0 || j >= regs.length) return;
+            regs[i] = regs[j]; regs[j] = reg;
+            desenhar();
+        }
+    });
+    form.addEventListener('submit', function () {
+        regs.forEach(function (r) { if (nos[r.k] && nos[r.k]._quill) r.html = nos[r.k]._quill.root.innerHTML; });
+        gravar();
+    });
+    desenhar();
+})();
+</script>

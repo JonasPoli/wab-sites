@@ -10,7 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Mantém parágrafos, títulos, negrito, itálico, sublinhado, tachado, listas
  * (inclusive o <li data-list="bullet"> do Quill 2), citações, links http/https/mailto
- * e imagens http/https, e só as classes de alinhamento do Quill (ql-align-*).
+ * (e `tel:`, desde o mapa de representantes) e imagens http/https, e só as classes de alinhamento do Quill (ql-align-*).
  * Remove scripts, atributos de evento, iframe, style e URLs javascript:/data:.
  *
  * Usa HTMLPurifier: o symfony/html-sanitizer 7.2 (a versão travada no projeto)
@@ -56,7 +56,7 @@ class ArticleBodySanitizer
         $config = \HTMLPurifier_Config::createDefault();
         $config->set('Cache.SerializerPath', $this->cacheDir);
         $config->set('HTML.DefinitionID', 'wab-article-body');
-        $config->set('HTML.DefinitionRev', 1);
+        $config->set('HTML.DefinitionRev', 2);
         $config->set('HTML.Doctype', 'HTML 4.01 Transitional');
         $config->set('HTML.Allowed', implode(',', [
             'p[class]', 'br', 'h2[class]', 'h3[class]',
@@ -70,7 +70,7 @@ class ArticleBodySanitizer
             'ql-align-center', 'ql-align-right', 'ql-align-justify',
         ]);
         $config->set('Attr.AllowedFrameTargets', ['_blank']);
-        $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
+        $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true]);
         $config->set('AutoFormat.RemoveEmpty', false);
 
         if ($def = $config->maybeGetRawHTMLDefinition()) {

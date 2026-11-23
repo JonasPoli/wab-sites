@@ -28,6 +28,7 @@ enum BlockType: string
     case Video         = 'video';
     case BlogPosts     = 'blog_posts';
     case Accordion     = 'accordion';
+    case Representatives = 'representatives';
 
     public function label(): string
     {
@@ -56,6 +57,7 @@ enum BlockType: string
             self::Video         => 'Vídeo',
             self::BlogPosts     => 'Últimas do blog',
             self::Accordion     => 'Sanfona',
+            self::Representatives => 'Mapa de representantes',
         };
     }
 
@@ -86,6 +88,7 @@ enum BlockType: string
             self::Video         => 'fa-solid fa-circle-play',
             self::BlogPosts     => 'fa-solid fa-rss',
             self::Accordion     => 'fa-solid fa-bars-staggered',
+            self::Representatives => 'fa-solid fa-map-location-dot',
         };
     }
 }

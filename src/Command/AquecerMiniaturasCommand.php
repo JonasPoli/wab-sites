@@ -47,6 +47,7 @@ final class AquecerMiniaturasCommand extends Command
         'uploads/team_member_image' => ['equipe'],
         'uploads/testimonial_avatar' => ['avatar'],
         'uploads/partner_logo' => ['logo_parceiro'],
+        'uploads/page_block_media' => ['logo_bloco'],
         'uploads/section/bg' => ['fundo_secao', 'fundo_secao_mobile'],
         'uploads/tenant/logo' => ['logo_site'],
         'uploads/tenant/dark_logo' => ['logo_site'],

@@ -396,6 +396,7 @@ a.at-contact-card:hover{background:#e3dbce}
 .at-accordion-table th{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--color-primary-text);border-bottom-color:var(--at-ink)}
 .at-accordion-table td{color:var(--at-muted)}
 .at-accordion-table td:first-child{color:var(--at-ink);font-weight:600}
+.at-accordion-img{display:block;width:auto;height:auto;max-width:160px;max-height:80px;object-fit:contain;margin-bottom:6px}
 .at-accordion-table a{color:var(--color-primary-text);text-decoration:underline;text-underline-offset:3px}
 .at-section--dark .at-accordion,.at-section--dark .at-accordion-item,.at-section--dark .at-accordion-table th,.at-section--dark .at-accordion-table td{border-color:rgba(255,255,255,.18)}
 .at-section--dark .at-accordion-title h3,.at-section--dark .at-accordion-table td:first-child,.at-section--dark .at-accordion-body .at-rich,.at-section--dark .at-accordion-body .at-rich strong{color:#fff}
@@ -412,4 +413,32 @@ a.at-contact-card:hover{background:#e3dbce}
   .at-has-head td::before{content:attr(data-rotulo);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--color-primary-text)}
   .at-has-head td.is-vazia{display:none}
 }
+/* Mapa de representantes (representatives, change bloco-mapa-de-representantes) */
+.at-mapa{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:start;margin-top:8px}
+.at-mapa [hidden]{display:none!important}
+.at-mapa .mapa-br{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+.at-mapa .mapa-uf{fill:#c9c1b4;stroke:var(--at-bg,#f7f5f0);stroke-width:2;stroke-linejoin:round;transition:fill .2s}
+.at-mapa .mapa-uf.sem{fill:#e4ded3}
+.at-mapa a:hover .mapa-uf,.at-mapa a:focus-visible .mapa-uf{fill:rgba(var(--color-primary-rgb),.6)}
+.at-mapa a.is-ativo .mapa-uf{fill:var(--color-primary)}
+.at-mapa a:focus{outline:none}
+.at-mapa a:focus-visible .mapa-uf{stroke:#f5ab57;stroke-width:5}
+.at-mapa-mapa{position:sticky;top:110px}
+.at-mapa-rotulo{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+.at-mapa-seletor{margin-bottom:24px}
+.at-mapa-chamada{display:flex;align-items:center;gap:20px;padding:30px;border:1px solid var(--at-line);background:var(--at-paper);font-family:'Manrope','DM Sans',Arial,sans-serif;font-size:19px;font-weight:600;letter-spacing:-.02em;line-height:1.35}
+.at-mapa-chamada svg{flex-shrink:0;width:44px;height:44px;color:var(--color-primary-text)}
+.at-mapa-cartao{padding:32px;border:1px solid var(--at-line);border-top:3px solid var(--color-primary);background:var(--at-paper)}
+.at-mapa-cartao+.at-mapa-cartao{margin-top:16px}
+.at-mapa-estado{font-family:'Manrope','DM Sans',Arial,sans-serif;font-size:28px;font-weight:600;letter-spacing:-.04em;margin:8px 0 22px}
+.at-mapa-rep{display:flex;gap:18px;align-items:flex-start}
+.at-mapa-rep+.at-mapa-rep{margin-top:22px;padding-top:22px;border-top:1px solid var(--at-line)}
+.at-mapa-logo{flex-shrink:0;width:92px;padding:6px;border:1px solid var(--at-line);background:#fff}
+.at-mapa-logo img{display:block;width:100%;height:auto;max-height:56px;object-fit:contain}
+.at-mapa-texto{font-size:14px;color:var(--at-muted);overflow-wrap:anywhere}
+.at-mapa-texto h3{font-size:19px;color:var(--at-ink);margin:0 0 6px}
+.at-mapa-texto>*+*{margin-top:.6em}
+.at-mapa-logo--vazio{border-color:transparent;background:none}
+@media(max-width:479px){.at-mapa-rep{flex-direction:column;gap:12px}.at-mapa-logo--vazio{display:none}}
+@media(max-width:860px){.at-mapa{grid-template-columns:1fr;gap:32px}.at-mapa-mapa{position:static}.at-mapa-cartao{padding:22px}}
 </style>

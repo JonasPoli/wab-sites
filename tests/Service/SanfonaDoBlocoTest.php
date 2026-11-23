@@ -89,4 +89,22 @@ final class SanfonaDoBlocoTest extends TestCase
         $cfg = $this->sanfona->normalizar(['firstOpen' => '1', 'multiple' => '0', 'lixo' => 'x', 'panels' => []]);
         self::assertSame(['panels' => [], 'firstOpen' => '1'], $cfg);
     }
+
+    public function testCelulaSoComImagemMantemALinha(): void
+    {
+        $item = $this->item(['title' => 'A', 'table' => json_encode(['rows' => [['Cidade', 'Logo'], ['', ['text' => '', 'image' => 'midia_abc.png']]]])]);
+        self::assertSame([['Cidade', 'Logo'], ['', ['text' => '', 'image' => 'midia_abc.png']]], $item['table']['rows']);
+    }
+
+    public function testNomeDeImagemInvalidoDescartado(): void
+    {
+        $item = $this->item(['title' => 'A', 'table' => json_encode(['rows' => [[['text' => 'X', 'image' => '../.env'], ['text' => 'Y', 'image' => 'a/b.png']]]])]);
+        self::assertSame([['X', 'Y']], $item['table']['rows']);
+    }
+
+    public function testCelulaDeTextoContinuaString(): void
+    {
+        $item = $this->item(['title' => 'A', 'table' => json_encode(['rows' => [['a', ['text' => 'b']]]])]);
+        self::assertSame([['a', 'b']], $item['table']['rows']);
+    }
 }

@@ -40,6 +40,7 @@ final class PreviaDoBloco
     public function __construct(
         private readonly CategoryRepository $categorias,
         private readonly SanfonaDoBloco $sanfona,
+        private readonly MapaDeRepresentantes $mapa,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {}
@@ -81,6 +82,12 @@ final class PreviaDoBloco
         }
         if ($tipo === 'banner') {
             $cfg['banners'] = $this->slides($r, $cfgSalvo['banners'] ?? [], $arquivos);
+        }
+        if ($tipo === 'representatives') {
+            $cfg = $this->mapa->normalizar(is_array($cfg) ? $cfg : []);
+            if ($cfg['reps'] === []) {
+                $cfg['reps'] = $this->mapa->exemplos();
+            }
         }
         if ($tipo === 'accordion') {
             $cfg = $this->sanfona->normalizar(is_array($cfg) ? $cfg : []);

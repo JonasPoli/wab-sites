@@ -1,0 +1,56 @@
+{#
+  Mapa de representantes (representatives, change bloco-mapa-de-representantes) no tema
+  atelie: mesmo mapa e script comuns (themes/_comum), com cartões claros de linha fina e
+  cantos retos; o estado escolhido fica na cor primária do site.
+#}
+{% set cfg = block.config ?? {} %}
+{% set grupos = mapa_por_estado(cfg.reps ?? []) %}
+{% set nomes = estados_do_brasil() %}
+{% if grupos|length > 0 or (cfg.emptyMessage ?? null) %}
+{% set mapaId = block.id ?? random(100000, 999999) %}
+{% set contagem = {} %}
+{% for uf, regs in grupos %}{% set contagem = contagem|merge({(uf): regs|length}) %}{% endfor %}
+{# A chamada (block.text) fica ao lado do mapa, não no cabeçalho #}
+{% include 'themes/atelie/blocks/_head.html.twig' with {block: {preTitle: block.preTitle, title: block.title, text: null}} only %}
+<div class="at-mapa" data-mapa="{{ mapaId }}">
+    <div class="at-mapa-mapa">
+        <label class="at-mapa-rotulo" for="mapa-{{ mapaId }}-seletor">Escolha o estado no mapa ou na lista</label>
+        <select class="at-input at-mapa-seletor" id="mapa-{{ mapaId }}-seletor" data-mapa-seletor>
+            <option value="">Selecione o estado…</option>
+            {% for uf, nome in nomes %}
+            <option value="{{ uf }}" data-nome="{{ nome }}">{{ nome }}{{ contagem[uf] is defined ? ' (' ~ contagem[uf] ~ ')' }}</option>
+            {% endfor %}
+        </select>
+        {% include 'themes/_comum/_mapa_do_brasil.html.twig' with {mapaId: mapaId, contagem: contagem, nomes: nomes} %}
+    </div>
+    <div class="at-mapa-lado" aria-live="polite">
+        {% if block.text %}
+        <div class="at-mapa-chamada" data-mapa-inicio>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+            <p>{{ block.text|nl2br }}</p>
+        </div>
+        {% endif %}
+        {% for uf, regs in grupos %}
+        <section class="at-mapa-cartao" id="mapa-{{ mapaId }}-{{ uf }}" data-mapa-painel="{{ uf }}" aria-label="{{ nomes[uf] }}">
+            <p class="at-eyebrow">{{ uf }}</p>
+            <p class="at-mapa-estado">{{ nomes[uf] }}</p>
+            {# Se algum registro do estado tem logo, os outros ganham o mesmo recuo (textos alinhados) #}
+            {% set comLogo = regs|filter(r => r.image)|length > 0 %}
+            {% for r in regs %}
+            <article class="at-mapa-rep">
+                {% if r.image %}<div class="at-mapa-logo"><img src="{{ ('uploads/page_block_media/' ~ r.image)|thumb('logo_bloco') }}" width="160" height="80" loading="lazy" decoding="async" alt=""></div>{% elseif comLogo %}<div class="at-mapa-logo at-mapa-logo--vazio" aria-hidden="true"></div>{% endif %}
+                {% if r.html %}<div class="at-rich at-mapa-texto">{{ r.html|raw }}</div>{% endif %}
+            </article>
+            {% endfor %}
+        </section>
+        {% endfor %}
+        {% if cfg.emptyMessage ?? null %}
+        <section class="at-mapa-cartao" id="mapa-{{ mapaId }}-vazio" data-mapa-painel="vazio">
+            <p class="at-mapa-estado" data-mapa-vazio-nome>Demais estados</p>
+            <div class="at-rich at-mapa-texto"><p>{{ cfg.emptyMessage|celula_da_sanfona }}</p></div>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% include 'themes/_comum/_mapa_script.html.twig' %}
+{% endif %}

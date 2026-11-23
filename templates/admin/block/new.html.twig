@@ -52,6 +52,7 @@
             {key: 'video',          label: 'Vídeo',                     icon: 'fa-solid fa-circle-play',          desc: 'YouTube ou MP4 com texto ao lado'},
             {key: 'blog_posts',     label: 'Últimas do blog',           icon: 'fa-solid fa-rss',                  desc: 'Posts mais recentes do blog'},
             {key: 'accordion',      label: 'Sanfona',                   icon: 'fa-solid fa-bars-staggered',       desc: 'Itens que abrem e fecham, com texto ou tabela'},
+            {key: 'representatives', label: 'Mapa de representantes',  icon: 'fa-solid fa-map-location-dot',     desc: 'Mapa do Brasil: clique no estado e veja os representantes'},
         ] %}
         {% for t in types %}
         {% if t.key == 'newsletter' and (not currentTenant or not currentTenant.newsletterEnabled) %}
