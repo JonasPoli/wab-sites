@@ -37,7 +37,7 @@
 ## 6. Deploy (autorizado no pedido do Jonas: "publique")
 
 - [x] 6.1 Backup (leitura + escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/` no wabsites; conferir o `post_max_size` e o `max_input_vars` do pool PHP 8.3 (leitura) e anotar o HTTP atual dos domínios de cliente
-- [ ] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull` e `./build.sh` (sem migration)
+- [x] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull` e `./build.sh` (sem migration)
 - [ ] 6.3 Conferência: HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br; no `/admin` de um site, a escolha de tipo mostra "Sanfona" e o formulário abre
 
 ## Medições
@@ -56,3 +56,5 @@
 ## Deploy
 
 - 6.1 (23/11/2026): backup `~/backups/wab-sites-antes-bloco-sanfona-20261123-2016.sql.gz` (120 KB, permissão 600). PHP CLI do servidor: `max_input_vars` 1000, `post_max_size` 512M (o pool FPM não é legível pelo runcloud; a tabela vai num campo JSON por item, então o limite de campos não pesa). HTTP antes: 200 nos 9 domínios.
+- 6.2 (23/11/2026): commit `0b5ef08` no main; no servidor, `git pull` (de `d8f66c1`) e `./build.sh` concluído (1.325 miniaturas refeitas); sem migration. O `sh/reset.sh` alterado no servidor (fora do git) não foi tocado.
+- 6.3: HTTP 200 nos 9 domínios depois do deploy; os sites servem `app-5cxeY3-.css` (o mesmo compilado localmente, com `.wab-sanfona`); `lint:twig` dos 3 templates novos ok e `SanfonaDoBloco` no contêiner de produção. **Pendente:** abrir no `/admin` de um site a escolha de tipo e o formulário da Sanfona (precisa de login em produção, que não foi feito aqui).
