@@ -13,10 +13,16 @@
 
 ## 3. Produção (escrita, pedida pelo Jonas)
 
-- [ ] 3.1 Backup do banco de produção
-- [ ] 3.2 Enviar os logos e rodar o script de gravação (D3) no servidor
-- [ ] 3.3 Conferência: `https://transmai.wab.com.br/p/revendas` responde 200, com 85 registros, logos carregando e 27 estados no mapa; a home continua 200
+- [x] 3.1 Backup do banco de produção
+- [x] 3.2 Enviar os logos e rodar o script de gravação (D3) no servidor
+- [x] 3.3 Conferência: `https://transmai.wab.com.br/p/revendas` responde 200, com 85 registros, logos carregando e 27 estados no mapa; a home continua 200
 
 ## 4. Registro
 
 - [ ] 4.1 Com a confirmação do Jonas, registrar no ticket 13505 (cliente 213) e lançar as horas
+
+## Deploy
+
+- 23/11/2026: backup o mesmo do deploy acima. 49 logos (47 baixados do site antigo, 2 BMP convertidos para PNG) enviados por `scp` para `public/uploads/page_block_media/`; script de gravação rodado no servidor: página 62 (`/p/revendas`), seção 99, blocos 157 (texto de introdução) e 158 (mapa) com 85 registros; miniaturas aquecidas.
+- Conferência: `https://transmai.wab.com.br/p/revendas` 200, 27 estados, 85 registros, 24 cartões (23 estados + demais estados), as 49 miniaturas dos logos respondem 200; home 200. Visual conferido no Amazonas (recuo de alinhamento) em produção.
+- Pendente: 4.1 (registro no ticket 13505), aguardando confirmação do Jonas.

@@ -23,4 +23,8 @@
 
 ## 5. Deploy (junto com `bloco-mapa-de-representantes`)
 
-- [ ] 5.1 Backup do banco de produção, `git push`, no servidor `git pull` e `./build.sh` (sem migration); HTTP 200 nos 9 domínios
+- [x] 5.1 Backup do banco de produção, `git push`, no servidor `git pull` e `./build.sh` (sem migration); HTTP 200 nos 9 domínios
+
+## Deploy
+
+- 23/11/2026: backup `~/backups/wab-sites-antes-mapa-de-representantes-20261123-2114.sql.gz` (122 KB, permissão 600); commit `e93031a` no main; no servidor `git pull` e `./build.sh` (1.374 miniaturas; sem migration). HTTP 200 antes e depois em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br, ajope.wab.com.br e transmai.wab.com.br.

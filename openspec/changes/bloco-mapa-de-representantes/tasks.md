@@ -27,7 +27,7 @@
 
 ## 5. Deploy (junto com `imagem-na-celula-da-sanfona`)
 
-- [ ] 5.1 Backup do banco de produção; `git push`; no servidor `git pull` e `./build.sh` (sem migration); HTTP 200 nos 9 domínios e em transmai.wab.com.br
+- [x] 5.1 Backup do banco de produção; `git push`; no servidor `git pull` e `./build.sh` (sem migration); HTTP 200 nos 9 domínios e em transmai.wab.com.br
 
 ## Medições
 
@@ -35,3 +35,7 @@
 - Conferência no navegador (servidor HTTP local em 127.0.0.1:8011): cetec claro e escuro, moderno (cores verdes do site), atelie (computador, MG por `#`), wab e noticias só pelo teste funcional e HTTP 200, celular 390 px no cetec (DF pelo seletor, sem rolagem lateral), seção de fundo escuro (simulada com `mp-section-dark`), teclado (Tab até os estados, contorno de foco, Enter abre a Bahia), clique na Bahia, link direto `#mapa-189-SP`, painel com filtro BA, registro novo herdando o estado do filtro, mover, salvar (86 registros, `h2` → `h3`, `tel:` mantido).
 - Pedido do Jonas durante a implementação: quando algum registro do estado tem logo, os sem logo ganham o mesmo recuo (requisito "Alinhamento dos registros do estado"); conferido no Amazonas.
 - `vendor/bin/phpunit`: 136 testes, só as 5 falhas antigas do `SuperTestFieldsControllerTest`.
+
+## Deploy
+
+- 23/11/2026: backup `~/backups/wab-sites-antes-mapa-de-representantes-20261123-2114.sql.gz` (122 KB, permissão 600); commit `e93031a` no main; no servidor `git pull` e `./build.sh` (1.374 miniaturas; sem migration). HTTP 200 antes e depois em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br, ajope.wab.com.br e transmai.wab.com.br.
