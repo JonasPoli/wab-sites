@@ -19,10 +19,10 @@
 
 ## 4. Registro
 
-- [ ] 4.1 Com a confirmação do Jonas, registrar no ticket 13505 (cliente 213) e lançar as horas
+- [x] 4.1 Registrar o trabalho num ticket: por decisão do Jonas, ticket interno da WAB (cliente 196, projeto 96 "WAB Sites"), não no 13505 da Transmai
 
 ## Deploy
 
 - 23/11/2026: backup o mesmo do deploy acima. 49 logos (47 baixados do site antigo, 2 BMP convertidos para PNG) enviados por `scp` para `public/uploads/page_block_media/`; script de gravação rodado no servidor: página 62 (`/p/revendas`), seção 99, blocos 157 (texto de introdução) e 158 (mapa) com 85 registros; miniaturas aquecidas.
 - Conferência: `https://transmai.wab.com.br/p/revendas` 200, 27 estados, 85 registros, 24 cartões (23 estados + demais estados), as 49 miniaturas dos logos respondem 200; home 200. Visual conferido no Amazonas (recuo de alinhamento) em produção.
-- Pendente: 4.1 (registro no ticket 13505), aguardando confirmação do Jonas.
+- 4.1: ticket interno #13510 (cliente WAB 196, projeto 96), e-mail enviado a suporte@wab.com.br, status concluído, 5:00 h lançadas (registro 13868, sem contrato).
