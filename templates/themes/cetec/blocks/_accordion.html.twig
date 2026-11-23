@@ -1,0 +1,52 @@
+{#
+  Sanfona (accordion, change bloco-sanfona): itens que abrem e fecham com <details>, sem
+  JavaScript. Cada item é texto (HTML sanitizado ao gravar) ou tabela (células em texto
+  puro, pelo filtro celula_da_sanfona). "Um de cada vez" usa o atributo name comum aos
+  <details> do bloco. Estilos no componente .wab-sanfona do app.css. Também usado pelos
+  temas moderno, wab e noticias.
+#}
+{% set cfg = block.config ?? {} %}
+{% set itens = (cfg.panels ?? [])|filter(p => (p.title ?? '')|trim != '') %}
+{% if itens|length > 0 %}
+{% set grupo = (cfg.multiple ?? '') == '1' ? null : 'sanfona-' ~ (block.id ?? random(100000, 999999)) %}
+<div class="wab-block my-10" data-aos="fade-up">
+    {% if block.preTitle or block.title or block.text %}
+    <div class="text-center max-w-3xl mx-auto mb-8">
+        {% if block.preTitle %}{% include 'themes/cetec/blocks/_pre_title.html.twig' with {text: block.preTitle} %}{% endif %}
+        {% if block.title %}<h2 class="text-2xl md:text-4xl font-extrabold mb-3 text-cetec-primary-text">{{ block.title }}</h2>{% endif %}
+        <div class="w-16 h-1 bg-cetec-secondary mx-auto mb-4 rounded-full"></div>
+        {% if block.text %}<p class="text-gray-600 dark:text-gray-400 text-sm md:text-base max-w-2xl mx-auto">{{ block.text|nl2br }}</p>{% endif %}
+    </div>
+    {% endif %}
+    <div class="wab-sanfona">
+        {% for p in itens %}
+        <details class="wab-sanfona__item"{% if grupo %} name="{{ grupo }}"{% endif %}{% if loop.first and (cfg.firstOpen ?? '') == '1' %} open{% endif %}>
+            <summary class="wab-sanfona__titulo">
+                <h3>{{ p.title }}</h3>
+                <svg class="wab-sanfona__seta" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="wab-sanfona__conteudo">
+                {% if (p.kind ?? 'text') == 'table' %}
+                    {% set linhas = p.table.rows ?? [] %}
+                    {% if linhas|length > 0 %}
+                    {% set cabeca = (p.table.header ?? true) ? linhas|first : null %}
+                    <div class="wab-sanfona__rolagem">
+                        <table class="wab-sanfona__tabela{{ cabeca ? ' tem-cabecalho' }}">
+                            {% if cabeca %}<thead><tr>{% for h in cabeca %}<th scope="col">{{ h|celula_da_sanfona }}</th>{% endfor %}</tr></thead>{% endif %}
+                            <tbody>
+                                {% for linha in (cabeca ? linhas|slice(1) : linhas) %}
+                                <tr>{% for celula in linha %}<td{% if cabeca %} data-rotulo="{{ cabeca[loop.index0] ?? '' }}"{% endif %}{% if celula == '' %} class="is-vazia"{% endif %}><span>{{ celula|celula_da_sanfona }}</span></td>{% endfor %}</tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                {% elseif p.html ?? null %}
+                    <div class="wab-sanfona__texto">{{ p.html|raw }}</div>
+                {% endif %}
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

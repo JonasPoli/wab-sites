@@ -27,6 +27,7 @@ enum BlockType: string
     case Cta           = 'cta';
     case Video         = 'video';
     case BlogPosts     = 'blog_posts';
+    case Accordion     = 'accordion';
 
     public function label(): string
     {
@@ -54,6 +55,7 @@ enum BlockType: string
             self::Cta           => 'Chamada para ação',
             self::Video         => 'Vídeo',
             self::BlogPosts     => 'Últimas do blog',
+            self::Accordion     => 'Sanfona',
         };
     }
 
@@ -83,6 +85,7 @@ enum BlockType: string
             self::Cta           => 'fa-solid fa-bullhorn',
             self::Video         => 'fa-solid fa-circle-play',
             self::BlogPosts     => 'fa-solid fa-rss',
+            self::Accordion     => 'fa-solid fa-bars-staggered',
         };
     }
 }

@@ -139,8 +139,9 @@ Os blocos de conteúdo são filhos diretos das seções e determinam o layout in
 | `steps` | Etapas | Até 6 passos numerados (rótulo, título, texto). |
 | `cta` | Chamada para ação | Faixa na cor primária com título e botão (pode abrir em nova aba). |
 | `video` | Vídeo | YouTube pelo link (watch, youtu.be, shorts) ou MP4 enviado (até 30 MB, em `uploads/page_block_video`), horizontal ou vertical, com texto ao lado. |
+| `accordion` | Sanfona | Itens que abrem e fecham (`<details>`, sem JavaScript; um aberto de cada vez ou vários). Cada item é texto formatado (editor do painel, HTML sanitizado ao gravar) ou tabela (até 12 colunas e 500 linhas; primeira linha como cabeçalho opcional; e-mails e links viram links; no celular, a tabela com cabeçalho vira cartões). No painel, a tabela aceita colar trechos do Excel, do Google Planilhas ou de uma tabela de página web; o JSON da tabela vai num campo só por item (`config.panels[].table`), para não esbarrar no `max_input_vars`. Desenho do cetec em cetec, moderno, wab e noticias (CSS `.wab-sanfona` no `app.css`) e próprio no atelie. |
 
-Os sete últimos são desenhados por `templates/themes/cetec/blocks/`, também nos temas `moderno`, `wab` e `noticias`. Ao criar um tipo novo, o teste `tests/Entity/BlockTypeCoberturaTest.php` cobra o formulário do painel, a entrada na escolha de tipo e o desenho em cada tema.
+Os oito últimos são desenhados por `templates/themes/cetec/blocks/`, também nos temas `moderno`, `wab` e `noticias`. Ao criar um tipo novo, o teste `tests/Entity/BlockTypeCoberturaTest.php` cobra o formulário do painel, a entrada na escolha de tipo e o desenho em cada tema.
 
 > [!TIP]
 > Os blocos flexibilizam as propriedades armazenando configurações estruturais complexas (ex: links CTA, títulos de cards) em uma única coluna do tipo **JSON** (`config`), mantendo a tabela limpa e a arquitetura altamente extensível.

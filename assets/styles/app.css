@@ -1066,3 +1066,45 @@
 .swiper-wrapper { display: flex; position: relative; width: 100%; height: 100%; z-index: 1; box-sizing: content-box; }
 .swiper-slide { flex-shrink: 0; width: 100%; height: 100%; position: relative; }
 .swiper-horizontal > .swiper-wrapper { flex-direction: row; }
+
+
+/* ===== Sanfona (bloco accordion, change bloco-sanfona) =====
+   Itens <details>/<summary>; texto rico e tabela vêm de HTML gerado, sem classes.
+   Cores do site pelas variáveis do tenant_css_vars(); usado por cetec, moderno, wab e noticias.
+   ========================================= */
+.wab-sanfona { --sf-b: #e5e7eb; --sf-f: #fff; --sf-f2: #f9fafb; --sf-t: #4b5563; --sf-x: #111827; --sf-c: rgba(var(--color-primary-rgb), .08);
+    display: grid; gap: .75rem; text-align: left; }
+:is(.dark, .wab-section-dark, .mp-section-dark) .wab-sanfona { --sf-b: #ffffff1f; --sf-f: #ffffff0a; --sf-f2: #ffffff0f; --sf-t: #d1d5db; --sf-x: #fff; --sf-c: #ffffff14; }
+.wab-sanfona__item { border: 1px solid var(--sf-b); border-radius: .75rem; background: var(--sf-f); }
+.wab-sanfona__item[open] { border-color: rgba(var(--color-primary-rgb), .45); box-shadow: 0 8px 24px -12px #0000002e; }
+.wab-sanfona__titulo { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem clamp(1rem, 3vw, 1.25rem); cursor: pointer; list-style: none; border-radius: .75rem; color: var(--color-primary-text); }
+.wab-sanfona__titulo::-webkit-details-marker { display: none; }
+.wab-sanfona__titulo:hover { background: var(--sf-f2); }
+.wab-sanfona__titulo:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+.wab-sanfona__titulo h3 { font-size: 1.05rem; font-weight: 700; line-height: 1.35; }
+.wab-sanfona__seta { flex-shrink: 0; color: var(--color-secondary-text); transition: transform .25s; }
+[open] > .wab-sanfona__titulo .wab-sanfona__seta { transform: rotate(180deg); }
+.wab-sanfona__conteudo { padding: .25rem clamp(1rem, 3vw, 1.25rem) 1.25rem; color: var(--sf-t); font-size: .95rem; line-height: 1.65; }
+.wab-sanfona__texto > * + * { margin-top: .85em; }
+.wab-sanfona__texto :is(h2, h3, strong, b) { color: var(--sf-x); font-weight: 700; }
+.wab-sanfona__texto :is(h2, h3) { font-size: 1.15rem; }
+.wab-sanfona__texto :is(ul, ol) { padding-left: 1.4em; list-style: disc; }
+.wab-sanfona__texto ol li:not([data-list="bullet"]) { list-style: decimal; }
+.wab-sanfona__texto blockquote { border-left: 3px solid var(--color-secondary); padding-left: 1em; font-style: italic; }
+.wab-sanfona a { color: var(--color-primary-text); text-decoration: underline; text-underline-offset: 2px; }
+.wab-sanfona__rolagem { overflow-x: auto; border: 1px solid var(--sf-b); border-radius: .5rem; }
+.wab-sanfona__tabela { width: 100%; border-collapse: collapse; font-size: .875rem; line-height: 1.5; }
+.wab-sanfona__tabela :is(th, td) { padding: .65rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--sf-b); overflow-wrap: anywhere; min-width: 7rem; }
+.wab-sanfona__tabela th { background: var(--sf-c); color: var(--sf-x); border-bottom: 2px solid rgba(var(--color-secondary-rgb), .6); }
+.wab-sanfona__tabela tr:nth-child(even) { background: var(--sf-f2); }
+@media (max-width: 639px) {
+    /* Tabela com cabeçalho vira cartões: "Coluna: valor" */
+    .wab-sanfona__rolagem:has(.tem-cabecalho) { border: 0; }
+    .tem-cabecalho thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .tem-cabecalho, .tem-cabecalho :is(tbody, tr) { display: block; }
+    .tem-cabecalho tr { border: 1px solid var(--sf-b); border-radius: .5rem; padding: .5rem .85rem; margin-bottom: .75rem; background: none !important; }
+    .wab-sanfona__tabela.tem-cabecalho td { display: grid; grid-template-columns: minmax(6rem, 38%) 1fr; gap: .75rem; padding: .4rem 0; min-width: 0; border: 0; }
+    .tem-cabecalho td + td { border-top: 1px solid var(--sf-b); }
+    .tem-cabecalho td::before { content: attr(data-rotulo); font-weight: 700; color: var(--sf-x); }
+    .tem-cabecalho td.is-vazia { display: none; }
+}

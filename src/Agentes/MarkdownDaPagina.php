@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Agentes;
 
 use App\Entity\Tenant;
+use League\HTMLToMarkdown\Converter\TableConverter;
 use League\HTMLToMarkdown\HtmlConverter;
 
 /**
@@ -42,6 +43,8 @@ final class MarkdownDaPagina
                 $conteudo .= $doc->saveHTML($filho);
             }
             $converter = new HtmlConverter(['strip_tags' => true, 'header_style' => 'atx', 'hard_break' => true, 'remove_nodes' => 'script style']);
+            // Tabelas (sanfona do construtor) saem como tabelas Markdown — change bloco-sanfona
+            $converter->getEnvironment()->addConverter(new TableConverter());
             $markdown = $converter->convert($conteudo);
         }
 

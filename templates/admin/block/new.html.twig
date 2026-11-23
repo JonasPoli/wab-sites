@@ -51,6 +51,7 @@
             {key: 'cta',            label: 'Chamada para ação',         icon: 'fa-solid fa-bullhorn',             desc: 'Faixa colorida com título e botão'},
             {key: 'video',          label: 'Vídeo',                     icon: 'fa-solid fa-circle-play',          desc: 'YouTube ou MP4 com texto ao lado'},
             {key: 'blog_posts',     label: 'Últimas do blog',           icon: 'fa-solid fa-rss',                  desc: 'Posts mais recentes do blog'},
+            {key: 'accordion',      label: 'Sanfona',                   icon: 'fa-solid fa-bars-staggered',       desc: 'Itens que abrem e fecham, com texto ou tabela'},
         ] %}
         {% for t in types %}
         {% if t.key == 'newsletter' and (not currentTenant or not currentTenant.newsletterEnabled) %}

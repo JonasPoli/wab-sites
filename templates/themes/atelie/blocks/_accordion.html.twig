@@ -1,0 +1,42 @@
+{#
+  Sanfona (accordion, change bloco-sanfona) no tema atelie: lista editorial com linhas
+  finas, título em Manrope e sinal "+" que vira "−". Itens <details>, sem JavaScript.
+  Texto: HTML sanitizado ao gravar, com .at-rich. Tabela: células em texto puro
+  (filtro celula_da_sanfona); no celular, tabela com cabeçalho vira cartões.
+#}
+{% set cfg = block.config ?? {} %}
+{% set itens = (cfg.panels ?? [])|filter(p => (p.title ?? '')|trim != '') %}
+{% if itens|length > 0 %}
+{% set grupo = (cfg.multiple ?? '') == '1' ? null : 'sanfona-' ~ (block.id ?? random(100000, 999999)) %}
+{% include 'themes/atelie/blocks/_head.html.twig' %}
+<div class="at-accordion" data-aos="fade-up">
+    {% for p in itens %}
+    <details class="at-accordion-item"{% if grupo %} name="{{ grupo }}"{% endif %}{% if loop.first and (cfg.firstOpen ?? '') == '1' %} open{% endif %}>
+        <summary class="at-accordion-title">
+            <h3>{{ p.title }}</h3>
+            <span class="at-accordion-sign" aria-hidden="true"></span>
+        </summary>
+        <div class="at-accordion-body">
+            {% if (p.kind ?? 'text') == 'table' %}
+                {% set linhas = p.table.rows ?? [] %}
+                {% if linhas|length > 0 %}
+                {% set cabeca = (p.table.header ?? true) ? linhas|first : null %}
+                <div class="at-accordion-scroll">
+                    <table class="at-accordion-table{{ cabeca ? ' at-has-head' }}">
+                        {% if cabeca %}<thead><tr>{% for h in cabeca %}<th scope="col">{{ h|celula_da_sanfona }}</th>{% endfor %}</tr></thead>{% endif %}
+                        <tbody>
+                            {% for linha in (cabeca ? linhas|slice(1) : linhas) %}
+                            <tr>{% for celula in linha %}<td{% if cabeca %} data-rotulo="{{ cabeca[loop.index0] ?? '' }}"{% endif %}{% if celula == '' %} class="is-vazia"{% endif %}><span>{{ celula|celula_da_sanfona }}</span></td>{% endfor %}</tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            {% elseif p.html ?? null %}
+                <div class="at-rich">{{ p.html|raw }}</div>
+            {% endif %}
+        </div>
+    </details>
+    {% endfor %}
+</div>
+{% endif %}

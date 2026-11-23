@@ -61,6 +61,27 @@ trait BlocosDeExemplo
         return $b;
     }
 
+    /** Sanfona de exemplo (change bloco-sanfona): um item de texto e dois de tabela. */
+    public static function sanfonaDeExemplo(): array
+    {
+        $cabeca = ['Cidade', 'Logo', 'Empresa', 'Resp. Técnico', 'Resp. Empresa', 'Assistência Técnica', 'Distribuidor'];
+        return ['preTitle' => 'Onde encontrar', 'title' => 'Distribuidores e assistência técnica', 'text' => 'Uma rede de parceiros treinados em todo o país.',
+            'config' => ['firstOpen' => '1', 'panels' => [
+                ['title' => 'Como funciona a garantia', 'kind' => 'text', 'table' => ['header' => true, 'rows' => []],
+                 'html' => '<p>Todos os técnicos são treinados na fábrica e recebem <strong>certificação</strong>.</p><ul><li>Atendimento em até 48 horas</li><li>Peças originais</li><li>Laudo técnico por escrito</li></ul><p>Dúvidas? <a href="https://exemplo.com.br/contato">Fale com a gente</a>.</p>'],
+                ['title' => 'São Paulo', 'kind' => 'table', 'html' => null, 'table' => ['header' => true, 'rows' => [
+                    $cabeca,
+                    ['SÃO PAULO', '', "Exemplo Equipamentos Ltda\nRua das Flores, 100 — Centro\nCEP 01000-000\nE-mail: contato@exemplo.com.br\nSite: www.exemplo.com.br", 'Ana Souza', 'Carlos Lima', 'X', 'X'],
+                    ['CAMPINAS', '', "Modelo Serviços Técnicos\nAv. Brasil, 2000\nFone: (19) 3000-0000", 'João Pereira', 'João Pereira', 'X', ''],
+                    ['RIBEIRÃO PRETO', '', "Demonstração Hospitalar ME\nE-mail: vendas@demonstracao.com.br", 'Marta Reis', 'Paulo Reis', '', 'X'],
+                ]]],
+                ['title' => 'Amapá', 'kind' => 'table', 'html' => null, 'table' => ['header' => false, 'rows' => [
+                    ['Entre em contato para saber o distribuidor ou a assistência técnica mais próxima.'],
+                    ["Tel.: (11) 2000-0000\nE-mail: assistencia@exemplo.com.br"],
+                ]]],
+            ]]];
+    }
+
     /** Fotos do portfólio: [título, categoria] */
     private function fotosDoPortfolio(ObjectManager $m, PageBlock $b, string $prefixo, array $fotos): void
     {
@@ -130,6 +151,7 @@ trait BlocosDeExemplo
             'team'           => ['title' => 'Equipe'],
             'contact'        => ['title' => 'Contato'],
         ];
+        $tipos['accordion'] = self::sanfonaDeExemplo();
         if ($comBlog) {
             $tipos['blog_posts'] = ['preTitle' => 'Blog', 'title' => 'Últimas do blog', 'itemCount' => 3];
         }

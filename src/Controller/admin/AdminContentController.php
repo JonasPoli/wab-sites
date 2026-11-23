@@ -45,6 +45,7 @@ class AdminContentController extends AbstractController
             TenantContext::class         => TenantContext::class,
             PageSectionRepository::class => PageSectionRepository::class,
             PageBlockRepository::class   => PageBlockRepository::class,
+            \App\Service\SanfonaDoBloco::class => \App\Service\SanfonaDoBloco::class,
         ];
     }
 
@@ -635,6 +636,10 @@ class AdminContentController extends AbstractController
                     $cfg['items'][$idx]['externalUrl'] = $extUrl;
                 }
             }
+        }
+        // Sanfona: itens limpos (HTML sanitizado, tabela do JSON) — change bloco-sanfona
+        if ($type === 'accordion') {
+            $cfg = $this->container->get(\App\Service\SanfonaDoBloco::class)->normalizar(is_array($cfg) ? $cfg : []);
         }
         $block->setConfig($cfg ?: null);
 

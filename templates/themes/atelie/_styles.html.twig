@@ -374,4 +374,42 @@ a.at-contact-card:hover{background:#e3dbce}
 .at-chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:12px 0 0}
 .at-chips li{border:1px solid var(--at-line);padding:6px 12px;font-size:13px}
 @media(max-width:860px){.at-profile{grid-template-columns:1fr}}
+/* Sanfona (accordion, change bloco-sanfona) */
+.at-accordion{border-top:1px solid var(--at-line);margin-top:8px}
+.at-accordion-item{border-bottom:1px solid var(--at-line)}
+.at-accordion-title{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 4px;cursor:pointer;list-style:none;transition:color .2s}
+.at-accordion-title::-webkit-details-marker{display:none}
+.at-accordion-title h3{font-size:clamp(18px,2vw,22px);font-weight:600}
+.at-accordion-title:hover,.at-accordion-item[open]>.at-accordion-title{color:var(--color-primary-text)}
+.at-accordion-title:focus-visible{outline:3px solid #f5ab57;outline-offset:3px}
+.at-accordion-sign{position:relative;flex-shrink:0;width:38px;height:38px;border:1px solid #cfc8bc;border-radius:50%;transition:.25s}
+.at-accordion-sign:before,.at-accordion-sign:after{content:'';position:absolute;left:50%;top:50%;width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%);transition:transform .25s}
+.at-accordion-sign:after{transform:translate(-50%,-50%) rotate(90deg)}
+.at-accordion-item[open] .at-accordion-sign{background:var(--at-ink);border-color:var(--at-ink);color:#fff}
+.at-accordion-item[open] .at-accordion-sign:after{transform:translate(-50%,-50%) rotate(0)}
+.at-accordion-body{padding:0 4px 32px}
+.at-accordion-body .at-rich{max-width:none;color:var(--at-muted)}
+.at-accordion-body .at-rich strong{color:var(--at-ink)}
+.at-accordion-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.at-accordion-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.55}
+.at-accordion-table th,.at-accordion-table td{padding:13px 16px 13px 0;text-align:left;vertical-align:top;border-bottom:1px solid var(--at-line);overflow-wrap:anywhere;min-width:7rem}
+.at-accordion-table th{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--color-primary-text);border-bottom-color:var(--at-ink)}
+.at-accordion-table td{color:var(--at-muted)}
+.at-accordion-table td:first-child{color:var(--at-ink);font-weight:600}
+.at-accordion-table a{color:var(--color-primary-text);text-decoration:underline;text-underline-offset:3px}
+.at-section--dark .at-accordion,.at-section--dark .at-accordion-item,.at-section--dark .at-accordion-table th,.at-section--dark .at-accordion-table td{border-color:rgba(255,255,255,.18)}
+.at-section--dark .at-accordion-title h3,.at-section--dark .at-accordion-table td:first-child,.at-section--dark .at-accordion-body .at-rich,.at-section--dark .at-accordion-body .at-rich strong{color:#fff}
+.at-section--dark .at-accordion-table td{color:#d0c7b9}
+.at-section--dark .at-accordion-sign{border-color:rgba(255,255,255,.4)}
+@media(max-width:640px){
+  .at-accordion-title{padding:20px 0}
+  .at-accordion-body{padding:0 0 24px}
+  .at-has-head thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .at-has-head,.at-has-head tbody,.at-has-head tr,.at-has-head td{display:block;width:100%}
+  .at-has-head tr{border-top:1px solid var(--at-line);padding:12px 0}
+  .at-has-head tr:first-child{border-top:0}
+  .at-accordion-table.at-has-head td{display:grid;grid-template-columns:minmax(6rem,38%) 1fr;gap:12px;padding:5px 0;border:0;min-width:0}
+  .at-has-head td::before{content:attr(data-rotulo);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--color-primary-text)}
+  .at-has-head td.is-vazia{display:none}
+}
 </style>

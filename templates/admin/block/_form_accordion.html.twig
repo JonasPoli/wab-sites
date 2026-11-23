@@ -1,0 +1,438 @@
+{#
+  Formulário do bloco Sanfona (accordion, change bloco-sanfona).
+  Cada item: título, tipo (texto ou tabela), texto no editor Quill e tabela editável.
+  As células da tabela não têm `name`: o JavaScript mantém o JSON {header, rows} num campo
+  oculto por item (config[panels][i][table]), para uma tabela grande não passar do
+  max_input_vars do PHP e para a prévia não trocar célula vazia pelo nome do campo.
+#}
+{% import 'admin/block/_campos.html.twig' as c %}
+{% import _self as sf %}
+{% set cfg = block.config ?? {} %}
+{% set itens = cfg.panels ?? [] %}
+
+{% macro item(i, item) %}
+{% set tabela = item.table ?? {header: true, rows: []} %}
+{% set ehTabela = (item.kind ?? 'text') == 'table' %}
+<div class="card sf-item" data-sf-item>
+    <div class="sf-item__nome">Item {{ i + 1 }}</div>
+    <div class="sf-item__acoes">
+        <button type="button" class="btn btn-g btn-sm" data-sf-acao="subir" title="Subir o item" aria-label="Subir o item"><sl-icon name="arrow-up"></sl-icon></button>
+        <button type="button" class="btn btn-g btn-sm" data-sf-acao="descer" title="Descer o item" aria-label="Descer o item"><sl-icon name="arrow-down"></sl-icon></button>
+        <button type="button" class="btn btn-g btn-sm sf-remover" data-sf-acao="remover"><sl-icon name="trash"></sl-icon> <span>Remover</span></button>
+    </div>
+    <div class="sf-item__cabeca">
+        <div class="af-field">
+            <label>Título do item</label>
+            <input type="text" class="ai" data-campo="title" name="config[panels][{{ i }}][title]" value="{{ item.title ?? '' }}" maxlength="200" placeholder="Ex.: Bahia, Formas de pagamento…">
+        </div>
+        <div class="af-field">
+            <label>Conteúdo</label>
+            <select class="as" data-campo="kind" name="config[panels][{{ i }}][kind]">
+                <option value="text" {{ not ehTabela ? 'selected' }}>Texto formatado</option>
+                <option value="table" {{ ehTabela ? 'selected' }}>Tabela</option>
+            </select>
+        </div>
+    </div>
+    <div class="sf-texto" data-sf-texto {{ ehTabela ? 'hidden' }}>
+        <div class="af-field">
+            <label>Texto</label>
+            <div class="sf-quill" data-sf-quill></div>
+            <textarea data-campo="html" name="config[panels][{{ i }}][html]" style="display:none">{{ item.html ?? '' }}</textarea>
+        </div>
+    </div>
+    <div class="sf-tabela" data-sf-tabela {{ not ehTabela ? 'hidden' }}>
+        <input type="hidden" data-campo="table" name="config[panels][{{ i }}][table]" value="{{ tabela|json_encode }}">
+        <div class="sf-barra">
+            <label class="sf-check"><input type="checkbox" data-sf-cabecalho {{ (tabela.header ?? true) ? 'checked' }}> Primeira linha é o cabeçalho</label>
+            <span class="sf-barra__espaco"></span>
+            <button type="button" class="btn btn-g btn-sm" data-sf-acao="linha"><sl-icon name="plus-lg"></sl-icon> Linha</button>
+            <button type="button" class="btn btn-g btn-sm" data-sf-acao="coluna"><sl-icon name="plus-lg"></sl-icon> Coluna</button>
+        </div>
+        <div class="sf-grade-rolagem"><table class="sf-grade" data-sf-grade></table></div>
+        <p class="af-hint sf-contagem" data-sf-contagem></p>
+        <div class="sf-colar">
+            <label class="sf-colar__rotulo"><sl-icon name="clipboard"></sl-icon> Colar de planilha ou de página web</label>
+            <textarea class="ate" rows="2" data-sf-colar data-previa-vazio placeholder="Selecione as células no Excel, no Google Planilhas ou uma tabela num site, copie e cole aqui (Ctrl+V / ⌘V). A tabela deste item é trocada pelo que for colado."></textarea>
+            <p class="af-hint sf-colar__aviso" data-sf-aviso aria-live="polite"></p>
+            <button type="button" class="btn btn-g btn-sm" data-sf-acao="desfazer" hidden><sl-icon name="arrow-counterclockwise"></sl-icon> Desfazer colagem</button>
+        </div>
+        <p class="af-hint">Dica: dá para colar várias células direto numa célula da tabela. E-mails e endereços de site viram links no site; Enter quebra a linha dentro da célula.</p>
+    </div>
+</div>
+{% endmacro %}
+
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<style>
+.sf-item{margin:0 0 1rem;padding:1rem;display:grid;grid-template-columns:1fr auto;gap:.75rem 1rem;align-items:center}
+.card.sf-item+.card.sf-item{margin-top:0}
+.sf-item__nome{font-weight:700;font-size:.85rem}
+.sf-item__acoes{display:flex;gap:.35rem}
+.sf-item__acoes .btn:disabled{opacity:.35;cursor:default}
+.sf-item__acoes .sf-remover.is-confirmar{background:var(--danger);color:#fff;border-color:var(--danger)}
+.sf-item__cabeca{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem}
+.sf-texto,.sf-tabela{grid-column:1/-1}
+.sf-texto[hidden],.sf-tabela[hidden]{display:none}
+.sf-quill{background:#fff;color:#1a1a2e;border-radius:0 0 6px 6px}
+.sf-quill .ql-editor{min-height:140px;max-height:420px;font-size:.95rem;line-height:1.6;color:#1a1a2e}
+.sf-quill .ql-editor a{color:#2563eb}
+.sf-quill .ql-editor.ql-blank::before{color:#9ca3af}
+.sf-texto .ql-toolbar.ql-snow{background:#f1f5f9;border-radius:6px 6px 0 0;border-color:var(--border)}
+.sf-texto .ql-container.ql-snow{border-color:var(--border)}
+.sf-barra{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem}
+.sf-barra__espaco{flex:1}
+.sf-check{display:inline-flex;align-items:center;gap:.45rem;font-size:.82rem;cursor:pointer}
+.sf-grade-rolagem{overflow:auto;max-height:480px;border:1px solid var(--border);border-radius:8px;background:var(--bg3)}
+.sf-grade{border-collapse:collapse;min-width:100%}
+.sf-grade th{position:sticky;top:0;z-index:1;background:var(--bg2);padding:.2rem;font-weight:500;font-size:.7rem;color:var(--muted);text-align:center;border-bottom:1px solid var(--border)}
+.sf-grade td{border:1px solid var(--border);padding:0;vertical-align:top;min-width:170px}
+.sf-grade td.sf-grade__ponta,.sf-grade th.sf-grade__ponta{min-width:0;width:2rem;border:0;text-align:center;vertical-align:middle;color:var(--muted);font-size:.7rem}
+.sf-grade tr.is-cabecalho td:not(.sf-grade__ponta){background:rgba(79,110,247,.12)}
+.sf-grade tr.is-cabecalho .sf-celula{font-weight:700}
+.sf-celula{display:block;width:100%;min-height:2.2rem;border:0;background:transparent;color:var(--text);font:inherit;font-size:.85rem;line-height:1.4;padding:.45rem .55rem;resize:none;overflow:hidden;outline:none}
+.sf-celula:focus{background:rgba(79,110,247,.1);box-shadow:inset 0 0 0 2px var(--primary)}
+.sf-mini{background:none;border:0;color:var(--muted);cursor:pointer;padding:.15rem .35rem;border-radius:4px;font-size:.85rem;line-height:1}
+.sf-mini:hover{color:var(--danger);background:rgba(239,68,68,.1)}
+.sf-contagem{margin:.35rem 0 .75rem}
+.sf-colar{border:1px dashed var(--border);border-radius:8px;padding:.75rem;margin-bottom:.5rem}
+.sf-colar__rotulo{display:flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem}
+.sf-colar__aviso:empty{display:none}
+.sf-colar__aviso{margin:.4rem 0;color:var(--success)}
+.sf-colar__aviso.is-erro{color:var(--danger)}
+.sf-adicionar{margin:.25rem 0 1.5rem}
+[data-sf-form] [hidden]{display:none!important}
+@media (max-width:700px){.sf-item__cabeca{grid-template-columns:1fr}.sf-item__acoes .sf-remover span{display:none}}
+</style>
+
+<form method="post" action="{{ action }}" class="af" data-sf-form>
+    <input type="hidden" name="type" value="accordion">
+    {{ c.cabecalho(block, false, 3) }}
+    <div class="af-row" style="margin:.5rem 0 1rem">
+        <label class="sf-check"><input type="checkbox" name="config[firstOpen]" value="1" {{ (cfg.firstOpen ?? '') == '1' ? 'checked' }}> Abrir o primeiro item quando a página carregar</label>
+        <label class="sf-check"><input type="checkbox" name="config[multiple]" value="1" {{ (cfg.multiple ?? '') == '1' ? 'checked' }}> Permitir vários itens abertos ao mesmo tempo</label>
+    </div>
+
+    <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens da sanfona</div>
+    <p class="af-hint" style="margin-bottom:.75rem">Cada item tem um título, que fica sempre visível, e um conteúdo que abre ao clicar: texto formatado ou tabela. Item sem título não aparece no site.</p>
+
+    <div data-sf-itens>
+        {% for it in itens %}
+            {{ sf.item(loop.index0, it) }}
+        {% else %}
+            {{ sf.item(0, {kind: 'text'}) }}
+        {% endfor %}
+    </div>
+    <template data-sf-modelo>{{ sf.item(0, {kind: 'text'}) }}</template>
+    <button type="button" class="btn btn-g sf-adicionar" data-sf-acao="adicionar"><sl-icon name="plus-lg"></sl-icon> Adicionar item</button>
+
+    {{ c.acoes(block, section) }}
+</form>
+
+<script>
+(function () {
+    var form = document.querySelector('[data-sf-form]');
+    if (!form) return;
+    var lista = form.querySelector('[data-sf-itens]');
+    var modelo = form.querySelector('[data-sf-modelo]');
+    var MAX_COL = 12, MAX_LIN = 500, seq = 0;
+
+    function avisarPrevia() { form.dispatchEvent(new Event('input', {bubbles: true})); }
+    function itens() { return Array.prototype.slice.call(lista.querySelectorAll('[data-sf-item]')); }
+
+    // ── Nomes e rótulos na ordem atual ─────────────────────────────────────────
+    function renumerar() {
+        var todos = itens();
+        todos.forEach(function (it, i) {
+            it.querySelector('.sf-item__nome').textContent = 'Item ' + (i + 1);
+            it.querySelectorAll('[data-campo]').forEach(function (el) {
+                el.name = 'config[panels][' + i + '][' + el.dataset.campo + ']';
+            });
+            it.querySelector('[data-sf-acao=subir]').disabled = i === 0;
+            it.querySelector('[data-sf-acao=descer]').disabled = i === todos.length - 1;
+        });
+    }
+
+    // ── Texto: um editor Quill por item, criado quando o item é de texto ─────────
+    function prepararTexto(it) {
+        if (it._quill || typeof Quill === 'undefined') return;
+        var area = it.querySelector('[data-campo=html]');
+        var caixa = it.querySelector('[data-sf-quill]');
+        area.id = area.id || 'sf-html-' + (++seq);
+        caixa.id = 'quill-' + area.id; // a prévia acha o textarea por este id
+        var q = new Quill(caixa, {
+            theme: 'snow',
+            placeholder: 'Texto do item…',
+            modules: {toolbar: [[{header: [2, 3, false]}], ['bold', 'italic', 'underline', 'strike'], [{list: 'ordered'}, {list: 'bullet'}], ['link', 'blockquote'], ['clean']]}
+        });
+        if (area.value) q.root.innerHTML = area.value;
+        q.on('text-change', function () { area.value = q.root.innerHTML; });
+        it._quill = q;
+    }
+
+    // ── Tabela: estado em JSON no campo oculto ─────────────────────────────────
+    function estado(it) {
+        if (!it._tabela) {
+            var t;
+            try { t = JSON.parse(it.querySelector('[data-campo=table]').value || '{}'); } catch (e) { t = {}; }
+            var linhas = Array.isArray(t.rows) ? t.rows.map(function (l) { return (Array.isArray(l) ? l : []).map(function (c) { return c == null ? '' : String(c); }); }) : [];
+            it._tabela = {header: t.header !== false, rows: linhas};
+            igualar(it._tabela);
+            if (!it._tabela.rows.length) it._tabela.rows = [['', '', ''], ['', '', ''], ['', '', '']];
+        }
+        return it._tabela;
+    }
+    function largura(t) { return t.rows.reduce(function (m, l) { return Math.max(m, l.length); }, 0) || 1; }
+    function igualar(t) {
+        var w = largura(t);
+        t.rows.forEach(function (l) { while (l.length < w) l.push(''); });
+    }
+    function gravar(it) {
+        it.querySelector('[data-campo=table]').value = JSON.stringify(estado(it));
+        var t = estado(it);
+        var cheias = t.rows.filter(function (l) { return l.join('').trim() !== ''; }).length;
+        it.querySelector('[data-sf-contagem]').textContent = cheias + (cheias === 1 ? ' linha' : ' linhas') + ' preenchida' + (cheias === 1 ? '' : 's') + ' · ' + largura(t) + (largura(t) === 1 ? ' coluna' : ' colunas') + (t.header && cheias ? ' (a primeira é o cabeçalho)' : '') + '. Linhas vazias não são gravadas.';
+    }
+    function crescer(el) { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
+    function ajustarAlturas(grade) {
+        var todas = function () { grade.querySelectorAll('.sf-celula').forEach(crescer); };
+        requestAnimationFrame(todas);
+        setTimeout(todas, 400);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(todas);
+    }
+
+    function desenhar(it) {
+        var t = estado(it), w = largura(t);
+        var grade = it.querySelector('[data-sf-grade]');
+        var h = '<thead><tr><th class="sf-grade__ponta"></th>';
+        for (var c = 0; c < w; c++) {
+            h += '<th>Coluna ' + (c + 1) + (w > 1 ? ' <button type="button" class="sf-mini" data-sf-acao="tirar-coluna" data-c="' + c + '" title="Remover a coluna ' + (c + 1) + '" aria-label="Remover a coluna ' + (c + 1) + '">✕</button>' : '') + '</th>';
+        }
+        h += '<th class="sf-grade__ponta"></th></tr></thead><tbody>';
+        t.rows.forEach(function (l, r) {
+            h += '<tr class="' + (r === 0 && t.header ? 'is-cabecalho' : '') + '"><td class="sf-grade__ponta">' + (r + 1) + '</td>';
+            for (var c = 0; c < w; c++) {
+                h += '<td><textarea class="sf-celula" rows="1" data-r="' + r + '" data-c="' + c + '" data-previa-vazio aria-label="Linha ' + (r + 1) + ', coluna ' + (c + 1) + '"></textarea></td>';
+            }
+            h += '<td class="sf-grade__ponta">' + (t.rows.length > 1 ? '<button type="button" class="sf-mini" data-sf-acao="tirar-linha" data-r="' + r + '" title="Remover a linha ' + (r + 1) + '" aria-label="Remover a linha ' + (r + 1) + '">✕</button>' : '') + '</td></tr>';
+        });
+        grade.innerHTML = h + '</tbody>';
+        grade.querySelectorAll('.sf-celula').forEach(function (el) {
+            el.value = t.rows[+el.dataset.r][+el.dataset.c];
+        });
+        // altura só depois de o navegador medir (o item pode estar escondido; fontes ainda carregando)
+        ajustarAlturas(grade);
+        it.querySelector('[data-sf-acao=linha]').disabled = t.rows.length >= MAX_LIN;
+        it.querySelector('[data-sf-acao=coluna]').disabled = w >= MAX_COL;
+        gravar(it);
+    }
+
+    function prepararTabela(it) {
+        if (it._grade) return;
+        it._grade = true;
+        desenhar(it);
+    }
+
+    function mostrarTipo(it) {
+        var tabela = it.querySelector('[data-campo=kind]').value === 'table';
+        it.querySelector('[data-sf-texto]').hidden = tabela;
+        it.querySelector('[data-sf-tabela]').hidden = !tabela;
+        tabela ? prepararTabela(it) : prepararTexto(it);
+    }
+
+    // ── Colar: tabela HTML (página web, Excel, Google Planilhas) ou texto com tabulação ─
+    function textoDaCelula(cel) {
+        var copia = cel.cloneNode(true);
+        copia.querySelectorAll('br').forEach(function (b) { b.replaceWith('\n'); });
+        copia.querySelectorAll('p, div, li').forEach(function (b) { b.append('\n'); });
+        return copia.textContent.split('\n').map(function (s) { return s.replace(/[ \t ]+/g, ' ').trim(); })
+            .join('\n').replace(/\n{2,}/g, '\n').trim();
+    }
+    function lerTsv(texto) {
+        var linhas = [], linha = [], cel = '', aspas = false, i = 0;
+        texto = texto.replace(/\r\n?/g, '\n');
+        while (i < texto.length) {
+            var ch = texto[i];
+            if (aspas) {
+                if (ch === '"' && texto[i + 1] === '"') { cel += '"'; i += 2; continue; }
+                if (ch === '"') { aspas = false; i++; continue; }
+                cel += ch; i++; continue;
+            }
+            if (ch === '"' && cel === '') { aspas = true; i++; continue; }
+            if (ch === '\t') { linha.push(cel); cel = ''; i++; continue; }
+            if (ch === '\n') { linha.push(cel); linhas.push(linha); linha = []; cel = ''; i++; continue; }
+            cel += ch; i++;
+        }
+        if (cel !== '' || linha.length) { linha.push(cel); linhas.push(linha); }
+        return linhas.map(function (l) { return l.map(function (c) { return c.trim(); }); });
+    }
+    function lerColagem(e) {
+        var dados = e.clipboardData || window.clipboardData;
+        if (!dados) return null;
+        var html = dados.getData('text/html') || '';
+        if (/<table[\s>]/i.test(html)) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+            var linhas = [];
+            doc.querySelectorAll('table').forEach(function (tab) {
+                Array.prototype.forEach.call(tab.rows, function (tr) {
+                    var l = Array.prototype.map.call(tr.cells, textoDaCelula);
+                    if (l.length) linhas.push(l);
+                });
+            });
+            if (linhas.length) return linhas;
+        }
+        var texto = dados.getData('text/plain') || '';
+        if (texto.indexOf('\t') === -1 && texto.indexOf('\n') === -1) return null;
+        return lerTsv(texto.replace(/\n+$/, ''));
+    }
+    function limitar(linhas) {
+        var cortou = linhas.length > MAX_LIN || linhas.some(function (l) { return l.length > MAX_COL; });
+        return {linhas: linhas.slice(0, MAX_LIN).map(function (l) { return l.slice(0, MAX_COL); }), cortou: cortou};
+    }
+
+    function colarNaArea(it, e) {
+        var linhas = lerColagem(e);
+        var aviso = it.querySelector('[data-sf-aviso]');
+        e.preventDefault();
+        if (!linhas) {
+            aviso.className = 'af-hint sf-colar__aviso is-erro';
+            aviso.textContent = 'Não encontramos uma tabela no que foi colado. Copie células de uma planilha ou uma tabela de página web.';
+            return;
+        }
+        var lim = limitar(linhas.filter(function (l) { return l.join('').trim() !== ''; }));
+        var t = estado(it);
+        it._antes = JSON.parse(JSON.stringify(t));
+        t.rows = lim.linhas.length ? lim.linhas : [['']];
+        igualar(t);
+        desenhar(it);
+        aviso.className = 'af-hint sf-colar__aviso';
+        aviso.textContent = 'Colamos ' + t.rows.length + (t.rows.length === 1 ? ' linha' : ' linhas') + ' e ' + largura(t) + (largura(t) === 1 ? ' coluna' : ' colunas') + '.' + (lim.cortou ? ' O limite é de ' + MAX_LIN + ' linhas e ' + MAX_COL + ' colunas por item; o resto ficou de fora.' : '');
+        it.querySelector('[data-sf-acao=desfazer]').hidden = false;
+        avisarPrevia();
+    }
+
+    function colarNaCelula(it, el, e) {
+        var linhas = lerColagem(e);
+        if (!linhas || (linhas.length === 1 && linhas[0].length === 1)) return; // colagem comum
+        e.preventDefault();
+        var t = estado(it), r0 = +el.dataset.r, c0 = +el.dataset.c;
+        it._antes = JSON.parse(JSON.stringify(t));
+        linhas.forEach(function (l, i) {
+            var r = r0 + i;
+            if (r >= MAX_LIN) return;
+            while (t.rows.length <= r) t.rows.push([]);
+            l.forEach(function (v, j) { if (c0 + j < MAX_COL) { while (t.rows[r].length <= c0 + j) t.rows[r].push(''); t.rows[r][c0 + j] = v; } });
+        });
+        igualar(t);
+        desenhar(it);
+        var aviso = it.querySelector('[data-sf-aviso]');
+        aviso.className = 'af-hint sf-colar__aviso';
+        aviso.textContent = 'Colamos ' + linhas.length + (linhas.length === 1 ? ' linha' : ' linhas') + ' a partir da linha ' + (r0 + 1) + ', coluna ' + (c0 + 1) + '.';
+        it.querySelector('[data-sf-acao=desfazer]').hidden = false;
+        avisarPrevia();
+    }
+
+    // ── Eventos ────────────────────────────────────────────────────────────────
+    function prepararItem(it) {
+        mostrarTipo(it);
+    }
+
+    lista.addEventListener('input', function (e) {
+        var el = e.target, it = el.closest('[data-sf-item]');
+        if (!it) return;
+        if (el.classList.contains('sf-celula')) {
+            estado(it).rows[+el.dataset.r][+el.dataset.c] = el.value;
+            crescer(el);
+            gravar(it);
+            it.querySelector('[data-sf-acao=desfazer]').hidden = true;
+        }
+    });
+    lista.addEventListener('change', function (e) {
+        var el = e.target, it = el.closest('[data-sf-item]');
+        if (!it) return;
+        if (el.dataset.campo === 'kind') mostrarTipo(it);
+        if (el.hasAttribute('data-sf-cabecalho')) { estado(it).header = el.checked; desenhar(it); }
+    });
+    lista.addEventListener('paste', function (e) {
+        var el = e.target, it = el.closest('[data-sf-item]');
+        if (!it) return;
+        if (el.hasAttribute('data-sf-colar')) colarNaArea(it, e);
+        else if (el.classList.contains('sf-celula')) colarNaCelula(it, el, e);
+    });
+    // A área de colar só recebe colagem: o que for digitado nela não vai a lugar nenhum
+    lista.addEventListener('keydown', function (e) {
+        if (e.target.hasAttribute && e.target.hasAttribute('data-sf-colar') && !(e.ctrlKey || e.metaKey) && e.key.length === 1) e.preventDefault();
+    });
+
+    form.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-sf-acao]');
+        if (!b || !form.contains(b)) return;
+        var it = b.closest('[data-sf-item]'), acao = b.dataset.sfAcao, t;
+        switch (acao) {
+            case 'adicionar':
+                var novo = modelo.content.firstElementChild.cloneNode(true);
+                lista.appendChild(novo);
+                renumerar();
+                prepararItem(novo);
+                novo.querySelector('[data-campo=title]').focus();
+                break;
+            case 'subir':
+                if (it.previousElementSibling) lista.insertBefore(it, it.previousElementSibling);
+                renumerar();
+                break;
+            case 'descer':
+                if (it.nextElementSibling) lista.insertBefore(it.nextElementSibling, it);
+                renumerar();
+                break;
+            case 'remover':
+                // Dois cliques, sem janela de confirmação do navegador
+                if (!b.classList.contains('is-confirmar')) {
+                    b.classList.add('is-confirmar');
+                    b.querySelector('span').textContent = 'Confirmar';
+                    setTimeout(function () { b.classList.remove('is-confirmar'); b.querySelector('span').textContent = 'Remover'; }, 3000);
+                    return;
+                }
+                it.remove();
+                renumerar();
+                break;
+            case 'linha':
+                t = estado(it);
+                if (t.rows.length < MAX_LIN) { t.rows.push(new Array(largura(t)).fill('')); desenhar(it); }
+                var ult = it.querySelectorAll('.sf-celula[data-c="0"]');
+                if (ult.length) ult[ult.length - 1].focus();
+                break;
+            case 'coluna':
+                t = estado(it);
+                if (largura(t) < MAX_COL) { var w = largura(t); t.rows.forEach(function (l) { l.length = w; l.push(''); }); desenhar(it); }
+                break;
+            case 'tirar-linha':
+                t = estado(it);
+                t.rows.splice(+b.dataset.r, 1);
+                desenhar(it);
+                break;
+            case 'tirar-coluna':
+                t = estado(it);
+                t.rows.forEach(function (l) { l.splice(+b.dataset.c, 1); });
+                desenhar(it);
+                break;
+            case 'desfazer':
+                if (it._antes) { it._tabela = it._antes; it._antes = null; desenhar(it); }
+                b.hidden = true;
+                it.querySelector('[data-sf-aviso]').textContent = 'Colagem desfeita.';
+                break;
+            default:
+                return;
+        }
+        avisarPrevia();
+    });
+
+    form.addEventListener('submit', function () {
+        itens().forEach(function (it) {
+            if (it._quill) it.querySelector('[data-campo=html]').value = it._quill.root.innerHTML;
+            if (it._tabela) gravar(it);
+        });
+    });
+
+    itens().forEach(prepararItem);
+    renumerar();
+})();
+</script>

@@ -34,7 +34,7 @@
                         {% set rotulo = (section.titlePart1 ~ ' ' ~ section.titlePart2)|trim %}
                         {% if rotulo == '' %}
                             {% set primeiro = section.blocks|first %}
-                            {% set rotulos = {banner: 'Início', hero_split: 'Início', blurbs4: 'Recursos', team: 'Equipe', statement: 'Sobre', contact: 'Contato', cta: 'Contato', gallery: 'Portfólio', portfolio: 'Portfólio', steps: 'Como trabalhamos', highlights: 'Diferenciais', video: 'Vídeo', blog_posts: 'Blog'} %}
+                            {% set rotulos = {banner: 'Início', hero_split: 'Início', blurbs4: 'Recursos', team: 'Equipe', statement: 'Sobre', contact: 'Contato', cta: 'Contato', gallery: 'Portfólio', portfolio: 'Portfólio', steps: 'Como trabalhamos', highlights: 'Diferenciais', video: 'Vídeo', blog_posts: 'Blog', accordion: 'Informações'} %}
                             {% set rotulo = primeiro ? (rotulos[primeiro.type] ?? '') : '' %}
                             {% if rotulo == '' %}{% set rotulo = 'Seção ' ~ loop.index %}{% endif %}
                         {% endif %}

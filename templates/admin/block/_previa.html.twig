@@ -84,7 +84,7 @@
         });
         Object.keys(arquivos).forEach(function (n) { fd.append('_previa_arquivos[' + n + ']', arquivos[n]); });
         form.querySelectorAll('input, textarea').forEach(function (el) {
-            if (!el.name || el.disabled || el.closest('template')) return;
+            if (!el.name || el.disabled || el.closest('template') || el.hasAttribute('data-previa-vazio')) return;
             var tipo = (el.getAttribute('type') || 'text').toLowerCase();
             if (el.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'search'].indexOf(tipo) === -1) return;
             if (/(^_token$)|\[id\]$|\[slug\]$/.test(el.name)) return;

@@ -39,6 +39,7 @@ final class PreviaDoBloco
 
     public function __construct(
         private readonly CategoryRepository $categorias,
+        private readonly SanfonaDoBloco $sanfona,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {}
@@ -80,6 +81,18 @@ final class PreviaDoBloco
         }
         if ($tipo === 'banner') {
             $cfg['banners'] = $this->slides($r, $cfgSalvo['banners'] ?? [], $arquivos);
+        }
+        if ($tipo === 'accordion') {
+            $cfg = $this->sanfona->normalizar(is_array($cfg) ? $cfg : []);
+            if ($cfg['panels'] === []) {
+                $cfg['panels'] = $this->sanfona->exemplos();
+            }
+            // Item de tabela ainda sem linha: a tabela de exemplo no lugar
+            foreach ($cfg['panels'] as $i => $item) {
+                if ($item['kind'] === 'table' && $item['table']['rows'] === []) {
+                    $cfg['panels'][$i]['table'] = $this->sanfona->exemplos()[1]['table'];
+                }
+            }
         }
         $bloco->setConfig($cfg ?: null);
 
