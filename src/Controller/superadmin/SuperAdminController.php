@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\TenantRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
+use App\Service\BarraSuperior;
 use App\Service\BotaoFlutuante;
 use App\Service\HeadingFonts;
 use Doctrine\ORM\EntityManagerInterface;
@@ -785,16 +786,14 @@ class SuperAdminController extends AbstractController
 
         // Menu and TopBar settings
         $showMenuIcons = (bool) $r->request->get('showMenuIcons');
-        $topBarEnabled = (bool) $r->request->get('topBarEnabled');
-        $topBarLeft = $r->request->all('topBarLeft');
-        $topBarRight = $r->request->all('topBarRight');
-
         $existingNav = $tenant->getNavigationSettings() ?? [];
+        [$topBarEnabled, $topBarBg, $topBarLeft, $topBarRight] = BarraSuperior::doFormulario($r->request->all(), $existingNav);
         $tenant->setNavigationSettings([
             'showMenuIcons'   => $showMenuIcons,
             'topBarEnabled'   => $topBarEnabled,
             'topBarLeft'      => $topBarLeft,
             'topBarRight'     => $topBarRight,
+            'topBarBg'        => $topBarBg,
             'customMenuItems' => $existingNav['customMenuItems'] ?? [],
             // Editados só no /admin/settings: mantidos ao salvar pelo SuperAdmin
             'headerCtaLabel'  => $existingNav['headerCtaLabel'] ?? '',

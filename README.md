@@ -91,6 +91,12 @@ A extensão de Twig `TenantExtension` expõe globals e funções utilitárias qu
 * **`tenant_css_vars()`**: Injeta dinamicamente no `<head>` um bloco `<style>` contendo propriedades personalizadas CSS (`--color-primary`, `--color-secondary` e suas versões RGB) baseadas nas cores de branding cadastradas no Tenant.
 * **Global Variables**: Disponibiliza em 100% dos templates Twig as variáveis `currentTenant` (dados do site ativo), `headerCategories` (menu dinâmico), `footerPages` e `footerCategories` para renderização imediata do cabeçalho e rodapé.
 
+### Barra superior
+Faixa fina acima do cabeçalho, nos cinco temas (parcial `themes/_topbar.html.twig`, função Twig `barra_superior()`, serviço `App\Service\BarraSuperior`). Ela rola com a página: não fica fixa, e o cabeçalho de cada tema continua grudando no topo como antes (no moderno, um script curto faz o cabeçalho fixo subir junto com a barra).
+* Editada no `/admin/settings` e na edição do tenant no `/superadmin` pelo mesmo parcial, `admin/_editor_da_barra_superior.html.twig`: ligar, cor de fundo opcional (vazia = cor primária do site) e, em cada lado, itens em ordem, com subir, descer, passar para o outro lado e remover.
+* Tipos: Telefone, WhatsApp (número formatado), E-mail, Endereço (abre o Google Maps), Horário e Redes sociais, com os dados do site (os quatro primeiros aceitam texto próprio, por exemplo "Araraquara"), e Personalizado (ícone pelo seletor do Blurbs4, texto e link, cada um opcional). Item sem dado no site não aparece; no celular, item com ícone mostra só o ícone.
+* Gravada em `navigationSettings`: `topBarEnabled`, `topBarBg` e `topBarLeft`/`topBarRight` (listas de `{type, text, icon, url, newTab}`; o formato antigo, só o nome do tipo, continua valendo). O editor envia tudo num campo `topBarJson`.
+
 ### Botão flutuante
 Escolhido na edição do tenant no `/superadmin` (grupo "Botão flutuante", coluna JSON `tenant.floating_button`) e desenhado nos cinco temas pelo parcial `themes/_comum/_botao_flutuante.html.twig` (função Twig `botao_flutuante()`, serviço `App\Service\BotaoFlutuante`):
 * **Nenhum**: o site não mostra botão.

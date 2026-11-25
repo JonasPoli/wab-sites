@@ -126,10 +126,10 @@ html:not(.dark) .logo-light { display: block !important; }
 html:not(.dark) .logo-dark { display: none !important; }
 
 .moderno-header {
-    position: fixed; top: var(--topbar-height, 0px); left: 0; right: 0; z-index: 200;
+    position: fixed; top: var(--mh-topo, var(--topbar-height, 0px)); left: 0; right: 0; z-index: 200;
     background: var(--header-bg); backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid var(--header-border);
-    transition: background .25s, top .25s;
+    transition: background .25s;
 }
 .mh-inner { display:flex; align-items:center; justify-content:space-between; height:70px; gap:2rem; }
 .mh-logo-text {
@@ -157,10 +157,31 @@ html:not(.dark) .logo-dark { display: none !important; }
 .mh-toggle span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:.2s; }
 @media(max-width:768px){
     .mh-toggle{display:flex;}
-    .mh-nav{display:none;flex-direction:column;position:fixed;top:calc(70px + var(--topbar-height, 0px));left:0;right:0;background:var(--bg-card);padding:1.5rem;border-bottom:1px solid var(--border);transition:top .25s;}
+    .mh-nav{display:none;flex-direction:column;position:fixed;top:calc(70px + var(--mh-topo, var(--topbar-height, 0px)));left:0;right:0;background:var(--bg-card);padding:1.5rem;border-bottom:1px solid var(--border);}
     .mh-nav.open{display:flex;}
     .mh-link{width:100%;padding:0.85rem 1rem;}
     .mh-dropdown-menu{position:static;box-shadow:none;border:none;padding-left:1rem;}
 }
 body { padding-top: calc(70px + var(--topbar-height, 0px)); }
+/* A barra superior fica no topo da página, acima do cabeçalho fixo: sobe o espaço que o
+   padding do body reserva para o cabeçalho e devolve esse espaço abaixo dela. */
+.topbar-wrapper { margin-top: calc(-70px - var(--topbar-height, 0px)); margin-bottom: 70px; }
 </style>
+{% if barra_superior() %}
+<script>
+/* A barra superior rola com a página: o cabeçalho fixo sobe junto até encostar no topo
+   (change barra-superior-configuravel). --mh-topo = altura da barra que ainda aparece. */
+(function () {
+    var barra = document.querySelector('.topbar-wrapper');
+    if (!barra) return;
+    var raiz = document.documentElement, pedido = false;
+    function ajustar() {
+        pedido = false;
+        raiz.style.setProperty('--mh-topo', Math.max(0, barra.offsetHeight - window.scrollY) + 'px');
+    }
+    window.addEventListener('scroll', function () { if (!pedido) { pedido = true; requestAnimationFrame(ajustar); } }, { passive: true });
+    window.addEventListener('resize', ajustar);
+    ajustar();
+})();
+</script>
+{% endif %}

@@ -21,6 +21,7 @@ use App\Repository\PageSectionRepository;
 use App\Repository\PageBlockRepository;
 use App\Repository\UserRepository;
 
+use App\Service\BarraSuperior;
 use App\Service\TenantContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -1111,9 +1112,10 @@ class AdminContentController extends AbstractController
 
             // Menu and TopBar settings
             $showMenuIcons = (bool) $r->request->get('showMenuIcons');
-            $topBarEnabled = (bool) $r->request->get('topBarEnabled');
-            $topBarLeft = $r->request->all('topBarLeft');
-            $topBarRight = $r->request->all('topBarRight');
+            [$topBarEnabled, $topBarBg, $topBarLeft, $topBarRight] = BarraSuperior::doFormulario(
+                $r->request->all(),
+                $tenant->getNavigationSettings() ?? [],
+            );
 
             $rawCustomItems = $r->request->all('customMenuItems');
             $customMenuItems = [];
@@ -1142,6 +1144,7 @@ class AdminContentController extends AbstractController
                 'topBarEnabled'   => $topBarEnabled,
                 'topBarLeft'      => $topBarLeft,
                 'topBarRight'     => $topBarRight,
+                'topBarBg'        => $topBarBg,
                 'customMenuItems' => $customMenuItems,
                 // Botão de ação e frase do cabeçalho (tema atelie)
                 'headerCtaLabel'  => mb_substr(trim((string) $r->request->get('headerCtaLabel', '')), 0, 60),

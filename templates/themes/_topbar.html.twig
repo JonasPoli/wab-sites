@@ -1,77 +1,96 @@
-{% set navSettings = currentTenant.navigationSettings ?? {} %}
-{% set topBarEnabled = navSettings.topBarEnabled ?? false %}
+{#
+  Barra superior (change barra-superior-configuravel), no topo do _header dos cinco temas.
+  Os itens vêm de barra_superior() (App\Service\BarraSuperior), já resolvidos com os dados do site.
+  A barra rola com a página (não é fixa); o cabeçalho de cada tema cuida do próprio "grudar".
+  Sem cor própria, fundo var(--color-primary) e texto var(--topbar-text) do tenant_css_vars();
+  com cor própria (topBarBg), as duas variáveis são trocadas só aqui.
+  O HTML dos tipos antigos (social, phone, email, hours) é o mesmo de antes da mudança.
+#}
+{% set barra = barra_superior() %}
 
-{% if topBarEnabled %}
+{% if barra %}
     {% import _self as helper %}
+    {% set estiloCor = '' %}
+    {% if barra.fundo %}
+        {% set escura = is_dark_color(barra.fundo) %}
+        {% set estiloCor = '--color-primary: ' ~ barra.fundo ~ '; --topbar-text: ' ~ (escura ? '#ffffff' : '#1f2937') ~ '; --topbar-border: ' ~ (escura ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)') ~ '; ' %}
+    {% endif %}
 
-    <div class="topbar-wrapper" style="background-color: var(--color-primary); color: var(--topbar-text); height: var(--topbar-height); display: flex; align-items: center; border-bottom: 1px solid var(--topbar-border); font-size: 0.85rem; overflow: hidden; position: relative; z-index: 1030; width: 100%;">
+    <div class="topbar-wrapper" style="{{ estiloCor }}background-color: var(--color-primary); color: var(--topbar-text); height: var(--topbar-height); display: flex; align-items: center; border-bottom: 1px solid var(--topbar-border); font-size: 0.85rem; overflow: hidden; position: relative; z-index: 1030; width: 100%;">
         <div class="container mx-auto px-4 flex justify-between items-center w-full">
             {# Left Side #}
             <div class="flex items-center gap-4 sm:gap-6">
-                {% for item in navSettings.topBarLeft ?? [] %}
-                    {{ helper.render_item(item, currentTenant) }}
+                {% for item in barra.esquerda %}
+                    {{ helper.render_item(item) }}
                 {% endfor %}
             </div>
-            
+
             {# Right Side #}
             <div class="flex items-center gap-4 sm:gap-6">
-                {% for item in navSettings.topBarRight ?? [] %}
-                    {{ helper.render_item(item, currentTenant) }}
+                {% for item in barra.direita %}
+                    {{ helper.render_item(item) }}
                 {% endfor %}
             </div>
         </div>
     </div>
 {% endif %}
 
-{% macro render_item(item_key, tenant) %}
-  {% if item_key == 'social' %}
+{% macro render_item(item) %}
+  {% if item.tipo == 'social' %}
     <div class="flex items-center gap-3">
-      {% if tenant.whatsappLink %}
-        <a href="{{ tenant.whatsappLink }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="WhatsApp">
-          {{ ux_icon('fa6-brands:whatsapp', {class: 'text-base', 'aria-hidden': 'true'}) }}
+      {% for r in item.redes %}
+        {% set nomes = {whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook', youtube: 'YouTube', linkedin: 'LinkedIn'} %}
+        <a href="{{ r.url }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="{{ nomes[r.rede] }}">
+          {% if r.rede == 'whatsapp' %}{{ ux_icon('fa6-brands:whatsapp', {class: 'text-base', 'aria-hidden': 'true'}) }}
+          {% elseif r.rede == 'instagram' %}{{ ux_icon('fa6-brands:instagram', {class: 'text-base', 'aria-hidden': 'true'}) }}
+          {% elseif r.rede == 'facebook' %}{{ ux_icon('fa6-brands:facebook', {class: 'text-base', 'aria-hidden': 'true'}) }}
+          {% elseif r.rede == 'youtube' %}{{ ux_icon('fa6-brands:youtube', {class: 'text-base', 'aria-hidden': 'true'}) }}
+          {% else %}{{ ux_icon('fa6-brands:linkedin', {class: 'text-base', 'aria-hidden': 'true'}) }}{% endif %}
         </a>
-      {% endif %}
-      {% if tenant.instagramLink %}
-        <a href="{{ tenant.instagramLink }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="Instagram">
-          {{ ux_icon('fa6-brands:instagram', {class: 'text-base', 'aria-hidden': 'true'}) }}
-        </a>
-      {% endif %}
-      {% if tenant.facebookLink %}
-        <a href="{{ tenant.facebookLink }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="Facebook">
-          {{ ux_icon('fa6-brands:facebook', {class: 'text-base', 'aria-hidden': 'true'}) }}
-        </a>
-      {% endif %}
-      {% if tenant.youtubeLink %}
-        <a href="{{ tenant.youtubeLink }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="YouTube">
-          {{ ux_icon('fa6-brands:youtube', {class: 'text-base', 'aria-hidden': 'true'}) }}
-        </a>
-      {% endif %}
-      {% if tenant.linkedinLink %}
-        <a href="{{ tenant.linkedinLink }}" target="_blank" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity" title="LinkedIn">
-          {{ ux_icon('fa6-brands:linkedin', {class: 'text-base', 'aria-hidden': 'true'}) }}
-        </a>
-      {% endif %}
+      {% endfor %}
     </div>
-  {% elseif item_key == 'phone' and tenant.phone %}
-    <a href="tel:{{ tenant.phone|replace({' ': '', '-': '', '(': '', ')': ''}) }}" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ tenant.phone }}">
+  {% elseif item.tipo == 'phone' %}
+    <a href="{{ item.url }}" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ item.titulo }}">
       {{ ux_icon('fa6-solid:phone', {class: 'text-xs', 'aria-hidden': 'true'}) }}
-      <span class="hidden sm:inline">{{ tenant.phone }}</span>
+      <span class="hidden sm:inline">{{ item.texto }}</span>
     </a>
-  {% elseif item_key == 'email' and tenant.contactEmail %}
-    <a href="mailto:{{ tenant.contactEmail }}" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ tenant.contactEmail }}">
+  {% elseif item.tipo == 'whatsapp' %}
+    <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="WhatsApp {{ item.titulo }}">
+      {{ ux_icon('fa6-brands:whatsapp', {class: 'text-xs', 'aria-hidden': 'true'}) }}
+      <span class="hidden md:inline">{{ item.texto }}</span>
+    </a>
+  {% elseif item.tipo == 'email' %}
+    <a href="{{ item.url }}" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ item.titulo }}">
       {{ ux_icon('fa6-solid:envelope', {class: 'text-xs', 'aria-hidden': 'true'}) }}
-      <span class="hidden md:inline">{{ tenant.contactEmail }}</span>
+      <span class="hidden md:inline">{{ item.texto }}</span>
     </a>
-  {% elseif item_key == 'hours' and tenant.openingHours is not empty %}
+  {% elseif item.tipo == 'hours' %}
     {# Horário de funcionamento numa linha (opção "Horário" da barra superior) #}
     <span style="color: var(--topbar-text); opacity: 0.85;" class="flex items-center gap-1.5 text-sm cursor-default">
       {{ ux_icon('fa6-solid:clock', {class: 'text-xs', 'aria-hidden': 'true'}) }}
-      <span class="hidden md:inline">{% for h in tenant.openingHours %}{{ h.days }} {{ h.hours }}{{ not loop.last ? ' – ' }}{% endfor %}</span>
+      <span class="hidden md:inline">{{ item.texto }}</span>
     </span>
-  {% elseif item_key == 'address' and tenant.address %}
-    <span style="color: var(--topbar-text); opacity: 0.85;" class="flex items-center gap-1.5 text-sm cursor-default" title="{{ tenant.address }}">
+  {% elseif item.tipo == 'address' %}
+    <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ item.titulo }}">
       {{ ux_icon('fa6-solid:location-dot', {class: 'text-xs', 'aria-hidden': 'true'}) }}
-      <span class="hidden lg:inline">{{ tenant.address }}</span>
-    </span>
+      <span class="hidden lg:inline">{{ item.texto }}</span>
+    </a>
+  {% elseif item.tipo == 'custom' %}
+    {# Personalizado: ícone, texto e link opcionais (pelo menos ícone ou texto) #}
+    {% set icone = item.icone|icone_do_painel('text-xs') %}
+    {% set rotulo = item.texto ?: ((item.icone|nome_do_icone)|default('')|split(':')|last|replace({'-': ' '})) %}
+    {% set conteudo %}
+      {{ icone|raw }}{# SVG desenhado pelo icone_do_painel, não vem do usuário #}
+      {% if item.texto %}<span class="{{ icone ? 'hidden md:inline' : '' }}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 18rem;">{{ item.texto }}</span>{% endif %}
+    {% endset %}
+    {% if item.url %}
+      <a href="{{ item.url }}"{% if item.novaAba %} target="_blank" rel="noopener noreferrer"{% endif %} style="color: var(--topbar-text); opacity: 0.85;" class="hover:opacity-100 transition-opacity flex items-center gap-1.5 text-sm" title="{{ rotulo }}"{% if not item.texto or icone %} aria-label="{{ rotulo }}"{% endif %}>
+        {{ conteudo }}
+      </a>
+    {% else %}
+      <span style="color: var(--topbar-text); opacity: 0.85;" class="flex items-center gap-1.5 text-sm cursor-default" title="{{ rotulo }}">
+        {{ conteudo }}
+      </span>
+    {% endif %}
   {% endif %}
 {% endmacro %}

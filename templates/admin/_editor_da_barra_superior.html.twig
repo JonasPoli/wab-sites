@@ -1,0 +1,206 @@
+{#
+  Editor da barra superior (change barra-superior-configuravel), no /admin/settings e na edição
+  do tenant no /superadmin. Variável: tenant.
+  Campos enviados: topBarEnabled (caixa), topBarBg (cor ou vazio) e topBarJson
+  ({left: [...], right: [...]}, cada item {type, text, icon, url, newTab}), refeito a cada mudança.
+  O ícone do item personalizado usa o seletor de admin/_seletor_de_icones.html.twig.
+#}
+{% set bs = barra_superior_editor(tenant) %}
+<div class="bs-editor" id="bs-editor"
+     data-estado="{{ {left: bs.left, right: bs.right}|json_encode|e('html_attr') }}"
+     data-dados="{{ bs.dados|json_encode|e('html_attr') }}">
+    <label class="bs-ligar">
+        <input type="checkbox" name="topBarEnabled" value="1" id="bs-ligada" {% if bs.ligada %}checked{% endif %}>
+        <span>
+            <strong>Mostrar a barra superior</strong>
+            <small>Faixa fina acima do menu, com contatos, redes e links. Ela rola com a página (não fica fixa).</small>
+        </span>
+    </label>
+
+    <div class="bs-painel" id="bs-painel" {% if not bs.ligada %}hidden{% endif %}>
+        <div class="bs-cor">
+            <label for="bs-cor-texto">Cor de fundo</label>
+            <div class="bs-cor-linha">
+                <input type="color" id="bs-cor-roda" value="{{ bs.cor ?: '#3d3e90' }}" aria-label="Escolher a cor de fundo">
+                <input type="text" name="topBarBg" id="bs-cor-texto" class="ai" value="{{ bs.cor }}" placeholder="Cor primária do site" maxlength="7" style="max-width:170px">
+                <button type="button" class="btn btn-g btn-sm" id="bs-cor-limpar">Usar a cor primária</button>
+            </div>
+            <p class="af-hint">Vazio = cor primária do site (no modo escuro, a primária escura). O texto fica claro ou escuro conforme o fundo.</p>
+        </div>
+
+        <div class="bs-lados">
+            {% for lado, titulo in {left: 'Lado esquerdo', right: 'Lado direito'} %}
+                <div class="bs-lado" data-lado="{{ lado }}">
+                    <div class="bs-lado-titulo">{{ titulo }}</div>
+                    <div class="bs-itens"></div>
+                    <p class="bs-vazio af-hint">Nenhum item.</p>
+                    <select class="as bs-acrescentar" aria-label="Acrescentar item no {{ titulo|lower }}">
+                        <option value="">+ Acrescentar item…</option>
+                        <option value="phone">Telefone</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="email">E-mail</option>
+                        <option value="address">Endereço (abre o mapa)</option>
+                        <option value="hours">Horário de funcionamento</option>
+                        <option value="social">Redes sociais (ícones)</option>
+                        <option value="custom">Personalizado (ícone, texto e link)</option>
+                    </select>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="af-hint">Telefone, WhatsApp, e-mail, endereço, horário e redes usam os dados cadastrados acima; item sem o dado não aparece. No celular, os itens com ícone mostram só o ícone.</p>
+    </div>
+    <input type="hidden" name="topBarJson" id="bs-json" value="">
+</div>
+
+<style>
+.bs-editor{margin:1rem 0 2rem}
+.bs-ligar{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.bs-ligar input{width:18px;height:18px;margin-top:.15rem;accent-color:var(--primary)}
+.bs-ligar strong{display:block;font-size:.92rem}
+.bs-ligar small{display:block;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+.bs-painel{margin-top:1rem;padding:1.25rem;border:1px solid var(--border);border-radius:var(--radius,10px);background:rgba(255,255,255,.02)}
+.bs-painel[hidden]{display:none}
+.bs-cor label{display:block;font-size:.82rem;font-weight:600;margin-bottom:.35rem}
+.bs-cor-linha{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.bs-cor-linha input[type=color]{width:42px;height:38px;padding:2px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer}
+.bs-lados{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.25rem 0 .5rem}
+.bs-lado{display:flex;flex-direction:column;gap:.6rem;padding:.9rem;border:1px dashed var(--border);border-radius:var(--radius,10px)}
+.bs-lado-titulo{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.bs-itens{display:flex;flex-direction:column;gap:.6rem}
+.bs-itens:not(:empty) + .bs-vazio{display:none}
+.bs-item{border:1px solid var(--border);border-radius:8px;background:var(--bg3,rgba(255,255,255,.03));padding:.65rem .75rem}
+.bs-item-topo{display:flex;align-items:center;gap:.4rem}
+.bs-item-tipo{font-weight:700;font-size:.85rem;flex:1}
+.bs-item-topo button{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:.85rem;line-height:1}
+.bs-item-topo button:hover{color:var(--text);border-color:var(--primary)}
+.bs-item-topo button.bs-remover:hover{color:var(--danger,#ef4444);border-color:var(--danger,#ef4444)}
+.bs-item-topo button:disabled{opacity:.3;cursor:default}
+.bs-item-campos{display:grid;gap:.5rem;margin-top:.55rem}
+.bs-item-campos label{font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem}
+.bs-item-campos .ai{font-size:.85rem}
+.bs-item-dado{font-size:.76rem;color:var(--muted);margin-top:.35rem}
+.bs-item-dado.bs-falta{color:var(--warning,#f59e0b)}
+.bs-novaaba{display:flex;align-items:center;gap:.4rem;font-size:.8rem;cursor:pointer}
+@media(max-width:900px){.bs-lados{grid-template-columns:1fr}}
+</style>
+
+<script>
+(function () {
+    const raiz = document.getElementById('bs-editor');
+    if (!raiz) return;
+    const NOMES = {phone: 'Telefone', whatsapp: 'WhatsApp', email: 'E-mail', address: 'Endereço', hours: 'Horário de funcionamento', social: 'Redes sociais', custom: 'Personalizado'};
+    const COM_TEXTO = ['phone', 'whatsapp', 'email', 'address'];
+    const SEM_DADO = {phone: 'Sem telefone cadastrado: o item não aparece.', whatsapp: 'Sem WhatsApp cadastrado: o item não aparece.', email: 'Sem e-mail de contato: o item não aparece.', address: 'Sem endereço cadastrado: o item não aparece.', hours: 'Sem horários cadastrados: o item não aparece.', social: 'Nenhuma rede cadastrada: o item não aparece.'};
+    const estado = JSON.parse(raiz.dataset.estado || '{}');
+    const dados = JSON.parse(raiz.dataset.dados || '{}');
+    const saida = document.getElementById('bs-json');
+    let seq = 0;
+
+    function el(tag, attrs, filhos) {
+        const e = document.createElement(tag);
+        Object.entries(attrs || {}).forEach(([k, v]) => {
+            if (k === 'text') e.textContent = v; else if (k === 'value') e.value = v; else if (k === 'checked') e.checked = v; else e.setAttribute(k, v);
+        });
+        (filhos || []).forEach(f => e.appendChild(f));
+        return e;
+    }
+
+    function campo(rotulo, input) {
+        return el('div', {}, [el('label', {for: input.id, text: rotulo}), input]);
+    }
+
+    function cartao(item) {
+        const id = 'bs' + (++seq);
+        const tipo = item.type;
+        const topo = el('div', {class: 'bs-item-topo'}, [
+            el('span', {class: 'bs-item-tipo', text: NOMES[tipo] || tipo}),
+            el('button', {type: 'button', class: 'bs-subir', title: 'Subir', 'aria-label': 'Subir', text: '↑'}),
+            el('button', {type: 'button', class: 'bs-descer', title: 'Descer', 'aria-label': 'Descer', text: '↓'}),
+            el('button', {type: 'button', class: 'bs-trocar', title: 'Passar para o outro lado', 'aria-label': 'Passar para o outro lado', text: '⇄'}),
+            el('button', {type: 'button', class: 'bs-remover', title: 'Remover', 'aria-label': 'Remover', text: '✕'}),
+        ]);
+        const c = el('div', {class: 'bs-item', 'data-type': tipo}, [topo]);
+        const campos = el('div', {class: 'bs-item-campos'});
+
+        if (tipo === 'custom') {
+            const prev = el('div', {class: 'icon-preview', id: id + '-pv'});
+            if (item.icon) prev.appendChild(el('i', {class: item.icon}));
+            const icone = el('input', {type: 'text', class: 'ai bs-icon', id: id + '-ic', value: item.icon || '', placeholder: 'fa-solid fa-user-lock', style: 'flex:1'});
+            const escolher = el('button', {type: 'button', class: 'btn btn-g btn-sm', text: 'Escolher'});
+            escolher.addEventListener('click', () => openIconPicker(id + '-ic', id + '-pv'));
+            campos.appendChild(el('div', {}, [el('label', {for: id + '-ic', text: 'Ícone (opcional)'}), el('div', {class: 'icon-picker-wrap'}, [prev, icone, escolher])]));
+            campos.appendChild(campo('Texto (opcional)', el('input', {type: 'text', class: 'ai bs-text', id: id + '-tx', value: item.text || '', maxlength: '80', placeholder: 'Portal do Aluno'})));
+            campos.appendChild(campo('Link (opcional)', el('input', {type: 'text', class: 'ai bs-url', id: id + '-url', value: item.url || '', maxlength: '500', placeholder: 'https://… , tel:… ou mailto:…'})));
+            campos.appendChild(el('label', {class: 'bs-novaaba'}, [el('input', {type: 'checkbox', class: 'bs-newtab', checked: !!item.newTab}), document.createTextNode('Abrir o link em nova aba')]));
+            campos.appendChild(el('div', {class: 'bs-item-dado', text: 'Precisa de ícone ou texto; sem link, aparece só como texto.'}));
+        } else {
+            if (COM_TEXTO.includes(tipo)) {
+                campos.appendChild(campo('Texto (opcional, no lugar do dado)', el('input', {type: 'text', class: 'ai bs-text', id: id + '-tx', value: item.text || '', maxlength: '80', placeholder: dados[tipo] || ''})));
+            }
+            const dado = dados[tipo] || '';
+            campos.appendChild(el('div', {class: 'bs-item-dado' + (dado ? '' : ' bs-falta'), text: dado ? 'Usa: ' + dado : SEM_DADO[tipo]}));
+        }
+        c.appendChild(campos);
+        return c;
+    }
+
+    function serializar() {
+        const json = {};
+        raiz.querySelectorAll('.bs-lado').forEach(lado => {
+            json[lado.dataset.lado] = Array.from(lado.querySelectorAll('.bs-item')).map(c => ({
+                type: c.dataset.type,
+                text: c.querySelector('.bs-text')?.value.trim() || '',
+                icon: c.querySelector('.bs-icon')?.value.trim() || '',
+                url: c.querySelector('.bs-url')?.value.trim() || '',
+                newTab: !!c.querySelector('.bs-newtab')?.checked,
+            }));
+            const itens = lado.querySelectorAll('.bs-item');
+            itens.forEach((c, i) => {
+                c.querySelector('.bs-subir').disabled = i === 0;
+                c.querySelector('.bs-descer').disabled = i === itens.length - 1;
+            });
+        });
+        saida.value = JSON.stringify(json);
+    }
+
+    raiz.querySelectorAll('.bs-lado').forEach(lado => {
+        const lista = lado.querySelector('.bs-itens');
+        (estado[lado.dataset.lado] || []).forEach(item => lista.appendChild(cartao(item)));
+        lado.querySelector('.bs-acrescentar').addEventListener('change', function () {
+            if (!this.value) return;
+            const novo = cartao({type: this.value});
+            lista.appendChild(novo);
+            this.value = '';
+            serializar();
+            novo.querySelector('input')?.focus();
+        });
+    });
+
+    raiz.addEventListener('click', e => {
+        const b = e.target.closest('.bs-item-topo button');
+        if (!b) return;
+        const c = b.closest('.bs-item');
+        if (b.classList.contains('bs-subir') && c.previousElementSibling) c.parentNode.insertBefore(c, c.previousElementSibling);
+        if (b.classList.contains('bs-descer') && c.nextElementSibling) c.parentNode.insertBefore(c.nextElementSibling, c);
+        if (b.classList.contains('bs-trocar')) {
+            const outro = raiz.querySelector('.bs-lado:not([data-lado="' + c.closest('.bs-lado').dataset.lado + '"]) .bs-itens');
+            outro.appendChild(c);
+        }
+        if (b.classList.contains('bs-remover')) c.remove();
+        serializar();
+    });
+    raiz.addEventListener('input', serializar);
+    raiz.addEventListener('change', serializar);
+    // O seletor de ícones grava o campo sem disparar evento
+    // (o modal do seletor entra depois deste parcial na página: delegação no document)
+    document.addEventListener('click', e => { if (e.target.closest('#icon-grid-container')) setTimeout(serializar, 0); });
+
+    document.getElementById('bs-ligada').addEventListener('change', function () { document.getElementById('bs-painel').hidden = !this.checked; });
+    const roda = document.getElementById('bs-cor-roda'), texto = document.getElementById('bs-cor-texto');
+    roda.addEventListener('input', () => { texto.value = roda.value; });
+    texto.addEventListener('input', () => { if (/^#[0-9a-f]{6}$/i.test(texto.value.trim())) roda.value = texto.value.trim(); });
+    document.getElementById('bs-cor-limpar').addEventListener('click', () => { texto.value = ''; });
+
+    serializar();
+})();
+</script>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Service\BarraSuperior;
 use App\Twig\IconeDoPainelExtension;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -107,6 +108,18 @@ final class SincronizarIconesCommand extends Command
             $fb = json_decode($json, true);
             if (is_array($fb) && is_string($fb['icon'] ?? null) && $fb['icon'] !== '') {
                 $classes[] = $fb['icon'];
+            }
+        }
+
+        // Ícones dos itens personalizados da barra superior (navigationSettings.topBarLeft/Right)
+        foreach ($this->colunaDeTexto('SELECT navigation_settings FROM tenant WHERE navigation_settings IS NOT NULL') as $json) {
+            $nav = json_decode($json, true);
+            foreach (['topBarLeft', 'topBarRight'] as $lado) {
+                foreach (BarraSuperior::normalizarLado($nav[$lado] ?? []) as $item) {
+                    if ($item['icon'] !== '') {
+                        $classes[] = $item['icon'];
+                    }
+                }
             }
         }
 

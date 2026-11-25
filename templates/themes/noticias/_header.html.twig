@@ -2,6 +2,7 @@
   Cabeçalho do tema noticias. Variável header_section: nome da editoria
   (página da notícia), mostrada no centro; o logo vai para a esquerda.
 #}
+{% include 'themes/_topbar.html.twig' %}
 {% set tenantName = currentTenant ? currentTenant.name : '' %}
 {% set customMenuItems = currentTenant ? (currentTenant.navigationSettings.customMenuItems ?? []) : [] %}
 

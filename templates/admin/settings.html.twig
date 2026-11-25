@@ -271,11 +271,8 @@
 			{# ── Menu e TopBar ── #}
 			{% set navSettings = tenant.navigationSettings ?? {} %}
 			{% set showMenuIcons = navSettings.showMenuIcons ?? true %}
-			{% set topBarEnabled = navSettings.topBarEnabled ?? false %}
-			{% set topBarLeft = navSettings.topBarLeft ?? [] %}
-			{% set topBarRight = navSettings.topBarRight ?? [] %}
 
-			<div style="margin:2rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Configurações do Menu Principal e TopBar</div>
+			<div style="margin:2rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Configurações do menu principal</div>
 			
 			<div class="af-row">
 				<div class="af-field" style="flex:1">
@@ -285,72 +282,10 @@
 					</label>
 					<p class="af-hint">Exibe ou oculta os ícones correspondentes às categorias no menu principal de navegação.</p>
 				</div>
-				<div class="af-field" style="flex:1">
-					<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
-						<input type="checkbox" name="topBarEnabled" value="1" {% if topBarEnabled %}checked{% endif %} style="width:18px;height:18px;cursor:pointer" onchange="toggleTopBarSettings(this.checked)">
-						<span>Ativar Barra Superior (TopBar)</span>
-					</label>
-					<p class="af-hint">Exibe uma barra superior acima do cabeçalho principal nas páginas públicas do site.</p>
-				</div>
 			</div>
 
-			<div id="topbar-config-panel" style="{% if not topBarEnabled %}display:none;{% endif %}margin-top:1rem;margin-bottom:2rem;padding:1.25rem;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.02)">
-				<h4 style="margin-top:0;margin-bottom:1rem;color:var(--primary)">Configuração da TopBar</h4>
-				<div class="af-row">
-					<div class="af-field">
-						<label style="font-weight:600;margin-bottom:.5rem">Lado Esquerdo</label>
-						<p class="af-hint" style="margin-bottom:.75rem">Selecione quais itens deseja exibir à esquerda:</p>
-						<div style="display:flex;flex-direction:column;gap:.5rem">
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarLeft[]" value="social" {% if 'social' in topBarLeft %}checked{% endif %}>
-								<span>Redes Sociais</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarLeft[]" value="phone" {% if 'phone' in topBarLeft %}checked{% endif %}>
-								<span>Telefone e WhatsApp</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarLeft[]" value="email" {% if 'email' in topBarLeft %}checked{% endif %}>
-								<span>E-mail</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarLeft[]" value="address" {% if 'address' in topBarLeft %}checked{% endif %}>
-								<span>Endereço</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarLeft[]" value="hours" {% if 'hours' in topBarLeft %}checked{% endif %}>
-								<span>Horário de funcionamento</span>
-							</label>
-						</div>
-					</div>
-					<div class="af-field">
-						<label style="font-weight:600;margin-bottom:.5rem">Lado Direito</label>
-						<p class="af-hint" style="margin-bottom:.75rem">Selecione quais itens deseja exibir à direita:</p>
-						<div style="display:flex;flex-direction:column;gap:.5rem">
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarRight[]" value="social" {% if 'social' in topBarRight %}checked{% endif %}>
-								<span>Redes Sociais</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarRight[]" value="phone" {% if 'phone' in topBarRight %}checked{% endif %}>
-								<span>Telefone e WhatsApp</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarRight[]" value="email" {% if 'email' in topBarRight %}checked{% endif %}>
-								<span>E-mail</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarRight[]" value="address" {% if 'address' in topBarRight %}checked{% endif %}>
-								<span>Endereço</span>
-							</label>
-							<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal">
-								<input type="checkbox" name="topBarRight[]" value="hours" {% if 'hours' in topBarRight %}checked{% endif %}>
-								<span>Horário de funcionamento</span>
-							</label>
-						</div>
-					</div>
-				</div>
-			</div>
+			<div style="margin:2rem 0 .25rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Barra superior</div>
+			{% include 'admin/_editor_da_barra_superior.html.twig' with {tenant: tenant} %}
 
 			{# ── Botão de ação e frase do cabeçalho (tema atelie) ── #}
 			<div style="margin:2.5rem 0 .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Botão de ação e frase do cabeçalho</div>
@@ -445,12 +380,6 @@ el.src = e.target.result;
 };
 reader.readAsDataURL(input.files[0]);
 }
-		function toggleTopBarSettings(enabled) {
-			const panel = document.getElementById('topbar-config-panel');
-			if (panel) {
-				panel.style.display = enabled ? 'block' : 'none';
-			}
-		}
 
 		function updateContrastPreview() {
 			const primaryLight = document.getElementById('primaryColorInput').value || '#0044cc';
