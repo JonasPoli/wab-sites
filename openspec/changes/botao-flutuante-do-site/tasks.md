@@ -33,9 +33,9 @@
 
 ## 6. Deploy (pedido do Jonas: "publique")
 
-- [ ] 6.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/` no wabsites; anotar o HTTP atual dos domínios de cliente
-- [ ] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull`, `./build.sh` e `bin/console doctrine:migrations:migrate --no-interaction`
-- [ ] 6.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br; `SELECT id, theme, floating_button FROM tenant`; o botão do WhatsApp continua nos sites cetec que têm link e o ajope não ganhou botão
+- [x] 6.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/` no wabsites; anotar o HTTP atual dos domínios de cliente
+- [x] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull`, `./build.sh` e `bin/console doctrine:migrations:migrate --no-interaction`
+- [x] 6.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br; `SELECT id, theme, floating_button FROM tenant`; o botão do WhatsApp continua nos sites cetec que têm link e o ajope não ganhou botão
 
 ## Medições
 
@@ -47,3 +47,10 @@
 ## Workflow follow-up
 
 - Arquivar a mudança (sincronizando as specs) depois do deploy conferido.
+
+## Deploy
+
+- 6.1 (25/11/2026): backup `~/backups/wab-sites-antes-botao-flutuante-20261125-1647.sql.gz` (140 KB, permissão 600, dump completo). HTTP antes: 200 em todos os domínios (os 9 da lista, mais pichoneri.wab.com.br e transmai.wab.com.br). Leitura dos tenants: o único site de tema sem botão (ajope, noticias) não tinha WhatsApp, então a migration não muda nada visível.
+- 6.2 (25/11/2026): commit `7404177` no main e push; no servidor, `git pull` (de `e93031a`), `doctrine:migrations:migrate` (Version20261125162223, 2 comandos SQL) e `./build.sh` concluído (1.526 miniaturas refeitas). O `sh/reset.sh` alterado no servidor (fora do git) não foi tocado.
+- 6.3: HTTP 200 nos 11 domínios; o botão do WhatsApp aparece nos mesmos sites de antes (marapossi, pkwy, cemporcentoexpresso, imperiodainformatica, topdrim e pichoneri) e em nenhum outro; nenhum site mostra o botão de formulário; `floating_button` nulo em todos os tenants, menos o 10 (ajope), com `none`; `lint:twig` dos 3 templates novos ok em produção. A tela `/superadmin/tenant/13/edit` em produção não foi aberta (pede login); fica para o Jonas conferir antes de arquivar.
+
