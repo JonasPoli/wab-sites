@@ -1,3 +1,4 @@
+{% set filtroLogo = currentTenant and currentTenant.headerLogo.large ? 'logo_site_grande' : 'logo_site' %}
 {#
   Cabeçalho do tema atelie: barra superior (themes/_topbar), logo + nome + frase do site,
   menu e botão de ação (navigationSettings.headerCtaLabel / headerCtaUrl).
@@ -15,7 +16,7 @@
     <div class="at-wrap at-nav">
         <a class="at-logo" href="{{ path('pub_home') }}" aria-label="{{ currentTenant ? currentTenant.name : 'Início' }} — página inicial">
             {% if currentTenant and currentTenant.logo %}
-                <img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="" decoding="async">
+                <img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs(filtroLogo) }} alt="" decoding="async">
             {% endif %}
             <span class="at-logo-words">
                 <strong>{{ currentTenant ? currentTenant.name : '' }}</strong>
@@ -87,3 +88,4 @@
         </nav>
     </div>
 </header>
+{% include 'themes/_comum/_logo_grande.html.twig' with {tema: 'atelie'} %}

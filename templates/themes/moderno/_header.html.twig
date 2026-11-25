@@ -157,15 +157,15 @@ html:not(.dark) .logo-dark { display: none !important; }
 .mh-toggle span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:.2s; }
 @media(max-width:768px){
     .mh-toggle{display:flex;}
-    .mh-nav{display:none;flex-direction:column;position:fixed;top:calc(70px + var(--mh-topo, var(--topbar-height, 0px)));left:0;right:0;background:var(--bg-card);padding:1.5rem;border-bottom:1px solid var(--border);}
+    .mh-nav{display:none;flex-direction:column;position:fixed;top:calc(70px + var(--wab-logo-extra, var(--wab-logo-d, 0px)) + var(--mh-topo, var(--topbar-height, 0px)));left:0;right:0;background:var(--bg-card);padding:1.5rem;border-bottom:1px solid var(--border);}
     .mh-nav.open{display:flex;}
     .mh-link{width:100%;padding:0.85rem 1rem;}
     .mh-dropdown-menu{position:static;box-shadow:none;border:none;padding-left:1rem;}
 }
-body { padding-top: calc(70px + var(--topbar-height, 0px)); }
+body { padding-top: calc(70px + var(--wab-logo-extra, var(--wab-logo-d, 0px)) + var(--topbar-height, 0px)); }
 /* A barra superior fica no topo da página, acima do cabeçalho fixo: sobe o espaço que o
    padding do body reserva para o cabeçalho e devolve esse espaço abaixo dela. */
-.topbar-wrapper { margin-top: calc(-70px - var(--topbar-height, 0px)); margin-bottom: 70px; }
+.topbar-wrapper { margin-top: calc(-70px - var(--wab-logo-extra, var(--wab-logo-d, 0px)) - var(--topbar-height, 0px)); margin-bottom: calc(70px + var(--wab-logo-extra, var(--wab-logo-d, 0px))); }
 </style>
 {% if barra_superior() %}
 <script>
@@ -185,3 +185,4 @@ body { padding-top: calc(70px + var(--topbar-height, 0px)); }
 })();
 </script>
 {% endif %}
+{% include 'themes/_comum/_logo_grande.html.twig' with {tema: 'moderno'} %}

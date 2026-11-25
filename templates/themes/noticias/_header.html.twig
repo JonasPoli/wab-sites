@@ -9,9 +9,9 @@
 {% macro logo(currentTenant, tenantName) %}
     {% set dark = currentTenant ? is_dark_color(currentTenant.primaryColor) : true %}
     {% if currentTenant and dark and currentTenant.darkLogo %}
-        <img {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" decoding="async">
+        <img {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs(currentTenant.headerLogo.large ? 'logo_site_grande' : 'logo_site') }} alt="{{ tenantName }}" decoding="async">
     {% elseif currentTenant and currentTenant.logo %}
-        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ tenantName }}" decoding="async"></span>
+        <span class="{{ dark ? 'nt-logo--pill' : '' }}" style="display:inline-flex"><img {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs(currentTenant.headerLogo.large ? 'logo_site_grande' : 'logo_site') }} alt="{{ tenantName }}" decoding="async"></span>
     {% else %}
         {{ tenantName }}
     {% endif %}
@@ -139,3 +139,4 @@
     closeBtn.addEventListener('click', close);
 })();
 </script>
+{% include 'themes/_comum/_logo_grande.html.twig' with {tema: 'noticias'} %}

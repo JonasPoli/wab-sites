@@ -66,6 +66,38 @@
             </div>
         </div>
 
+        {# ── Logo maior na abertura (change logo-maior-na-abertura) ── #}
+        {% set hl = tenant.headerLogo %}
+        <div class="af-field lg-grupo" id="logo-abertura">
+            <input type="hidden" name="headerLogoForm" value="1">
+            <label class="lg-ligar">
+                <input type="checkbox" name="headerLogoLarge" value="1" id="lg-ligado" {% if hl.large %}checked{% endif %}>
+                <span>
+                    <strong>Logo maior na abertura da página</strong>
+                    <small>No topo da página o logo aparece na altura abaixo e diminui conforme a página rola, até o tamanho normal do menu. No celular, o aumento é a metade.</small>
+                </span>
+            </label>
+            <div class="lg-painel" id="lg-painel" {% if not hl.large %}hidden{% endif %}>
+                <label for="lg-altura">Altura do logo na abertura</label>
+                <div class="lg-controle">
+                    <input type="range" id="lg-faixa" min="60" max="200" step="2" value="{{ hl.height }}" aria-label="Altura do logo na abertura">
+                    <input type="number" name="headerLogoHeight" id="lg-altura" class="ai" min="60" max="200" step="1" value="{{ hl.height }}" style="width:90px">
+                    <span class="lg-px">px</span>
+                </div>
+                <div class="lg-previa" aria-hidden="true">
+                    <div class="lg-col">
+                        {% if tenant.logo %}<img id="lg-img-grande" src="{{ asset('uploads/tenant/logo/' ~ tenant.logo) }}" alt="" style="height:{{ hl.height }}px">{% else %}<div class="lg-sem" id="lg-img-grande" style="height:{{ hl.height }}px">logo</div>{% endif %}
+                        <small>Na abertura: <b id="lg-rot-grande">{{ hl.height }}</b> px</small>
+                    </div>
+                    <div class="lg-col">
+                        {% if tenant.logo %}<img id="lg-img-normal" src="{{ asset('uploads/tenant/logo/' ~ tenant.logo) }}" alt="">{% else %}<div class="lg-sem" id="lg-img-normal">logo</div>{% endif %}
+                        <small>Rolada (normal do tema): <b id="lg-rot-normal"></b> px</small>
+                    </div>
+                </div>
+                <p class="af-hint" id="lg-aviso" hidden>A altura escolhida não passa da normal do tema: o logo não muda.</p>
+            </div>
+        </div>
+
         <hr style="border:none;border-top:1px solid var(--border)">
 
         {# ── Identificação ── #}
@@ -691,6 +723,24 @@
 {% endblock %}
 
 {% block stylesheets %}{{ parent() }}
+<style>
+/* Logo maior na abertura */
+.lg-grupo{margin-top:1.5rem}
+.lg-ligar{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.lg-ligar input{width:18px;height:18px;margin-top:.15rem;accent-color:var(--primary)}
+.lg-ligar strong{display:block;font-size:.92rem}
+.lg-ligar small{display:block;color:var(--muted);font-size:.78rem;margin-top:.15rem;font-weight:400}
+.lg-painel{margin-top:.9rem;padding:1rem 1.25rem;border:1px dashed var(--border);border-radius:var(--radius)}
+.lg-painel[hidden]{display:none}
+.lg-controle{display:flex;align-items:center;gap:.75rem;margin:.35rem 0 1rem}
+.lg-controle input[type=range]{flex:1;max-width:360px;accent-color:var(--primary)}
+.lg-px{color:var(--muted);font-size:.85rem}
+.lg-previa{display:flex;gap:2.5rem;align-items:flex-end;flex-wrap:wrap;padding:1rem;border-radius:8px;background:#fff;color:#334155;overflow-x:auto}
+.lg-col{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem}
+.lg-col img{width:auto;max-width:none;object-fit:contain;display:block}
+.lg-col small{font-size:.72rem;color:#64748b}
+.lg-sem{display:flex;align-items:center;justify-content:center;aspect-ratio:3/1;border:1px dashed #94a3b8;border-radius:6px;color:#94a3b8;font-size:.8rem}
+</style>
 {# Font Awesome: só para o seletor de ícones do botão flutuante #}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
@@ -754,6 +804,33 @@
 {% block javascripts %}{{ parent() }}
 {% include 'admin/_seletor_de_icones.html.twig' %}
 <script>
+// Logo maior na abertura: liga o painel, sincroniza faixa e número e atualiza a prévia
+(function () {
+    const NORMAIS = {cetec: 56, wab: 52, moderno: 40, atelie: 58, noticias: 44};
+    const ligado = document.getElementById('lg-ligado');
+    if (!ligado) return;
+    const painel = document.getElementById('lg-painel'), faixa = document.getElementById('lg-faixa'), num = document.getElementById('lg-altura');
+    const grande = document.getElementById('lg-img-grande'), normal = document.getElementById('lg-img-normal');
+    const tema = document.querySelector('[name="theme"]');
+    function atualizar(origem) {
+        let v = parseInt(origem.value, 10);
+        if (isNaN(v)) return;
+        if (origem === faixa) num.value = v; else faixa.value = Math.max(60, Math.min(200, v));
+        v = Math.max(60, Math.min(200, v));
+        const n = NORMAIS[tema ? tema.value : 'cetec'] || 56;
+        grande.style.height = v + 'px';
+        normal.style.height = n + 'px';
+        document.getElementById('lg-rot-grande').textContent = v;
+        document.getElementById('lg-rot-normal').textContent = n;
+        document.getElementById('lg-aviso').hidden = v > n;
+    }
+    ligado.addEventListener('change', () => { painel.hidden = !ligado.checked; });
+    faixa.addEventListener('input', () => atualizar(faixa));
+    num.addEventListener('input', () => atualizar(num));
+    tema?.addEventListener('change', () => atualizar(num));
+    atualizar(num);
+})();
+
 // Botão flutuante: campos do Formulário só com esse tipo marcado; prévia acompanha texto e ícone
 (function () {
     const caixa = document.getElementById('fb-form');

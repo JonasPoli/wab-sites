@@ -1,14 +1,15 @@
+{% set filtroLogo = currentTenant and currentTenant.headerLogo.large ? 'logo_site_grande' : 'logo_site' %}
 {% include 'themes/_topbar.html.twig' %}
 <header class="cetec-header" id="navbar">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center h-[70px]">
         <!-- Logo -->
         <a href="{{ path('pub_home') }}" class="flex items-center">
             {% if currentTenant and currentTenant.logo %}
-                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" decoding="async">
+                <img class="logo-light h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs(filtroLogo) }} alt="{{ currentTenant.name }}" decoding="async">
                 {% if currentTenant.darkLogo %}
-                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/dark_logo/' ~ currentTenant.darkLogo)|thumb_attrs(filtroLogo) }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
                 {% else %}
-                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs('logo_site') }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
+                    <img class="logo-dark h-12 md:h-14 transition-all duration-300 w-auto object-contain" {{ ('uploads/tenant/logo/' ~ currentTenant.logo)|thumb_attrs(filtroLogo) }} alt="{{ currentTenant.name }}" loading="lazy" decoding="async">
                 {% endif %}
             {% else %}
                 <span class="text-2xl font-black tracking-wider uppercase" style="color: var(--color-primary);">{{ currentTenant ? currentTenant.name : 'CETEC' }}</span>
@@ -348,3 +349,4 @@ function toggleMobileMenu() {
     }
 }
 </script>
+{% include 'themes/_comum/_logo_grande.html.twig' with {tema: 'cetec'} %}

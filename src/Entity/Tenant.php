@@ -114,6 +114,13 @@ class Tenant
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $floatingButton = null;
 
+    /**
+     * Logo maior na abertura da página (change logo-maior-na-abertura): {large, height}.
+     * Nulo = desligado.
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $headerLogo = null;
+
     /** Favicon file upload */
     #[\Vich\UploaderBundle\Mapping\Annotation\UploadableField(mapping: 'tenant_favicon', fileNameProperty: 'favicon')]
     private ?\Symfony\Component\HttpFoundation\File\File $faviconFile = null;
@@ -301,6 +308,26 @@ class Tenant
     public function getFloatingButtonRaw(): ?array { return $this->floatingButton; }
 
     public function setFloatingButton(?array $floatingButton): static { $this->floatingButton = $floatingButton; return $this; }
+
+    public const HEADER_LOGO_MIN = 60;
+    public const HEADER_LOGO_MAX = 200;
+    public const HEADER_LOGO_DEFAULT = 110;
+
+    /** @return array{large: bool, height: int} sempre com a altura entre 60 e 200 */
+    public function getHeaderLogo(): array
+    {
+        $h = $this->headerLogo['height'] ?? self::HEADER_LOGO_DEFAULT;
+
+        return [
+            'large'  => !empty($this->headerLogo['large']),
+            'height' => is_numeric($h) ? max(self::HEADER_LOGO_MIN, min(self::HEADER_LOGO_MAX, (int) $h)) : self::HEADER_LOGO_DEFAULT,
+        ];
+    }
+
+    /** O JSON gravado como está (exportação). */
+    public function getHeaderLogoRaw(): ?array { return $this->headerLogo; }
+
+    public function setHeaderLogo(?array $headerLogo): static { $this->headerLogo = $headerLogo; return $this; }
 
     public function getFaviconFile(): ?\Symfony\Component\HttpFoundation\File\File { return $this->faviconFile; }
     public function setFaviconFile(?\Symfony\Component\HttpFoundation\File\File $file): static
@@ -508,6 +535,7 @@ class Tenant
             'darkLogo'           => $this->darkLogo,
             'homePageId'         => $this->homePage?->getId(),
             'floatingButton'     => $this->floatingButton,
+            'headerLogo'         => $this->headerLogo,
             'googleAnalyticsId'  => $this->googleAnalyticsId,
             // Só a site key: a secret key nunca sai do servidor
             'recaptchaSiteKey'   => $this->recaptchaSiteKey,
@@ -566,6 +594,7 @@ class Tenant
         $this->faviconFile       = null;
         $this->homePage          = null; // lazy-loaded separately if needed
         $this->floatingButton    = $data['floatingButton'] ?? null;
+        $this->headerLogo        = $data['headerLogo'] ?? null;
     }
 
     public function __toString(): string { return $this->name; }

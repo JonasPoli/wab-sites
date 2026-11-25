@@ -1,0 +1,71 @@
+{#
+  Logo maior na abertura da página (change logo-maior-na-abertura), no fim do _header dos cinco temas:
+    {% include 'themes/_comum/_logo_grande.html.twig' with {tema: 'cetec'} %}
+
+  Com currentTenant.headerLogo.large, no topo da página o logo do cabeçalho tem a altura escolhida
+  e diminui, na mesma medida da rolagem, até a altura normal do tema.
+  --wab-logo-d     = quanto o logo cresce na abertura (por faixa de largura; metade abaixo de 768 px)
+  --wab-logo-extra = quanto ainda falta diminuir = max(0, d − rolagem), escrito pelo script no <html>.
+  Sem script, vale o d inteiro (logo grande). Sem a opção, nada é emitido e o tema fica como antes.
+#}
+{% set cfg = currentTenant ? currentTenant.headerLogo : {large: false, height: 0} %}
+{# Altura normal do logo de cada tema: desktop, celular (< 768 px) e, no atelie, até 860 px #}
+{% set normais = {
+    cetec:    {desktop: 56, celular: 48},
+    wab:      {desktop: 52, celular: 52},
+    moderno:  {desktop: 40, celular: 40},
+    atelie:   {desktop: 58, celular: 46, medio: 46},
+    noticias: {desktop: 44, celular: 44},
+} %}
+{% set n = normais[tema] ?? null %}
+{% if cfg.large and n and cfg.height > n.desktop and not (modoPrevia ?? false) %}
+    {% set d = cfg.height - n.desktop %}
+    {% set dc = max(0, ((cfg.height - n.celular) / 2)|round) %}
+    {% set x = 'var(--wab-logo-extra, var(--wab-logo-d, 0px))' %}
+    <style>
+    {# O cabeçalho encolhe enquanto a página rola: sem isto, o "scroll anchoring" do navegador
+       devolve a rolagem que o cabeçalho perdeu, e o logo nunca diminui em rolagens curtas. #}
+    html, body { overflow-anchor: none; }
+    :root { --wab-logo-d: {{ d }}px; }
+    {% if n.medio is defined %}@media (max-width: 860px) { :root { --wab-logo-d: {{ max(0, cfg.height - n.medio) }}px; } }{% endif %}
+    @media (max-width: 767px) { :root { --wab-logo-d: {{ dc }}px; } }
+    {% if tema == 'cetec' %}
+    .cetec-header > .container { height: calc(70px + {{ x }}) !important; }
+    .cetec-header img.logo-light, .cetec-header img.logo-dark { height: calc(56px + {{ x }}) !important; max-width: none !important; transition: none !important; }
+    @media (max-width: 767px) { .cetec-header img.logo-light, .cetec-header img.logo-dark { height: calc(48px + {{ x }}) !important; } }
+    {% elseif tema == 'wab' %}
+    .wab-header .header-inner { height: calc(72px + {{ x }}); }
+    .wab-header .header-logo { height: calc(52px + {{ x }}); }
+    .wab-header .header-logo img { max-height: calc(52px + {{ x }}) !important; max-width: none !important; }
+    {% elseif tema == 'moderno' %}
+    .moderno-header .mh-inner { height: calc(70px + {{ x }}); }
+    .moderno-header .mh-logo img { max-height: calc(40px + {{ x }}) !important; height: calc(40px + {{ x }}) !important; }
+    {% elseif tema == 'atelie' %}
+    .at-header .at-nav { min-height: calc(91px + {{ x }}); }
+    .at-header .at-logo img { height: calc(58px + {{ x }}); max-width: none; }
+    {# O bloco do logo (imagem + nome) pode encolher: com o logo maior, o nome quebra em vez de empurrar o menu #}
+    .at-header .at-logo { flex-shrink: 1; }
+    @media (max-width: 860px) { .at-header .at-nav { min-height: calc(70px + {{ x }}); } .at-header .at-logo img { height: calc(46px + {{ x }}); } }
+    {% elseif tema == 'noticias' %}
+    .nt-header .nt-header__inner { height: calc(64px + {{ x }}); }
+    .nt-header .nt-logo img { height: calc(44px + {{ x }}); }
+    .nt-header .nt-logo--pill img { height: calc(40px + {{ x }}); }
+    .nt-header--section .nt-logo img { height: calc(36px + {{ x }}); }
+    .nt-search { top: calc(64px + {{ x }}); }
+    {% endif %}
+    </style>
+    <script>
+    (function () {
+        var raiz = document.documentElement, pedido = false;
+        function ajustar() {
+            pedido = false;
+            var d = parseFloat(getComputedStyle(raiz).getPropertyValue('--wab-logo-d')) || 0;
+            raiz.style.setProperty('--wab-logo-extra', Math.max(0, d - window.scrollY) + 'px');
+        }
+        function pedir() { if (!pedido) { pedido = true; requestAnimationFrame(ajustar); } }
+        window.addEventListener('scroll', pedir, { passive: true });
+        window.addEventListener('resize', pedir);
+        ajustar();
+    })();
+    </script>
+{% endif %}

@@ -97,6 +97,9 @@ Faixa fina acima do cabeçalho, nos cinco temas (parcial `themes/_topbar.html.tw
 * Tipos: Telefone, WhatsApp (número formatado), E-mail, Endereço (abre o Google Maps), Horário e Redes sociais, com os dados do site (os quatro primeiros aceitam texto próprio, por exemplo "Araraquara"), e Personalizado (ícone pelo seletor do Blurbs4, texto e link, cada um opcional). Item sem dado no site não aparece; no celular, item com ícone mostra só o ícone.
 * Gravada em `navigationSettings`: `topBarEnabled`, `topBarBg` e `topBarLeft`/`topBarRight` (listas de `{type, text, icon, url, newTab}`; o formato antigo, só o nome do tipo, continua valendo). O editor envia tudo num campo `topBarJson`.
 
+### Logo maior na abertura
+Opção da edição do tenant no `/superadmin` (grupo "Logo na abertura", coluna JSON `tenant.header_logo` = `{large, height}`): no topo da página o logo do cabeçalho aparece na altura escolhida (60 a 200 px) e diminui na mesma medida da rolagem até o tamanho normal do tema (cetec 56, wab 52, moderno 40, atelie 58, noticias 44 px); no celular, o aumento é a metade. O parcial `themes/_comum/_logo_grande.html.twig`, no fim do `_header` dos cinco temas, escreve o CSS por tema com a variável `--wab-logo-extra`, atualizada por um script na rolagem, e desliga o *scroll anchoring* do navegador (senão o logo não diminui em rolagens curtas). Com a opção ligada, cetec, atelie e noticias servem o logo pela miniatura `logo_site_grande` (até 1200×400).
+
 ### Botão flutuante
 Escolhido na edição do tenant no `/superadmin` (grupo "Botão flutuante", coluna JSON `tenant.floating_button`) e desenhado nos cinco temas pelo parcial `themes/_comum/_botao_flutuante.html.twig` (função Twig `botao_flutuante()`, serviço `App\Service\BotaoFlutuante`):
 * **Nenhum**: o site não mostra botão.

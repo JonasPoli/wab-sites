@@ -205,6 +205,7 @@ class TenantImporter
             $tenant->setInstagramLink($tData['instagramLink'] ?? null);
             $tenant->setFacebookLink($tData['facebookLink'] ?? null);
             $tenant->setWhatsappLink($tData['whatsappLink'] ?? null);
+            $tenant->setHeaderLogo(is_array($tData['headerLogo'] ?? null) ? $tData['headerLogo'] : null);
             $tenant->setLinkedinLink($tData['linkedinLink'] ?? null);
             $tenant->setAboutText($tData['aboutText'] ?? null);
             $tenant->setAboutFullText($tData['aboutFullText'] ?? null);

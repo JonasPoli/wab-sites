@@ -768,6 +768,15 @@ class SuperAdminController extends AbstractController
         $tenant->setWhatsappLink($r->request->get('whatsappLink') ?: null);
         $tenant->setLinkedinLink($r->request->get('linkedinLink') ?: null);
 
+        // Logo maior na abertura (change logo-maior-na-abertura): só quando o grupo veio no POST
+        if ($r->request->has('headerLogoForm')) {
+            $altura = (int) $r->request->get('headerLogoHeight', Tenant::HEADER_LOGO_DEFAULT);
+            $tenant->setHeaderLogo([
+                'large'  => $r->request->get('headerLogoLarge') === '1',
+                'height' => max(Tenant::HEADER_LOGO_MIN, min(Tenant::HEADER_LOGO_MAX, $altura ?: Tenant::HEADER_LOGO_DEFAULT)),
+            ]);
+        }
+
         // Botão flutuante (change botao-flutuante-do-site). Só quando o formulário traz o tipo:
         // o cadastro de tenant novo não traz, e o tenant novo fica com o WhatsApp (nulo).
         // A página de destino tem de ser do tenant editado (o /superadmin roda sem o filtro do domínio).

@@ -162,6 +162,13 @@ liip_imagine:
             filters:
                 thumbnail: { size: [440, 120], mode: inset }
 
+        # Logo do cabeçalho com "logo maior na abertura" (até 200 px de altura, nítido em tela 2×)
+        logo_site_grande:
+            quality: 85
+            format: webp
+            filters:
+                thumbnail: { size: [1200, 400], mode: inset }
+
         # "Sobre" da home e outras imagens largas de conteúdo
         conteudo_largo:
             quality: 78
