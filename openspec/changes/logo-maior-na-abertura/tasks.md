@@ -25,9 +25,9 @@
 
 ## 5. Deploy (só com a confirmação do Jonas)
 
-- [ ] 5.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/`; HTTP atual dos domínios
-- [ ] 5.2 Deploy (escrita): commit, `git push origin main`; no servidor, `git pull`, `./build.sh` e `bin/console doctrine:migrations:migrate --no-interaction`
-- [ ] 5.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br (e pichoneri e transmai); nenhum site com o parcial do logo grande; `header_logo` nulo em todos os tenants
+- [x] 5.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/`; HTTP atual dos domínios
+- [x] 5.2 Deploy (escrita): commit, `git push origin main`; no servidor, `git pull`, `./build.sh` e `bin/console doctrine:migrations:migrate --no-interaction`
+- [x] 5.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br (e pichoneri e transmai); nenhum site com o parcial do logo grande; `header_logo` nulo em todos os tenants
 
 ## Medições
 
@@ -41,3 +41,10 @@
 ## Workflow follow-up
 
 - Arquivar a mudança (sincronizando as specs) depois do deploy conferido.
+
+## Deploy
+
+- 5.1 (25/11/2026, publicação confirmada pelo Jonas): backup `~/backups/wab-sites-antes-logo-maior-20261125-1945.sql.gz` (dump completo, permissão 600); HTTP 200 nos 11 domínios.
+- 5.2: push de `6f06b43`; no servidor, `git pull` (de `e6fcabe`), `doctrine:migrations:migrate` (Version20261125183242, 1 comando SQL) e `./build.sh` concluído.
+- 5.3: HTTP 200 nos 11 domínios; `lint:twig` do parcial ok em produção. Nenhum site com o logo grande, exceto a Transmai (tenant 13, cetec), que o Jonas ligou logo depois do deploy com 100 px (`--wab-logo-d` 44 px no desktop e 26 px no celular); o logo do cabeçalho sai pela miniatura `logo_site_grande` (200, WebP de 33 KB).
+
