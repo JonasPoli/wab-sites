@@ -91,6 +91,14 @@ A extensão de Twig `TenantExtension` expõe globals e funções utilitárias qu
 * **`tenant_css_vars()`**: Injeta dinamicamente no `<head>` um bloco `<style>` contendo propriedades personalizadas CSS (`--color-primary`, `--color-secondary` e suas versões RGB) baseadas nas cores de branding cadastradas no Tenant.
 * **Global Variables**: Disponibiliza em 100% dos templates Twig as variáveis `currentTenant` (dados do site ativo), `headerCategories` (menu dinâmico), `footerPages` e `footerCategories` para renderização imediata do cabeçalho e rodapé.
 
+### Botão flutuante
+Escolhido na edição do tenant no `/superadmin` (grupo "Botão flutuante", coluna JSON `tenant.floating_button`) e desenhado nos cinco temas pelo parcial `themes/_comum/_botao_flutuante.html.twig` (função Twig `botao_flutuante()`, serviço `App\Service\BotaoFlutuante`):
+* **Nenhum**: o site não mostra botão.
+* **WhatsApp** (padrão quando nada foi escolhido): aparece quando o campo WhatsApp está preenchido; círculo verde, e no atelie a pílula própria do tema.
+* **Formulário**: pílula com ícone (o mesmo seletor de ícones do Blurbs4, parcial `admin/_seletor_de_icones.html.twig`) e texto de até 40 caracteres, na cor primária do site (a escura no modo escuro), que leva a uma página do site e some na própria página. Sem página ou sem texto, o botão não aparece.
+
+O ícone escolhido entra no `app:icones:sincronizar`, e a escolha vai na exportação e na importação do tenant (a página de destino é religada à página importada).
+
 ---
 
 ## 🧱 Visual Builder: Seções & Blocos

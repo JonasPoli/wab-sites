@@ -469,6 +469,14 @@ class TenantImporter
                 ]);
             }
 
+            // ── 7b. Botão flutuante: destino ligado à página importada ───
+            if (is_array($tData['floatingButton'] ?? null)) {
+                $fb = $tData['floatingButton'];
+                $antigo = $fb['pageId'] ?? null;
+                $fb['pageId'] = ($antigo !== null && isset($pageMap[$antigo])) ? $pageMap[$antigo]->getId() : null;
+                $tenant->setFloatingButton($fb);
+            }
+
             // ── 8. Hero Banners ───────────────────────────────────────────
             foreach ($data['hero_banners'] ?? [] as $hbData) {
                 $hb = new HeroBanner();

@@ -1,0 +1,49 @@
+{#
+  Botão flutuante do site (change botao-flutuante-do-site), no fim do <body> dos cinco temas:
+    {% include 'themes/_comum/_botao_flutuante.html.twig' with {tema: 'cetec'} %}
+
+  O tipo vem de botao_flutuante() (App\Service\BotaoFlutuante): nenhum, WhatsApp ou formulário.
+  - WhatsApp: o desenho de antes da mudança. O atelie mantém a pílula dele (.at-float-whatsapp,
+    CSS em themes/atelie/_styles.html.twig); os outros quatro usam o círculo verde do cetec.
+  - Formulário: pílula com ícone e texto, na cor primária do site (--color-primary, que o
+    tenant_css_vars() troca pela escura no modo escuro), escondida na própria página de destino.
+  Nada aparece na prévia do bloco no painel (modoPrevia).
+#}
+{% if not (modoPrevia ?? false) %}
+    {% set botao = botao_flutuante() %}
+    {% if botao and botao.tipo == 'whatsapp' %}
+        {% if tema == 'atelie' %}
+            <a href="{{ botao.url }}" class="at-float-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp">
+                {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }} WhatsApp
+            </a>
+        {% else %}
+            <style>
+            .whatsapp-float{position:fixed;bottom:28px;right:28px;background:#25d366;color:#fff;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 18px rgba(0,0,0,.25);z-index:999;transition:transform .2s,background .2s;text-decoration:none}
+            .whatsapp-float:hover{background:#1ebd59;transform:scale(1.1);color:#fff}
+            </style>
+            <a href="{{ botao.url }}" target="_blank" rel="noopener"
+               aria-label="Fale conosco pelo WhatsApp" class="whatsapp-float">
+                {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }}
+            </a>
+        {% endif %}
+    {% elseif botao and botao.tipo == 'form' and not (page is defined and page.id is defined and page.id == botao.paginaId) %}
+        {% set fbClara = currentTenant.primaryColor ?: '#0044cc' %}
+        {% set fbEscura = currentTenant.primaryColorDark ?: '#3b82f6' %}
+        <style>
+        a.wab-flutuante-form,a.wab-flutuante-form:hover,a.wab-flutuante-form:focus{color:{{ is_dark_color(fbClara) ? '#fff' : '#111827' }};text-decoration:none}
+        [data-theme="dark"] a.wab-flutuante-form,.dark a.wab-flutuante-form{color:{{ is_dark_color(fbEscura) ? '#fff' : '#111827' }}}
+        .wab-flutuante-form{position:fixed;right:28px;bottom:28px;z-index:999;display:inline-flex;align-items:center;gap:.55em;max-width:calc(100vw - 56px);padding:.85em 1.4em;border-radius:999px;border:1px solid rgba(0,0,0,.12);background:var(--color-primary,{{ fbClara }});font-family:inherit;font-size:15px;font-weight:700;line-height:1.2;letter-spacing:.01em;box-shadow:0 8px 24px rgba(0,0,0,.22);transition:transform .2s,box-shadow .2s}
+        .wab-flutuante-form:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.28)}
+        .wab-flutuante-form:focus-visible{outline:3px solid var(--color-primary,{{ fbClara }});outline-offset:3px}
+        .wab-flutuante-form svg{flex-shrink:0}
+        .wab-flutuante-form span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        @media(max-width:640px){.wab-flutuante-form{right:16px;bottom:16px;max-width:calc(100vw - 32px);font-size:14px;padding:.8em 1.2em}}
+        @media(prefers-reduced-motion:reduce){.wab-flutuante-form{transition:none}.wab-flutuante-form:hover{transform:none}}
+        @media print{.wab-flutuante-form{display:none}}
+        </style>
+        <a href="{{ botao.url }}" class="wab-flutuante-form">
+            {{- botao.icone|icone_do_painel('', '1.15em') -}}
+            <span>{{ botao.texto }}</span>
+        </a>
+    {% endif %}
+{% endif %}

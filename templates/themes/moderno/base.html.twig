@@ -226,6 +226,7 @@
 </main>
 
 {% if not (modoPrevia ?? false) %}{% include 'themes/moderno/_footer.html.twig' %}{% endif %}
+{% include 'themes/_comum/_botao_flutuante.html.twig' with {tema: 'moderno'} %}
 
 {% block javascripts %}
 <script>

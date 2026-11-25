@@ -107,6 +107,13 @@ class Tenant
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Page $homePage = null;
 
+    /**
+     * Botão flutuante do site (change botao-flutuante-do-site):
+     * {mode: none|whatsapp|form, pageId, label, icon}. Nulo = whatsapp, como antes da mudança.
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $floatingButton = null;
+
     /** Favicon file upload */
     #[\Vich\UploaderBundle\Mapping\Annotation\UploadableField(mapping: 'tenant_favicon', fileNameProperty: 'favicon')]
     private ?\Symfony\Component\HttpFoundation\File\File $faviconFile = null;
@@ -267,6 +274,33 @@ class Tenant
 
     public function getHomePage(): ?Page { return $this->homePage; }
     public function setHomePage(?Page $homePage): static { $this->homePage = $homePage; return $this; }
+
+    public const FLOATING_BUTTON_MODES = ['none', 'whatsapp', 'form'];
+
+    /**
+     * Sempre as quatro chaves: mode (none|whatsapp|form; desconhecido ou nulo = whatsapp),
+     * pageId (int|null), label e icon (texto, podem ser vazios).
+     *
+     * @return array{mode: string, pageId: ?int, label: string, icon: string}
+     */
+    public function getFloatingButton(): array
+    {
+        $fb = $this->floatingButton ?? [];
+        $mode = $fb['mode'] ?? 'whatsapp';
+        $pageId = $fb['pageId'] ?? null;
+
+        return [
+            'mode'   => in_array($mode, self::FLOATING_BUTTON_MODES, true) ? $mode : 'whatsapp',
+            'pageId' => is_numeric($pageId) && (int) $pageId > 0 ? (int) $pageId : null,
+            'label'  => is_string($fb['label'] ?? null) ? $fb['label'] : '',
+            'icon'   => is_string($fb['icon'] ?? null) ? $fb['icon'] : '',
+        ];
+    }
+
+    /** O JSON gravado como está (exportação). */
+    public function getFloatingButtonRaw(): ?array { return $this->floatingButton; }
+
+    public function setFloatingButton(?array $floatingButton): static { $this->floatingButton = $floatingButton; return $this; }
 
     public function getFaviconFile(): ?\Symfony\Component\HttpFoundation\File\File { return $this->faviconFile; }
     public function setFaviconFile(?\Symfony\Component\HttpFoundation\File\File $file): static
@@ -473,6 +507,7 @@ class Tenant
             'blogEnabled'        => $this->blogEnabled,
             'darkLogo'           => $this->darkLogo,
             'homePageId'         => $this->homePage?->getId(),
+            'floatingButton'     => $this->floatingButton,
             'googleAnalyticsId'  => $this->googleAnalyticsId,
             // Só a site key: a secret key nunca sai do servidor
             'recaptchaSiteKey'   => $this->recaptchaSiteKey,
@@ -530,6 +565,7 @@ class Tenant
         $this->aboutImageFile    = null;
         $this->faviconFile       = null;
         $this->homePage          = null; // lazy-loaded separately if needed
+        $this->floatingButton    = $data['floatingButton'] ?? null;
     }
 
     public function __toString(): string { return $this->name; }

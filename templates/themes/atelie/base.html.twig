@@ -58,11 +58,7 @@
 
     {% if not (modoPrevia ?? false) %}{% include 'themes/atelie/_footer.html.twig' %}{% endif %}
 
-    {% if currentTenant and currentTenant.whatsappLink and not (modoPrevia ?? false) %}
-        <a href="{{ currentTenant.whatsappLink }}" class="at-float-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp">
-            {{ ux_icon('bi:whatsapp', {'aria-hidden': 'true'}) }} WhatsApp
-        </a>
-    {% endif %}
+    {% include 'themes/_comum/_botao_flutuante.html.twig' with {tema: 'atelie'} %}
 
     {% if usaCarrossel %}
         <script src="{{ asset('carrossel.js') }}" defer data-swiper="{{ asset('bibliotecas/swiper/swiper-bundle.min.js') }}"></script>

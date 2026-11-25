@@ -216,6 +216,7 @@
 
 {# ── FOOTER ── #}
 {% if not (modoPrevia ?? false) %}{% include 'themes/wab/_footer.html.twig' %}{% endif %}
+{% include 'themes/_comum/_botao_flutuante.html.twig' with {tema: 'wab'} %}
 
 <!-- Global Scripts -->
 {% block javascripts %}{% endblock %}

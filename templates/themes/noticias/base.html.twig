@@ -249,6 +249,7 @@
     </main>
 
     {% if not (modoPrevia ?? false) %}{% include 'themes/noticias/_footer.html.twig' %}{% endif %}
+    {% include 'themes/_comum/_botao_flutuante.html.twig' with {tema: 'noticias'} %}
     {% include 'themes/noticias/_theme_mode.html.twig' with {part: 'foot'} %}
 
     <script>

@@ -102,6 +102,14 @@ final class SincronizarIconesCommand extends Command
             $classes[] = $valor;
         }
 
+        // Ícone do botão flutuante de formulário (tenant.floating_button)
+        foreach ($this->colunaDeTexto('SELECT floating_button FROM tenant WHERE floating_button IS NOT NULL') as $json) {
+            $fb = json_decode($json, true);
+            if (is_array($fb) && is_string($fb['icon'] ?? null) && $fb['icon'] !== '') {
+                $classes[] = $fb['icon'];
+            }
+        }
+
         // Ícones guardados no JSON de configuração dos blocos (blurbs4 e afins)
         foreach ($this->colunaDeTexto('SELECT config FROM page_block WHERE config IS NOT NULL AND config <> %s') as $json) {
             $config = json_decode($json, true);

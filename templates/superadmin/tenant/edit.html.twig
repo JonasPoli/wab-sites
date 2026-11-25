@@ -533,6 +533,73 @@
 
         <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
 
+        {# ── Botão flutuante (change botao-flutuante-do-site) ── #}
+        {% set fb = tenant.floatingButton %}
+        {% set fbBg = tenant.primaryColor ?: '#0044cc' %}
+        <h3 id="botao-flutuante" style="margin-bottom: .35rem; color: var(--text)">Botão flutuante</h3>
+        <p class="af-hint" style="margin-bottom:1rem">Botão fixo no canto inferior direito de todas as páginas do site, em todos os temas.</p>
+        <div class="fb-modos" role="radiogroup" aria-label="Tipo do botão flutuante">
+            {% for valor, rotulo in {none: 'Nenhum', whatsapp: 'WhatsApp', form: 'Formulário'} %}
+                <label class="fb-modo">
+                    <input type="radio" name="floatingButtonMode" value="{{ valor }}" {% if fb.mode == valor %}checked{% endif %}>
+                    <span>
+                        <strong>{{ rotulo }}</strong>
+                        <small>
+                            {%- if valor == 'none' -%}O site não mostra botão flutuante.
+                            {%- elseif valor == 'whatsapp' -%}Aparece quando o campo WhatsApp acima está preenchido.
+                            {%- else -%}Leva o visitante para uma página do site.{%- endif -%}
+                        </small>
+                    </span>
+                </label>
+            {% endfor %}
+        </div>
+        {% if fb.mode == 'whatsapp' and not tenant.whatsappLink %}
+            <p class="af-hint" id="fb-aviso-whats" style="color:var(--warning,#f59e0b)">O campo WhatsApp está vazio: o botão não aparece no site.</p>
+        {% endif %}
+
+        <div id="fb-form" class="fb-form" {% if fb.mode != 'form' %}hidden{% endif %}>
+            <div class="af-row" style="margin-bottom:1.25rem">
+                <div class="af-field">
+                    <label for="fb-pagina">Página do formulário</label>
+                    <select name="floatingButtonPageId" id="fb-pagina" class="as">
+                        <option value="">— Escolha a página —</option>
+                        {% for page in pages %}
+                            <option value="{{ page.id }}" {% if fb.pageId == page.id %}selected{% endif %}>{{ page.title }}{% if page.slug %} ({{ page.slug }}){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="af-hint">As páginas do site (as mesmas de Páginas no painel do site). O botão não aparece na própria página.</p>
+                </div>
+                <div class="af-field">
+                    <label for="fb-texto">Texto do botão</label>
+                    <input type="text" name="floatingButtonLabel" id="fb-texto" class="ai" maxlength="40" value="{{ fb.label }}" placeholder="Solicite um orçamento">
+                    <p class="af-hint">Até 40 caracteres. Sem texto, o botão não aparece.</p>
+                </div>
+            </div>
+            <div class="af-row">
+                <div class="af-field">
+                    <label for="fb-icone">Ícone</label>
+                    <div class="icon-picker-wrap">
+                        <div class="icon-preview" id="fb-icone-prev">{% if fb.icon %}<i class="{{ fb.icon }}"></i>{% endif %}</div>
+                        <input type="text" name="floatingButtonIcon" id="fb-icone" class="ai" value="{{ fb.icon }}" placeholder="fa-solid fa-envelope" style="flex:1">
+                        <button type="button" class="btn btn-g btn-sm" onclick="openIconPicker('fb-icone','fb-icone-prev')">Escolher</button>
+                    </div>
+                    <p class="af-hint">Opcional. O mesmo seletor de ícones dos blocos.</p>
+                </div>
+                <div class="af-field">
+                    <label>Prévia</label>
+                    <div class="fb-previa-area">
+                        <span class="fb-previa" id="fb-previa" style="background:{{ fbBg }};color:{{ is_dark_color(fbBg) ? '#fff' : '#111827' }}">
+                            <span id="fb-previa-icone">{% if fb.icon %}<i class="{{ fb.icon }}"></i>{% endif %}</span>
+                            <span id="fb-previa-texto">{{ fb.label ?: 'Solicite um orçamento' }}</span>
+                        </span>
+                    </div>
+                    <p class="af-hint">Na cor primária do site; no modo escuro, a cor primária escura.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin: 2rem 0;">
+
         {# ── Menu e TopBar ── #}
         {% set navSettings = tenant.navigationSettings ?? {} %}
         {% set showMenuIcons = navSettings.showMenuIcons ?? true %}
@@ -689,7 +756,23 @@
 {% endblock %}
 
 {% block stylesheets %}{{ parent() }}
+{# Font Awesome: só para o seletor de ícones do botão flutuante #}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
+/* Botão flutuante */
+.fb-modos{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.fb-modo{display:flex;gap:.6rem;align-items:flex-start;padding:.85rem 1rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color var(--ease),background var(--ease)}
+.fb-modo:hover{border-color:var(--primary)}
+.fb-modo:has(input:checked){border-color:var(--primary);background:rgba(124,58,237,.1)}
+.fb-modo input{margin-top:.2rem;width:16px;height:16px;accent-color:var(--primary)}
+.fb-modo strong{display:block;font-size:.9rem}
+.fb-modo small{display:block;color:var(--muted);font-size:.76rem;margin-top:.15rem;line-height:1.35}
+.fb-form{padding:1rem 1.25rem;border:1px dashed var(--border);border-radius:var(--radius);margin-bottom:1.5rem}
+.fb-form[hidden]{display:none}
+.fb-previa-area{display:flex;align-items:center;min-height:56px;padding:.5rem 1rem;border-radius:8px;background:repeating-conic-gradient(rgba(255,255,255,.04) 0 25%,transparent 0 50%) 0 0/16px 16px}
+.fb-previa{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.2rem;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 6px 18px rgba(0,0,0,.3);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-previa #fb-previa-icone:empty{display:none}
+@media(max-width:900px){.fb-modos{grid-template-columns:1fr}}
 .logo-upload-btn {
     display: inline-flex;
     align-items: center;
@@ -734,7 +817,32 @@
 {% endblock %}
 
 {% block javascripts %}{{ parent() }}
+{% include 'admin/_seletor_de_icones.html.twig' %}
 <script>
+// Botão flutuante: campos do Formulário só com esse tipo marcado; prévia acompanha texto e ícone
+(function () {
+    const caixa = document.getElementById('fb-form');
+    const texto = document.getElementById('fb-texto');
+    const icone = document.getElementById('fb-icone');
+    const prevTexto = document.getElementById('fb-previa-texto');
+    const prevIcone = document.getElementById('fb-previa-icone');
+    if (!caixa) return;
+    document.querySelectorAll('input[name="floatingButtonMode"]').forEach(function (r) {
+        r.addEventListener('change', function () { caixa.hidden = this.value !== 'form'; });
+    });
+    function atualizar() {
+        prevTexto.textContent = texto.value.trim() || 'Solicite um orçamento';
+        const cls = icone.value.trim();
+        prevIcone.innerHTML = '';
+        if (cls) { const i = document.createElement('i'); i.className = cls; prevIcone.appendChild(i); }
+    }
+    texto.addEventListener('input', atualizar);
+    icone.addEventListener('input', atualizar);
+    icone.addEventListener('change', atualizar);
+    // O seletor grava o campo sem disparar evento: observa o valor depois de escolher
+    document.getElementById('icon-grid-container')?.addEventListener('click', function () { setTimeout(atualizar, 0); });
+})();
+
 function previewLogo(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];

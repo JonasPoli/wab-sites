@@ -149,6 +149,8 @@ class TenantExporter
             'mapsEmbedUrl'        => $t->getMapsEmbedUrl(),
             'theme'               => $t->getTheme(),
             'homePageId'          => $t->getHomePage()?->getId(),
+            // Botão flutuante: o pageId é o da página exportada, trocado na importação
+            'floatingButton'      => $t->getFloatingButtonRaw(),
             'favicon'             => $t->getFavicon(),
             'seoTitle'            => $t->getSeoTitle(),
             'seoDescription'      => $t->getSeoDescription(),

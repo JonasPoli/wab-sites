@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\TenantRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
+use App\Service\BotaoFlutuante;
 use App\Service\HeadingFonts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -765,6 +766,22 @@ class SuperAdminController extends AbstractController
         $tenant->setFacebookLink($r->request->get('facebookLink') ?: null);
         $tenant->setWhatsappLink($r->request->get('whatsappLink') ?: null);
         $tenant->setLinkedinLink($r->request->get('linkedinLink') ?: null);
+
+        // Botão flutuante (change botao-flutuante-do-site). Só quando o formulário traz o tipo:
+        // o cadastro de tenant novo não traz, e o tenant novo fica com o WhatsApp (nulo).
+        // A página de destino tem de ser do tenant editado (o /superadmin roda sem o filtro do domínio).
+        if ($r->request->has('floatingButtonMode')) {
+            $fbPageId = (int) $r->request->get('floatingButtonPageId');
+            $fbPage = ($fbPageId && $tenant->getId() !== null)
+                ? $pageRepo->findOneBy(['id' => $fbPageId, 'tenant' => $tenant])
+                : null;
+            $tenant->setFloatingButton(BotaoFlutuante::normalizar(
+                (string) $r->request->get('floatingButtonMode'),
+                $fbPage?->getId(),
+                (string) $r->request->get('floatingButtonLabel'),
+                (string) $r->request->get('floatingButtonIcon'),
+            ));
+        }
 
         // Menu and TopBar settings
         $showMenuIcons = (bool) $r->request->get('showMenuIcons');
