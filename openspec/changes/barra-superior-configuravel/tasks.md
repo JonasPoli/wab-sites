@@ -30,9 +30,9 @@
 
 ## 6. Deploy (pedido do Jonas: "publique")
 
-- [ ] 6.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/`; anotar o HTTP atual dos domínios e salvar o HTML da barra da Pichoneri
-- [ ] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull` e `./build.sh` (sem migration)
-- [ ] 6.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br (e pichoneri e transmai); a barra da Pichoneri igual à salva na 6.1; nenhum outro site com barra
+- [x] 6.1 Backup (escrita de arquivo no servidor): `mysqldump` do banco de produção para `~/backups/`; anotar o HTTP atual dos domínios e salvar o HTML da barra da Pichoneri
+- [x] 6.2 Deploy (escrita): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull` e `./build.sh` (sem migration)
+- [x] 6.3 Conferência (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br e ajope.wab.com.br (e pichoneri e transmai); a barra da Pichoneri igual à salva na 6.1; nenhum outro site com barra
 
 ## Medições
 
@@ -45,3 +45,10 @@
 ## Workflow follow-up
 
 - Arquivar a mudança (sincronizando as specs) depois do deploy conferido.
+
+## Deploy
+
+- 6.1 (25/11/2026): backup `~/backups/wab-sites-antes-barra-superior-20261125-1749.sql.gz` (dump completo, permissão 600); HTTP 200 nos 11 domínios; HTML da barra da Pichoneri salvo.
+- 6.2 (25/11/2026): commit `e6fcabe` e push; no servidor, `git pull` (de `7404177`) e `./build.sh` concluído (1.541 miniaturas); sem migration.
+- 6.3: HTTP 200 nos 11 domínios; a barra da Pichoneri idêntica à de antes (ignorando espaços). A Transmai (tenant 13) também mostra a barra: o Jonas já a montou pelo editor novo depois do deploy (telefone, e-mail e WhatsApp à esquerda; endereço com texto próprio à direita), gravada no formato novo. Nenhum outro site com barra.
+
