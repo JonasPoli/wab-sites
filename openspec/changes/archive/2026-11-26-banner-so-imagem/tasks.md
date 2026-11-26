@@ -42,14 +42,14 @@
 - [x] 5.1 Backup e leitura antes (leitura em produção + escrita de arquivo de backup no servidor): `mysqldump` do banco de produção para `~/backups/` no wabsites, com permissão 600; contar as imagens de `public/uploads/page_block` (cada uma ganha duas miniaturas no `build.sh`); anotar o HTTP atual dos domínios de cliente
 - [x] 5.2 Deploy (escrita em produção): commit, `git push origin main`; no servidor, como runcloud, em `~/webapps/app-wab-sites`: `git pull` e `./build.sh` (mudou template, filtro de miniatura e PHP); sem migration
 - [x] 5.3 Conferência depois (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br, ajope.wab.com.br e transmai.wab.com.br; home da Transmai igual à de antes (o bloco 147 continua com a opção desligada); em `https://transmai.wab.com.br/admin/block/147/edit`, o interruptor "Só a imagem" aparece e, ligado, desabilita os campos de texto (sem salvar)
-- [ ] 5.4 Registrar o resultado no ticket interno da WAB (cliente 196, projeto 96 "WAB Sites"), por decisão do Jonas em 26/11/2026, pela API (`responder-ticket.py`), com print anotado do bloco 147 com a opção ligada na prévia, horas lançadas, status concluído e envio programado para 2 horas depois
+- [x] 5.4 Registrar o resultado no ticket interno da WAB (cliente 196, projeto 96 "WAB Sites"), por decisão do Jonas em 26/11/2026, pela API (`responder-ticket.py`), com print anotado do bloco 147 com a opção ligada na prévia, horas lançadas, status concluído e envio programado para 2 horas depois
 
 ## Deploy
 
 - 5.1 (26/11/2026 20:43 UTC): HTTP antes 200 nos 10 domínios; home da Transmai guardada (`app-Nxyn4jV.css`). No servidor: HEAD `6f06b43` em `~/backups/wab-sites-HEAD-antes-20261126-2043.txt` e dump `~/backups/wab-sites-antes-banner-so-imagem-20261126-2043.sql.gz` (145 KB, permissão 600, 21 tabelas, com o bloco 147); nenhuma migration pendente; 127 imagens em `public/uploads/page_block`; `sh/reset.sh` alterado fora do git, não tocado.
 - 5.2: commit `0af1f53` no main (a mudança já arquivada e as specs sincronizadas foram no mesmo commit); no servidor, `git pull --ff-only` de `6f06b43` para `0af1f53` e `nice ./build.sh` concluído (1.840 miniaturas geradas, inclusive as `banner_inteiro*`); sem migration.
 - 5.3: HTTP 200 nos 10 domínios; home da Transmai idêntica à de antes (normalizando hash de asset e tokens), sem `banner-so-imagem`; em `/admin/block/147/edit` o interruptor aparece desligado, as 8 descrições existem e, ligado sem salvar, os 8 cartões ficam inertes e a prévia mostra a arte inteira, sem camada. Aba fechada sem salvar.
-- 5.4: fica para depois da mudança `banner-so-imagem-por-slide`, pedida pelo Jonas durante este deploy; um registro só no ticket interno cobre as duas.
+- 5.4: um registro só para esta mudança e a `banner-so-imagem-por-slide`, pedida pelo Jonas durante este deploy: ticket interno #13533, 4:00 h (registro 13877), resposta programada id 111 para 26/11/2026 20:20 (ver o tasks.md da `banner-so-imagem-por-slide`).
 
 ## Medições
 

@@ -587,22 +587,26 @@ Na prévia do bloco, um mapa sem registro SHALL aparecer com registros de exempl
 - **THEN** a prévia mostra o mapa e cartões de exemplo de três estados
 
 ### Requirement: Banner só com a imagem
-O bloco `banner` SHALL ter a opção "Só a imagem", desligada por padrão e válida para todos os slides do bloco. Com ela ligada, cada slide ativo SHALL mostrar só a sua imagem: sem camada escura, degradê, tom da cor do site, desfoque nem zoom ao passar o mouse, e sem pré-título, título, subtítulo e botões, inclusive os botões fixos do tema.
+Cada slide do bloco `banner` SHALL ter a opção "Só a imagem", desligada por padrão. Um slide ativo com ela ligada SHALL mostrar só a sua imagem: sem camada escura, degradê, tom da cor do site, desfoque nem zoom ao passar o mouse, e sem pré-título, título, subtítulo e botões, inclusive os botões fixos do tema. Bloco gravado com a opção antiga, do bloco inteiro, SHALL tratar todos os slides como "só a imagem".
 
 #### Scenario: Slide com título e botão gravados
-- **WHEN** o banner com a opção ligada tem um slide ativo com título "Novembro Azul", subtítulo e o botão "Conheça Nossos Produtos"
+- **WHEN** o banner tem um slide ativo com "Só a imagem" ligada, título "Novembro Azul", subtítulo e o botão "Conheça Nossos Produtos"
 - **THEN** a página mostra a imagem do slide com as cores originais e não mostra "Novembro Azul", o subtítulo, "Conheça Nossos Produtos", "Ver Nossos Cursos" nem "Fale Conosco"
 
 #### Scenario: Banner sem a opção
-- **WHEN** um banner gravado antes desta mudança é exibido
+- **WHEN** um banner gravado antes desta mudança e sem a opção é exibido
 - **THEN** ele sai exatamente como antes, com camada escura, título e botões
 
+#### Scenario: Banner gravado com a opção do bloco
+- **WHEN** um banner gravado com "Só a imagem" ligada para o bloco inteiro, antes desta mudança, é exibido
+- **THEN** todos os slides saem só com a imagem, como antes
+
 #### Scenario: Slide desativado
-- **WHEN** o banner com a opção ligada tem oito slides e só o primeiro está ativo
+- **WHEN** o banner tem oito slides "só a imagem" e só o primeiro está ativo
 - **THEN** a página mostra só a imagem do primeiro, sem carrossel
 
 ### Requirement: Imagem inteira no banner só com a imagem
-Com "Só a imagem" ligada e "100% de altura" desligada, o banner SHALL mostrar a imagem inteira, na largura do banner e na proporção da própria imagem, sem recorte e sem altura mínima. Com "100% de altura" ligada, o banner SHALL ocupar a altura da tela e a imagem SHALL preencher esse espaço, recortada nas bordas quando a proporção for outra.
+Quando todos os slides ativos do banner estão com "Só a imagem" e "100% de altura" está desligada, o banner SHALL mostrar a imagem inteira, na largura do banner e na proporção da própria imagem, sem recorte e sem altura mínima. Com "100% de altura" ligada, o banner SHALL ocupar a altura da tela e a imagem SHALL preencher esse espaço, recortada nas bordas quando a proporção for outra.
 
 #### Scenario: Arte larga num banner de largura inteira
 - **WHEN** a imagem do slide tem 1884×835 px, o banner tem "100% de largura" e é visto numa tela de 1280 px
@@ -621,10 +625,10 @@ Com "Só a imagem" ligada e "100% de altura" desligada, o banner SHALL mostrar a
 - **THEN** a `<img>` traz `width` e `height` na proporção da imagem servida e o conteúdo abaixo do banner não se desloca quando a imagem chega
 
 ### Requirement: Carrossel do banner só com a imagem
-Com "Só a imagem" ligada e mais de um slide ativo, o banner SHALL continuar como carrossel, com troca automática a cada 5 segundos, setas e bolinhas de navegação. A altura do carrossel SHALL seguir a proporção da imagem do primeiro slide ativo, e as imagens dos outros slides SHALL preencher a mesma área.
+Quando todos os slides ativos estão com "Só a imagem" e há mais de um, o banner SHALL continuar como carrossel, com troca automática a cada 5 segundos, setas e bolinhas de navegação. A altura do carrossel SHALL seguir a proporção da imagem do primeiro slide ativo, e as imagens dos outros slides SHALL preencher a mesma área.
 
 #### Scenario: Três slides ativos do mesmo tamanho
-- **WHEN** o banner tem três slides ativos com imagens de 1920×800 px
+- **WHEN** o banner tem três slides ativos "só a imagem" com imagens de 1920×800 px
 - **THEN** a página mostra a primeira imagem inteira, com setas e bolinhas, e troca para a segunda depois de 5 segundos
 
 #### Scenario: Slide com proporção diferente
@@ -632,7 +636,7 @@ Com "Só a imagem" ligada e mais de um slide ativo, o banner SHALL continuar com
 - **THEN** o carrossel mantém a altura do primeiro e a segunda imagem preenche a área, recortada nas bordas
 
 ### Requirement: Descrição da imagem do banner
-Com "Só a imagem" ligada, cada slide SHALL aceitar uma "Descrição da imagem" opcional, que não aparece na tela. Preenchida, ela SHALL ser o texto alternativo da imagem e SHALL aparecer na versão Markdown da página; vazia, a imagem SHALL ser tratada como decorativa, com texto alternativo vazio, e ficar fora da versão Markdown.
+Cada slide com "Só a imagem" ligada SHALL aceitar uma "Descrição da imagem" opcional, que não aparece na tela. Preenchida, ela SHALL ser o texto alternativo da imagem e SHALL aparecer na versão Markdown da página; vazia, a imagem SHALL ser tratada como decorativa, com texto alternativo vazio, e ficar fora da versão Markdown.
 
 #### Scenario: Descrição preenchida
 - **WHEN** o slide tem a descrição "Campanha Novembro Azul: cuidar de você também é prevenção"
@@ -642,6 +646,10 @@ Com "Só a imagem" ligada, cada slide SHALL aceitar uma "Descrição da imagem" 
 - **WHEN** o slide não tem descrição
 - **THEN** a `<img>` tem `alt=""` e a versão `.md` da página não cita a imagem
 
+#### Scenario: Slide só com a imagem num carrossel com texto
+- **WHEN** o segundo slide de um carrossel com slides de texto está com "Só a imagem" e tem descrição
+- **THEN** a imagem desse slide tem a descrição como `alt`
+
 ### Requirement: Banner só com a imagem em todos os temas
 A opção "Só a imagem" SHALL funcionar do mesmo jeito nos temas cetec, moderno, wab, noticias e atelie, respeitando as opções "100% de largura" e "100% de altura" e o espaçamento que cada tema já dá à seção de banner.
 
@@ -650,30 +658,42 @@ A opção "Só a imagem" SHALL funcionar do mesmo jeito nos temas cetec, moderno
 - **THEN** os dois mostram só a imagem inteira, sem camada escura, sem texto e sem botões
 
 ### Requirement: Primeira imagem do banner só com a imagem
-Quando o banner "só a imagem" é o primeiro elemento da página, a imagem do primeiro slide ativo SHALL ser carregada com prioridade alta e sem adiamento, com `preload` no `<head>` pedindo os mesmos arquivos que a `<img>`; as imagens dos outros slides SHALL ser adiadas.
+Quando um banner com todos os slides "só a imagem" é o primeiro elemento da página, a imagem do primeiro slide ativo SHALL ser carregada com prioridade alta e sem adiamento, com `preload` no `<head>` pedindo os mesmos arquivos que a `<img>`; as imagens dos outros slides SHALL ser adiadas.
 
 #### Scenario: Home com banner só com a imagem
-- **WHEN** a home de um site tem um banner "só a imagem" na primeira seção
+- **WHEN** a home de um site tem um banner com todos os slides "só a imagem" na primeira seção
 - **THEN** o `imagesrcset` do `preload` é igual ao `srcset` da `<img>` do primeiro slide, e essa `<img>` tem `fetchpriority="high"`
 
+#### Scenario: Primeiro slide só com a imagem num carrossel com texto
+- **WHEN** o primeiro slide ativo é "só a imagem" e o segundo tem texto
+- **THEN** o `imagesrcset` do `preload` é igual ao `srcset` da `<img>` do primeiro slide, e ela tem `fetchpriority="high"`
+
 ### Requirement: Edição do banner só com a imagem no painel
-No formulário do bloco `banner`, a opção "Só a imagem" SHALL ficar acima dos slides. Ligada, título, subtítulo, texto e link do botão de cada slide SHALL ficar desabilitados, com aviso de que não aparecem no site, o título SHALL deixar de ser obrigatório e cada slide SHALL mostrar o campo "Descrição da imagem". Os textos já gravados SHALL ser mantidos e voltar a valer ao desligar a opção.
+No formulário do bloco `banner`, cada slide SHALL ter o interruptor "Só a imagem". Ligado num slide, título, subtítulo, texto e link do botão desse slide SHALL ficar desabilitados, com aviso de que não aparecem no site, o título dele SHALL deixar de ser obrigatório e ele SHALL mostrar o campo "Descrição da imagem"; os outros slides não mudam. Os textos já gravados SHALL ser mantidos e voltar a valer ao desligar a opção.
 
 #### Scenario: Ligar a opção num banner existente
-- **WHEN** o admin liga "Só a imagem" no bloco 147 e salva
+- **WHEN** o admin liga "Só a imagem" nos oito slides do bloco 147 e salva
 - **THEN** o bloco é gravado sem erro, e os títulos, subtítulos e botões dos oito slides continuam gravados
 
+#### Scenario: Ligar a opção num slide
+- **WHEN** o admin liga "Só a imagem" no segundo de três slides e salva
+- **THEN** só o segundo fica gravado como "só a imagem", e os títulos, subtítulos e botões dos três continuam gravados
+
 #### Scenario: Desligar a opção
-- **WHEN** o admin desliga "Só a imagem" desse bloco e salva
-- **THEN** o banner volta a mostrar no site os títulos, subtítulos e botões de antes
+- **WHEN** o admin desliga "Só a imagem" desse slide e salva
+- **THEN** o slide volta a mostrar no site o título, o subtítulo e o botão de antes
 
 #### Scenario: Slide novo só com a imagem
-- **WHEN** com a opção ligada o admin acrescenta um slide, escolhe a imagem e salva sem preencher título
+- **WHEN** o admin acrescenta um slide, liga "Só a imagem", escolhe a imagem e salva sem preencher título
 - **THEN** o slide é gravado com a imagem e o título vazio
 
 #### Scenario: Campos desabilitados
-- **WHEN** a opção está ligada
-- **THEN** os campos de título, subtítulo, texto e link do botão aparecem apagados e não aceitam digitação nem foco pelo teclado
+- **WHEN** a opção está ligada num slide
+- **THEN** os campos de título, subtítulo, texto e link do botão desse slide aparecem apagados e não aceitam digitação nem foco pelo teclado, e os dos outros slides continuam editáveis
+
+#### Scenario: Bloco gravado com a opção do bloco
+- **WHEN** o admin abre um banner gravado com a opção antiga, do bloco inteiro
+- **THEN** todos os slides aparecem com "Só a imagem" ligada, e ao salvar a escolha fica gravada em cada slide
 
 ### Requirement: Banner só com a imagem na prévia do painel
 A prévia do bloco SHALL refletir a opção "Só a imagem" assim que ela é ligada ou desligada, sem salvar, mostrando o banner como ele sairá no site.
@@ -681,3 +701,14 @@ A prévia do bloco SHALL refletir a opção "Só a imagem" assim que ela é liga
 #### Scenario: Ligar a opção com a prévia aberta
 - **WHEN** o admin liga "Só a imagem" num banner com título e botão preenchidos
 - **THEN** a prévia passa a mostrar só a imagem, sem o título, sem o botão e sem a camada escura
+
+### Requirement: Banner com slides dos dois tipos
+Num banner com slides ativos "só a imagem" e slides com texto, o banner SHALL seguir o desenho e a altura dos slides com texto do tema, como carrossel; cada slide "só a imagem" SHALL mostrar só a sua imagem preenchendo a área, recortada nas bordas quando a proporção for outra, sem camada, degradê, zoom, texto nem botões. O formulário do painel SHALL avisar isso.
+
+#### Scenario: Arte entre slides com texto
+- **WHEN** um carrossel tem o slide 1 com texto e botão e o slide 2 "só a imagem" com título guardado "Promoção"
+- **THEN** o slide 1 sai com camada, título e botão, e o slide 2 só com a imagem, sem "Promoção", na mesma altura do slide 1
+
+#### Scenario: Mesmo banner nos cinco temas
+- **WHEN** a mesma página com esse carrossel é aberta em sites dos temas cetec, moderno, wab, noticias e atelie
+- **THEN** em todos o slide "só a imagem" sai sem camada, texto e botões, e o slide com texto sai como antes desta mudança

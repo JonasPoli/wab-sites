@@ -30,9 +30,16 @@
 ## 5. Deploy (autorizado pelo Jonas: "faça tudo, ao testar, publique, arquive")
 
 - [x] 5.1 Backup antes (leitura + escrita de backup no servidor): HTTP dos 10 domínios de cliente, home da Transmai guardada, HEAD e dump em `~/backups/`
-- [ ] 5.2 Deploy (escrita): commit, `git push origin main`; no servidor, `git pull --ff-only` e `./build.sh` (template e PHP); sem migration
-- [ ] 5.3 Conferência depois (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br, ajope.wab.com.br e transmai.wab.com.br; home da Transmai igual à de antes; em `/admin/block/147/edit` da Transmai, cada slide tem o interruptor "Só a imagem" (sem salvar)
-- [ ] 5.4 Registrar no ticket interno da WAB (cliente 196, projeto 96), um registro para esta mudança e a `banner-so-imagem`, pela API, com print anotado, horas, status concluído e envio programado para 2 horas depois
+- [x] 5.2 Deploy (escrita): commit, `git push origin main`; no servidor, `git pull --ff-only` e `./build.sh` (template e PHP); sem migration
+- [x] 5.3 Conferência depois (leitura): HTTP 200 em marapossi.com.br, pkwy.com.br, cemporcentoexpresso.com.br, imperiodainformatica.com.br, site.transterraararaquara.com.br, site.petvida.com.br, site.topdrim.com.br, site.abifer.com.br, ajope.wab.com.br e transmai.wab.com.br; home da Transmai igual à de antes; em `/admin/block/147/edit` da Transmai, cada slide tem o interruptor "Só a imagem" (sem salvar)
+- [x] 5.4 Registrar no ticket interno da WAB (cliente 196, projeto 96), um registro para esta mudança e a `banner-so-imagem`, pela API, com print anotado, horas, status concluído e envio programado para 2 horas depois
+
+## Deploy
+
+- 5.1 (26/11/2026 21:06 UTC): HTTP antes 200 nos 10 domínios; home da Transmai guardada. No servidor: HEAD `0af1f53` em `~/backups/wab-sites-HEAD-antes-20261126-2106.txt` e dump `~/backups/wab-sites-antes-banner-so-imagem-por-slide-20261126-2106.sql.gz` (145 KB, permissão 600, 21 tabelas); `sh/reset.sh` alterado fora do git, não tocado.
+- 5.2: commit `514fa3b` no main; no servidor, `git pull --ff-only` de `0af1f53` para `514fa3b` e `nice ./build.sh` concluído ("Concluído com sucesso!" em `/tmp/build-banner-por-slide.log`, só avisos de depreciação); sem migration. A sessão SSH que esperava o build caiu ("Connection reset by peer", código 255) depois do fim do build, nas duas publicações do dia.
+- 5.3: HTTP 200 nos 10 domínios. A home da Transmai mudou, por conteúdo, não por código: entre o backup e a conferência, o bloco 147 foi editado pelo painel (slide 1 "Novembro Azul" com "Só a imagem", slide 2 "Bisturi BP-150S" ativo com texto), e a home já sai no desenho misto desta mudança (slide 1 sem camada, slides esticados). No `/admin/block/147/edit`, cada um dos 8 slides tem o interruptor, ligado só no 1º.
+- 5.4: ticket interno #13533 (cliente WAB 196, projeto 96, "Atividade Geral"), aberto pela API para as duas mudanças (`banner-so-imagem` e esta); 4:00 h lançadas (registro 13877, sem contrato, com nota técnica); resposta programada id 111 para 26/11/2026 20:20 (Brasília), para suporte@wab.com.br, status final concluído, com o print anotado do bloco 147 no corpo (`servidores-wab/wab/tickets-2026-11-26/bloco-147-so-imagem.jpg`). Editar ou cancelar: `responder-ticket.py 13533 --editar 111` ou `--cancelar 111`.
 
 ## Medições
 
