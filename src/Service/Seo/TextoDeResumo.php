@@ -6,6 +6,7 @@ namespace App\Service\Seo;
 
 use App\Entity\Page;
 use App\Entity\PageBlock;
+use App\Service\SlidesDoBanner;
 
 /**
  * Tira de um conteúdo o texto que serve de `<meta name="description">` quando ninguém
@@ -87,9 +88,10 @@ final class TextoDeResumo
     }
 
     /**
-     * Textos do bloco que podem virar resumo. O banner "Só a imagem" (change banner-so-imagem)
-     * não mostra título nem subtítulo, que ficam guardados e bloqueados no painel; dele vale só
-     * a "Descrição da imagem" do primeiro slide ativo, que o admin edita.
+     * Textos do bloco que podem virar resumo. No banner, o primeiro slide ativo decide: um slide
+     * "Só a imagem" (changes banner-so-imagem e -por-slide) não mostra título nem subtítulo, que
+     * ficam guardados e bloqueados no painel, e dele vale só a "Descrição da imagem", que o admin
+     * edita; um slide com texto contribui com o texto e o título, que o painel copia para o bloco.
      *
      * @return list<?string>
      */
@@ -97,18 +99,17 @@ final class TextoDeResumo
     {
         $tipo = $bloco->getType();
         $tipo = $tipo instanceof \BackedEnum ? (string) $tipo->value : (string) $tipo;
-        $config = $bloco->getConfig() ?? [];
-
-        if ($tipo !== 'banner' || ($config['imageOnly'] ?? '0') !== '1') {
+        if ($tipo !== 'banner') {
             return [$bloco->getText(), $bloco->getTitle()];
         }
 
-        foreach ($config['banners'] ?? [] as $slide) {
-            if (($slide['active'] ?? '1') === '1' && !empty($slide['image'])) {
-                return [$slide['alt'] ?? null];
-            }
+        $config = $bloco->getConfig() ?? [];
+        $primeiro = SlidesDoBanner::primeiroComImagem($config);
+        if ($primeiro !== null) {
+            return SlidesDoBanner::soImagem($primeiro, $config) ? [$primeiro['alt'] ?? null] : [$bloco->getText(), $bloco->getTitle()];
         }
 
-        return [];
+        // Sem slide com imagem: banner antigo, que segue a opção do bloco
+        return SlidesDoBanner::todosSoImagem($config) ? [] : [$bloco->getText(), $bloco->getTitle()];
     }
 }

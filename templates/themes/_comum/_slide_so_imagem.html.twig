@@ -1,0 +1,33 @@
+{#
+  Slide "Só a imagem" dentro do carrossel com texto (change banner-so-imagem-por-slide), incluído
+  logo depois da abertura do <div class="swiper-slide"> no _banner.html.twig de cetec (também
+  usado pelo noticias), moderno, wab e atelie, quando o banner mistura slides dos dois tipos.
+
+  Só a imagem, cobrindo a área do slide (a altura é a dos slides com texto, do <style> do bloco):
+  sem camada, degradê, zoom (sem a classe banner-bg, que o :hover do tema amplia), texto nem
+  botões. Mesmas miniaturas do carrossel com texto, para a pré-carga do LCP pedir o mesmo arquivo.
+
+  Variáveis: b (o slide), primeiro (loop.first do carrossel).
+#}
+{% if b.image is not empty %}
+    {% set arquivo = 'uploads/page_block/' ~ b.image %}
+    {% set srcset = arquivo|thumb_srcset({'banner_mobile': 768, 'banner_desktop': 1600}) %}
+    {# Os slides ficam empilhados no mesmo ponto da tela: só o primeiro vem com src; os outros
+       são promovidos pelo assets/imagens-adiadas.js depois do load. #}
+    <img {% if primeiro %}{{ arquivo|thumb_attrs('banner_desktop') }}
+         srcset="{{ srcset }}" sizes="100vw"
+         fetchpriority="high"
+         {% else %}{% set m = thumb_size(arquivo, 'banner_desktop') %}width="{{ m[0] }}" height="{{ m[1] }}"
+         data-adiada="{{ arquivo|thumb('banner_desktop') }}"
+         data-adiada-srcset="{{ srcset }}" sizes="100vw"
+         loading="lazy" decoding="async"
+         {% endif %}{% if (b.alt ?? '') is not empty %}alt="{{ b.alt }}"{% else %}alt="" aria-hidden="true"{% endif %}
+         class="banner-slide-so-imagem"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;display:block;">
+{% endif %}
+{# No moderno e no wab a altura do slide vem do conteúdo (slideStyles, com min-height): sem conteúdo,
+   o slide sumiria. O espaçador dá a mesma altura mínima, também antes de o Swiper carregar, e a regra
+   abaixo estica todos os slides deste carrossel até o mais alto (o Swiper põe height:100%, que aqui não
+   resolve). Só sai em banner com slide "só a imagem"; os outros banners não mudam. #}
+<div aria-hidden="true" style="{{ slideStyles ?? '' }}"></div>
+<style>.banner-swiper-{{ block.id }} .swiper-wrapper{align-items:stretch}.banner-swiper-{{ block.id }} .swiper-slide{height:auto}</style>

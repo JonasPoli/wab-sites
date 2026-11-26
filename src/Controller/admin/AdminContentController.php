@@ -895,6 +895,9 @@ class AdminContentController extends AbstractController
             $files = $r->files->all('banners') ?: [];
             $savedBanners = [];
             $existingBanners = $block->getConfig()['banners'] ?? [];
+            // "Só a imagem" é por slide (change banner-so-imagem-por-slide); a opção antiga, do bloco
+            // inteiro, só vale para slide enviado sem a chave própria (aba do painel aberta antes do deploy)
+            $soImagemDoBloco = (($r->request->all('config')['imageOnly'] ?? $block->getConfig()['imageOnly'] ?? '0') === '1');
 
             foreach ($banners as $idx => $data) {
                 $slideImage = $data['image'] ?? null;
@@ -922,6 +925,7 @@ class AdminContentController extends AbstractController
                     'image' => $slideImage,
                     // "Descrição da imagem" do banner "Só a imagem" (change banner-so-imagem): vira o alt
                     'alt' => is_string($data['alt'] ?? null) ? mb_substr(trim(strip_tags($data['alt'])), 0, 250) : '',
+                    'imageOnly' => array_key_exists('imageOnly', $data) ? ($data['imageOnly'] === '1' ? '1' : '0') : ($soImagemDoBloco ? '1' : '0'),
                 ];
             }
 
@@ -929,10 +933,11 @@ class AdminContentController extends AbstractController
             $cfg['banners'] = $savedBanners;
             $reqCfg = $r->request->all('config') ?: [];
             foreach ($reqCfg as $k => $v) {
-                if ($k !== 'banners') {
+                if ($k !== 'banners' && $k !== 'imageOnly') {
                     $cfg[$k] = $v;
                 }
             }
+            unset($cfg['imageOnly']); // a escolha agora está em cada slide
             $block->setConfig($cfg);
 
             $firstSlide = null;

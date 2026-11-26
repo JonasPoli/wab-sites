@@ -150,7 +150,8 @@ final class PreviaDoBloco
                 : (($s['image'] ?? '') ?: (($salvos[$i]['image'] ?? '') ?: $this->exemplo('imagem', false)));
             $slides[] = ['title' => $s['title'] ?? '', 'text' => $s['text'] ?? '', 'ctaText' => $s['ctaText'] ?? '', 'ctaLink' => $s['ctaLink'] ?? '',
                          'active' => ($s['active'] ?? '1') === '0' ? '0' : '1', 'image' => $imagem,
-                         'alt' => is_string($s['alt'] ?? null) ? mb_substr(trim(strip_tags($s['alt'])), 0, 250) : ''];
+                         'alt' => is_string($s['alt'] ?? null) ? mb_substr(trim(strip_tags($s['alt'])), 0, 250) : '',
+                         'imageOnly' => ($s['imageOnly'] ?? '0') === '1' ? '1' : '0'];
         }
         return $slides ?: [['title' => 'Título do slide', 'text' => 'Texto do slide', 'ctaText' => 'Texto do botão', 'ctaLink' => '#', 'active' => '1', 'image' => $this->exemplo('imagem', false)]];
     }

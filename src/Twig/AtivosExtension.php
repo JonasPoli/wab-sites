@@ -6,6 +6,7 @@ namespace App\Twig;
 
 use App\Entity\Category;
 use App\Entity\Page;
+use App\Service\SlidesDoBanner;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -168,8 +169,9 @@ final class AtivosExtension extends AbstractExtension
                 // Mesma ordem de imagemDoLcp(): banner, fundo da seção, primeira imagem de bloco
                 foreach ($secao->getBlocks() as $bloco) {
                     if ($this->tipo($bloco) === 'banner') {
-                        // "Só a imagem" (change banner-so-imagem): a arte sai inteira, pelos filtros que não recortam
-                        return (($bloco->getConfig() ?? [])['imageOnly'] ?? '0') === '1'
+                        // Todos os slides "Só a imagem" (changes banner-so-imagem e -por-slide): a arte sai
+                        // inteira, pelos filtros que não recortam; num banner misto, valem os do banner com texto
+                        return SlidesDoBanner::todosSoImagem($bloco->getConfig() ?? [])
                             ? ['filtros' => self::FILTROS_DO_BANNER_INTEIRO, 'sizes' => '100vw']
                             : $padrao;
                     }

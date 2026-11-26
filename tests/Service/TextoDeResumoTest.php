@@ -103,6 +103,28 @@ final class TextoDeResumoTest extends TestCase
         self::assertStringNotContainsString('desativado', $resumo);
     }
 
+    public function testPrimeiroSlideSoComAImagemPorSlide(): void
+    {
+        $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['banners' => [
+            ['image' => 'a.png', 'active' => '1', 'imageOnly' => '1', 'alt' => 'Campanha Novembro Azul: cuidar de você também é prevenção'],
+            ['image' => 'b.png', 'active' => '1', 'imageOnly' => '0', 'alt' => ''],
+        ]]));
+
+        self::assertStringStartsWith('Campanha Novembro Azul', $resumo);
+        self::assertStringNotContainsString('Há 26 anos', $resumo);
+    }
+
+    public function testPrimeiroSlideComTextoNumBannerMisto(): void
+    {
+        $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['banners' => [
+            ['image' => 'a.png', 'active' => '1', 'imageOnly' => '0', 'alt' => ''],
+            ['image' => 'b.png', 'active' => '1', 'imageOnly' => '1', 'alt' => 'Arte do segundo slide, que não entra no resumo'],
+        ]]));
+
+        self::assertStringStartsWith('Há 26 anos valorizando a saúde', $resumo);
+        self::assertStringNotContainsString('Arte do segundo slide', $resumo);
+    }
+
     public function testBannerSoComAImagemSemDescricaoFicaForaDoResumo(): void
     {
         $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['imageOnly' => '1', 'banners' => [['image' => 'a.png', 'active' => '1', 'alt' => '']]]));

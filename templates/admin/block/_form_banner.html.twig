@@ -18,21 +18,18 @@
         Slides de Banner
     </div>
 
-    {# "Só a imagem" (change banner-so-imagem): vale para todos os slides do bloco #}
-    {% set soImagem = (block.config.imageOnly ?? '0') == '1' %}
-    <div class="af-field" style="flex-direction:row;align-items:flex-start;gap:.75rem;margin:0 0 1.5rem 0;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:12px;background:var(--bg2)">
-        <input type="hidden" name="config[imageOnly]" value="0">
-        <sl-switch id="banner-so-imagem" name="config[imageOnly]" value="1" {{ soImagem ? 'checked' : '' }} style="margin-top:.15rem"></sl-switch>
-        <div>
-            <label for="banner-so-imagem" style="color:var(--text);font-weight:700">Só a imagem</label>
-            <p class="af-hint" style="margin:.2rem 0 0">Mostra só a imagem dos slides, inteira, sem escurecer, sem texto e sem botões.</p>
-        </div>
-    </div>
+    {# "Só a imagem" é escolhido em cada slide (changes banner-so-imagem e banner-so-imagem-por-slide) #}
+    <p class="af-hint" style="margin:0 0 1.5rem;padding:.85rem 1.1rem;border:1px solid var(--border);border-radius:12px;background:var(--bg2)">
+        Cada slide pode mostrar <strong>só a imagem</strong>, sem escurecer, sem texto e sem botões. Com todos os slides assim, a arte aparece inteira, na proporção dela.
+        Misturando com slides de texto, vale a altura dos slides com texto e a arte preenche essa área, podendo ser recortada nas bordas.
+    </p>
 
-    <div id="banners-wrap" class="{{ soImagem ? 'so-imagem' : '' }}">
+    <div id="banners-wrap">
     {% for b in banners %}
         {% set idx = loop.index0 %}
-        <div class="card slide-card" style="margin: 0 0 1.5rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg2); position: relative; transition: all 0.2s ease;">
+        {# Slide sem a chave própria: bloco gravado com a opção antiga, do bloco inteiro #}
+        {% set soImagem = slide_so_imagem(b, block.config ?? {}) %}
+        <div class="card slide-card{{ soImagem ? ' so-imagem' : '' }}" style="margin: 0 0 1.5rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg2); position: relative; transition: all 0.2s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border);padding-bottom:.75rem">
                 <div style="font-weight:700;font-size:.9rem;color:var(--primary);display:flex;align-items:center;gap:.5rem">
                     <sl-icon name="image"></sl-icon> Slide #<span class="slide-index">{{ loop.index }}</span>
@@ -40,6 +37,15 @@
                 <button type="button" class="btn btn-g" style="padding:.25rem .5rem;font-size:.75rem;color:var(--danger);border-color:var(--danger);background:transparent" onclick="removeSlide(this)">
                     <sl-icon name="trash"></sl-icon> Remover Slide
                 </button>
+            </div>
+
+            <div class="af-field" style="flex-direction:row;align-items:flex-start;gap:.75rem;margin:0 0 1.25rem 0">
+                <input type="hidden" name="banners[{{ idx }}][imageOnly]" value="0">
+                <sl-switch class="chave-so-imagem" name="banners[{{ idx }}][imageOnly]" value="1" {{ soImagem ? 'checked' : '' }} style="margin-top:.15rem"></sl-switch>
+                <div>
+                    <label style="color:var(--text);font-weight:700">Só a imagem</label>
+                    <p class="af-hint" style="margin:.2rem 0 0">Este slide mostra só a imagem, sem escurecer, sem texto e sem botões.</p>
+                </div>
             </div>
 
             <input type="hidden" name="banners[{{ idx }}][image]" value="{{ b.image }}">
@@ -159,6 +165,15 @@
             </button>
         </div>
 
+        <div class="af-field" style="flex-direction:row;align-items:flex-start;gap:.75rem;margin:0 0 1.25rem 0">
+            <input type="hidden" name="banners[__i__][imageOnly]" value="0">
+            <sl-switch class="chave-so-imagem" name="banners[__i__][imageOnly]" value="1" style="margin-top:.15rem"></sl-switch>
+            <div>
+                <label style="color:var(--text);font-weight:700">Só a imagem</label>
+                <p class="af-hint" style="margin:.2rem 0 0">Este slide mostra só a imagem, sem escurecer, sem texto e sem botões.</p>
+            </div>
+        </div>
+
         <input type="hidden" name="banners[__i__][image]" value="">
         <div class="af-field" style="margin-bottom: 1.25rem;">
             <label><span class="rotulo-com-texto">Imagem de fundo do Slide</span><span class="rotulo-so-imagem">Imagem do slide</span></label>
@@ -220,44 +235,44 @@
 </template>
 
 <style>
-/* "Só a imagem" (change banner-so-imagem): o que muda nos cartões dos slides */
-#banners-wrap .rotulo-so-imagem, #banners-wrap .campo-descricao, #banners-wrap .aviso-so-imagem { display: none; }
-#banners-wrap.so-imagem .rotulo-com-texto { display: none; }
-#banners-wrap.so-imagem .rotulo-so-imagem { display: inline; }
-#banners-wrap.so-imagem p.rotulo-so-imagem, #banners-wrap.so-imagem .aviso-so-imagem { display: block; }
-#banners-wrap.so-imagem .campo-descricao { display: flex; }
-#banners-wrap.so-imagem .campos-de-texto { opacity: .45; }
+/* "Só a imagem" por slide (changes banner-so-imagem e banner-so-imagem-por-slide): o que muda no cartão */
+.slide-card .rotulo-so-imagem, .slide-card .campo-descricao, .slide-card .aviso-so-imagem { display: none; }
+.slide-card.so-imagem .rotulo-com-texto { display: none; }
+.slide-card.so-imagem .rotulo-so-imagem { display: inline; }
+.slide-card.so-imagem p.rotulo-so-imagem, .slide-card.so-imagem .aviso-so-imagem { display: block; }
+.slide-card.so-imagem .campo-descricao { display: flex; }
+.slide-card.so-imagem .campos-de-texto { opacity: .45; }
 </style>
 
 <script>
 let bannerIdx = {{ banners|length }};
 
 /*
- * "Só a imagem": os campos de texto ficam inertes (sem clique, digitação nem foco pelo teclado),
- * e não desabilitados, porque campo desabilitado não vai no POST e os textos guardados seriam
- * apagados ao salvar. O título deixa de ser obrigatório.
+ * "Só a imagem" de um slide: os campos de texto dele ficam inertes (sem clique, digitação nem foco
+ * pelo teclado), e não desabilitados, porque campo desabilitado não vai no POST e os textos
+ * guardados seriam apagados ao salvar. O título dele deixa de ser obrigatório.
  */
-function aplicarSoImagem() {
-    const chave = document.getElementById('banner-so-imagem');
+function aplicarSoImagem(cartao) {
+    const chave = cartao.querySelector('.chave-so-imagem');
     const ligado = !!(chave && chave.checked);
-    const wrap = document.getElementById('banners-wrap');
-    wrap.classList.toggle('so-imagem', ligado);
-    wrap.querySelectorAll('.campos-de-texto').forEach(campos => {
-        campos.inert = ligado;
-        const titulo = campos.querySelector('input[name$="[title]"]');
-        if (titulo) titulo.required = !ligado;
-    });
+    cartao.classList.toggle('so-imagem', ligado);
+    const campos = cartao.querySelector('.campos-de-texto');
+    if (!campos) return;
+    campos.inert = ligado;
+    const titulo = campos.querySelector('input[name$="[title]"]');
+    if (titulo) titulo.required = !ligado;
 }
 
 (function () {
-    const chave = document.getElementById('banner-so-imagem');
-    if (!chave) return;
-    const aoMudar = () => {
-        aplicarSoImagem();
+    const wrap = document.getElementById('banners-wrap');
+    if (!wrap) return;
+    // O sl-change sobe do interruptor; vale também para os slides acrescentados depois
+    wrap.addEventListener('sl-change', e => {
+        if (!e.target.classList || !e.target.classList.contains('chave-so-imagem')) return;
+        aplicarSoImagem(e.target.closest('.slide-card'));
         // A prévia escuta input/change do formulário, não o sl-change do interruptor
-        chave.closest('form').dispatchEvent(new Event('input', { bubbles: true }));
-    };
-    chave.addEventListener('sl-change', aoMudar);
+        wrap.closest('form').dispatchEvent(new Event('input', { bubbles: true }));
+    });
 })();
 
 function previewBannerSlide(input) {
@@ -294,8 +309,7 @@ function addSlide() {
     
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
-    wrap.appendChild(tempDiv.firstElementChild);
-    aplicarSoImagem(); // o slide novo nasce no estado atual de "Só a imagem"
+    wrap.appendChild(tempDiv.firstElementChild); // o slide novo nasce com "Só a imagem" desligada
 }
 
 function removeSlide(btn) {

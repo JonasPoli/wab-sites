@@ -49,6 +49,23 @@ final class FiltrosDoLcpTest extends TestCase
         self::assertSame(['banner_mobile' => 768, 'banner_desktop' => 1600], $lcp['filtros']);
     }
 
+    public function testTodosOsSlidesSoComAImagemPorSlide(): void
+    {
+        $config = ['banners' => [['image' => 'a.png', 'active' => '1', 'imageOnly' => '1'], ['image' => 'b.png', 'active' => '1', 'imageOnly' => '1']]];
+        $lcp = (new AtivosExtension())->filtrosDoLcp(['page' => self::pagina('banner', $config)]);
+
+        self::assertSame(['banner_inteiro_mobile' => 768, 'banner_inteiro' => 1600], $lcp['filtros']);
+    }
+
+    public function testBannerMistoUsaOsFiltrosDoBannerComTexto(): void
+    {
+        // O primeiro slide é "só a imagem", mas num banner misto ele preenche a área do banner com texto
+        $config = ['banners' => [['image' => 'a.png', 'active' => '1', 'imageOnly' => '1'], ['image' => 'b.png', 'active' => '1', 'imageOnly' => '0']]];
+        $lcp = (new AtivosExtension())->filtrosDoLcp(['page' => self::pagina('banner', $config)]);
+
+        self::assertSame(['banner_mobile' => 768, 'banner_desktop' => 1600], $lcp['filtros']);
+    }
+
     public function testDestaqueComFotoContinuaComOsFiltrosDoDestaque(): void
     {
         $lcp = (new AtivosExtension())->filtrosDoLcp(['page' => self::pagina('hero_split', null, 'foto.jpg')]);

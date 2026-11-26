@@ -1,5 +1,5 @@
 {# Banner "Só a imagem" (change banner-so-imagem): desenho comum aos temas, sem camada, texto nem botões #}
-{% if (block.config.imageOnly ?? '0') == '1' %}
+{% if banner_so_imagem(block.config ?? {}) %}
     {% include 'themes/_comum/_banner_so_imagem.html.twig' with {raio: '16px', margem: '3rem'} %}
 {% else %}
 {% if (block.config.active ?? '1') == '1' %}
@@ -95,6 +95,7 @@
             <div class="swiper-wrapper">
                 {% for b in banners %}
                     <div class="swiper-slide" style="position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+{% if slide_so_imagem(b, block.config ?? {}) %}{% include 'themes/_comum/_slide_so_imagem.html.twig' with {primeiro: loop.first} %}{% else %}
                         {# Background image with primary overlay #}
                         {% if b.image %}
                             <div style="position:absolute;inset:0;background-image:url('{{ asset('uploads/page_block/' ~ b.image) }}');background-size:cover;background-position:center;z-index:0;" class="banner-bg"></div>
@@ -130,6 +131,7 @@
                                 </div>
                             {% endif %}
                         </div>
+{% endif %}
                     </div>
                 {% endfor %}
             </div>
