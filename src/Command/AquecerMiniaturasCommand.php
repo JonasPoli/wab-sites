@@ -41,7 +41,7 @@ final class AquecerMiniaturasCommand extends Command
         // banner_mobile tem de estar aqui: sem ele, o celular pedia /media/cache/resolve/…,
         // que responde 302 e manda gerar a miniatura na hora — num servidor de 1 vCPU isso
         // levou o speed-index de 1,3 s para 7 s.
-        'uploads/page_block' => ['bloco_imagem', 'banner_desktop', 'banner_mobile', 'destaque_foto', 'destaque_foto_mobile'],
+        'uploads/page_block' => ['bloco_imagem', 'banner_desktop', 'banner_mobile', 'banner_inteiro', 'banner_inteiro_mobile', 'destaque_foto', 'destaque_foto_mobile'],
         'uploads/page_cover' => ['capa_pagina', 'capa_pagina_inteira'],
         'uploads/page_block_gallery' => ['galeria', 'portfolio', 'portfolio_grande'],
         'uploads/team_member_image' => ['equipe'],

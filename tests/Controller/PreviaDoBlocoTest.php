@@ -88,6 +88,18 @@ final class PreviaDoBlocoTest extends WebTestCase
         $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::SITE], ['type' => 'testimonials']);
         self::assertStringContainsString('Cargo / Função', (string) $cliente->getResponse()->getContent());
 
+        // Arquivo escolhido e ainda não salvo (change banner-so-imagem): os nomes dos campos vão num JSON,
+        // porque com colchetes ("banners[0][imageFile]", "galleryFiles[]") a chave de formulário era cortada pelo PHP
+        $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::SITE], ['type' => 'gallery', '_previa_arquivos_json' => json_encode(['galleryFiles[]' => 2])]);
+        self::assertSame(2, preg_match_all('~<img\b[^>]*previa-foto-arquivo~', (string) $cliente->getResponse()->getContent()), 'duas fotos escolhidas na galeria');
+        $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::SITE], ['type' => 'banner', 'config' => ['imageOnly' => '1'],
+            'banners' => [['image' => '', 'title' => 'Slide', 'active' => '1']], '_previa_arquivos_json' => json_encode(['banners[0][imageFile]' => 1])]);
+        self::assertStringContainsString('previa-imagem-arquivo', (string) $cliente->getResponse()->getContent(), 'imagem escolhida no slide do banner');
+        $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::SITE], ['type' => 'hero_split', 'title' => 'x', '_previa_arquivos_json' => json_encode(['imageFile' => 1])]);
+        self::assertStringContainsString('previa-imagem-arquivo', (string) $cliente->getResponse()->getContent(), 'imagem escolhida no destaque');
+        $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::SITE], ['type' => 'hero_split', 'title' => 'x', '_previa_arquivos_json' => '{inválido']);
+        self::assertResponseIsSuccessful('JSON inválido é ignorado');
+
         // Seção de outro site
         $cliente->request('POST', '/admin/block/previa?section=' . $secoes[self::OUTRO], ['type' => 'cta', 'title' => 'x']);
         self::assertResponseStatusCodeSame(404);

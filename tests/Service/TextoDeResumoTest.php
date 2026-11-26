@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
+use App\Entity\Page;
+use App\Entity\PageBlock;
+use App\Entity\PageSection;
 use App\Service\Seo\TextoDeResumo;
 use PHPUnit\Framework\TestCase;
 
@@ -65,5 +68,45 @@ final class TextoDeResumoTest extends TestCase
 
         self::assertStringNotContainsString('<', $resumo);
         self::assertLessThanOrEqual(TextoDeResumo::MAXIMO, mb_strlen($resumo));
+    }
+
+    /** Página com um banner (título e subtítulo do 1º slide copiados para o bloco, como o painel grava) e um bloco de texto. */
+    private static function paginaComBanner(array $configDoBanner): Page
+    {
+        $pagina = (new Page())->setTitle('Início')->setSlug('inicio');
+        $secao = (new PageSection())->setPage($pagina)->setPosition(0);
+        $pagina->getSections()->add($secao);
+        $secao->getBlocks()->add((new PageBlock())->setSection($secao)->setType('banner')
+            ->setTitle('Novembro Azul')->setText('Há 26 anos valorizando a saúde e o bem-estar.')->setConfig($configDoBanner));
+        $secao->getBlocks()->add((new PageBlock())->setSection($secao)->setType('text_only')
+            ->setText('<p>Equipamentos médicos hospitalares fabricados no Brasil.</p>'));
+
+        return $pagina;
+    }
+
+    public function testBannerComTextoEntraNoResumo(): void
+    {
+        $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['banners' => [['image' => 'a.png', 'active' => '1', 'alt' => 'Arte da campanha']]]));
+
+        self::assertStringStartsWith('Há 26 anos valorizando a saúde', $resumo);
+    }
+
+    public function testBannerSoComAImagemEntraPelaDescricaoDaImagem(): void
+    {
+        $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['imageOnly' => '1', 'banners' => [
+            ['image' => 'velha.png', 'active' => '0', 'alt' => 'Slide desativado com uma descrição bem comprida'],
+            ['image' => 'a.png', 'active' => '1', 'alt' => 'Campanha Novembro Azul: cuidar de você também é prevenção'],
+        ]]));
+
+        self::assertStringStartsWith('Campanha Novembro Azul: cuidar de você também é prevenção', $resumo);
+        self::assertStringNotContainsString('Há 26 anos', $resumo, 'subtítulo guardado e invisível fica fora');
+        self::assertStringNotContainsString('desativado', $resumo);
+    }
+
+    public function testBannerSoComAImagemSemDescricaoFicaForaDoResumo(): void
+    {
+        $resumo = TextoDeResumo::daPagina(self::paginaComBanner(['imageOnly' => '1', 'banners' => [['image' => 'a.png', 'active' => '1', 'alt' => '']]]));
+
+        self::assertSame('Equipamentos médicos hospitalares fabricados no Brasil.', $resumo);
     }
 }

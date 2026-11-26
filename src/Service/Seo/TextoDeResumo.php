@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Seo;
 
 use App\Entity\Page;
+use App\Entity\PageBlock;
 
 /**
  * Tira de um conteúdo o texto que serve de `<meta name="description">` quando ninguém
@@ -70,7 +71,7 @@ final class TextoDeResumo
                 continue;
             }
             foreach ($secao->getBlocks() as $bloco) {
-                foreach ([$bloco->getText(), $bloco->getTitle()] as $candidato) {
+                foreach (self::textosDoBloco($bloco) as $candidato) {
                     $limpo = self::limpar($candidato);
                     if (mb_strlen($limpo) >= 20) {
                         $partes[] = $limpo;
@@ -83,5 +84,31 @@ final class TextoDeResumo
         }
 
         return self::cortar(trim(implode(' ', $partes)));
+    }
+
+    /**
+     * Textos do bloco que podem virar resumo. O banner "Só a imagem" (change banner-so-imagem)
+     * não mostra título nem subtítulo, que ficam guardados e bloqueados no painel; dele vale só
+     * a "Descrição da imagem" do primeiro slide ativo, que o admin edita.
+     *
+     * @return list<?string>
+     */
+    private static function textosDoBloco(PageBlock $bloco): array
+    {
+        $tipo = $bloco->getType();
+        $tipo = $tipo instanceof \BackedEnum ? (string) $tipo->value : (string) $tipo;
+        $config = $bloco->getConfig() ?? [];
+
+        if ($tipo !== 'banner' || ($config['imageOnly'] ?? '0') !== '1') {
+            return [$bloco->getText(), $bloco->getTitle()];
+        }
+
+        foreach ($config['banners'] ?? [] as $slide) {
+            if (($slide['active'] ?? '1') === '1' && !empty($slide['image'])) {
+                return [$slide['alt'] ?? null];
+            }
+        }
+
+        return [];
     }
 }

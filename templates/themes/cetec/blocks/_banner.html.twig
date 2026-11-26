@@ -1,3 +1,7 @@
+{# Banner "Só a imagem" (change banner-so-imagem): desenho comum aos temas, sem camada, texto nem botões #}
+{% if (block.config.imageOnly ?? '0') == '1' %}
+    {% include 'themes/_comum/_banner_so_imagem.html.twig' with {raio: '24px', margem: '2.5rem'} %}
+{% else %}
 {% if (block.config.active ?? '1') == '1' %}
 {% set isFullWidth = (block.config.fullWidth ?? '0') == '1' %}
 {% set isFullHeight = (block.config.fullHeight ?? '0') == '1' %}
@@ -288,5 +292,6 @@
         }
     }
     </style>
+{% endif %}
 {% endif %}
 {% endif %}

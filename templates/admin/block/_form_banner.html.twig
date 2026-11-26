@@ -18,7 +18,18 @@
         Slides de Banner
     </div>
 
-    <div id="banners-wrap">
+    {# "Só a imagem" (change banner-so-imagem): vale para todos os slides do bloco #}
+    {% set soImagem = (block.config.imageOnly ?? '0') == '1' %}
+    <div class="af-field" style="flex-direction:row;align-items:flex-start;gap:.75rem;margin:0 0 1.5rem 0;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:12px;background:var(--bg2)">
+        <input type="hidden" name="config[imageOnly]" value="0">
+        <sl-switch id="banner-so-imagem" name="config[imageOnly]" value="1" {{ soImagem ? 'checked' : '' }} style="margin-top:.15rem"></sl-switch>
+        <div>
+            <label for="banner-so-imagem" style="color:var(--text);font-weight:700">Só a imagem</label>
+            <p class="af-hint" style="margin:.2rem 0 0">Mostra só a imagem dos slides, inteira, sem escurecer, sem texto e sem botões.</p>
+        </div>
+    </div>
+
+    <div id="banners-wrap" class="{{ soImagem ? 'so-imagem' : '' }}">
     {% for b in banners %}
         {% set idx = loop.index0 %}
         <div class="card slide-card" style="margin: 0 0 1.5rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg2); position: relative; transition: all 0.2s ease;">
@@ -33,7 +44,7 @@
 
             <input type="hidden" name="banners[{{ idx }}][image]" value="{{ b.image }}">
             <div class="af-field" style="margin-bottom: 1.25rem;">
-                <label>Imagem de fundo do Slide</label>
+                <label><span class="rotulo-com-texto">Imagem de fundo do Slide</span><span class="rotulo-so-imagem">Imagem do slide</span></label>
                 <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
                     {% if b.image %}
                         <div>
@@ -57,29 +68,39 @@
                                    style="display:none"
                                    onchange="previewBannerSlide(this)">
                         </label>
-                        <p class="af-hint" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                        <p class="af-hint rotulo-com-texto" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                        <p class="af-hint rotulo-so-imagem" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920 px de largura, todas as imagens do mesmo tamanho · max 5 MB</p>
                     </div>
                 </div>
             </div>
 
-            <div class="af-field" style="margin-bottom: 1rem;">
-                <label>Título do Slide <span class="req">*</span></label>
-                <input type="text" name="banners[{{ idx }}][title]" class="ai" value="{{ b.title }}" required placeholder="Título principal do slide">
+            <div class="af-field campo-descricao" style="margin-bottom: 1rem;">
+                <label>Descrição da imagem <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+                <input type="text" name="banners[{{ idx }}][alt]" class="ai" value="{{ b.alt ?? '' }}" maxlength="250" data-previa-vazio placeholder="Ex.: Campanha Novembro Azul: cuidar de você também é prevenção">
+                <p class="af-hint">Não aparece no site. É lida por leitores de tela, pelo Google e por agentes de IA; descreva o que a arte mostra ou o texto que está nela.</p>
             </div>
 
-            <div class="af-field" style="margin-bottom: 1rem;">
-                <label>Subtítulo do Slide</label>
-                <input type="text" name="banners[{{ idx }}][text]" class="ai" value="{{ b.text }}" placeholder="Subtítulo ou descrição curta">
-            </div>
-
-            <div class="af-row" style="margin-bottom: 1rem;">
-                <div class="af-field">
-                    <label>Texto do botão (CTA)</label>
-                    <input type="text" name="banners[{{ idx }}][ctaText]" class="ai" value="{{ b.ctaText }}" placeholder="Ex: Saiba mais">
+            <p class="af-hint aviso-so-imagem" style="margin:0 0 .75rem">Título, subtítulo e botão não aparecem no site com "Só a imagem" ligada; ficam guardados para quando você desligar.</p>
+            <div class="campos-de-texto"{{ soImagem ? ' inert' : '' }}>
+                <div class="af-field" style="margin-bottom: 1rem;">
+                    <label>Título do Slide <span class="req">*</span></label>
+                    <input type="text" name="banners[{{ idx }}][title]" class="ai" value="{{ b.title }}"{{ soImagem ? '' : ' required' }} placeholder="Título principal do slide">
                 </div>
-                <div class="af-field">
-                    <label>Link do botão</label>
-                    <input type="text" name="banners[{{ idx }}][ctaLink]" class="ai" value="{{ b.ctaLink }}" placeholder="Ex: /p/servicos ou #contato">
+
+                <div class="af-field" style="margin-bottom: 1rem;">
+                    <label>Subtítulo do Slide</label>
+                    <input type="text" name="banners[{{ idx }}][text]" class="ai" value="{{ b.text }}" placeholder="Subtítulo ou descrição curta">
+                </div>
+
+                <div class="af-row" style="margin-bottom: 1rem;">
+                    <div class="af-field">
+                        <label>Texto do botão (CTA)</label>
+                        <input type="text" name="banners[{{ idx }}][ctaText]" class="ai" value="{{ b.ctaText }}" placeholder="Ex: Saiba mais">
+                    </div>
+                    <div class="af-field">
+                        <label>Link do botão</label>
+                        <input type="text" name="banners[{{ idx }}][ctaLink]" class="ai" value="{{ b.ctaLink }}" placeholder="Ex: /p/servicos ou #contato">
+                    </div>
                 </div>
             </div>
 
@@ -140,7 +161,7 @@
 
         <input type="hidden" name="banners[__i__][image]" value="">
         <div class="af-field" style="margin-bottom: 1.25rem;">
-            <label>Imagem de fundo do Slide</label>
+            <label><span class="rotulo-com-texto">Imagem de fundo do Slide</span><span class="rotulo-so-imagem">Imagem do slide</span></label>
             <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
                 <div class="banner-preview"
                      style="width:160px;height:80px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted)">
@@ -154,29 +175,39 @@
                                style="display:none"
                                onchange="previewBannerSlide(this)">
                     </label>
-                    <p class="af-hint" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                    <p class="af-hint rotulo-com-texto" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920×600 px · max 5 MB</p>
+                    <p class="af-hint rotulo-so-imagem" style="margin-top:.4rem">WebP, JPG ou PNG · Recomendado: 1920 px de largura, todas as imagens do mesmo tamanho · max 5 MB</p>
                 </div>
             </div>
         </div>
 
-        <div class="af-field" style="margin-bottom: 1rem;">
-            <label>Título do Slide <span class="req">*</span></label>
-            <input type="text" name="banners[__i__][title]" class="ai" required placeholder="Título principal do slide">
+        <div class="af-field campo-descricao" style="margin-bottom: 1rem;">
+            <label>Descrição da imagem <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+            <input type="text" name="banners[__i__][alt]" class="ai" maxlength="250" data-previa-vazio placeholder="Ex.: Campanha Novembro Azul: cuidar de você também é prevenção">
+            <p class="af-hint">Não aparece no site. É lida por leitores de tela, pelo Google e por agentes de IA; descreva o que a arte mostra ou o texto que está nela.</p>
         </div>
 
-        <div class="af-field" style="margin-bottom: 1rem;">
-            <label>Subtítulo do Slide</label>
-            <input type="text" name="banners[__i__][text]" class="ai" placeholder="Subtítulo ou descrição curta">
-        </div>
-
-        <div class="af-row" style="margin-bottom: 1rem;">
-            <div class="af-field">
-                <label>Texto do botão (CTA)</label>
-                <input type="text" name="banners[__i__][ctaText]" class="ai" placeholder="Ex: Saiba mais">
+        <p class="af-hint aviso-so-imagem" style="margin:0 0 .75rem">Título, subtítulo e botão não aparecem no site com "Só a imagem" ligada; ficam guardados para quando você desligar.</p>
+        <div class="campos-de-texto">
+            <div class="af-field" style="margin-bottom: 1rem;">
+                <label>Título do Slide <span class="req">*</span></label>
+                <input type="text" name="banners[__i__][title]" class="ai" required placeholder="Título principal do slide">
             </div>
-            <div class="af-field">
-                <label>Link do botão</label>
-                <input type="text" name="banners[__i__][ctaLink]" class="ai" placeholder="Ex: /p/servicos ou #contato">
+
+            <div class="af-field" style="margin-bottom: 1rem;">
+                <label>Subtítulo do Slide</label>
+                <input type="text" name="banners[__i__][text]" class="ai" placeholder="Subtítulo ou descrição curta">
+            </div>
+
+            <div class="af-row" style="margin-bottom: 1rem;">
+                <div class="af-field">
+                    <label>Texto do botão (CTA)</label>
+                    <input type="text" name="banners[__i__][ctaText]" class="ai" placeholder="Ex: Saiba mais">
+                </div>
+                <div class="af-field">
+                    <label>Link do botão</label>
+                    <input type="text" name="banners[__i__][ctaLink]" class="ai" placeholder="Ex: /p/servicos ou #contato">
+                </div>
             </div>
         </div>
 
@@ -188,8 +219,46 @@
     </div>
 </template>
 
+<style>
+/* "Só a imagem" (change banner-so-imagem): o que muda nos cartões dos slides */
+#banners-wrap .rotulo-so-imagem, #banners-wrap .campo-descricao, #banners-wrap .aviso-so-imagem { display: none; }
+#banners-wrap.so-imagem .rotulo-com-texto { display: none; }
+#banners-wrap.so-imagem .rotulo-so-imagem { display: inline; }
+#banners-wrap.so-imagem p.rotulo-so-imagem, #banners-wrap.so-imagem .aviso-so-imagem { display: block; }
+#banners-wrap.so-imagem .campo-descricao { display: flex; }
+#banners-wrap.so-imagem .campos-de-texto { opacity: .45; }
+</style>
+
 <script>
 let bannerIdx = {{ banners|length }};
+
+/*
+ * "Só a imagem": os campos de texto ficam inertes (sem clique, digitação nem foco pelo teclado),
+ * e não desabilitados, porque campo desabilitado não vai no POST e os textos guardados seriam
+ * apagados ao salvar. O título deixa de ser obrigatório.
+ */
+function aplicarSoImagem() {
+    const chave = document.getElementById('banner-so-imagem');
+    const ligado = !!(chave && chave.checked);
+    const wrap = document.getElementById('banners-wrap');
+    wrap.classList.toggle('so-imagem', ligado);
+    wrap.querySelectorAll('.campos-de-texto').forEach(campos => {
+        campos.inert = ligado;
+        const titulo = campos.querySelector('input[name$="[title]"]');
+        if (titulo) titulo.required = !ligado;
+    });
+}
+
+(function () {
+    const chave = document.getElementById('banner-so-imagem');
+    if (!chave) return;
+    const aoMudar = () => {
+        aplicarSoImagem();
+        // A prévia escuta input/change do formulário, não o sl-change do interruptor
+        chave.closest('form').dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    chave.addEventListener('sl-change', aoMudar);
+})();
 
 function previewBannerSlide(input) {
     if (!input.files || !input.files[0]) return;
@@ -226,6 +295,7 @@ function addSlide() {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     wrap.appendChild(tempDiv.firstElementChild);
+    aplicarSoImagem(); // o slide novo nasce no estado atual de "Só a imagem"
 }
 
 function removeSlide(btn) {

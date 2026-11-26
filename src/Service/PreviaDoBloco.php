@@ -130,10 +130,13 @@ final class PreviaDoBloco
     /** @return array<string, int> nome do campo de arquivo => quantos arquivos foram escolhidos */
     private function arquivosEscolhidos(Request $r): array
     {
+        // Nome do campo => quantidade de arquivos, num JSON: nomes com colchetes ("banners[0][imageFile]",
+        // "galleryFiles[]") não sobrevivem como chave de formulário, que o PHP corta no primeiro "]".
+        $dados = json_decode((string) $r->request->get('_previa_arquivos_json', ''), true);
         $lista = [];
-        foreach ((array) $r->request->all('_previa_arquivos') as $nome => $qtd) {
-            if ((int) $qtd > 0) {
-                $lista[(string) $nome] = (int) $qtd;
+        foreach (is_array($dados) ? $dados : [] as $nome => $qtd) {
+            if (is_string($nome) && is_numeric($qtd) && (int) $qtd > 0) {
+                $lista[$nome] = (int) $qtd;
             }
         }
         return $lista;
@@ -146,7 +149,8 @@ final class PreviaDoBloco
             $imagem = isset($arquivos["banners[$i][imageFile]"]) ? $this->exemplo('imagem', true)
                 : (($s['image'] ?? '') ?: (($salvos[$i]['image'] ?? '') ?: $this->exemplo('imagem', false)));
             $slides[] = ['title' => $s['title'] ?? '', 'text' => $s['text'] ?? '', 'ctaText' => $s['ctaText'] ?? '', 'ctaLink' => $s['ctaLink'] ?? '',
-                         'active' => ($s['active'] ?? '1') === '0' ? '0' : '1', 'image' => $imagem];
+                         'active' => ($s['active'] ?? '1') === '0' ? '0' : '1', 'image' => $imagem,
+                         'alt' => is_string($s['alt'] ?? null) ? mb_substr(trim(strip_tags($s['alt'])), 0, 250) : ''];
         }
         return $slides ?: [['title' => 'Título do slide', 'text' => 'Texto do slide', 'ctaText' => 'Texto do botão', 'ctaLink' => '#', 'active' => '1', 'image' => $this->exemplo('imagem', false)]];
     }

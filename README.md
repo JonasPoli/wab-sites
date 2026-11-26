@@ -148,7 +148,7 @@ Os blocos de conteúdo são filhos diretos das seções e determinam o layout in
 | `page_list` | Listar Páginas | Listagem automatizada de páginas pertencentes a uma categoria específica. |
 | `testimonials` | Depoimentos | Lista de avaliações/depoimentos com notas em estrelas (1 a 5), nomes, avatares e cargos dos depoentes. |
 | `partner_logos` | Logos de Parceiros | Linha horizontal de logotipos de patrocinadores ou parceiros institucionais com animações de hover. |
-| `banner` | Banner | Slider de banners rotativos com imagens de fundo, títulos e botões de chamada de ação. |
+| `banner` | Banner | Slider de banners rotativos com imagens de fundo, títulos e botões de chamada de ação. Com a opção **Só a imagem** (`config.imageOnly`), cada slide mostra só a imagem, inteira e na proporção dela (área com `aspect-ratio` da miniatura do 1º slide; com "100% de altura", cobre a tela e recorta), sem camada, degradê, zoom, texto nem botões; título, subtítulo e botão ficam guardados e inertes no painel, e a "Descrição da imagem" de cada slide (`banners[].alt`) vira o `alt` e entra no resumo de SEO. Desenho comum aos cinco temas em `themes/_comum/_banner_so_imagem.html.twig`, com as miniaturas `banner_inteiro` e `banner_inteiro_mobile`, que não recortam. |
 | `hero_split` | Destaque com foto | Texto (com um trecho do título em destaque) ao lado de uma foto com selo de número e legenda. Primeiro bloco da página sem título: sai como `h1` e a foto é pré-carregada. |
 | `highlights` | Faixa de destaques | 2 a 4 diferenciais curtos lado a lado. |
 | `portfolio` | Portfólio com filtro | Fotos com título e categoria; um botão por categoria filtra a grade sem recarregar. A primeira foto sai maior. |
@@ -248,7 +248,7 @@ Nenhuma `<img>` de página pública aponta para `/uploads/` direto: tudo passa p
 ```
 
 Os conjuntos de filtro ficam em `config/packages/liip_imagine.yaml` (`banner_desktop`,
-`banner_mobile`, `capa_pagina`, `bloco_imagem`, `galeria`, `equipe`, `avatar`,
+`banner_mobile`, `banner_inteiro`, `banner_inteiro_mobile`, `capa_pagina`, `bloco_imagem`, `galeria`, `equipe`, `avatar`,
 `logo_parceiro`, `logo_site`, `fundo_secao`, `capa_noticia`…), com largura igual ao dobro da
 maior largura de exibição. Imagem que o servidor não converte (AVIF, por exemplo) é mostrada
 pelo arquivo original, sem erro.

@@ -60,6 +60,19 @@ liip_imagine:
             filters:
                 thumbnail: { size: [768, 560], mode: outbound }
 
+        # Banner "Só a imagem" (change banner-so-imagem): a arte aparece inteira, na proporção
+        # dela, então a miniatura não pode recortar. Mesmas larguras dos filtros acima.
+        banner_inteiro:
+            quality: 72
+            format: webp
+            filters:
+                thumbnail: { size: [1600, 1600], mode: inset }
+        banner_inteiro_mobile:
+            quality: 68
+            format: webp
+            filters:
+                thumbnail: { size: [768, 768], mode: inset }
+
         # Fundo de seção (imagem atrás do conteúdo, com opacidade)
         fundo_secao:
             quality: 68

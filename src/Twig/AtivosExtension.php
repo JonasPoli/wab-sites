@@ -130,6 +130,9 @@ final class AtivosExtension extends AbstractExtension
     /** Blocos cuja foto é desenhada com os filtros `destaque_foto*`, e não os de banner. */
     private const BLOCOS_DE_DESTAQUE = ['hero_split', 'statement'];
 
+    /** Filtros do banner "Só a imagem"; o parcial themes/_comum/_banner_so_imagem usa os mesmos no `srcset`. */
+    public const FILTROS_DO_BANNER_INTEIRO = ['banner_inteiro_mobile' => 768, 'banner_inteiro' => 1600];
+
     /**
      * Filtros e `sizes` da pré-carga do LCP, para a pré-carga pedir o mesmo arquivo que a
      * `<img>` vai pedir. O padrão é o do banner (`banner_mobile`/`banner_desktop`, 100vw),
@@ -165,7 +168,10 @@ final class AtivosExtension extends AbstractExtension
                 // Mesma ordem de imagemDoLcp(): banner, fundo da seção, primeira imagem de bloco
                 foreach ($secao->getBlocks() as $bloco) {
                     if ($this->tipo($bloco) === 'banner') {
-                        return $padrao;
+                        // "Só a imagem" (change banner-so-imagem): a arte sai inteira, pelos filtros que não recortam
+                        return (($bloco->getConfig() ?? [])['imageOnly'] ?? '0') === '1'
+                            ? ['filtros' => self::FILTROS_DO_BANNER_INTEIRO, 'sizes' => '100vw']
+                            : $padrao;
                     }
                 }
                 if ($secao->getBgType() === 'image' && $secao->getBgImage()) {

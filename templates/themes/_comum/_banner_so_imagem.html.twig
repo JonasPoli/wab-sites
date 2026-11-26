@@ -1,0 +1,159 @@
+{#
+  Banner "Só a imagem" (change banner-so-imagem), incluído no começo do _banner.html.twig
+  dos temas cetec (também usado pelo noticias), moderno, wab e atelie quando
+  block.config.imageOnly == '1'.
+
+  Cada slide mostra só a imagem: sem camada escura, degradê, tom da cor do site, desfoque
+  nem zoom, e sem pré-título, título, texto ou botões. A imagem sai inteira, na proporção
+  dela: o contêiner recebe o aspect-ratio da miniatura do primeiro slide, então o espaço fica
+  reservado antes de a imagem chegar e antes de o Swiper carregar (CLS zero). Com "100% de
+  altura", o contêiner tem a altura da tela e a imagem cobre o espaço (object-fit: cover).
+
+  data-proporcao marca a imagem que define o aspect-ratio; a prévia do painel o refaz quando
+  troca essa imagem pelo arquivo escolhido no computador (admin/block/_previa.html.twig).
+
+  Variáveis: block; raio e margem = canto e margem inferior do tema quando o banner não tem
+  "100% de largura" (os mesmos valores do parcial com texto do tema).
+#}
+{% if (block.config.active ?? '1') == '1' %}
+{% set isFullWidth = (block.config.fullWidth ?? '0') == '1' %}
+{% set isFullHeight = (block.config.fullHeight ?? '0') == '1' %}
+
+{% set slides = [] %}
+{% for b in block.config.banners ?? [] %}
+    {% if (b.active ?? '1') == '1' and b.image is not empty %}
+        {% set slides = slides|merge([b]) %}
+    {% endif %}
+{% endfor %}
+{# Banner antigo, sem a lista de slides: a imagem do próprio bloco #}
+{% if slides is empty and (block.config.banners ?? []) is empty and block.image %}
+    {% set slides = [{'image': block.image, 'alt': ''}] %}
+{% endif %}
+
+{% if slides is not empty %}
+    {% set filtros = constant('App\\Twig\\AtivosExtension::FILTROS_DO_BANNER_INTEIRO') %}
+    {% set medidas = thumb_size('uploads/page_block/' ~ slides[0].image, 'banner_inteiro') %}
+    {% set classe = 'banner-so-imagem-' ~ block.id %}
+
+    {% set estilo = 'position:relative;overflow:hidden;' %}
+    {% if isFullWidth %}
+        {% set estilo = estilo ~ 'width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;max-width:100vw;' %}
+    {% else %}
+        {% set estilo = estilo ~ 'width:100%;border-radius:' ~ (raio ?? '0') ~ ';' %}
+    {% endif %}
+    {% if isFullHeight %}
+        {% set estilo = estilo ~ 'height:100vh;' %}
+    {% elseif medidas[0] > 0 and medidas[1] > 0 %}
+        {% set estilo = estilo ~ 'aspect-ratio:' ~ medidas[0] ~ ' / ' ~ medidas[1] ~ ';' %}
+    {% endif %}
+    {% set estilo = estilo ~ 'margin-bottom:' ~ ((isFullWidth or isFullHeight) ? '0' : (margem ?? '0')) ~ ';' %}
+
+    {% set estiloDaImagem = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;' %}
+
+    {% if slides|length == 1 %}
+        {% set b = slides[0] %}
+        {% set arquivo = 'uploads/page_block/' ~ b.image %}
+        <div class="wab-block banner-so-imagem {{ classe }}" style="{{ estilo }}">
+            <img {{ arquivo|thumb_attrs('banner_inteiro') }}
+                 srcset="{{ arquivo|thumb_srcset(filtros) }}" sizes="100vw"
+                 fetchpriority="high" data-proporcao
+                 {% if (b.alt ?? '') is not empty %}alt="{{ b.alt }}"{% else %}alt="" aria-hidden="true"{% endif %}
+                 style="{{ estiloDaImagem }}">
+        </div>
+    {% else %}
+        <div class="wab-block banner-so-imagem {{ classe }} swiper banner-swiper-{{ block.id }}" style="{{ estilo }}">
+            <div class="swiper-wrapper">
+                {% for b in slides %}
+                    {% set arquivo = 'uploads/page_block/' ~ b.image %}
+                    {% set srcset = arquivo|thumb_srcset(filtros) %}
+                    <div class="swiper-slide">
+                        {# Os slides ficam empilhados no mesmo ponto da tela: só o primeiro vem com src;
+                           os outros são promovidos pelo assets/imagens-adiadas.js depois do load. #}
+                        <img {% if loop.first %}{{ arquivo|thumb_attrs('banner_inteiro') }}
+                             srcset="{{ srcset }}" sizes="100vw"
+                             fetchpriority="high" data-proporcao
+                             {% else %}{% set m = thumb_size(arquivo, 'banner_inteiro') %}width="{{ m[0] }}" height="{{ m[1] }}"
+                             data-adiada="{{ arquivo|thumb('banner_inteiro') }}"
+                             data-adiada-srcset="{{ srcset }}" sizes="100vw"
+                             loading="lazy" decoding="async"
+                             {% endif %}{% if (b.alt ?? '') is not empty %}alt="{{ b.alt }}"{% else %}alt="" aria-hidden="true"{% endif %}
+                             style="{{ estiloDaImagem }}">
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination swiper-pagination-{{ block.id }}"></div>
+            <div class="swiper-button-next swiper-button-next-{{ block.id }}"></div>
+            <div class="swiper-button-prev swiper-button-prev-{{ block.id }}"></div>
+        </div>
+
+        <script>
+        // 'swiper:pronto' vem do assets/carrossel.js, que carrega o Swiper depois do load.
+        document.addEventListener('swiper:pronto', function() {
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.banner-swiper-{{ block.id }}', {
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: { crossFade: true },
+                    autoplay: { delay: 5000, disableOnInteraction: false },
+                    pagination: { el: '.swiper-pagination-{{ block.id }}', clickable: true },
+                    navigation: { nextEl: '.swiper-button-next-{{ block.id }}', prevEl: '.swiper-button-prev-{{ block.id }}' },
+                });
+            }
+        });
+        </script>
+
+        <style>
+        /* Antes e depois do Swiper, cada slide ocupa a área inteira; o overflow do contêiner mostra só o primeiro. */
+        .{{ classe }} .swiper-wrapper { height: 100%; }
+        .{{ classe }} .swiper-slide { position: relative; height: 100%; }
+        .{{ classe }} .swiper-pagination { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45)); }
+        .{{ classe }} .swiper-pagination-bullet {
+            background: rgba(255, 255, 255, .7);
+            opacity: 1;
+            /* Ponto de 10 px dentro de um alvo de toque de 24 px (WCAG 2.2) */
+            width: 24px;
+            height: 24px;
+            padding: 7px;
+            box-sizing: border-box;
+            background-clip: content-box;
+            margin: 0;
+            transition: background .3s ease;
+        }
+        .{{ classe }} .swiper-pagination-bullet-active {
+            background: var(--color-secondary, #fff);
+            background-clip: content-box;
+            width: 38px;
+            padding: 7px 14px;
+            border-radius: 12px;
+        }
+        /* Setas sem desfoque de fundo: nada embaça a imagem */
+        .{{ classe }} .swiper-button-next,
+        .{{ classe }} .swiper-button-prev {
+            color: #fff;
+            background: rgba(0, 0, 0, .45);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, .3);
+            transition: background .2s ease;
+            z-index: 10;
+        }
+        .{{ classe }} .swiper-button-next:hover,
+        .{{ classe }} .swiper-button-prev:hover {
+            background: rgba(0, 0, 0, .7);
+        }
+        .{{ classe }} .swiper-button-next::after,
+        .{{ classe }} .swiper-button-prev::after {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .{{ classe }} .swiper-button-next,
+            .{{ classe }} .swiper-button-prev {
+                display: none;
+            }
+        }
+        </style>
+    {% endif %}
+{% endif %}
+{% endif %}

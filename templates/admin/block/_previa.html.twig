@@ -82,7 +82,9 @@
             fd.delete(i.name);
             if (i.files && i.files.length) arquivos[i.name] = (arquivos[i.name] || 0) + i.files.length;
         });
-        Object.keys(arquivos).forEach(function (n) { fd.append('_previa_arquivos[' + n + ']', arquivos[n]); });
+        // Em JSON: como chave de formulário, "_previa_arquivos[banners[0][imageFile]]" seria cortada
+        // pelo PHP no primeiro "]" e nunca casaria com o nome do campo (change banner-so-imagem).
+        fd.append('_previa_arquivos_json', JSON.stringify(arquivos));
         form.querySelectorAll('input, textarea').forEach(function (el) {
             if (!el.name || el.disabled || el.closest('template') || el.hasAttribute('data-previa-vazio')) return;
             var tipo = (el.getAttribute('type') || 'text').toLowerCase();
@@ -116,6 +118,17 @@
             urls.push(u);
             ['srcset', 'data-adiada', 'data-adiada-srcset', 'sizes'].forEach(function (a) { img.removeAttribute(a); });
             img.src = u;
+            // Banner "Só a imagem": a área segue a proporção da imagem do 1º slide, e a escolhida
+            // pode ter outra proporção que a de exemplo (change banner-so-imagem)
+            if (img.hasAttribute('data-proporcao')) {
+                img.addEventListener('load', function () {
+                    var area = img.closest('.banner-so-imagem');
+                    if (area && area.style.aspectRatio && img.naturalWidth && img.naturalHeight) {
+                        area.style.aspectRatio = img.naturalWidth + ' / ' + img.naturalHeight;
+                        ajustar();
+                    }
+                }, {once: true});
+            }
             var pic = img.closest('picture');
             if (pic) pic.querySelectorAll('source').forEach(function (s) { s.remove(); });
         });

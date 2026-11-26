@@ -920,6 +920,8 @@ class AdminContentController extends AbstractController
                     'ctaLink' => $data['ctaLink'] ?? '',
                     'active' => (isset($data['active']) && $data['active'] === '1') ? '1' : '0',
                     'image' => $slideImage,
+                    // "Descrição da imagem" do banner "Só a imagem" (change banner-so-imagem): vira o alt
+                    'alt' => is_string($data['alt'] ?? null) ? mb_substr(trim(strip_tags($data['alt'])), 0, 250) : '',
                 ];
             }
 
